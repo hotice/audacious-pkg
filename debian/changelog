@@ -1,0 +1,345 @@
+audacious (2.3-1) experimental; urgency=low
+
+  * New uploader.
+  * New upstream release. (Closes: #559055)
+  * Use source format 3.0 (quilt)
+  * Use dh7 in debian/rules
+  * Remove libsad* from packaging.
+    - Add replaces in debian/control
+  * Remove libaudutil* from packaging.
+    - Add replaces in debian/control.
+  * Add libaudtag and libaudgui to libaudcore1.
+  * Update debian/control.
+  * Bump standards-version.
+  * Update debian/copyright.
+
+ -- Chris Taylor <ctaylor@debian.org>  Fri, 02 Apr 2010 21:37:21 +0000
+
+audacious (2.1-1) unstable; urgency=low
+
+  * New upstream release.
+    - Do not set the system volume at startup.  (Closes: #531831)
+    - Don't crash on control-c in certain situations.  (Closes: #531823)
+    - Fix 'stop after current song' behaviour.  (Closes: #471553)
+
+  * debian/patches/003-change-default-skin.patch: dropped.
+  * debian/control: Add dbus-x11 dependency.  (Closes: #503427)
+
+ -- William Pitcock <nenolod@dereferenced.org>  Tue, 07 Jul 2009 20:29:37 -0500
+
+audacious (2.0.1-1) unstable; urgency=low
+
+  [ William Pitcock ]
+  * New upstream release.
+  * debian/patches/audacious-play-files-from-commandline.patch: dropped
+  * debian/patches/bugzilla-42.patch: dropped
+
+  [ John Lindgren ]
+  * Fix improper behaviour when the file info dialog is closed.
+    (Closes: #495427)
+  * Fix crash with 'audtool help playback-seek-relative'.
+    (Closes: #512910)
+  * Fix some problems seeking while paused.
+    (Closes: #517692)
+  * Fix behaviour of -t argument when Audacious is not already running.
+    (Closes: #497602)
+
+  [ Andrew O. Shadoura ]
+  * Include track number in MPRIS exported metadata.
+    (Closes: #514426)
+
+  [ Benjamin Drung ]
+  * debian/patches/003-change-default-skin.patch: Corrected path
+    (skins -> Skins)
+
+ -- William Pitcock <nenolod@dereferenced.org>  Fri, 29 May 2009 21:25:03 -0500
+
+audacious (1.5.1-4) unstable; urgency=medium
+
+  [ Benjamin Drung ]
+  * debian/rules: Do not disable SSE2 on x86_64, because all x86_64 CPUs support
+    SSE2.
+  * debian/control: cosmetic improvements
+
+  [ William Pitcock ]
+  * debian/patches/audacious-play-files-from-command-line.patch: Make adding
+    files from the command line work. Thanks Stefan Ott! (Closes: #491043)
+  * debian/patches/bugzilla-42.patch: Fix a bunch of crappy bugs in the
+    playlist code. (Closes: #491655, #491097).
+
+ -- William Pitcock <nenolod@dereferenced.org>  Fri, 29 Aug 2008 15:56:58 -0500
+
+audacious (1.5.1-3) unstable; urgency=medium
+
+  * Change dependency relations to make the package installable.
+    (Closes: #491699, #491910).
+
+ -- William Pitcock <nenolod@dereferenced.org>  Sun, 20 Jul 2008 23:10:13 -0500
+
+audacious (1.5.1-2) unstable; urgency=medium
+
+  * Build without SSE2 support where appropriate.
+    (Closes: #471061, #489037).
+  * Strengthen dependency on audacious-plugins to enforce correct
+    plugin version usage due to an ABI break.
+    (Closes: #489958, #486543, #489217).
+  * Make sure that libaudclient1 and libaudid3tag1 are updated to matching
+    versions so that the private interfaces match up correctly, by Depending
+    on them in audacious.
+  * debian/control: Bump to Standards-Version 3.8.0; no changes required.
+
+ -- William Pitcock <nenolod@dereferenced.org>  Thu, 17 Jul 2008 20:10:07 -0500
+
+audacious (1.5.1-1) unstable; urgency=low
+
+  * New upstream release, highlights include (Closes: #483095):
+    - On UNIX platforms, add a dbus dependency in audacious/audclient.pc.
+      (Closes: #469055)
+    - Remove Reload Plugins feature.
+      (Closes: #480202)
+    - Scaling feature has been reset back to the old scaling ratio.
+      (Closes: #471040)
+  * Move to team maintainance, like in audacious-plugins.
+  * Packaging improvements:
+    - debian/control: fix description of audacious-dev package, libaudacious
+      was dropped a long time ago and replaced with libaudclient.
+      (Closes: #475142)
+    - debian/control: make sure dependency relations cannot cause a cyclic
+      error. (Closes: #461511)
+    - debian/control: add audacious-dbg package. Please install this before
+      reporting segfaults, it makes correcting them much easier for me.
+    - debian/control: update my e-mail address
+    - debian/control, debian/rules, debian/patches/*: switch to Quilt.
+    - debian/patches/003-change-default-skin.patch: rebased against 1.5.1.
+
+ -- William Pitcock <nenolod@dereferenced.org>  Thu, 05 Jun 2008 23:07:17 -0500
+
+audacious (1.5.0-2) unstable; urgency=low
+
+  * Configure without SSE2 support (Closes: #471061).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Wed, 26 Mar 2008 09:45:26 +0100
+
+audacious (1.5.0-1) unstable; urgency=low
+
+  * New upstream release, highlights include:
+    - Provide the correct location for skins and configuration in
+      documentation.
+      (Closes: #430905)
+  * debian/control:
+    - Correct Build-Depends so that it won't try to incorrectly build on Etch.
+      (Closes: #466518)
+    - Bump Depends to force dependency on audacious-plugins 1.5.
+  * debian/copyright: major updates
+
+ -- William Pitcock <nenolod@sacredspiral.co.uk>  Thu, 13 Mar 2008 21:19:05 -0500
+
+audacious (1.4.6-2) unstable; urgency=low
+
+  * Fix D-Bus related breakage by depending on dbus itself.
+    (Closes: #460626, #452061, #460601)
+
+ -- William Pitcock <nenolod@sacredspiral.co.uk>  Sun, 03 Feb 2008 16:19:24 -0600
+
+audacious (1.4.6-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches/002-fix-eqf-import.patch:
+    - Upstream has included this in 1.4.6, dropped.
+
+ -- William Pitcock <nenolod@sacredspiral.co.uk>  Thu, 31 Jan 2008 14:45:57 -0600
+
+audacious (1.4.5-2) unstable; urgency=low
+
+  * debian/control: Improve the package descriptions a little.
+  * debian/patches/002-fix-eqf-import.dpatch:
+    - Fix EQF preset import/export. Patch by Cristi Magherusan 
+      <majeru@gentoo.ro>. (Closes: #457811)
+  * debian/patches/003-default-skin-change.dpatch:
+    - Switch the default skin back to the 1.3 skin, "Default1.3", because
+      some people complained too loudly. The people who complained loudly 
+      are encouraged to supply a default skin which integrates better into 
+      the Debian desktop than the 1.3 skin, as there have been complaints
+      with the 1.3 skin too. (Closes: #456557)
+
+ -- William Pitcock <nenolod@sacredspiral.co.uk>  Sun, 20 Jan 2008 16:59:07 -0600
+
+audacious (1.4.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add gtk2-engines-pixbuf to runtime depends to satisfy policy violation
+    (Closes: #458083)
+
+ -- William Pitcock <nenolod@sacredspiral.co.uk>  Sat, 29 Dec 2007 15:38:17 -0600
+
+audacious (1.4.4-1) unstable; urgency=low
+
+  * New upstream release (Closes: #452884).
+  * Added William Pitcock (upstream) as co-maintainer.
+  * Bump Standards-Version to 3.7.3.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Tue, 11 Dec 2007 19:21:54 +0100
+
+audacious (1.4.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump audacious-plugins dependency (API fix).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Wed, 21 Nov 2007 21:30:35 +0100
+
+audacious (1.4.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Tue, 13 Nov 2007 11:20:10 +0100
+
+audacious (1.4.0~beta4-1) unstable; urgency=low
+
+  * New upstream release:
+    - Add 000-Disable_Makefile_silent_output patch (new build system),
+    - Add 001-libaudid3tag_is_a_public_library.dpatch patch,
+    - Drop libaudaciousX package (library dropped upstream),
+    - Add libaudid3tagX, libauclientX packages,
+    - Add DBUS build-depends.
+  * Update debian/watch.
+  * Rewrite PNG/XPM icons handling; all sizes are now generated.
+  * Use new dpkg 'homepage' field.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sun, 28 Oct 2007 21:23:29 +0100
+
+audacious (1.3.2-5) unstable; urgency=low
+
+  * Build with --enable-samplerate (Closes: #437428).
+  * Fix debian/watch.
+  * Update debian/menu to current policy.
+  * Fix .desktop to fit current FreeDesktop specifications.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Thu, 04 Oct 2007 14:40:02 +0200
+
+audacious (1.3.2-4) unstable; urgency=low
+
+  * debian/rules: install target should depends on build (Closes: #425205).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Tue, 22 May 2007 13:55:18 +0200
+
+audacious (1.3.2-3) unstable; urgency=low
+
+  * Add missing libmcs-dev (>= 0.4.1) depends to audacious-dev (Closes: #420592).
+  * Audacious now recommends unzip (winamp skins) (Closes: #421923).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Wed, 09 May 2007 09:24:20 +0200
+
+audacious (1.3.2-2) unstable; urgency=low
+
+  * Add dh_desktop call to run update-desktop-database (Closes: #420416).
+  * Merge upstream patch against doc to reflect use of XDG paths (Closes: #420106).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Mon, 23 Apr 2007 09:14:52 +0200
+
+audacious (1.3.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sat, 14 Apr 2007 19:41:37 +0200
+
+audacious (1.3.1-3) unstable; urgency=low
+
+  * Uploading to unstable (Closes: #416997, #416415)
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Fri, 13 Apr 2007 12:01:43 +0200
+
+audacious (1.3.1-2) experimental; urgency=low
+
+  * Add missing libaudid3tag.so to libaudacious5 package.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Tue, 20 Mar 2007 10:51:30 +0100
+
+audacious (1.3.1-1) experimental; urgency=low
+
+  * New upstream release.
+    - HTTP support reimplemented through curl (Closes: #409303).
+    - Improve paranormal plugin (Closes: #410573).
+    - Charset detection has been improved, enable it!
+  * Update debian/watch.
+  * Remove 000-Fix_lock_up_with_invalid_playlist patch, fixed upstream.
+  * Add build-depends on libmcs-dev (>= 0.4.1), mcs manages audacious' conf file.
+  * $(MAKE) distclean failure is not fatal anymore.
+  * Bump libaudacious so-name (major: 5).
+  * debian/rules target's dependencies adjusted to avoid configure run twice.
+  * Update debian/copyright.
+  * Add versionned dependency on -plugins packages.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sat, 10 Mar 2007 22:59:33 +0100
+
+audacious (1.2.2-4) unstable; urgency=low
+
+  * Add a %U to the Exec entry in audacious.desktop (Closes: #410755).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Tue, 13 Feb 2007 13:58:12 +0100
+
+audacious (1.2.2-3) unstable; urgency=low
+
+  * Add quilt dependency as patch system.
+  * New patch: 000-Fix_lock_up_with_invalid_playlist (Closes: #403221).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Fri, 15 Dec 2006 21:37:44 +0100
+
+audacious (1.2.2-2) unstable; urgency=low
+
+  * Split again libaudacious4 in separate package to get rid of circular
+    dependencies (Closes: #401353).
+  * Remove audtool manpage, merged in upstream.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sun,  3 Dec 2006 10:49:22 +0100
+
+audacious (1.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sun, 26 Nov 2006 23:24:50 +0100
+
+audacious (1.2.1-3) unstable; urgency=low
+
+  * Touch mk/rules.mk to avoid clean runs configure (Closes: #397794).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Mon, 20 Nov 2006 08:21:12 +0100
+
+audacious (1.2.1-2) unstable; urgency=low
+
+  * Remove audacious-dev rdepends on audacious to avoid circular dependency
+    when building audacious-plugins.
+  * Install doc in audacious-dev package as it doesn't depend on audacious
+    anymore.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sun, 19 Nov 2006 17:47:38 +0100
+
+audacious (1.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Remove all plugins related stuff, upstream splitted sources.
+  * Remove libaudacious. Now create audacious and audacious-dev packages.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Thu,  2 Nov 2006 20:00:08 +0100
+
+audacious (1.1.2-3) unstable; urgency=low
+
+  * Install audacious.pc in libaudacious-dev (Closes: #396547).
+  * Remove linux-any from build-depends, deprecated.
+  * Write audtool manpage.
+  * Add debian/watch.
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Wed,  1 Nov 2006 18:12:58 +0100
+
+audacious (1.1.2-2) unstable; urgency=low
+
+  * Fix FTBS on systems which do not use ALSA (Closes: #395838).
+  * Add menu entry (Closes: #395571).
+  * Disable amidi-plug (Closes: #395848).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Sat, 28 Oct 2006 04:18:33 +0200
+
+audacious (1.1.2-1) unstable; urgency=low
+
+  * Initial release (Closes: #360524).
+
+ -- Adam Cécile (Le_Vert) <gandalf@le-vert.net>  Fri,  1 Sep 2006 20:56:15 +0200

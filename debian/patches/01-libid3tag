@@ -1,0 +1,15 @@
+Convert patch from Adam Cecile to quilt.
+
+
+Author: Chris Taylor <ctaylor@debian.org>
+--- a/src/libid3tag/Makefile
++++ b/src/libid3tag/Makefile
+@@ -2,7 +2,7 @@ LIB = ${LIB_PREFIX}audid3tag${LIB_SUFFIX
+ LIB_MAJOR = 2
+ LIB_MINOR = 0
+ 
+-LIBDIR = ${plugindir}
++LIBDIR = ${libdir}
+ 
+ INCLUDES = id3tag.h
+ 

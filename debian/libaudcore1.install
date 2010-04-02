@@ -1,0 +1,3 @@
+usr/lib/libaudcore*.so.*
+usr/lib/libaudtag*.so.*
+usr/lib/libaudgui*.so.*

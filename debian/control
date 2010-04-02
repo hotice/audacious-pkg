@@ -1,0 +1,191 @@
+Source: audacious
+Section: sound
+Priority: optional
+Maintainer: Debian Audacious Packagers <pkg-audacious-maintainers@lists.alioth.debian.org>
+Uploaders: Chris Taylor <ctaylor@debian.org>
+Homepage: http://www.audacious-media-player.org/
+Build-Depends: autotools-dev,
+               debhelper (>= 7.0.50~),
+               imagemagick,
+               libdbus-1-dev (>= 0.60),
+               libdbus-glib-1-dev (>= 0.60),
+               libglade2-dev (>= 2.3.1),
+               libgtk2.0-dev (>= 2.10),
+               libmcs-dev (>= 0.4.1),
+               libmowgli-dev (>= 0.4),
+               quilt,
+	       automake,
+               autoconf
+Standards-Version: 3.8.4
+
+Package: audacious
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         audacious-plugins (>> 2.0),
+         dbus,
+         dbus-x11,
+         libaudclient2 (= ${binary:Version}),
+         libaudid3tag2 (= ${binary:Version}),
+         libaudcore1 (= ${binary:Version}),
+         gtk2-engines-pixbuf
+Provides: audacious2
+Replaces: libsad2, libaudutil1
+Recommends: unzip
+Description: small and fast audio player which supports lots of formats
+ Audacious is a fork of beep-media-player which supports winamp skins
+ and many codecs.
+ .
+ In the default install, the following codecs are supported:
+ .
+  * MP3
+  * Ogg Vorbis
+  * AAC and AAC+
+  * FLAC
+  * Windows Media (WMA)
+  * Musepack
+  * TTA
+  * Many module formats and much more!
+ .
+ Additionally, Audacious is extendable through plugins, and contains
+ other useful features like LIRC support and support for last.fm.
+ .
+ This package contains the core player and its localization.
+
+Package: libaudid3tag2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: audacious (<< 1.4~)
+Description: audacious id3 tag manipulation library
+ Audacious is a fork of beep-media-player which supports winamp skins
+ and many codecs.
+ .
+ In the default install, the following codecs are supported:
+ .
+  * MP3
+  * Ogg Vorbis
+  * AAC and AAC+
+  * FLAC
+  * Windows Media (WMA)
+  * Musepack
+  * TTA
+  * Many module formats and much more!
+ .
+ Additionally, Audacious is extendable through plugins, and contains
+ other useful features like LIRC support and support for last.fm.
+ .
+ This package contains a library used to manipulate id3 tags.
+
+Package: libaudclient2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: audacious dbus remote control library
+ Audacious is a fork of beep-media-player which supports winamp skins
+ and many codecs.
+ .
+ In the default install, the following codecs are supported:
+ .
+  * MP3
+  * Ogg Vorbis
+  * AAC and AAC+
+  * FLAC
+  * Windows Media (WMA)
+  * Musepack
+  * TTA
+  * Many module formats and much more!
+ .
+ Additionally, Audacious is extendable through plugins, and contains
+ other useful features like LIRC support and support for last.fm.
+ .
+ This package contains a library used to remote control audacious.
+
+Package: libaudcore1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: audacious core engine library
+ Audacious is a fork of beep-media-player which supports winamp skins
+ and many codecs.
+ .
+ In the default install, the following codecs are supported:
+ .
+  * MP3
+  * Ogg Vorbis
+  * AAC and AAC+
+  * FLAC
+  * Windows Media (WMA)
+  * Musepack
+  * TTA
+  * Many module formats and much more!
+ .
+ Additionally, Audacious is extendable through plugins, and contains
+ other useful features like LIRC support and support for last.fm.
+ .
+ This package contains a library which provides core functionality
+ of Audacious.
+
+Package: audacious-dev
+Section: libdevel
+Architecture: any
+Depends: libaudclient2 (= ${binary:Version}),
+         libaudid3tag2 (= ${binary:Version}),
+         libaudcore1 (= ${binary:Version}),
+         libdbus-1-dev (>= 0.60),
+         libdbus-glib-1-dev (>= 0.60),
+         libglade2-dev (>= 2.3.1),
+         libgtk2.0-dev (>= 2.6),
+         libmcs-dev (>= 0.4.1),
+         libmowgli-dev (>= 0.4),
+         libsamplerate0-dev | libsamplerate-dev,
+	 ${misc:Depends}
+Provides: libaudid3tag-dev, libaudclient-dev, libaudcore-dev
+Description: audacious development files
+ Audacious is a fork of beep-media-player which supports winamp skins
+ and many codecs.
+ .
+ In the default install, the following codecs are supported:
+ .
+  * MP3
+  * Ogg Vorbis
+  * AAC and AAC+
+  * FLAC
+  * Windows Media (WMA)
+  * Musepack
+  * TTA
+  * Many module formats and much more!
+ .
+ Additionally, Audacious is extendable through plugins, and contains
+ other useful features like LIRC support and support for last.fm.
+ .
+ This package contains the development libraries and header files
+ required for developing components for audacious.
+ .
+ Please note that this package no longer contains libaudacious, as
+ libaudacious was dropped in Audacious 1.4. You should use libaudclient
+ instead.
+
+Package: audacious-dbg
+Section: debug
+Architecture: any
+Depends: audacious, , ${misc:Depends}
+Provides: libaudid3tag2-dbg, libaudclient2-dbg, libaudcore1-dbg
+Recommends: audacious-plugins-dbg
+Priority: extra
+Description: audacious media player (debugging symbols)
+ Audacious is a fork of beep-media-player which supports winamp skins
+ and many codecs.
+ .
+ In the default install, the following codecs are supported:
+ .
+  * MP3
+  * Ogg Vorbis
+  * AAC and AAC+
+  * FLAC
+  * Windows Media (WMA)
+  * Musepack
+  * TTA
+  * Many module formats and much more!
+ .
+ Additionally, Audacious is extendable through plugins, and contains
+ other useful features like LIRC support and support for last.fm.
+ .
+ This package contains the debugging symbols. Please install it before
+ reporting crashes, as this makes the backtrace output more usable.
