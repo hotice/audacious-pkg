@@ -6,7 +6,8 @@ Uploaders: Chris Taylor <ctaylor@debian.org>,
            Benjamin Drung <bdrung@ubuntu.com>
 DM-Upload-Allowed: yes
 Homepage: http://www.audacious-media-player.org/
-Build-Depends: debhelper (>= 7.0.50~),
+Build-Depends: autotools-dev,
+               debhelper (>= 7.0.50~),
                imagemagick,
                libdbus-1-dev (>= 0.60),
                libdbus-glib-1-dev (>= 0.60),
