@@ -1,7 +1,7 @@
 ?package(audacious): needs="X11" \
-		     section="Applications/Sound" \
-		     title="Audacious" \
-		     longtitle="Audacious Media Player" \
-		     icon32x32="/usr/share/pixmaps/audacious.xpm" \
-		     icon16x16="/usr/share/pixmaps/audacious-16.xpm" \
-		     command="/usr/bin/audacious2"
+                     section="Applications/Sound" \
+                     title="Audacious" \
+                     longtitle="Audacious Media Player" \
+                     icon32x32="/usr/share/pixmaps/audacious.xpm" \
+                     icon16x16="/usr/share/pixmaps/audacious-16.xpm" \
+                     command="/usr/bin/audacious2"
