@@ -12,6 +12,11 @@ override_dh_auto_clean:
 	rm -f src/audacious/dbus-client-bindings.h src/audacious/dbus-server-bindings.h
 	find -name '.deps' -delete
 
+override_dh_auto_build:
+	# Change build id from UNSUPPORTED VERSION to <vendor> package
+	echo "const char *build_stamp = \"$(shell dpkg-vendor --query vendor) package\";" > src/audacious/build_stamp.c;
+	dh_auto_build
+
 override_dh_strip:
 	dh_strip --dbg-package=audacious-dbg
 
