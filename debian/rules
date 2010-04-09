@@ -10,16 +10,12 @@ override_dh_auto_configure:
 	dh_auto_configure -- --disable-rpath --enable-chardet
 
 override_dh_auto_clean:
+	dh_auto_clean
 	rm -f config.sub
 	rm -f config.guess
-	find po -name \*.gmo -exec rm -f {} \;
-	rm -f  man/*.1 po/stamp-po config.guess config.sub config.status \
-		config.log config.h *.pc \
-		src/audacious/dbus-client-bindings.h \
-		src/audacious/dbus-server-bindings.h \
-		src/audacious/build_stamp.c
-	dh_auto_clean
-	rm -f buildsys.mk
+	rm -f man/*.1 config.status config.log config.h *.pc buildsys.mk
+	rm -f src/audacious/dbus-client-bindings.h src/audacious/dbus-server-bindings.h
+	find -name '.deps' -delete
 
 override_dh_strip:
 	dh_strip --dbg-package=audacious-dbg
