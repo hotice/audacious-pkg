@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 7.0.50~),
                libdbus-glib-1-dev (>= 0.60),
                libglade2-dev (>= 2.3.1),
                libgtk2.0-dev (>= 2.10),
-               libmcs-dev (>= 0.4.1),
+               libmcs-dev (>= 0.7),
                libmowgli-dev (>= 0.4)
 Standards-Version: 3.8.4
 VCS-Browser: http://git.debian.org/?p=pkg-audacious/audacious.git;a=summary
@@ -131,7 +131,7 @@ Depends: libaudclient2 (= ${binary:Version}),
          libdbus-glib-1-dev (>= 0.60),
          libglade2-dev (>= 2.3.1),
          libgtk2.0-dev (>= 2.6),
-         libmcs-dev (>= 0.4.1),
+         libmcs-dev (>= 0.7),
          libmowgli-dev (>= 0.4),
          libsamplerate0-dev | libsamplerate-dev,
          ${misc:Depends}
