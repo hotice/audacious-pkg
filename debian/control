@@ -2,7 +2,9 @@ Source: audacious
 Section: sound
 Priority: optional
 Maintainer: Debian Audacious Packagers <pkg-audacious-maintainers@lists.alioth.debian.org>
-Uploaders: Chris Taylor <ctaylor@debian.org>
+Uploaders: Chris Taylor <ctaylor@debian.org>,
+           Benjamin Drung <bdrung@ubuntu.com>
+DM-Upload-Allowed: yes
 Homepage: http://www.audacious-media-player.org/
 Build-Depends: debhelper (>= 7.0.50~),
                imagemagick,
