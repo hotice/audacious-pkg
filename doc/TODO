@@ -1,0 +1,69 @@
+Long-term "TODO"
+================
+- add generic debugging code in plugin/playback handling to see what
+  plugin gets to handle the given file.
+
+
+- improve error handling:
+  * plugin init() should be able to return error codes.
+  * InputPlugin play_file also should return error codes (not only through
+  InputPlayback->error) .. or maybe just change pb->error to more versatile
+  enum instead of just signifying audio output problems.
+  * OutputPlugin ?
+
+  * Transport plugins?
+
+- output plugins should have some kind of (optional) "query available formats"
+  function, so that the core could determine what should be used. perhaps
+  offer users this info?
+
+- remove the idiotic XMMS compatibility output plugin hack.
+
+- maybe all audio plugins (input, output, effect) could be made completely
+  re-entrant. this probably means severely breaking the API. not very
+  trivial either .. some plugins are probably impossible.
+  * basically plugin init() should allocate / init a state struct to
+    be used in all operations, etc.
+  * context support should be added to plugin functions.
+  * question: issues with plugins that use non-re-entrant library backends
+    etc?
+
+
+- URIs with "?" are stripped (the subtune support uses that), which is bad,
+  because some (a lot) of real-world URLs use 'GET' arguments. this breaks
+  probing, but current input probing is confusing (and possibly broken anyway)
+  and should be refactored.
+
+
+- mime-types support:
+  * there is already code for mime support, but I think it may not be
+    sufficient as it is designed for input plugins only -- 
+    also playlist containers etc. need this (IMHO)
+
+  * might be nicer to have the type registrations in plugin struct
+    instead of a separate function, a'la vfs_extensions.
+
+
+- document the different APIs via Doxygen
+
+
+- audacious VFS is not 64-bit offset safe, breakage will most likely occur,
+  if files larger than 2^31 are used (rather unlikely, tho, but still...)
+
+  * nenolod says: current vfs sucks, it needs a "rewrite":
+    - buffering support
+    - non-blocking I/O support
+    - better error handling (e.g. unified error codes, etc.)
+
+
+- {core,plugins}/configure.ac need some cleanup loving.
+  * make session management (SM) optional. (done)
+  * build system cleanups .. extra.mk.in? wtf? (done in core, progressing
+  for plugins)
+  --- this is in progress, worked on by ccr
+
+
+- plugin rewrites:
+  * madplug
+  * modplug (in progress by ccr)
+  * scrobbler (in progress by ccr)

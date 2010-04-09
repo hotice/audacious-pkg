@@ -1,0 +1,26 @@
+LIB = ${LIB_PREFIX}audgui${LIB_SUFFIX}
+LIB_MAJOR = 1
+LIB_MINOR = 0
+
+SRCS = effects-menu.c \
+       ui_gtk.c \
+       ui_fileopener.c \
+       ui_urlopener.c \
+       ui_jumptotrack.c \
+       ui_jumptotrack_cache.c \
+       icons-stock.c \
+       ui_about.c \
+       ui_credits.c
+
+INCLUDES = libaudgui.h \
+           libaudgui-gtk.h
+
+include ../../buildsys.mk
+include ../../extra.mk
+
+includesubdir = libaudgui
+
+CPPFLAGS += -DHAVE_CONFIG_H ${LIB_CPPFLAGS} -D_AUDACIOUS_CORE -I.. -I../.. -I../libaudcore -I../audacious ${GLIB_CFLASG} ${GTK_CFLAGS} ${DBUS_CFLAGS} ${LIBMCS_CFLAGS} ${AUDACIOUS_DEFINES} ${REGEX_CFLAGS}
+CFLAGS += ${LIB_CFLAGS}
+LDFLAGS += $(AUDLDFLAGS)
+LIBS += ${GLIB_LIBS} ${MOWGLI_LIBS} ${GTK_LIBS} ${REGEX_LIBS} -L../libaudcore -laudcore

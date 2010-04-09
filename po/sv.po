@@ -1,0 +1,4976 @@
+# Swedish language translation for BMP
+# Copyright (C) 2004 Free Software Foundation, Inc.
+# -----
+# Martin Persenius <martin@persenius.net>, 2004.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bmp 0.9.7\n"
+"Report-Msgid-Bugs-To: http://bugzilla.atheme.org/\n"
+"POT-Creation-Date: 2009-09-16 02:06+0300\n"
+"PO-Revision-Date: 2004-02-29 02:46+0100\n"
+"Last-Translator: Martin Persenius <martin@persenius.net>\n"
+"Language-Team: Sweden\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"NPOT-Creation-Date: 2004-02-21 19:35+0200\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: src/audacious/credits.c:34
+#, c-format
+msgid ""
+"<big><b>Audacious %s</b></big>\n"
+"An audio player for many platforms.\n"
+"Copyright (C) 2005-2009 Audacious Development Team"
+msgstr ""
+
+#: src/audacious/credits.c:39
+#, fuzzy
+msgid "Core developers:"
+msgstr "Avkodare:"
+
+#: src/audacious/credits.c:53
+msgid "Graphics:"
+msgstr ""
+
+#: src/audacious/credits.c:58
+#, fuzzy
+msgid "Default skin:"
+msgstr "Förinställning (%s)"
+
+#: src/audacious/credits.c:64
+#, fuzzy
+msgid "Plugin development:"
+msgstr "Insticksmodulsnamn"
+
+#: src/audacious/credits.c:85
+msgid "Patch authors:"
+msgstr ""
+
+#: src/audacious/credits.c:120
+#, fuzzy
+msgid "1.x developers:"
+msgstr "Avkodare:"
+
+#: src/audacious/credits.c:142
+#, fuzzy
+msgid "BMP Developers:"
+msgstr "Avkodare:"
+
+#: src/audacious/credits.c:174
+msgid "Basque:"
+msgstr ""
+
+#: src/audacious/credits.c:177
+msgid "Brazilian Portuguese:"
+msgstr ""
+
+#: src/audacious/credits.c:181
+msgid "Breton:"
+msgstr ""
+
+#: src/audacious/credits.c:184
+#, fuzzy
+msgid "Bulgarian:"
+msgstr "Buffrande:"
+
+#: src/audacious/credits.c:187
+#, fuzzy
+msgid "Catalan:"
+msgstr "Plats:"
+
+#: src/audacious/credits.c:190
+#, fuzzy
+msgid "Croatian:"
+msgstr "Plats:"
+
+#: src/audacious/credits.c:193
+msgid "Czech:"
+msgstr ""
+
+#: src/audacious/credits.c:196
+#, fuzzy
+msgid "Dutch:"
+msgstr "/Koppla loss"
+
+#: src/audacious/credits.c:200
+#, fuzzy
+msgid "Estonian:"
+msgstr "Plats:"
+
+#: src/audacious/credits.c:203
+msgid "Finnish:"
+msgstr ""
+
+#: src/audacious/credits.c:207
+msgid "French:"
+msgstr ""
+
+#: src/audacious/credits.c:212
+#, fuzzy
+msgid "German:"
+msgstr "Genre"
+
+#: src/audacious/credits.c:217
+#, fuzzy
+msgid "Georgian:"
+msgstr "Genre"
+
+#: src/audacious/credits.c:220
+#, fuzzy
+msgid "Greek:"
+msgstr "Genre"
+
+#: src/audacious/credits.c:225
+msgid "Hindi:"
+msgstr ""
+
+#: src/audacious/credits.c:228
+#, fuzzy
+msgid "Hungarian:"
+msgstr "Buffrande:"
+
+#: src/audacious/credits.c:231
+#, fuzzy
+msgid "Italian:"
+msgstr "Plats:"
+
+#: src/audacious/credits.c:235
+msgid "Japanese:"
+msgstr ""
+
+#: src/audacious/credits.c:238
+#, fuzzy
+msgid "Korean:"
+msgstr "Genre"
+
+#: src/audacious/credits.c:241
+msgid "Lithuanian:"
+msgstr ""
+
+#: src/audacious/credits.c:244
+#, fuzzy
+msgid "Macedonian:"
+msgstr "Genre"
+
+#: src/audacious/credits.c:247
+msgid "Polish:"
+msgstr ""
+
+#: src/audacious/credits.c:250
+#, fuzzy
+msgid "Romanian:"
+msgstr "Plats:"
+
+#: src/audacious/credits.c:254
+msgid "Russian:"
+msgstr ""
+
+#: src/audacious/credits.c:257
+msgid "Serbian (Latin):"
+msgstr ""
+
+#: src/audacious/credits.c:260
+msgid "Serbian (Cyrillic):"
+msgstr ""
+
+#: src/audacious/credits.c:263
+msgid "Simplified Chinese:"
+msgstr ""
+
+#: src/audacious/credits.c:266
+msgid "Slovak:"
+msgstr ""
+
+#: src/audacious/credits.c:269
+msgid "Spanish:"
+msgstr ""
+
+#: src/audacious/credits.c:272
+msgid "Swedish:"
+msgstr ""
+
+#: src/audacious/credits.c:275
+msgid "Traditional Chinese:"
+msgstr ""
+
+#: src/audacious/credits.c:280
+msgid "Turkish:"
+msgstr ""
+
+#: src/audacious/credits.c:284
+#, fuzzy
+msgid "Ukrainian:"
+msgstr "Organisation:"
+
+#: src/audacious/credits.c:287
+msgid "Welsh:"
+msgstr ""
+
+#: src/audacious/equalizer_preset.c:174
+#, c-format
+msgid "Error importing Winamp EQF file '%s'"
+msgstr ""
+
+#: src/audacious/input.c:439
+#, fuzzy, c-format
+msgid "audacious: %s"
+msgstr "CD-ljudinsticksmodul"
+
+#: src/audacious/input.c:455
+msgid "Filename:"
+msgstr "Filnamn:"
+
+#: src/audacious/input.c:474
+msgid "No input plugin recognized this file"
+msgstr "Ingen insticksmodul kände igen den här filen"
+
+#: src/audacious/input.c:476
+#, c-format
+msgid "Input plugin: %s"
+msgstr "Insticksmodul: %s"
+
+#: src/audacious/logger.c:125
+#, c-format
+msgid "Unable to create log file (%s)!\n"
+msgstr "Kunde ej skapa loggfil (%s)!\n"
+
+#: src/audacious/main.c:72
+msgid "Audacious"
+msgstr ""
+
+#: src/audacious/main.c:163
+msgid "Skip backwards in playlist"
+msgstr "Hoppa båket i spellista"
+
+#: src/audacious/main.c:164
+msgid "Start playing current playlist"
+msgstr "Börja spela nuvarande spellista"
+
+#: src/audacious/main.c:165
+msgid "Pause current song"
+msgstr "Pausa nuvarande sång"
+
+#: src/audacious/main.c:166
+msgid "Stop current song"
+msgstr "Stoppa nuvarande sång"
+
+#: src/audacious/main.c:167
+msgid "Pause if playing, play otherwise"
+msgstr "Pausa om spelandes, spela annars"
+
+#: src/audacious/main.c:168
+msgid "Skip forward in playlist"
+msgstr "Hoppas framåt i spellistan"
+
+#: src/audacious/main.c:169
+#, fuzzy
+msgid "Display Jump to File dialog"
+msgstr "/Hoppa till fil"
+
+#: src/audacious/main.c:170
+msgid "Don't clear the playlist"
+msgstr "Rensa inte spellistan"
+
+#: src/audacious/main.c:171
+#, fuzzy
+msgid "Add new files to a temporary playlist"
+msgstr "Kunde ej skriva spellista!"
+
+#: src/audacious/main.c:172
+#, fuzzy
+msgid "Display the main window"
+msgstr "Visa huvudfönstret."
+
+#: src/audacious/main.c:173
+msgid "Display all open Audacious windows"
+msgstr ""
+
+#: src/audacious/main.c:174
+msgid "Print all errors and warnings to stdout"
+msgstr ""
+
+#: src/audacious/main.c:175
+#, fuzzy
+msgid "Show version"
+msgstr "/Visa spellistredigeraren"
+
+#: src/audacious/main.c:176
+msgid "Interface to use (use -i list to view available interfaces)"
+msgstr ""
+
+#: src/audacious/main.c:178
+msgid "Used in macpacking"
+msgstr ""
+
+#: src/audacious/main.c:180
+msgid "FILE..."
+msgstr ""
+
+#: src/audacious/main.c:197
+msgid "- play multimedia files"
+msgstr ""
+
+#: src/audacious/main.c:208
+#, c-format
+msgid ""
+"%s: %s\n"
+"Try `%s --help' for more information.\n"
+msgstr ""
+
+#: src/audacious/main.c:458
+msgid "Sorry, threads aren't supported on your platform.\n"
+msgstr ""
+
+#: src/audacious/main.c:496
+#, fuzzy, c-format
+msgid "%s: Unable to open display, exiting.\n"
+msgstr "BMP: Kunde ej öppna för visning, avslutar."
+
+#: src/audacious/main.c:530
+msgid ""
+"Available interfaces:\n"
+"\n"
+msgstr ""
+
+#: src/audacious/playback.c:266
+msgid ""
+"<b><big>No output plugin selected.</big></b>\n"
+"You have not selected an output plugin."
+msgstr ""
+
+#: src/audacious/playlist-new.c:227
+#, fuzzy
+msgid "Untitled Playlist"
+msgstr "/Ny spellista"
+
+#: src/audacious/pluginenum.c:780
+msgid "Module loading not supported! Plugins will not be loaded.\n"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:96
+#, fuzzy
+msgid "Blues"
+msgstr "Blues"
+
+#: src/audacious/ui_fileinfo.c:96
+msgid "Classic Rock"
+msgstr "Klassisk rock"
+
+#: src/audacious/ui_fileinfo.c:96
+msgid "Country"
+msgstr "Country"
+
+#: src/audacious/ui_fileinfo.c:96
+msgid "Dance"
+msgstr "Dans"
+
+#: src/audacious/ui_fileinfo.c:97
+msgid "Disco"
+msgstr "Disco"
+
+#: src/audacious/ui_fileinfo.c:97
+msgid "Funk"
+msgstr "Funk"
+
+#: src/audacious/ui_fileinfo.c:97
+msgid "Grunge"
+msgstr "Grunge"
+
+#: src/audacious/ui_fileinfo.c:97
+msgid "Hip-Hop"
+msgstr "Hip-Hop"
+
+#: src/audacious/ui_fileinfo.c:98
+msgid "Jazz"
+msgstr "Jazz"
+
+#: src/audacious/ui_fileinfo.c:98
+msgid "Metal"
+msgstr "Metall"
+
+#: src/audacious/ui_fileinfo.c:98
+msgid "New Age"
+msgstr "New Age"
+
+#: src/audacious/ui_fileinfo.c:98
+msgid "Oldies"
+msgstr "Oldies"
+
+#: src/audacious/ui_fileinfo.c:99
+msgid "Other"
+msgstr "Övrigt"
+
+#: src/audacious/ui_fileinfo.c:99
+msgid "Pop"
+msgstr "Pop"
+
+#: src/audacious/ui_fileinfo.c:99
+msgid "R&B"
+msgstr "R&B"
+
+#: src/audacious/ui_fileinfo.c:99
+msgid "Rap"
+msgstr "Rap"
+
+#: src/audacious/ui_fileinfo.c:99
+msgid "Reggae"
+msgstr "Reggae"
+
+#: src/audacious/ui_fileinfo.c:100
+msgid "Rock"
+msgstr "Rock"
+
+#: src/audacious/ui_fileinfo.c:100
+msgid "Techno"
+msgstr "Techno"
+
+#: src/audacious/ui_fileinfo.c:100
+msgid "Industrial"
+msgstr "Industriell"
+
+#: src/audacious/ui_fileinfo.c:100
+msgid "Alternative"
+msgstr "Alternativt"
+
+#: src/audacious/ui_fileinfo.c:101
+msgid "Ska"
+msgstr "Ska"
+
+#: src/audacious/ui_fileinfo.c:101
+msgid "Death Metal"
+msgstr "Dödsmetall"
+
+#: src/audacious/ui_fileinfo.c:101
+#, fuzzy
+msgid "Pranks"
+msgstr "Skämt"
+
+#: src/audacious/ui_fileinfo.c:101
+msgid "Soundtrack"
+msgstr "Soundtrack"
+
+#: src/audacious/ui_fileinfo.c:102
+msgid "Euro-Techno"
+msgstr "Euro-Techno"
+
+#: src/audacious/ui_fileinfo.c:102
+msgid "Ambient"
+msgstr "Bakgrundsljud"
+
+#: src/audacious/ui_fileinfo.c:102
+msgid "Trip-Hop"
+msgstr "Trip-Hop"
+
+#: src/audacious/ui_fileinfo.c:102
+msgid "Vocal"
+msgstr "Vokal"
+
+#: src/audacious/ui_fileinfo.c:103
+msgid "Jazz+Funk"
+msgstr "Jazz+Funk"
+
+#: src/audacious/ui_fileinfo.c:103
+#, fuzzy
+msgid "Fusion"
+msgstr "Fast-Fusion"
+
+#: src/audacious/ui_fileinfo.c:103
+msgid "Trance"
+msgstr "Trance"
+
+#: src/audacious/ui_fileinfo.c:103
+msgid "Classical"
+msgstr "Klassiskt"
+
+#: src/audacious/ui_fileinfo.c:104
+msgid "Instrumental"
+msgstr "Instrumentell"
+
+#: src/audacious/ui_fileinfo.c:104
+msgid "Acid"
+msgstr "Acid"
+
+#: src/audacious/ui_fileinfo.c:104
+msgid "House"
+msgstr "House"
+
+#: src/audacious/ui_fileinfo.c:104
+msgid "Game"
+msgstr "Spelmusik"
+
+#: src/audacious/ui_fileinfo.c:105
+msgid "Sound Clip"
+msgstr "Ljudklipp"
+
+#: src/audacious/ui_fileinfo.c:105
+msgid "Gospel"
+msgstr "Gospell"
+
+#: src/audacious/ui_fileinfo.c:105
+msgid "Noise"
+msgstr "Oljud"
+
+#: src/audacious/ui_fileinfo.c:105
+msgid "AlternRock"
+msgstr "Alternativ rock"
+
+#: src/audacious/ui_fileinfo.c:106
+#, fuzzy
+msgid "Bass"
+msgstr "Bass"
+
+#: src/audacious/ui_fileinfo.c:106
+msgid "Soul"
+msgstr "Soul"
+
+#: src/audacious/ui_fileinfo.c:106
+msgid "Punk"
+msgstr "Punk"
+
+#: src/audacious/ui_fileinfo.c:106
+msgid "Space"
+msgstr "Space"
+
+#: src/audacious/ui_fileinfo.c:107
+msgid "Meditative"
+msgstr "Meditativ"
+
+#: src/audacious/ui_fileinfo.c:107
+msgid "Instrumental Pop"
+msgstr "Instrumentell pop"
+
+#: src/audacious/ui_fileinfo.c:108
+msgid "Instrumental Rock"
+msgstr "Instrumentell rock"
+
+#: src/audacious/ui_fileinfo.c:108
+msgid "Ethnic"
+msgstr "Etnisk musik"
+
+#: src/audacious/ui_fileinfo.c:108
+msgid "Gothic"
+msgstr "Gotisk"
+
+#: src/audacious/ui_fileinfo.c:109
+msgid "Darkwave"
+msgstr "Darkwave"
+
+#: src/audacious/ui_fileinfo.c:109
+msgid "Techno-Industrial"
+msgstr "Techno-Industriell"
+
+#: src/audacious/ui_fileinfo.c:109
+msgid "Electronic"
+msgstr "Elektronisk"
+
+#: src/audacious/ui_fileinfo.c:110
+msgid "Pop-Folk"
+msgstr "Pop-Folk"
+
+#: src/audacious/ui_fileinfo.c:110
+msgid "Eurodance"
+msgstr "Eurodance"
+
+#: src/audacious/ui_fileinfo.c:110
+msgid "Dream"
+msgstr "Dream"
+
+#: src/audacious/ui_fileinfo.c:111
+msgid "Southern Rock"
+msgstr "Southern Rock"
+
+#: src/audacious/ui_fileinfo.c:111
+msgid "Comedy"
+msgstr "Komedi"
+
+#: src/audacious/ui_fileinfo.c:111
+msgid "Cult"
+msgstr "Kult"
+
+#: src/audacious/ui_fileinfo.c:112
+msgid "Gangsta Rap"
+msgstr "Gangsterrap"
+
+#: src/audacious/ui_fileinfo.c:112
+msgid "Top 40"
+msgstr "Topp 40"
+
+#: src/audacious/ui_fileinfo.c:112
+msgid "Christian Rap"
+msgstr "Kristen rap"
+
+#: src/audacious/ui_fileinfo.c:113
+msgid "Pop/Funk"
+msgstr "Pop/Funk"
+
+#: src/audacious/ui_fileinfo.c:113
+msgid "Jungle"
+msgstr "Jungel"
+
+#: src/audacious/ui_fileinfo.c:113
+msgid "Native American"
+msgstr "Ursprungsamerikansk"
+
+#: src/audacious/ui_fileinfo.c:114
+msgid "Cabaret"
+msgstr "Cabaret"
+
+#: src/audacious/ui_fileinfo.c:114
+msgid "New Wave"
+msgstr "New Wave"
+
+#: src/audacious/ui_fileinfo.c:114
+msgid "Psychedelic"
+msgstr "Psychedelisk"
+
+#: src/audacious/ui_fileinfo.c:114
+msgid "Rave"
+msgstr "Rave"
+
+#: src/audacious/ui_fileinfo.c:115
+#, fuzzy
+msgid "Showtunes"
+msgstr "Showtunes"
+
+#: src/audacious/ui_fileinfo.c:115
+msgid "Trailer"
+msgstr "Trailer"
+
+#: src/audacious/ui_fileinfo.c:115
+msgid "Lo-Fi"
+msgstr "Lo-Fi"
+
+#: src/audacious/ui_fileinfo.c:115
+msgid "Tribal"
+msgstr "Stammusik"
+
+#: src/audacious/ui_fileinfo.c:116
+msgid "Acid Punk"
+msgstr "Acid Punk"
+
+#: src/audacious/ui_fileinfo.c:116
+msgid "Acid Jazz"
+msgstr "Acid Jazz"
+
+#: src/audacious/ui_fileinfo.c:116
+msgid "Polka"
+msgstr "Polka"
+
+#: src/audacious/ui_fileinfo.c:116
+msgid "Retro"
+msgstr "Retro"
+
+#: src/audacious/ui_fileinfo.c:117
+msgid "Musical"
+msgstr "Musikal"
+
+#: src/audacious/ui_fileinfo.c:117
+msgid "Rock & Roll"
+msgstr "Rock & Roll"
+
+#: src/audacious/ui_fileinfo.c:117
+msgid "Hard Rock"
+msgstr "Hård rock"
+
+#: src/audacious/ui_fileinfo.c:117
+msgid "Folk"
+msgstr "Folkdans"
+
+#: src/audacious/ui_fileinfo.c:118
+msgid "Folk/Rock"
+msgstr "Folkdans/Rock"
+
+#: src/audacious/ui_fileinfo.c:118
+msgid "National Folk"
+msgstr "Nationalfolkdans"
+
+#: src/audacious/ui_fileinfo.c:118
+msgid "Swing"
+msgstr "Swing"
+
+#: src/audacious/ui_fileinfo.c:119
+msgid "Fast-Fusion"
+msgstr "Fast-Fusion"
+
+#: src/audacious/ui_fileinfo.c:119
+msgid "Bebob"
+msgstr "Bebob"
+
+#: src/audacious/ui_fileinfo.c:119
+msgid "Latin"
+msgstr "Latin"
+
+#: src/audacious/ui_fileinfo.c:119
+msgid "Revival"
+msgstr "Återupplivning"
+
+#: src/audacious/ui_fileinfo.c:120
+msgid "Celtic"
+msgstr "Keltisk"
+
+#: src/audacious/ui_fileinfo.c:120
+msgid "Bluegrass"
+msgstr "Bluegrass"
+
+#: src/audacious/ui_fileinfo.c:120
+msgid "Avantgarde"
+msgstr "Avantgarde"
+
+#: src/audacious/ui_fileinfo.c:121
+msgid "Gothic Rock"
+msgstr "Gotisk rock"
+
+#: src/audacious/ui_fileinfo.c:121
+msgid "Progressive Rock"
+msgstr "Progressiv rock"
+
+#: src/audacious/ui_fileinfo.c:122
+msgid "Psychedelic Rock"
+msgstr "Psychadelisk rock"
+
+#: src/audacious/ui_fileinfo.c:122
+msgid "Symphonic Rock"
+msgstr "Symfonisk rock"
+
+#: src/audacious/ui_fileinfo.c:122
+msgid "Slow Rock"
+msgstr "Lugn Rock"
+
+#: src/audacious/ui_fileinfo.c:123
+msgid "Big Band"
+msgstr "Storband"
+
+#: src/audacious/ui_fileinfo.c:123
+msgid "Chorus"
+msgstr "Korus"
+
+#: src/audacious/ui_fileinfo.c:123
+msgid "Easy Listening"
+msgstr "Easy Listening"
+
+#: src/audacious/ui_fileinfo.c:124
+msgid "Acoustic"
+msgstr "Akustisk"
+
+#: src/audacious/ui_fileinfo.c:124
+msgid "Humour"
+msgstr "Humor"
+
+#: src/audacious/ui_fileinfo.c:124
+msgid "Speech"
+msgstr "Tal"
+
+#: src/audacious/ui_fileinfo.c:124
+msgid "Chanson"
+msgstr "Chanson"
+
+#: src/audacious/ui_fileinfo.c:125
+msgid "Opera"
+msgstr "Opera"
+
+#: src/audacious/ui_fileinfo.c:125
+msgid "Chamber Music"
+msgstr "Rumsmusik"
+
+#: src/audacious/ui_fileinfo.c:125
+msgid "Sonata"
+msgstr "Sonat"
+
+#: src/audacious/ui_fileinfo.c:125
+msgid "Symphony"
+msgstr "Symfoni"
+
+#: src/audacious/ui_fileinfo.c:126
+msgid "Booty Bass"
+msgstr "Booty Bass"
+
+#: src/audacious/ui_fileinfo.c:126
+msgid "Primus"
+msgstr "Primus"
+
+#: src/audacious/ui_fileinfo.c:126
+msgid "Porn Groove"
+msgstr "Porr groove"
+
+#: src/audacious/ui_fileinfo.c:127
+#, fuzzy
+msgid "Satire"
+msgstr "Stereo"
+
+#: src/audacious/ui_fileinfo.c:127
+#, fuzzy
+msgid "Slow Jam"
+msgstr "Slow Jam"
+
+#: src/audacious/ui_fileinfo.c:127
+msgid "Club"
+msgstr "Klubb"
+
+#: src/audacious/ui_fileinfo.c:127
+msgid "Tango"
+msgstr "Tango"
+
+#: src/audacious/ui_fileinfo.c:128
+msgid "Samba"
+msgstr "Samba"
+
+#: src/audacious/ui_fileinfo.c:128
+msgid "Folklore"
+msgstr "Folkvisa"
+
+#: src/audacious/ui_fileinfo.c:128
+msgid "Ballad"
+msgstr "Ballad"
+
+#: src/audacious/ui_fileinfo.c:128
+msgid "Power Ballad"
+msgstr "Kraftballad"
+
+#: src/audacious/ui_fileinfo.c:129
+msgid "Rhythmic Soul"
+msgstr "Rhytmisk Soul"
+
+#: src/audacious/ui_fileinfo.c:129
+msgid "Freestyle"
+msgstr "Freestyle"
+
+#: src/audacious/ui_fileinfo.c:129
+msgid "Duet"
+msgstr "Duett"
+
+#: src/audacious/ui_fileinfo.c:130
+msgid "Punk Rock"
+msgstr "Punkrock"
+
+#: src/audacious/ui_fileinfo.c:130
+msgid "Drum Solo"
+msgstr "Trummsolo"
+
+#: src/audacious/ui_fileinfo.c:130
+msgid "A Cappella"
+msgstr "A Cappella"
+
+#: src/audacious/ui_fileinfo.c:131
+msgid "Euro-House"
+msgstr "Euro-House"
+
+#: src/audacious/ui_fileinfo.c:131
+msgid "Dance Hall"
+msgstr "Dance Hall"
+
+#: src/audacious/ui_fileinfo.c:131
+msgid "Goa"
+msgstr "Goa"
+
+#: src/audacious/ui_fileinfo.c:132
+msgid "Drum & Bass"
+msgstr "Trumma & Bas"
+
+#: src/audacious/ui_fileinfo.c:132
+msgid "Club-House"
+msgstr "Club-House"
+
+#: src/audacious/ui_fileinfo.c:132
+msgid "Hardcore"
+msgstr "Hardcore"
+
+#: src/audacious/ui_fileinfo.c:133
+msgid "Terror"
+msgstr "Terror"
+
+#: src/audacious/ui_fileinfo.c:133
+msgid "Indie"
+msgstr "Indisk"
+
+#: src/audacious/ui_fileinfo.c:133
+msgid "BritPop"
+msgstr "BritPop"
+
+#: src/audacious/ui_fileinfo.c:133
+msgid "Negerpunk"
+msgstr "Negerpunk"
+
+#: src/audacious/ui_fileinfo.c:134
+msgid "Polsk Punk"
+msgstr "Polsk Punk"
+
+#: src/audacious/ui_fileinfo.c:134
+msgid "Beat"
+msgstr "Beat"
+
+#: src/audacious/ui_fileinfo.c:134
+msgid "Christian Gangsta Rap"
+msgstr "Kristen Gangsta Rap"
+
+#: src/audacious/ui_fileinfo.c:135
+msgid "Heavy Metal"
+msgstr "Heavy Metal"
+
+#: src/audacious/ui_fileinfo.c:135
+msgid "Black Metal"
+msgstr "Black Metal"
+
+#: src/audacious/ui_fileinfo.c:135
+msgid "Crossover"
+msgstr "Crossover"
+
+#: src/audacious/ui_fileinfo.c:136
+msgid "Contemporary Christian"
+msgstr "Samtida kristen"
+
+#: src/audacious/ui_fileinfo.c:136
+msgid "Christian Rock"
+msgstr "Kristen rock"
+
+#: src/audacious/ui_fileinfo.c:137
+msgid "Merengue"
+msgstr "Merengue"
+
+#: src/audacious/ui_fileinfo.c:137
+msgid "Salsa"
+msgstr "Salsa"
+
+#: src/audacious/ui_fileinfo.c:137
+msgid "Thrash Metal"
+msgstr "Thrash Metal"
+
+#: src/audacious/ui_fileinfo.c:138
+msgid "Anime"
+msgstr "Anime"
+
+#: src/audacious/ui_fileinfo.c:138
+msgid "JPop"
+msgstr "JPop"
+
+#: src/audacious/ui_fileinfo.c:138
+msgid "Synthpop"
+msgstr "SynthPop"
+
+#: src/audacious/ui_fileinfo.c:216 src/audacious/ui_fileinfo.c:550
+#: src/audacious/ui_fileinfo.c:553 src/audacious/ui_fileinfo.c:556
+msgid "<span size=\"small\">n/a</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:330
+msgid "Metadata updated successfully"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:336
+msgid "Metadata updating failed"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:488
+#, fuzzy
+msgid "Track Information"
+msgstr "Spårökning:"
+
+#: src/audacious/ui_fileinfo.c:520
+msgid "<span size=\"small\">General</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:540
+msgid "<span size=\"small\">Format:</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:543
+msgid "<span size=\"small\">Quality:</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:546
+msgid "<span size=\"small\">Bitrate:</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:579
+msgid "<span size=\"small\">Title</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:591
+msgid "<span size=\"small\">Artist</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:603
+msgid "<span size=\"small\">Album</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:615
+msgid "<span size=\"small\">Comment</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:627
+msgid "<span size=\"small\">Genre</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:658
+msgid "<span size=\"small\">Year</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:671
+msgid "<span size=\"small\">Track Number</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:684
+msgid "<span size=\"small\">Location</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:704
+msgid "<span size=\"small\">Raw Metadata</span>"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:721
+msgid "Key"
+msgstr ""
+
+#: src/audacious/ui_fileinfo.c:734
+#, fuzzy
+msgid "Value"
+msgstr "Blues"
+
+#: src/audacious/ui_fileinfo.c:824
+#, fuzzy, c-format
+msgid "%d kb/s"
+msgstr "%d kbit/s"
+
+#: src/audacious/ui_fileinfopopup.c:254 src/audacious/ui_fileinfopopup.c:366
+#: src/audacious/ui_preferences.c:140
+msgid "Title"
+msgstr "Titel"
+
+#: src/audacious/ui_fileinfopopup.c:257 src/audacious/ui_preferences.c:138
+#, fuzzy
+msgid "Artist"
+msgstr "Artist:"
+
+#: src/audacious/ui_fileinfopopup.c:260 src/audacious/ui_preferences.c:139
+msgid "Album"
+msgstr "Album"
+
+#: src/audacious/ui_fileinfopopup.c:263 src/audacious/ui_preferences.c:142
+msgid "Genre"
+msgstr "Genre"
+
+#: src/audacious/ui_fileinfopopup.c:266 src/audacious/ui_preferences.c:146
+msgid "Year"
+msgstr "År"
+
+#: src/audacious/ui_fileinfopopup.c:269
+#, fuzzy
+msgid "Track Number"
+msgstr "Spårnummer"
+
+#: src/audacious/ui_fileinfopopup.c:273
+#, fuzzy
+msgid "Track Length"
+msgstr "Spårlängd:"
+
+#: src/audacious/ui_fileinfopopup.c:375 src/audacious/ui_preferences.c:143
+#: src/audacious/ui_preferences.c:492
+msgid "Filename"
+msgstr "Filnamn"
+
+#: src/audacious/ui_headless.c:132
+#, fuzzy, c-format
+msgid "Available Plugin Preferences:\n"
+msgstr "OSS-uppspelningsinsticksmodul"
+
+#: src/audacious/ui_headless.c:150
+msgid "Headless Interface"
+msgstr ""
+
+#: src/audacious/ui_misc.c:48
+msgid "Audacious - Unsupported Version Warning"
+msgstr ""
+
+#: src/audacious/ui_misc.c:55
+msgid "<big><b>Audacious2 is not ready yet!</b></big>"
+msgstr ""
+
+#: src/audacious/ui_misc.c:61
+msgid ""
+"<b>Please don't file bugs at this point unless they represent major problems."
+"</b>"
+msgstr ""
+
+#: src/audacious/ui_misc.c:64
+msgid ""
+"This is an <i>alpha</i> build of Audacious2. It is still fairly incomplete "
+"and unpolished.\n"
+"We suspect that most minor bugs reported during this time will be resolved "
+"once more things\n"
+"stablize. However, if there is a major bug, such as a crash on playing a "
+"specific file, we\n"
+"need to know about it.\n"
+"\n"
+"However, we ask you to be aware that dealing with trivial bugs is "
+"distracting at this point,\n"
+"and to please refrain from doing so. Thanks in advance!"
+msgstr ""
+
+#: src/audacious/ui_misc.c:74
+msgid "<b>Blogging about bugs in it is also not helpful.</b>"
+msgstr ""
+
+#: src/audacious/ui_misc.c:77
+msgid ""
+"Likewise, we're developers. We don't read blogs on a regular basis. If there "
+"is a major bug,\n"
+"we ask you to bring it to our attention via our bugtracking instance at "
+"http://jira.atheme.org/,\n"
+"or via the forums that are on the website.\n"
+"\n"
+"This will help us find out more information about your concerns, which we "
+"would likely\n"
+"not know about otherwise."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:127
+#, fuzzy
+msgid "Audio"
+msgstr "Om MPEG-ljudinsticksmodulen"
+
+#: src/audacious/ui_preferences.c:128
+#, fuzzy
+msgid "Replay Gain"
+msgstr "ReplayGain"
+
+#: src/audacious/ui_preferences.c:129
+msgid "Connectivity"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:130
+#, fuzzy
+msgid "Playback"
+msgstr "/Kontroll"
+
+#: src/audacious/ui_preferences.c:131
+#, fuzzy
+msgid "Playlist"
+msgstr "/Spellista"
+
+#: src/audacious/ui_preferences.c:132
+#, fuzzy
+msgid "Plugins"
+msgstr "Insticksmoduler"
+
+#: src/audacious/ui_preferences.c:141
+#, fuzzy
+msgid "Tracknumber"
+msgstr "Spårnummer"
+
+#: src/audacious/ui_preferences.c:144
+#, fuzzy
+msgid "Filepath"
+msgstr "Sökväg"
+
+#: src/audacious/ui_preferences.c:145
+msgid "Date"
+msgstr "Datum"
+
+#: src/audacious/ui_preferences.c:147
+msgid "Comment"
+msgstr "Kommentar"
+
+#: src/audacious/ui_preferences.c:148
+#, fuzzy
+msgid "Codec"
+msgstr "Stäng"
+
+#: src/audacious/ui_preferences.c:149
+#, fuzzy
+msgid "Quality"
+msgstr "/_Avsluta"
+
+#: src/audacious/ui_preferences.c:154
+msgid "None"
+msgstr "Ingen"
+
+#: src/audacious/ui_preferences.c:155
+msgid "Japanese"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:156
+msgid "Taiwanese"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:157
+#, fuzzy
+msgid "Chinese"
+msgstr "Kanaler:"
+
+#: src/audacious/ui_preferences.c:158
+#, fuzzy
+msgid "Korean"
+msgstr "Genre"
+
+#: src/audacious/ui_preferences.c:159
+#, fuzzy
+msgid "Russian"
+msgstr "Fusion"
+
+#: src/audacious/ui_preferences.c:160
+#, fuzzy
+msgid "Greek"
+msgstr "Genre"
+
+#: src/audacious/ui_preferences.c:161
+msgid "Hebrew"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:162
+msgid "Turkish"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:163
+msgid "Arabic"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:164
+#, fuzzy
+msgid "Universal"
+msgstr "Genre"
+
+#: src/audacious/ui_preferences.c:176
+msgid "Best Sinc Interpolation"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:177
+msgid "Medium Sinc Interpolation"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:178
+msgid "Fastest Sinc Interpolation"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:179
+#, fuzzy
+msgid "ZOH Interpolation"
+msgstr "Använd autentisering"
+
+#: src/audacious/ui_preferences.c:180
+#, fuzzy
+msgid "Linear Interpolation"
+msgstr "Använd autentisering"
+
+#: src/audacious/ui_preferences.c:195 src/audacious/ui_preferences.c:198
+#, fuzzy
+msgid "Sampling Rate [Hz]:"
+msgstr "Uppsamlingstakt:"
+
+#: src/audacious/ui_preferences.c:196 src/audacious/ui_preferences.c:199
+#, fuzzy
+msgid "Interpolation Engine:"
+msgstr "Använd autentisering"
+
+#: src/audacious/ui_preferences.c:201
+msgid ""
+"<span size=\"small\">All streams will be converted to this sampling rate.\n"
+"This should be the max supported sampling rate of\n"
+"the sound card or output plugin.</span>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:206
+#, fuzzy
+msgid "<b>Format Detection</b>"
+msgstr "Automatiskt upptäckande"
+
+#: src/audacious/ui_preferences.c:207
+msgid "Detect file formats by extension."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:208
+msgid ""
+"When checked, Audacious will detect file formats based by extension. Only "
+"files with extensions of supported formats will be loaded."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:209
+#, fuzzy
+msgid "<b>Bit Depth</b>"
+msgstr "_Filter:"
+
+#: src/audacious/ui_preferences.c:210
+msgid "Output bit depth:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:211
+msgid ""
+"All streams will be converted to this bit depth.\n"
+"This should be the max supported bit depth of\n"
+"the sound card or output plugin."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:214
+#, fuzzy
+msgid "<b>Sampling Rate Converter</b>"
+msgstr "Uppsamlingstakt:"
+
+#: src/audacious/ui_preferences.c:216 src/audacious/ui_preferences.c:218
+#, fuzzy
+msgid "Enable Sampling Rate Converter"
+msgstr "Uppsamlingstakt:"
+
+#: src/audacious/ui_preferences.c:221
+#, fuzzy
+msgid "<b>Volume Control</b>"
+msgstr "Volymkontrol:"
+
+#: src/audacious/ui_preferences.c:222
+#, fuzzy
+msgid "Use software volume control"
+msgstr "Volymkontrol:"
+
+#: src/audacious/ui_preferences.c:224
+msgid ""
+"Use software volume control. This may be useful for situations where your "
+"audio system does not support controlling the playback volume."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:225
+#, fuzzy
+msgid "<b>Advanced</b>"
+msgstr "Avancerade inställningar"
+
+#: src/audacious/ui_preferences.c:226
+msgid "Bypass all of signal processing if possible"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:227
+msgid ""
+"Try to pass input plugin's output directly to output plugin, if the latter "
+"supports format produced by input plugin. If it's true, all signal "
+"processing will be disabled (i.e. DSP plugins, equalizer, resampling, Replay "
+"Gain and software volume control)."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:230
+msgid "Use fast floating-point conversion (16-bit output only)"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:235
+#, fuzzy
+msgid "Preamp:"
+msgstr "Dream"
+
+#: src/audacious/ui_preferences.c:235 src/audacious/ui_preferences.c:236
+msgid "dB"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:236
+#, fuzzy
+msgid "Default gain:"
+msgstr "Förinställning (%s)"
+
+#: src/audacious/ui_preferences.c:236
+msgid "This gain will be used if file doesn't contain Replay Gain metadata."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:237
+msgid ""
+"<span size=\"small\">Please remember that the most efficient way to prevent "
+"signal clipping is not to use positive values above.</span>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:241
+#, fuzzy
+msgid "<b>Replay Gain configuration</b>"
+msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#: src/audacious/ui_preferences.c:242
+#, fuzzy
+msgid "Enable Replay Gain"
+msgstr "Aktivera ReplayGain"
+
+#: src/audacious/ui_preferences.c:243
+#, fuzzy
+msgid "<b>Replay Gain mode</b>"
+msgstr "Police de la liste d'écoute:"
+
+#: src/audacious/ui_preferences.c:244
+#, fuzzy
+msgid "Track gain/peak"
+msgstr "Spårtopp:"
+
+#: src/audacious/ui_preferences.c:245
+#, fuzzy
+msgid "Album gain/peak"
+msgstr "Albumsökning:"
+
+#: src/audacious/ui_preferences.c:246 src/audacious/ui_preferences.c:1342
+#, fuzzy
+msgid "<b>Miscellaneous</b>"
+msgstr "_Filter:"
+
+#: src/audacious/ui_preferences.c:247
+#, fuzzy
+msgid "Enable peak info clipping prevention"
+msgstr "Aktivera klippskydd"
+
+#: src/audacious/ui_preferences.c:248
+msgid "Use peak value from Replay Gain info for clipping prevention"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:249
+msgid "Dynamically adjust scale factor to prevent clipping"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:250
+msgid "Decrease scale factor (gain) if clipping nevertheless occurred"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:255
+msgid "Proxy hostname:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:256
+#, fuzzy
+msgid "Proxy port:"
+msgstr "Proxy:"
+
+#: src/audacious/ui_preferences.c:260
+#, fuzzy
+msgid "Proxy username:"
+msgstr "Användarnamn:"
+
+#: src/audacious/ui_preferences.c:261
+#, fuzzy
+msgid "Proxy password:"
+msgstr "Lösenord:"
+
+#: src/audacious/ui_preferences.c:265
+#, fuzzy
+msgid "<b>Proxy Configuration</b>"
+msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#: src/audacious/ui_preferences.c:266
+msgid "Enable proxy usage"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:268
+#, fuzzy
+msgid "Use authentication with proxy"
+msgstr "Använd autentisering"
+
+#: src/audacious/ui_preferences.c:270
+msgid ""
+"<span size=\"small\">Changing these settings will require a restart of "
+"Audacious.</span>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:274
+#, fuzzy
+msgid "<b>Playback</b>"
+msgstr "/Kontroll"
+
+#: src/audacious/ui_preferences.c:275
+msgid "Continue playback on startup"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:276
+msgid ""
+"When Audacious starts, automatically begin playing from the point where we "
+"stopped before."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:277
+#, fuzzy
+msgid "Don't advance in the playlist"
+msgstr "Rensa inte spellistan"
+
+#: src/audacious/ui_preferences.c:278
+msgid "When finished playing a song, don't automatically advance to the next."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:282
+msgid "Auto character encoding detector for:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:290
+msgid "Fallback character encodings:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:290
+msgid ""
+"List of character encodings used for fall back conversion of metadata. If "
+"automatic character encoding detector failed or has been disabled, encodings "
+"in this list would be treated as candidates of the encoding of metadata, and "
+"fall back conversion from these encodings to UTF-8 would be attempted."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:294
+#, fuzzy
+msgid "<b>Metadata</b>"
+msgstr "_Filter:"
+
+#: src/audacious/ui_preferences.c:462
+#, fuzzy
+msgid "Enabled"
+msgstr "(aktiverad)"
+
+#: src/audacious/ui_preferences.c:478
+#, fuzzy
+msgid "Description"
+msgstr "Beskrivning:"
+
+#: src/audacious/ui_preferences.c:955
+msgid "Category"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1261
+#, fuzzy
+msgid "Popup Information Settings"
+msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#: src/audacious/ui_preferences.c:1270
+#, fuzzy
+msgid "<b>Cover image retrieve</b>"
+msgstr "Automatiskt upptäckande"
+
+#: src/audacious/ui_preferences.c:1275
+msgid ""
+"While searching for the album's cover, Audacious looks for certain words in "
+"the filename. You can specify those words in the lists below, separated "
+"using commas."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1292
+msgid "Exclude:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1299
+#, fuzzy
+msgid "Include:"
+msgstr "Indisk"
+
+#: src/audacious/ui_preferences.c:1316
+msgid "Recursively search for cover"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1326
+msgid "Search depth: "
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1339
+msgid "Use per-file cover"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1351
+msgid "Show Progress bar for the current track"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1361
+msgid "Delay until filepopup comes up: "
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1886
+#, fuzzy
+msgid "<b>Song Display</b>"
+msgstr "_Filter:"
+
+#: src/audacious/ui_preferences.c:1895
+msgid "Show song numbers"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1916
+msgid "Show information about titlestring format"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1927
+msgid "TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1928
+msgid "ARTIST - TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1929
+msgid "ARTIST - ALBUM - TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1930
+msgid "ARTIST - ALBUM - TRACK. TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1931
+msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1932
+msgid "ALBUM - TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1933
+#, fuzzy
+msgid "Custom"
+msgstr "Bufferttid (ms):"
+
+#: src/audacious/ui_preferences.c:1940
+msgid "Custom string:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1947
+msgid "Title format:"
+msgstr "Titelformat:"
+
+#: src/audacious/ui_preferences.c:1958
+#, fuzzy
+msgid "<b>Popup Information</b>"
+msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#: src/audacious/ui_preferences.c:1973
+msgid "Show popup information for playlist entries"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1975
+msgid ""
+"Toggles popup information window for the pointed entry in the playlist. The "
+"window shows title of song, name of album, genre, year of publish, track "
+"number, track length, and artwork."
+msgstr ""
+
+#: src/audacious/ui_preferences.c:1980
+msgid "Edit settings for popup information"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:2060
+#, fuzzy
+msgid "<b>Audio System</b>"
+msgstr "Förinställningar"
+
+#: src/audacious/ui_preferences.c:2077
+#, fuzzy
+msgid "Buffer size:"
+msgstr "Buffertstorlek (kB):"
+
+#: src/audacious/ui_preferences.c:2095
+#, fuzzy
+msgid "Current output plugin:"
+msgstr "eSound-uppspelningsinsticksmodul"
+
+#: src/audacious/ui_preferences.c:2124
+#, fuzzy
+msgid "Output Plugin Preferences"
+msgstr "OSS-uppspelningsinsticksmodul"
+
+#: src/audacious/ui_preferences.c:2141
+#, fuzzy
+msgid "Output Plugin Information"
+msgstr "Konfiguration av ESD-uppspelningsinsticksmodul"
+
+#: src/audacious/ui_preferences.c:2246
+#, fuzzy
+msgid "_Decoder list:"
+msgstr "Avkodare"
+
+#: src/audacious/ui_preferences.c:2276
+msgid "<span size=\"medium\"><b>Decoders</b></span>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:2289
+#, fuzzy
+msgid "_General plugin list:"
+msgstr "Generella insticksmoduler"
+
+#: src/audacious/ui_preferences.c:2319
+msgid "<span size=\"medium\"><b>General</b></span>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:2331
+#, fuzzy
+msgid "_Visualization plugin list:"
+msgstr "Visualiseringsinsticksmoduler"
+
+#: src/audacious/ui_preferences.c:2361
+#, fuzzy
+msgid "<b>Visualization</b>"
+msgstr "/Visualiseringsläge"
+
+#: src/audacious/ui_preferences.c:2373
+msgid "Effect plugins (for 16-bit output only):"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:2402
+#, fuzzy
+msgid "<b>Effects</b>"
+msgstr "Förinställningar"
+
+#: src/audacious/ui_preferences.c:2597
+#, fuzzy
+msgid "Audacious Preferences"
+msgstr "/Inställningar"
+
+#: src/audacious/util.c:708
+#, fuzzy, c-format
+msgid "Could not create directory (%s): %s\n"
+msgstr "Kunde ej skapa mapp (%s): %s"
+
+#: src/audtool/handlers_playlist.c:241
+msgid "Position not found."
+msgstr ""
+
+#: src/audtool/handlers_vitals.c:64
+msgid "No song playing."
+msgstr ""
+
+#: src/libaudcore/audstrings.c:171
+msgid "  (invalid UTF-8)"
+msgstr "  (invalid UTF-8)"
+
+#: src/libaudgui/ui_about.c:126 src/libaudgui/ui_credits.c:138
+#, fuzzy
+msgid "About Audacious"
+msgstr "Om MPEG-ljudinsticksmodulen"
+
+#: src/libaudgui/ui_about.c:175 src/libaudgui/ui_credits.c:181
+msgid "Credits"
+msgstr ""
+
+#: src/libaudgui/ui_credits.c:185
+msgid "Translators"
+msgstr ""
+
+#: src/libaudgui/ui_fileopener.c:149
+#, fuzzy
+msgid "Open Files"
+msgstr "/Ta borta icke valda"
+
+#: src/libaudgui/ui_fileopener.c:149
+#, fuzzy
+msgid "Add Files"
+msgstr "/Lägg till filer..."
+
+#: src/libaudgui/ui_fileopener.c:151
+#, fuzzy
+msgid "Close dialog on Open"
+msgstr "Stäng"
+
+#: src/libaudgui/ui_fileopener.c:151
+msgid "Close dialog on Add"
+msgstr ""
+
+#: src/libaudgui/ui_jumptotrack.c:142
+#, fuzzy
+msgid "Un_queue"
+msgstr "/_Lägg i väntelista"
+
+#: src/libaudgui/ui_jumptotrack.c:144 src/libaudgui/ui_jumptotrack.c:515
+#, fuzzy
+msgid "_Queue"
+msgstr "Kö"
+
+#: src/libaudgui/ui_jumptotrack.c:401
+#, fuzzy
+msgid "Jump to Track"
+msgstr "bmp: Hoppa till spår"
+
+#: src/libaudgui/ui_jumptotrack.c:444
+msgid "Filter: "
+msgstr "Filter:"
+
+#: src/libaudgui/ui_jumptotrack.c:445
+#, fuzzy
+msgid "_Filter:"
+msgstr "Filter:"
+
+#: src/libaudgui/ui_jumptotrack.c:463
+msgid "Remember"
+msgstr ""
+
+#: src/libaudgui/ui_jumptotrack.c:472
+#, fuzzy
+msgid "Clea_r"
+msgstr "/Rensa kön"
+
+#: src/libaudgui/ui_jumptotrack.c:507
+#, fuzzy
+msgid "Close on Jump"
+msgstr "Stäng"
+
+#: src/libaudgui/ui_urlopener.c:57
+#, fuzzy
+msgid "Add/Open URL Dialog"
+msgstr "/Lägg till filer..."
+
+#: src/libaudgui/ui_urlopener.c:176
+msgid "Enter location to play:"
+msgstr ""
+
+#: src/libeggsmclient/eggdesktopfile.c:140
+msgid "File is not a valid .desktop file"
+msgstr ""
+
+#: src/libeggsmclient/eggdesktopfile.c:162
+#, fuzzy, c-format
+msgid "Unrecognized desktop file Version '%s'"
+msgstr "%s: okänt val `--%s'\n"
+
+#: src/libeggsmclient/eggdesktopfile.c:873
+#, fuzzy, c-format
+msgid "Starting %s"
+msgstr "Mixerinställningar:"
+
+#: src/libeggsmclient/eggdesktopfile.c:1009
+msgid "Application does not accept documents on command line"
+msgstr ""
+
+#: src/libeggsmclient/eggdesktopfile.c:1077
+#, fuzzy, c-format
+msgid "Unrecognized launch option: %d"
+msgstr "%s: okänt val `--%s'\n"
+
+#: src/libeggsmclient/eggdesktopfile.c:1279
+msgid "Can't pass document URIs to a 'Type=Link' desktop entry"
+msgstr ""
+
+#: src/libeggsmclient/eggdesktopfile.c:1298
+msgid "Not a launchable item"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:183
+msgid "Disable connection to session manager"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:186
+msgid "Specify file containing saved configuration"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:186
+msgid "FILE"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:189
+msgid "Specify session management ID"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:189
+msgid "ID"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:225
+msgid "Session Management Options"
+msgstr ""
+
+#: src/libeggsmclient/eggsmclient.c:226
+#, fuzzy
+msgid "Show Session Management options"
+msgstr "Visa fönsterhanterarens dekorationer"
+
+#, fuzzy
+#~ msgid "Playlist Manager"
+#~ msgstr "/Fortsätt ej i spellista"
+
+#, fuzzy
+#~ msgid "_Rename"
+#~ msgstr "/Byt namn"
+
+#, fuzzy
+#~ msgid "Load metadata from playlists and files"
+#~ msgstr "Använd metadata i spellistor"
+
+#, fuzzy
+#~ msgid "Load metadata (tag information) from music files."
+#~ msgstr "Läs markeringsinformation från fil vid:"
+
+#, fuzzy
+#~ msgid "_Effect plugin list:"
+#~ msgstr "Effektinsticksmoduler"
+
+#, fuzzy
+#~ msgid "Jump to Time"
+#~ msgstr "/Hoppa till tiden"
+
+#~ msgid "minutes:seconds"
+#~ msgstr "minuter:sekunder"
+
+#~ msgid "Track length:"
+#~ msgstr "Spårlängd:"
+
+#, fuzzy
+#~ msgid "Save as Static Playlist"
+#~ msgstr "Spara spellista"
+
+#~ msgid "Error writing playlist \"%s\": %s"
+#~ msgstr "Fel vid skrivning av spellista \"%s\": %s"
+
+#~ msgid "%s already exist. Continue?"
+#~ msgstr "%s finns redan. Fortsätt?"
+
+#, fuzzy
+#~ msgid ""
+#~ "<b><big>Unable to save playlist.</big></b>\n"
+#~ "\n"
+#~ "Unknown file type for '%s'.\n"
+#~ msgstr "Kunde ej spara spellista! Okänd filtyp för %s."
+
+#, fuzzy
+#~ msgid "Save Playlist"
+#~ msgstr "Spara spellista"
+
+#, fuzzy
+#~ msgid "Load Playlist"
+#~ msgstr "Ladda spellista"
+
+#~ msgid "Presets"
+#~ msgstr "Förinställningar"
+
+#, fuzzy
+#~ msgid "Mouse"
+#~ msgstr "House"
+
+#, fuzzy
+#~ msgid "Pause between songs"
+#~ msgstr "Pausa mellan sånger i"
+
+#, fuzzy
+#~ msgid "Pause for"
+#~ msgstr "/Paus"
+
+#~ msgid "seconds"
+#~ msgstr "sekunder"
+
+#, fuzzy
+#~ msgid "<b>Filename</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "Convert underscores to blanks"
+#~ msgstr "Konvertera nedsatt streck till tomrum"
+
+#, fuzzy
+#~ msgid "Convert %20 to blanks"
+#~ msgstr "Konvertera %20 till tomrum"
+
+#, fuzzy
+#~ msgid "<b>File Dialog</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "Changes volume by"
+#~ msgstr "Mushjulet justerar volymen med (%)"
+
+#, fuzzy
+#~ msgid "Scrolls playlist by"
+#~ msgstr "Ladda spellista"
+
+#, fuzzy
+#~ msgid "lines"
+#~ msgstr "Oldies"
+
+#, fuzzy
+#~ msgid "<b>Mouse wheel</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "Stop after Current Song"
+#~ msgstr "Stoppa nuvarande sång"
+
+#, fuzzy
+#~ msgid "Peaks"
+#~ msgstr "Skämt"
+
+#, fuzzy
+#~ msgid "Repeat"
+#~ msgstr "/Repetera"
+
+#, fuzzy
+#~ msgid "Shuffle"
+#~ msgstr "/Blanda"
+
+#, fuzzy
+#~ msgid "No Playlist Advance"
+#~ msgstr "/Fortsätt ej i spellista"
+
+#, fuzzy
+#~ msgid "Play"
+#~ msgstr "/Spela"
+
+#, fuzzy
+#~ msgid "Pause"
+#~ msgstr "/Paus"
+
+#, fuzzy
+#~ msgid "Stop"
+#~ msgstr "/Stopp"
+
+#, fuzzy
+#~ msgid "Previous"
+#~ msgstr "/Föregående"
+
+#, fuzzy
+#~ msgid "Next"
+#~ msgstr "/Nästa"
+
+#, fuzzy
+#~ msgid "Visualization"
+#~ msgstr "/Visualiseringsläge"
+
+#, fuzzy
+#~ msgid "Visualization Mode"
+#~ msgstr "/Visualiseringsläge"
+
+#, fuzzy
+#~ msgid "Analyzer Mode"
+#~ msgstr "/Analyseringsläge/Eld"
+
+#, fuzzy
+#~ msgid "Scope Mode"
+#~ msgstr "/Scopeläge"
+
+#, fuzzy
+#~ msgid "Voiceprint Mode"
+#~ msgstr "/Analyseringsläge/Eld"
+
+#, fuzzy
+#~ msgid "WindowShade VU Mode"
+#~ msgstr "/Fönsterskuggningsläge"
+
+#, fuzzy
+#~ msgid "Refresh Rate"
+#~ msgstr "/Uppdateringsfrekvens"
+
+#, fuzzy
+#~ msgid "Analyzer Falloff"
+#~ msgstr "/Analyserarras"
+
+#, fuzzy
+#~ msgid "Peaks Falloff"
+#~ msgstr "/Toppras"
+
+#, fuzzy
+#~ msgid "New Playlist"
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Select Next Playlist"
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Select Previous Playlist"
+#~ msgstr "/Sortera valda/Genom titel"
+
+#, fuzzy
+#~ msgid "Delete Playlist"
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Load List"
+#~ msgstr "/Sortera l ista"
+
+#, fuzzy
+#~ msgid "Loads a playlist file into the selected playlist."
+#~ msgstr "Läs sångtitel och längd när sång visas i spellistan"
+
+#, fuzzy
+#~ msgid "Save List"
+#~ msgstr "/Ny lista"
+
+#, fuzzy
+#~ msgid "Saves the selected playlist."
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Save Default List"
+#~ msgstr "/Spara/förinställning"
+
+#, fuzzy
+#~ msgid "Saves the selected playlist to the default location."
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Refresh List"
+#~ msgstr "/Uppdateringsfrekvens"
+
+#, fuzzy
+#~ msgid "List Manager"
+#~ msgstr "/Fortsätt ej i spellista"
+
+#, fuzzy
+#~ msgid "Opens the playlist manager."
+#~ msgstr "Rensa inte spellistan"
+
+#, fuzzy
+#~ msgid "Add Internet Address..."
+#~ msgstr "/Lägg till mappar..."
+
+#, fuzzy
+#~ msgid "Adds a remote track to the playlist."
+#~ msgstr "Spara spellista"
+
+#, fuzzy
+#~ msgid "Add Files..."
+#~ msgstr "/Lägg till filer..."
+
+#, fuzzy
+#~ msgid "Adds files to the playlist."
+#~ msgstr "Kunde ej skriva spellista!"
+
+#, fuzzy
+#~ msgid "Search and Select"
+#~ msgstr "/Sortera valda"
+
+#, fuzzy
+#~ msgid "Invert Selection"
+#~ msgstr "/Sortera valda"
+
+#, fuzzy
+#~ msgid "Inverts the selected and unselected entries."
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Select All"
+#~ msgstr "/Sortera valda"
+
+#, fuzzy
+#~ msgid "Selects all of the playlist entries."
+#~ msgstr "Välj typsnitt för spellistan:"
+
+#, fuzzy
+#~ msgid "Select None"
+#~ msgstr "/Sortera valda"
+
+#, fuzzy
+#~ msgid "Deselects all of the playlist entries."
+#~ msgstr "Välj typsnitt för spellistan:"
+
+#, fuzzy
+#~ msgid "Remove All"
+#~ msgstr "/Ta bort"
+
+#, fuzzy
+#~ msgid "Removes all entries from the playlist."
+#~ msgstr "/Radera otillgängliga filer"
+
+#, fuzzy
+#~ msgid "Clear Queue"
+#~ msgstr "/Rensa kön"
+
+#, fuzzy
+#~ msgid "Clears the queue associated with this playlist."
+#~ msgstr "/Ny spellista"
+
+#, fuzzy
+#~ msgid "Remove Unavailable Files"
+#~ msgstr "/Radera otillgängliga filer"
+
+#, fuzzy
+#~ msgid "Removes unavailable files from the playlist."
+#~ msgstr "/Radera otillgängliga filer"
+
+#, fuzzy
+#~ msgid "Remove Duplicates"
+#~ msgstr "/Ta bort valda"
+
+#, fuzzy
+#~ msgid "By Title"
+#~ msgstr "Titel"
+
+#, fuzzy
+#~ msgid "Removes duplicate entries from the playlist by title."
+#~ msgstr "/Sortera l ista/Genom sökväg + filnamn"
+
+#, fuzzy
+#~ msgid "By Filename"
+#~ msgstr "Filnamn"
+
+#, fuzzy
+#~ msgid "Removes duplicate entries from the playlist by filename."
+#~ msgstr "/Sortera l ista/Genom sökväg + filnamn"
+
+#, fuzzy
+#~ msgid "By Path + Filename"
+#~ msgstr "/Sortera l ista/Genom sökväg + filnamn"
+
+#, fuzzy
+#~ msgid "Removes duplicate entries from the playlist by their full path."
+#~ msgstr "/Sortera l ista/Genom sökväg + filnamn"
+
+#, fuzzy
+#~ msgid "Remove Unselected"
+#~ msgstr "/Ta bort valda"
+
+#, fuzzy
+#~ msgid "Remove unselected entries from the playlist."
+#~ msgstr "/Sortera l ista/Genom sökväg + filnamn"
+
+#, fuzzy
+#~ msgid "Remove Selected"
+#~ msgstr "/Ta bort valda"
+
+#, fuzzy
+#~ msgid "Remove selected entries from the playlist."
+#~ msgstr "/Sortera l ista/Genom sökväg + filnamn"
+
+#, fuzzy
+#~ msgid "Randomize List"
+#~ msgstr "/Blanda lista"
+
+#, fuzzy
+#~ msgid "Randomizes the playlist."
+#~ msgstr "/Blanda lista"
+
+#, fuzzy
+#~ msgid "Reverse List"
+#~ msgstr "/Vänd på lista"
+
+#, fuzzy
+#~ msgid "Reverses the playlist."
+#~ msgstr "Rensa inte spellistan"
+
+#, fuzzy
+#~ msgid "Sort List"
+#~ msgstr "/Sortera l ista"
+
+#, fuzzy
+#~ msgid "Sorts the list by title."
+#~ msgstr "/Sortera l ista/Genom titel"
+
+#, fuzzy
+#~ msgid "By Album"
+#~ msgstr "Album"
+
+#, fuzzy
+#~ msgid "Sorts the list by album."
+#~ msgstr "/Sortera l ista/Genom titel"
+
+#, fuzzy
+#~ msgid "By Artist"
+#~ msgstr "Artist:"
+
+#, fuzzy
+#~ msgid "Sorts the list by artist."
+#~ msgstr "/Sortera l ista/Genom titel"
+
+#, fuzzy
+#~ msgid "Sorts the list by filename."
+#~ msgstr "/Sortera l ista/Genom filnamn"
+
+#, fuzzy
+#~ msgid "Sorts the list by full pathname."
+#~ msgstr "/Sortera l ista/Genom filnamn"
+
+#, fuzzy
+#~ msgid "By Date"
+#~ msgstr "Datum"
+
+#, fuzzy
+#~ msgid "Sorts the list by modification time."
+#~ msgstr "/Sortera l ista/Genom titel"
+
+#, fuzzy
+#~ msgid "By Track Number"
+#~ msgstr "Spårnummer"
+
+#, fuzzy
+#~ msgid "Sorts the list by track number."
+#~ msgstr "/Sortera l ista/Genom datum"
+
+#, fuzzy
+#~ msgid "By Playlist Entry"
+#~ msgstr "BMP-spellistredigerare"
+
+#, fuzzy
+#~ msgid "Sorts the list by playlist entry."
+#~ msgstr "/Sortera l ista/Genom titel"
+
+#, fuzzy
+#~ msgid "Sort Selected"
+#~ msgstr "/Sortera valda"
+
+#, fuzzy
+#~ msgid "File"
+#~ msgstr "Satir"
+
+#, fuzzy
+#~ msgid "Components"
+#~ msgstr "Kommentar"
+
+#, fuzzy
+#~ msgid "View Track Details"
+#~ msgstr "/Visa spårdetaljer"
+
+#, fuzzy
+#~ msgid "View track details"
+#~ msgstr "/Visa spårdetaljer"
+
+#, fuzzy
+#~ msgid "Play File"
+#~ msgstr "bmp: Spela filer"
+
+#, fuzzy
+#~ msgid "Load and play a file"
+#~ msgstr "Använd metadata i spellistor"
+
+#, fuzzy
+#~ msgid "Play Location"
+#~ msgstr "Plats:"
+
+#, fuzzy
+#~ msgid "Plugin services"
+#~ msgstr "Insticksmoduler"
+
+#, fuzzy
+#~ msgid "Preferences"
+#~ msgstr "/Inställningar"
+
+#, fuzzy
+#~ msgid "Open preferences window"
+#~ msgstr "/Inställningar"
+
+#, fuzzy
+#~ msgid "_Quit"
+#~ msgstr "/_Avsluta"
+
+#, fuzzy
+#~ msgid "Quit Audacious"
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#, fuzzy
+#~ msgid "Set A-B"
+#~ msgstr "/Rensa kön"
+
+#, fuzzy
+#~ msgid "Clear A-B"
+#~ msgstr "/Rensa kön"
+
+#, fuzzy
+#~ msgid "Jump to Playlist Start"
+#~ msgstr "/Hoppa till spellistans start"
+
+#, fuzzy
+#~ msgid "Jump to File"
+#~ msgstr "/Hoppa till fil"
+
+#, fuzzy
+#~ msgid "Queue Toggle"
+#~ msgstr "/Kö-växel"
+
+#~ msgid "Load"
+#~ msgstr "laddning"
+
+#, fuzzy
+#~ msgid "Import"
+#~ msgstr "/Importera"
+
+#, fuzzy
+#~ msgid "Save"
+#~ msgstr "/Spara"
+
+#~ msgid "Delete"
+#~ msgstr "Radera"
+
+#, fuzzy
+#~ msgid "Preset"
+#~ msgstr "Förinställningar"
+
+#~ msgid "Load preset"
+#~ msgstr "Ladda inställningar"
+
+#, fuzzy
+#~ msgid "Auto-load preset"
+#~ msgstr "/Spara/ladda automatiskt inställning"
+
+#, fuzzy
+#~ msgid "Load auto-load preset"
+#~ msgstr "/Ladda/Ladda automatiskt inställning"
+
+#~ msgid "Default"
+#~ msgstr "Förinställt"
+
+#, fuzzy
+#~ msgid "Load default preset into equalizer"
+#~ msgstr "Spara automatisk inställning"
+
+#, fuzzy
+#~ msgid "Zero"
+#~ msgstr "Retro"
+
+#, fuzzy
+#~ msgid "Set equalizer preset levels to zero"
+#~ msgstr "Spara qualizer-inställningar"
+
+#, fuzzy
+#~ msgid "From file"
+#~ msgstr "/Ladda/från fil"
+
+#, fuzzy
+#~ msgid "Load preset from file"
+#~ msgstr "Ladda inställningar"
+
+#, fuzzy
+#~ msgid "From WinAMP EQF file"
+#~ msgstr "/Ladda/från WinAMP EQF-fil"
+
+#, fuzzy
+#~ msgid "Load preset from WinAMP EQF file"
+#~ msgstr "/Ladda/från WinAMP EQF-fil"
+
+#, fuzzy
+#~ msgid "WinAMP Presets"
+#~ msgstr "/Importera/WinAMP-inställningar"
+
+#, fuzzy
+#~ msgid "Import WinAMP presets"
+#~ msgstr "/Importera/WinAMP-inställningar"
+
+#~ msgid "Save preset"
+#~ msgstr "Spara inställningar"
+
+#, fuzzy
+#~ msgid "Save auto-load preset"
+#~ msgstr "/Spara/ladda automatiskt inställning"
+
+#, fuzzy
+#~ msgid "Save default preset"
+#~ msgstr "Spara automatisk inställning"
+
+#, fuzzy
+#~ msgid "To file"
+#~ msgstr "/Spara/till fil"
+
+#, fuzzy
+#~ msgid "Save preset to file"
+#~ msgstr "Spara inställningar"
+
+#, fuzzy
+#~ msgid "To WinAMP EQF file"
+#~ msgstr "Sauver/dans un fichier EQF de Winamp"
+
+#, fuzzy
+#~ msgid "Save preset to WinAMP EQF file"
+#~ msgstr "Sauver/dans un fichier EQF de Winamp"
+
+#~ msgid "Delete preset"
+#~ msgstr "Radera förinställningar"
+
+#, fuzzy
+#~ msgid "Delete auto-load preset"
+#~ msgstr "/Radera/automatiskt laddat preset"
+
+#, fuzzy
+#~ msgid "Audacious core developers:"
+#~ msgstr "/Inställningar"
+
+#, fuzzy
+#~ msgid "Audacious Equalizer"
+#~ msgstr "/Konfigurera equalizer"
+
+#, fuzzy
+#~ msgid "Play files"
+#~ msgstr "bmp: Spela filer"
+
+#, fuzzy
+#~ msgid "Load files"
+#~ msgstr "bmp: Ladda filer"
+
+#~ msgid "VBR"
+#~ msgstr "VBR"
+
+#, fuzzy
+#~ msgid "stereo"
+#~ msgstr "Stereo"
+
+#, fuzzy
+#~ msgid "mono"
+#~ msgstr "Mono"
+
+#, fuzzy
+#~ msgid "Show main player window"
+#~ msgstr "Välj typsnitt för huvudfönstret:"
+
+#, fuzzy
+#~ msgid "Ignore"
+#~ msgstr "(ingen)"
+
+#, fuzzy
+#~ msgid "Do not display this warning again"
+#~ msgstr "Vissa inte denna varning igen"
+
+#, fuzzy
+#~ msgid "Seek to: %d:%-2.2d/%d:%-2.2d (%d%%)"
+#~ msgstr "POSITION: %d:%-2.2d/%d:%-2.2d (%d%%)"
+
+#, fuzzy
+#~ msgid "Options Menu"
+#~ msgstr "Options"
+
+#, fuzzy
+#~ msgid "Disable 'Always On Top'"
+#~ msgstr "/Alltid högst upp"
+
+#, fuzzy
+#~ msgid "Enable 'Always On Top'"
+#~ msgstr "/Alltid högst upp"
+
+#, fuzzy
+#~ msgid "File Info Box"
+#~ msgstr "Fil-info"
+
+#, fuzzy
+#~ msgid "Disable 'GUI Scaling'"
+#~ msgstr "Inaktivera ID3V3-markeringar"
+
+#, fuzzy
+#~ msgid "Visualization Menu"
+#~ msgstr "/Visualiseringsläge"
+
+#, fuzzy
+#~ msgid ""
+#~ "<b><big>Couldn't open audio.</big></b>\n"
+#~ "\n"
+#~ "Please check that:\n"
+#~ "1. You have the correct output plugin selected.\n"
+#~ "2. No other programs is blocking the soundcard.\n"
+#~ "3. Your soundcard is configured properly.\n"
+#~ msgstr ""
+#~ "Kunde ej öppna ljud. Var god kontrollera att:\n"
+#~ "\n"
+#~ "1. Du har den korrekt uppspelningsinsticksmodulen vald.\n"
+#~ "2. Inga andra program blokerar ljudkortet.\n"
+#~ "3. Ditt kort är korrekt konfigurerat."
+
+#, fuzzy
+#~ msgid "Autoscroll Songname"
+#~ msgstr "/Scrolla automatiskt till sångnamn"
+
+#, fuzzy
+#~ msgid "Show Player"
+#~ msgstr "/Visa spellistredigeraren"
+
+#, fuzzy
+#~ msgid "Show Playlist Editor"
+#~ msgstr "/Visa spellistredigeraren"
+
+#, fuzzy
+#~ msgid "Show Equalizer"
+#~ msgstr "BMP Equalizer"
+
+#, fuzzy
+#~ msgid "Always on Top"
+#~ msgstr "/Alltid högst upp"
+
+#, fuzzy
+#~ msgid "Roll up Player"
+#~ msgstr "/Konfigurera equalizer"
+
+#, fuzzy
+#~ msgid "Roll up Playlist Editor"
+#~ msgstr "/Fokusera spellistsredigeraren"
+
+#, fuzzy
+#~ msgid "Roll up Equalizer"
+#~ msgstr "/Konfigurera equalizer"
+
+#, fuzzy
+#~ msgid "Scale"
+#~ msgstr "/Spara"
+
+#, fuzzy
+#~ msgid "DoubleSize"
+#~ msgstr "/Dubbel storlek"
+
+#, fuzzy
+#~ msgid "Easy Move"
+#~ msgstr "/Lätt flyttning"
+
+#, fuzzy
+#~ msgid "Analyzer"
+#~ msgstr "/Analyseringsläge"
+
+#, fuzzy
+#~ msgid "Scope"
+#~ msgstr "/Scopeläge"
+
+#, fuzzy
+#~ msgid "Voiceprint"
+#~ msgstr "/Analyseringsläge/Eld"
+
+#, fuzzy
+#~ msgid "Normal"
+#~ msgstr "ID3-format:"
+
+#, fuzzy
+#~ msgid "Fire"
+#~ msgstr "Satir"
+
+#, fuzzy
+#~ msgid "Vertical Lines"
+#~ msgstr "/Analyseringsläge/Vertikala linjer"
+
+#, fuzzy
+#~ msgid "Lines"
+#~ msgstr "Oldies"
+
+#, fuzzy
+#~ msgid "Bars"
+#~ msgstr "Bass"
+
+#, fuzzy
+#~ msgid "Dot Scope"
+#~ msgstr "/Scopeläge/Punkt"
+
+#, fuzzy
+#~ msgid "Line Scope"
+#~ msgstr "/Scopeläge/Linje"
+
+#, fuzzy
+#~ msgid "Solid Scope"
+#~ msgstr "/Scopeläge/Solid"
+
+#, fuzzy
+#~ msgid "Smooth"
+#~ msgstr "Mono"
+
+#, fuzzy
+#~ msgid "Full (~50 fps)"
+#~ msgstr "/Uppdateringsfrekvens/Max (~50 fps)"
+
+#, fuzzy
+#~ msgid "Half (~25 fps)"
+#~ msgstr "/Uppdateringsfrekvens/Hög (~25 fps)"
+
+#, fuzzy
+#~ msgid "Quarter (~13 fps)"
+#~ msgstr "/Uppdateringsfrekvens/Mediuml (~13 fps)"
+
+#, fuzzy
+#~ msgid "Eighth (~6 fps)"
+#~ msgstr "/Uppdateringsfrekvens/Låg (~6 fps)"
+
+#, fuzzy
+#~ msgid "Slowest"
+#~ msgstr "Showtunes"
+
+#, fuzzy
+#~ msgid "Slow"
+#~ msgstr "Slow Jam"
+
+#, fuzzy
+#~ msgid "Time Elapsed"
+#~ msgstr "/Tid förfluten"
+
+#, fuzzy
+#~ msgid "Time Remaining"
+#~ msgstr "/Tid kvarvarande"
+
+#, fuzzy
+#~ msgid "Plugin Services"
+#~ msgstr "Insticksmoduler"
+
+#, fuzzy
+#~ msgid "Search entries in active playlist"
+#~ msgstr "Visa nummer i spellistan"
+
+#, fuzzy
+#~ msgid "Title: "
+#~ msgstr "Titel:"
+
+#, fuzzy
+#~ msgid "Album: "
+#~ msgstr "Album:"
+
+#, fuzzy
+#~ msgid "Artist: "
+#~ msgstr "Artist:"
+
+#, fuzzy
+#~ msgid "Filename: "
+#~ msgstr "Filnamn:"
+
+#, fuzzy
+#~ msgid "Audacious Playlist Editor"
+#~ msgstr "/Visa spellistredigeraren"
+
+#, fuzzy
+#~ msgid "Appearance"
+#~ msgstr "Trance"
+
+#, fuzzy
+#~ msgid "<b>_Fonts</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "_Player:"
+#~ msgstr "/_Spela"
+
+#, fuzzy
+#~ msgid "Select main player window font:"
+#~ msgstr "Välj typsnitt för huvudfönstret:"
+
+#, fuzzy
+#~ msgid "_Playlist:"
+#~ msgstr "/Spellista"
+
+#, fuzzy
+#~ msgid "Select playlist font:"
+#~ msgstr "Välj typsnitt för huvudfönstret:"
+
+#, fuzzy
+#~ msgid "Use Bitmap fonts if available"
+#~ msgstr "Använd omedelbar prioritet om tillgängligt"
+
+#, fuzzy
+#~ msgid "<b>_Miscellaneous</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "Show track numbers in playlist"
+#~ msgstr "Visa nummer i spellistan"
+
+#, fuzzy
+#~ msgid "Show separators in playlist"
+#~ msgstr "Visa nummer i spellistan"
+
+#, fuzzy
+#~ msgid "Show window manager decoration"
+#~ msgstr "Visa fönsterhanterarens dekorationer"
+
+#, fuzzy
+#~ msgid ""
+#~ "Load metadata on demand when displaying the file in the playlist. You may "
+#~ "need to set \"Detect file formats on demand\" in Audio page for full "
+#~ "benefit."
+#~ msgstr "Läs sångtitel och längd när sång visas i spellistan"
+
+#, fuzzy
+#~ msgid "Blue"
+#~ msgstr "Blues"
+
+#, fuzzy
+#~ msgid "Green"
+#~ msgstr "Genre"
+
+#, fuzzy
+#~ msgid "<b>_Skin</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "Refresh skin list"
+#~ msgstr "/Uppdateringsfrekvens"
+
+#~ msgid "PREAMP"
+#~ msgstr "PREAMP"
+
+#~ msgid "60HZ"
+#~ msgstr "60 HZ"
+
+#~ msgid "170HZ"
+#~ msgstr "170 HZ"
+
+#~ msgid "310HZ"
+#~ msgstr "310 HZ"
+
+#~ msgid "600HZ"
+#~ msgstr "600 HZ"
+
+#~ msgid "1KHZ"
+#~ msgstr "1 KHZ"
+
+#~ msgid "3KHZ"
+#~ msgstr "3 KHZ"
+
+#~ msgid "6KHZ"
+#~ msgstr "6 KHZ"
+
+#~ msgid "12KHZ"
+#~ msgstr "12 KHZ"
+
+#~ msgid "14KHZ"
+#~ msgstr "14 KHZ"
+
+#~ msgid "16KHZ"
+#~ msgstr "16 KHZ"
+
+#, fuzzy
+#~ msgid "Reload Plugins"
+#~ msgstr "/Ladda om tema"
+
+#, fuzzy
+#~ msgid ""
+#~ "Sorry, threads isn't supported on your platform.\n"
+#~ "\n"
+#~ "If you're on a libc5 based linux system and installed Glib & GTK+ before "
+#~ "you\n"
+#~ "installed LinuxThreads you need to recompile Glib & GTK+.\n"
+#~ msgstr ""
+#~ "Tyvärr, trådar stöds inte på din plattform.\n"
+#~ "\n"
+#~ "Om du är på ett libc5-baserat Linux-system och installerat Glib och GTK"
+#~ "+ \n"
+#~ "innan du installerade LinuxThreads måste du kompilera om Glib och GTK+.\n"
+
+#, fuzzy
+#~ msgid "Error in Audacious."
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#, fuzzy
+#~ msgid "Enable 6 dB hard limiter"
+#~ msgstr "Aktivera 6dB-ökning + Hård begränsning"
+
+#, fuzzy
+#~ msgid "Select which Audacious session ID to use"
+#~ msgstr "Välj XMMS-session (Förinställt: 0)"
+
+#, fuzzy
+#~ msgid "Disable 'Doublesize'"
+#~ msgstr "/Dubbel storlek"
+
+#, fuzzy
+#~ msgid "Enable 'Doublesize'"
+#~ msgstr "/Dubbel storlek"
+
+#, fuzzy
+#~ msgid "Equalizer"
+#~ msgstr "BMP Equalizer"
+
+#, fuzzy
+#~ msgid "<b>Presets</b>"
+#~ msgstr "Förinställningar"
+
+#~ msgid "File preset extension:"
+#~ msgstr "Inställningsfilsändelse:"
+
+#~ msgid "Directory preset file:"
+#~ msgstr "Répetoire des fichiers de pré-réglages:"
+
+#, fuzzy
+#~ msgid "Track Information Window"
+#~ msgstr "Spårökning:"
+
+#, fuzzy
+#~ msgid "Preferences Window"
+#~ msgstr "/Inställningar"
+
+#, fuzzy
+#~ msgid "Close"
+#~ msgstr "/Stäng"
+
+#, fuzzy
+#~ msgid "<b>Artist:</b> %s"
+#~ msgstr "Artist:"
+
+#, fuzzy
+#~ msgid "<b>Title:</b> %s"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "<b>Album:</b> %s"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "Audacious last.fm radio tuner"
+#~ msgstr "/Visa spellistredigeraren"
+
+#, fuzzy
+#~ msgid "Station:"
+#~ msgstr "Val:"
+
+#, fuzzy
+#~ msgid "<b>Artist:</b>"
+#~ msgstr "Artist:"
+
+#, fuzzy
+#~ msgid "<b>Title:</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "<b>Album:</b>"
+#~ msgstr "_Filter:"
+
+#~ msgid "VOLUME: %d%%"
+#~ msgstr "VOLYM: %d%%"
+
+#~ msgid "BALANCE: %d%% LEFT"
+#~ msgstr "BALANS: %d%% VÄNSTER"
+
+#~ msgid "BALANCE: CENTER"
+#~ msgstr "BALANS: CENTRUM"
+
+#~ msgid "BALANCE: %d%% RIGHT"
+#~ msgstr "BALANS: %d%% HÖGER"
+
+#, fuzzy
+#~ msgid "Last.fm radio"
+#~ msgstr "Plats:"
+
+#, fuzzy
+#~ msgid "Play Last.fm radio"
+#~ msgstr "Plats:"
+
+#, fuzzy
+#~ msgid "Add CD..."
+#~ msgstr "/Lägg till URL..."
+
+#, fuzzy
+#~ msgid "Play CD"
+#~ msgstr "/Spela CD-ljud"
+
+#~ msgid "Performer/Artist"
+#~ msgstr "Artist"
+
+#~ msgid "File name"
+#~ msgstr "Filnamn"
+
+#~ msgid "File path"
+#~ msgstr "Sökväg"
+
+#~ msgid "File extension"
+#~ msgstr "Filändelse"
+
+#~ msgid "Track name"
+#~ msgstr "Spårnamn"
+
+#~ msgid "Track number"
+#~ msgstr "Spårnummer"
+
+#, fuzzy
+#~ msgid ""
+#~ "Sorry, your GTK+ version (%d.%d.%d) does not work with Audacious.\n"
+#~ "Please use GTK+ %s or newer.\n"
+#~ msgstr ""
+#~ "Tyvärr, din GTK+ version (%d.%d.%d) fungerar inte med BMP.\n"
+#~ "Var god använd GTK+ %s eller nyare.\n"
+
+#~ msgid "OPTIONS MENU"
+#~ msgstr "VALMENY"
+
+#~ msgid "DISABLE ALWAYS ON TOP"
+#~ msgstr "INAKTIVERA ALLTID ÖVERST"
+
+#~ msgid "ENABLE ALWAYS ON TOP"
+#~ msgstr "AKTIVERA ALLTID ÖVERST"
+
+#~ msgid "FILE INFO BOX"
+#~ msgstr "FIL-INFO BOX"
+
+#~ msgid "DISABLE DOUBLESIZE"
+#~ msgstr "INAKTIVERA DUBBEL STORLEK"
+
+#~ msgid "ENABLE DOUBLESIZE"
+#~ msgstr "AKTIVERA DUBBEL STORLEK"
+
+#~ msgid "VISUALIZATION MENU"
+#~ msgstr "VISUALISERINGSMENY"
+
+#, fuzzy
+#~ msgid "Track name: "
+#~ msgstr "Spårnamn:"
+
+#, fuzzy
+#~ msgid "Album name: "
+#~ msgstr "Album"
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "Received SIGSEGV\n"
+#~ "\n"
+#~ "This could be a bug in Audacious. If you don't know why this happened, "
+#~ "file a bug at http://bugs-meta.atheme.org/\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Mottog SIGSEGV\n"
+#~ "\n"
+#~ "Det  är möjligt att detta är en bugg i BMP. Skicka en epost till oss på \n"
+#~ "beepmp-devel@lists.sourceforge.net om du inte vet varför det hände.\n"
+
+#, fuzzy
+#~ msgid "Enable playlist transparency"
+#~ msgstr "Aktivera ReplayGain"
+
+#~ msgid "%s: option `%s' is ambiguous\n"
+#~ msgstr "%s: valet `%s' är tvetydigt\n"
+
+#~ msgid "%s: option `--%s' doesn't allow an argument\n"
+#~ msgstr "%s valet `--%s' accepterar inte ett argument\n"
+
+#~ msgid "%s: option `%c%s' doesn't allow an argument\n"
+#~ msgstr "%s: valet `%c%s' accepterar inte ett argument\n"
+
+#~ msgid "%s: option `%s' requires an argument\n"
+#~ msgstr "%s: valet `%s' behöver ett argument\n"
+
+#~ msgid "%s: unrecognized option `%c%s'\n"
+#~ msgstr "%s: okänt val `%c%s'\n"
+
+#~ msgid "%s: illegal option -- %c\n"
+#~ msgstr "%s: otillåtet val -- %c\n"
+
+#~ msgid "%s: invalid option -- %c\n"
+#~ msgstr "%s: inkorrekt val -- %c\n"
+
+#~ msgid "%s: option requires an argument -- %c\n"
+#~ msgstr "%s: val kräver ett argument -- %c\n"
+
+#~ msgid "%s: option `-W %s' is ambiguous\n"
+#~ msgstr "%s: valet `-W %s' är tvetydigt\n"
+
+#~ msgid "%s: option `-W %s' doesn't allow an argument\n"
+#~ msgstr "%s: valet `-W %s' tillåter inte ett argument\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "Usage: audacious [options] [files] ...\n"
+#~ "\n"
+#~ "Options:\n"
+#~ "--------\n"
+#~ msgstr ""
+#~ "Användning: beep-media-player [val] [filer] ...\n"
+#~ "\n"
+#~ "Val:\n"
+#~ "--------\n"
+
+#, fuzzy
+#~ msgid "Display this text and exit"
+#~ msgstr "Visa den här texten och avsluta."
+
+#, fuzzy
+#~ msgid "Activate Audacious"
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#~ msgid "Previous session ID"
+#~ msgstr "Tidigare sessions-ID"
+
+#, fuzzy
+#~ msgid "Print version number and exit\n"
+#~ msgstr "Skriv versionsnummer och avsluta."
+
+#, fuzzy
+#~ msgid "Add/Open Files dialog"
+#~ msgstr "/Lägg till filer..."
+
+#, fuzzy
+#~ msgid "Artist Popup"
+#~ msgstr "Artist:"
+
+#, fuzzy
+#~ msgid "<i>Genre</i>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "<i>Year</i>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "<i>Track Number</i>"
+#~ msgstr "Spårnummer"
+
+#, fuzzy
+#~ msgid "<i>Track Length</i>"
+#~ msgstr "Spårlängd:"
+
+#~ msgid "/View Track Details"
+#~ msgstr "/Visa spårdetaljer"
+
+#~ msgid "/Visualization Mode/Analyzer"
+#~ msgstr "/Visualiseringsläge/Analyserare"
+
+#~ msgid "/Visualization Mode/Scope"
+#~ msgstr "/Visualiseringsläge/Scope"
+
+#, fuzzy
+#~ msgid "/Visualization Mode/Voiceprint"
+#~ msgstr "/Visualiseringsläge/Scope"
+
+#~ msgid "/Visualization Mode/Off"
+#~ msgstr "/Visualiseringsläge/Av"
+
+#~ msgid "/Analyzer Mode/Normal"
+#~ msgstr "/Analyseringsläge/Normal"
+
+#~ msgid "/Analyzer Mode/Lines"
+#~ msgstr "/Analyseringsläge/Linjer"
+
+#~ msgid "/Analyzer Mode/Bars"
+#~ msgstr "/Analyseringsläge/Staplar"
+
+#~ msgid "/Analyzer Mode/Peaks"
+#~ msgstr "/Analyseringsläge/Toppar"
+
+#, fuzzy
+#~ msgid "/Voiceprint mode/Normal"
+#~ msgstr "/Analyseringsläge/Normal"
+
+#~ msgid "/WindowShade VU Mode/Normal"
+#~ msgstr "/Fönsterskuggningsläge/Normal"
+
+#~ msgid "/WindowShade VU Mode/Smooth"
+#~ msgstr "/Fönsterskuggningsläge/Smidig"
+
+#~ msgid "/Analyzer Falloff/Slowest"
+#~ msgstr "/Analyserarras/Långsamast"
+
+#~ msgid "/Analyzer Falloff/Slow"
+#~ msgstr "/Analyserarras/Långsam"
+
+#~ msgid "/Analyzer Falloff/Medium"
+#~ msgstr "/Analyserarras/Medium"
+
+#~ msgid "/Analyzer Falloff/Fast"
+#~ msgstr "/Analyserarras/Snabb"
+
+#~ msgid "/Analyzer Falloff/Fastest"
+#~ msgstr "/Analyserarras/Snabbast"
+
+#~ msgid "/Peaks Falloff/Slowest"
+#~ msgstr "/Toppras/Långsamast"
+
+#~ msgid "/Peaks Falloff/Slow"
+#~ msgstr "/Toppras/Långsam"
+
+#~ msgid "/Peaks Falloff/Medium"
+#~ msgstr "/Toppras/Medium"
+
+#~ msgid "/Peaks Falloff/Fast"
+#~ msgstr "/Toppras/Snabb"
+
+#~ msgid "/Peaks Falloff/Fastest"
+#~ msgstr "/Toppras/Snabbast"
+
+#~ msgid "/Pause"
+#~ msgstr "/Paus"
+
+#~ msgid "/-"
+#~ msgstr "/-"
+
+#~ msgid "/Jump to Time"
+#~ msgstr "/Hoppa till tiden"
+
+#, fuzzy
+#~ msgid "/About Audacious"
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#, fuzzy
+#~ msgid "/Files..."
+#~ msgstr "/Lägg till filer..."
+
+#, fuzzy
+#~ msgid "/Internet location..."
+#~ msgstr "/Lägg till mappar..."
+
+#, fuzzy
+#~ msgid "New List"
+#~ msgstr "/Ny lista"
+
+#, fuzzy
+#~ msgid "Creates a new playlist."
+#~ msgstr "Spara spellista"
+
+#, fuzzy
+#~ msgid "Displays track information."
+#~ msgstr "Spårökning:"
+
+#~ msgid "/Load"
+#~ msgstr "/Ladda"
+
+#~ msgid "/Load/Preset"
+#~ msgstr "/Ladda/inställning"
+
+#~ msgid "/Load/Default"
+#~ msgstr "/Ladda/förinställning"
+
+#~ msgid "/Load/Zero"
+#~ msgstr "/Ladda/Noll"
+
+#~ msgid "/Import"
+#~ msgstr "/Importera"
+
+#~ msgid "/Save"
+#~ msgstr "/Spara"
+
+#~ msgid "/Save/Preset"
+#~ msgstr "/Spara/inställning"
+
+#~ msgid "/Save/Default"
+#~ msgstr "/Spara/förinställning"
+
+#~ msgid "/Save/To file"
+#~ msgstr "/Spara/till fil"
+
+#~ msgid "/Delete"
+#~ msgstr "/Radera"
+
+#~ msgid "/Delete/Preset"
+#~ msgstr "/Rader/inställning"
+
+#~ msgid "Load auto-preset"
+#~ msgstr "Ladda automatiskt inställningar"
+
+#~ msgid "Load equalizer preset"
+#~ msgstr "Ladda equalizer-inställningar"
+
+#~ msgid "Delete auto-preset"
+#~ msgstr "Radera automatisk inställning"
+
+#, fuzzy
+#~ msgid "/Remove Duplicates/By Title"
+#~ msgstr "/Sortera l ista/Genom titel"
+
+#, fuzzy
+#~ msgid "/Remove Duplicates/By Filename"
+#~ msgstr "/Sortera l ista/Genom filnamn"
+
+#~ msgid "/Update View"
+#~ msgstr "/Uppdatera synfält"
+
+#~ msgid "/Sort List/By Date"
+#~ msgstr "/Sortera l ista/Genom datum"
+
+#~ msgid "/Sort Selection/By Title"
+#~ msgstr "/Sortera valda/Genom titel"
+
+#, fuzzy
+#~ msgid "/Sort Selection/By Artist"
+#~ msgstr "/Sortera valda/Genom titel"
+
+#~ msgid "/Sort Selection/By Filename"
+#~ msgstr "/Sortera valda/Genom filnamn"
+
+#~ msgid "/Sort Selection/By Path + Filename"
+#~ msgstr "/Sortera valda/Genom sökväg + filnamn"
+
+#~ msgid "/Sort Selection/By Date"
+#~ msgstr "/Sortera valda/Genom datum"
+
+#, fuzzy
+#~ msgid "/Sort Selection/By Track Number"
+#~ msgstr "/Sortera valda/Genom datum"
+
+#, fuzzy
+#~ msgid "/Sort Selection/By Playlist Entry"
+#~ msgstr "/Sortera valda/Genom titel"
+
+#, fuzzy
+#~ msgid "<b>_Miscillaneous UI Features</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "About AudioCompress"
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#~ msgid "Ok"
+#~ msgstr "Ok"
+
+#, fuzzy
+#~ msgid "About Extra Stereo Plugin"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid "Configure Extra Stereo"
+#~ msgstr "/Konfigurera equalizer"
+
+#, fuzzy
+#~ msgid "Effect intensity:"
+#~ msgstr "Effektinsticksmoduler"
+
+#, fuzzy
+#~ msgid "Cancel"
+#~ msgstr "Dans"
+
+#, fuzzy
+#~ msgid "About LIRC Audacious Plugin"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid "LIRC Plugin "
+#~ msgstr "Insticksmoduler"
+
+#, fuzzy
+#~ msgid "LIRC Plugin"
+#~ msgstr "Insticksmoduler"
+
+#~ msgid "Username:"
+#~ msgstr "Användarnamn:"
+
+#~ msgid "Password:"
+#~ msgstr "Lösenord:"
+
+#, fuzzy
+#~ msgid "About Scrobbler Plugin"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid "Scrobbler Plugin"
+#~ msgstr "Uppspelningsinsticksmoduler"
+
+#, fuzzy
+#~ msgid "Commands"
+#~ msgstr "Kommentar"
+
+#, fuzzy
+#~ msgid "Command:"
+#~ msgstr "Kommentar:"
+
+#, fuzzy
+#~ msgid "About "
+#~ msgstr "Om"
+
+#, fuzzy
+#~ msgid "AMIDI-Plug - warning"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "AMIDI-Plug - select file"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "AMIDI-Plug - configuration"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#~ msgid "Name:"
+#~ msgstr "Namn:"
+
+#, fuzzy
+#~ msgid " MIDI Info "
+#~ msgstr "CD-info"
+
+#, fuzzy
+#~ msgid "Length (msec):"
+#~ msgstr "Längd:"
+
+#, fuzzy
+#~ msgid "Num of Tracks:"
+#~ msgstr "bmp: Hoppa till spår"
+
+#~ msgid "CD Audio Plugin"
+#~ msgstr "CD-ljudinsticksmodul"
+
+#~ msgid "CD Audio Track %02u"
+#~ msgstr "CD-spår %02u"
+
+#~ msgid "(unknown)"
+#~ msgstr "(okänd)"
+
+#~ msgid "Drive %d"
+#~ msgstr "Enhet %d"
+
+#~ msgid ""
+#~ "Failed to open device %s\n"
+#~ "Error: %s\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Kunde ej öppna enhet %s\n"
+#~ "Fel: %s\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "Failed to read \"Table of Contents\"\n"
+#~ "Maybe no disc in the drive?\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Kunde ej läsa innehållsförteckning\n"
+#~ "Kontrollera att CD:n är i spelaren\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "Device %s OK.\n"
+#~ "Disc has %d tracks"
+#~ msgstr ""
+#~ "Enhet %s OK.\n"
+#~ "Skivan har %d spår"
+
+#~ msgid " (%d data tracks)"
+#~ msgstr " (%d dataspår)"
+
+#~ msgid ""
+#~ "\n"
+#~ "Total length: %d:%d\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Total längd: %d:%d\n"
+
+#~ msgid ""
+#~ "Digital audio extraction not tested as the disc has no audio tracks\n"
+#~ msgstr ""
+#~ "Digitalljudläsning inte testat, eftersom skivan inte har några ljudspår.\n"
+
+#~ msgid ""
+#~ "Digital audio extraction test: OK\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Test av digitalljudläsning: OK\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "Digital audio extraction test failed: %s\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Test av digitalljudläsning misslyckades: %s\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "Failed to check directory %s\n"
+#~ "Error: %s"
+#~ msgstr ""
+#~ "Kunde ej kontrollera mappen %s\n"
+#~ "Fel: %s"
+
+#~ msgid "Error: %s exist, but is not a directory"
+#~ msgstr "Fel: %s finns, men är inte en mapp"
+
+#~ msgid "Directory %s OK."
+#~ msgstr "Mapp %s OK."
+
+#~ msgid "Device:"
+#~ msgstr "Enhet:"
+
+#~ msgid "_Device:"
+#~ msgstr "_Enhet:"
+
+#~ msgid "Dir_ectory:"
+#~ msgstr "Enh_et:"
+
+#~ msgid "Play mode:"
+#~ msgstr "Spelläge:"
+
+#~ msgid "Analog"
+#~ msgstr "Analog"
+
+#~ msgid "Digital audio extraction"
+#~ msgstr "Digitalljudläsning"
+
+#~ msgid "No mixer"
+#~ msgstr "Ingen mixer"
+
+#~ msgid "CDROM drive"
+#~ msgstr "CDROM-enhet"
+
+#~ msgid "OSS mixer"
+#~ msgstr "OSS-mixer"
+
+#~ msgid "Check drive..."
+#~ msgstr "Kontrollera enhet..."
+
+#~ msgid "Remove drive"
+#~ msgstr "Ta bort enhet"
+
+#~ msgid "CD Audio Player Configuration"
+#~ msgstr "Konfiguration av CD-ljudspelare"
+
+#~ msgid "Add drive"
+#~ msgstr "Lägg till enhet"
+
+#~ msgid "Device"
+#~ msgstr "Enhet"
+
+#~ msgid "CDDB:"
+#~ msgstr "CDDB:"
+
+#~ msgid "Use CDDB"
+#~ msgstr "Utiliser CDDB"
+
+#~ msgid "Get server list"
+#~ msgstr "Récupérer la liste du serveur"
+
+#~ msgid "Show network window"
+#~ msgstr "Voir la fenêtre réseau"
+
+#~ msgid "CDDB server:"
+#~ msgstr "CDDB-server"
+
+#~ msgid "CD Index:"
+#~ msgstr "CD-Index:"
+
+#~ msgid "Use CD Index"
+#~ msgstr "Använd CD-index"
+
+#~ msgid "CD Index server:"
+#~ msgstr "CD-indexserver"
+
+#~ msgid "Override generic titles"
+#~ msgstr "Kör över generella titlar"
+
+#~ msgid "Name format:"
+#~ msgstr "Namnformat:"
+
+#~ msgid "CD Info"
+#~ msgstr "CD-info"
+
+#, fuzzy
+#~ msgid "Unicode (UTF-8)"
+#~ msgstr "  (invalid UTF-8)"
+
+#, fuzzy
+#~ msgid "User Defined"
+#~ msgstr "Användarbestämd:"
+
+#~ msgid "Select the directory where you want to store the MPEG streams:"
+#~ msgstr "Välj mappen där du vill spara MPEG-strömmen:"
+
+#, fuzzy
+#~ msgid "Flac Configuration"
+#~ msgstr "Konfiguration av CD-ljudspelare"
+
+#, fuzzy
+#~ msgid "Enable ReplayGain processing"
+#~ msgstr "Aktivera ReplayGain"
+
+#, fuzzy
+#~ msgid "Resolution"
+#~ msgstr "Upplösning:"
+
+#, fuzzy
+#~ msgid "Without ReplayGain"
+#~ msgstr "ReplayGain"
+
+#, fuzzy
+#~ msgid "With ReplayGain"
+#~ msgstr "ReplayGain"
+
+#, fuzzy
+#~ msgid "Enable dithering"
+#~ msgstr "Aktivera insticksmodul"
+
+#, fuzzy
+#~ msgid "16 bps"
+#~ msgstr "16 bitar"
+
+#, fuzzy
+#~ msgid "Output"
+#~ msgstr "Uppspelningsinsticksmoduler"
+
+#~ msgid "Buffer size (kb):"
+#~ msgstr "Buffertstorlek (kB):"
+
+#~ msgid "Pre-buffer (percent):"
+#~ msgstr "Förbuffert (procent):"
+
+#~ msgid "Save stream to disk:"
+#~ msgstr "Spara ström till disk:"
+
+#~ msgid "Save stream to disk"
+#~ msgstr "Spara ström till disk"
+
+#~ msgid "Path:"
+#~ msgstr "Sökväg:"
+
+#~ msgid "Browse"
+#~ msgstr "Bläddra"
+
+#~ msgid "SHOUT/Icecast:"
+#~ msgstr "SHOUT/Icecast:"
+
+#~ msgid "Enable SHOUT/Icecast title streaming"
+#~ msgstr "Aktivera SHOUT/Icecast titelströmning"
+
+#~ msgid "Enable Icecast Metadata UDP Channel"
+#~ msgstr "Aktivera UDP-kanal för Icecast-metadata"
+
+#~ msgid "Streaming"
+#~ msgstr "Strömmar"
+
+#, fuzzy
+#~ msgid "About Flac Plugin"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid "Samplerate: %d Hz"
+#~ msgstr "Uppsamlingstakt:"
+
+#, fuzzy
+#~ msgid "Channels: %d"
+#~ msgstr "Kanaler:"
+
+#, fuzzy
+#~ msgid ""
+#~ "Samples: %llu\n"
+#~ "Length: %d:%.2d"
+#~ msgstr ""
+#~ "\n"
+#~ "Total längd: %d:%d\n"
+
+#, fuzzy
+#~ msgid "Filesize: %ld B"
+#~ msgstr "Filstorlek:"
+
+#, fuzzy
+#~ msgid "Tag:"
+#~ msgstr "Tango"
+
+#~ msgid "Comment:"
+#~ msgstr "Kommentar:"
+
+#~ msgid "Date:"
+#~ msgstr "Datum:"
+
+#~ msgid "Track number:"
+#~ msgstr "Spårnummer:"
+
+#~ msgid "Genre:"
+#~ msgstr "Genre"
+
+#, fuzzy
+#~ msgid "Remove Tag"
+#~ msgstr "/Ta bort"
+
+#, fuzzy
+#~ msgid "FLAC Info:"
+#~ msgstr "CD-info"
+
+#, fuzzy
+#~ msgid "File Info - %s"
+#~ msgstr "Fil-info"
+
+#~ msgid "Error"
+#~ msgstr "Fel"
+
+#~ msgid "LOOKING UP %s"
+#~ msgstr "KOLLAR UPP %s"
+
+#~ msgid "Couldn't look up host %s"
+#~ msgstr "Kunde ej hitta värd %s"
+
+#~ msgid "CONNECTING TO %s:%d"
+#~ msgstr "ANSLUTER TILL %s:%d"
+
+#~ msgid "Couldn't connect to host %s"
+#~ msgstr "Kunde ej ansluta till värd %s"
+
+#~ msgid "CONNECTED: WAITING FOR REPLY"
+#~ msgstr "ANSLUTEN: VÄNTAR PÅ SVAR"
+
+#~ msgid ""
+#~ "Couldn't connect to host %s\n"
+#~ "Server reported: %s"
+#~ msgstr ""
+#~ "Kunde ej ansluta till värd %s\n"
+#~ "Servern svarade: %s"
+
+#~ msgid "PRE-BUFFERING: %dKB/%dKB"
+#~ msgstr "FÖR-BUFFRAR: %dKO/%dKO"
+
+#, fuzzy
+#~ msgid "FLAC Audio Plugin"
+#~ msgstr "CD-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "ModPlug Configuration"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#~ msgid "16 bit"
+#~ msgstr "16 bitar"
+
+#~ msgid "8 bit"
+#~ msgstr "8 bitar"
+
+#, fuzzy
+#~ msgid "Channels"
+#~ msgstr "Kanaler:"
+
+#, fuzzy
+#~ msgid "48 kHz"
+#~ msgstr "1:1 (44 kHz)"
+
+#, fuzzy
+#~ msgid "44 kHz"
+#~ msgstr "1:1 (44 kHz)"
+
+#, fuzzy
+#~ msgid "22 kHz"
+#~ msgstr "1:2 (22 kHz)"
+
+#, fuzzy
+#~ msgid "11 kHz"
+#~ msgstr "1:1 (44 kHz)"
+
+#, fuzzy
+#~ msgid "Resampling"
+#~ msgstr "Strömmar"
+
+#, fuzzy
+#~ msgid "Fast Playlist Info"
+#~ msgstr "Ladda spellista"
+
+#, fuzzy
+#~ msgid "Reverb"
+#~ msgstr "Server"
+
+#, fuzzy
+#~ msgid "Enable"
+#~ msgstr "(aktiverad)"
+
+#, fuzzy
+#~ msgid "Depth"
+#~ msgstr "Duett"
+
+#, fuzzy
+#~ msgid "Delay"
+#~ msgstr "Spela"
+
+#, fuzzy
+#~ msgid "Amount"
+#~ msgstr "Om"
+
+#, fuzzy
+#~ msgid "Range"
+#~ msgstr "Rave"
+
+#, fuzzy
+#~ msgid "Preamp"
+#~ msgstr "Dream"
+
+#, fuzzy
+#~ msgid "Effects"
+#~ msgstr "Förinställningar"
+
+#, fuzzy
+#~ msgid "MOD Info"
+#~ msgstr "CD-info"
+
+#, fuzzy
+#~ msgid "Samples"
+#~ msgstr "Salsa"
+
+#, fuzzy
+#~ msgid "Instruments"
+#~ msgstr "Instrumentell"
+
+#, fuzzy
+#~ msgid "About Modplug"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid "MPEG Audio Plugin Configuration"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#~ msgid "Resolution:"
+#~ msgstr "Upplösning:"
+
+#~ msgid "Channels:"
+#~ msgstr "Kanaler:"
+
+#~ msgid "Stereo (if available)"
+#~ msgstr "Stereo (om tillgängligt)"
+
+#~ msgid "Mono"
+#~ msgstr "Mono"
+
+#~ msgid "Down sample:"
+#~ msgstr "Ner sampla:"
+
+#~ msgid "1:1 (44 kHz)"
+#~ msgstr "1:1 (44 kHz)"
+
+#~ msgid "1:2 (22 kHz)"
+#~ msgstr "1:2 (22 kHz)"
+
+#~ msgid "1:4 (11 kHz)"
+#~ msgstr "1:4 (11 kHz)"
+
+#~ msgid "Decoder"
+#~ msgstr "Avkodare"
+
+#~ msgid "ID3 Tags:"
+#~ msgstr "ID3-markering:"
+
+#~ msgid "ID3 format:"
+#~ msgstr "ID3-format:"
+
+#~ msgid "Joint stereo"
+#~ msgstr "Sammansatt stereo"
+
+#~ msgid "Dual channel"
+#~ msgstr "Dubbel kanal"
+
+#~ msgid "Single channel"
+#~ msgstr "Enkel kanal"
+
+#~ msgid "%d KBit/s"
+#~ msgstr "%d kbit/s"
+
+#~ msgid "%ld Hz"
+#~ msgstr "%ld Hz"
+
+#~ msgid "50/15 ms"
+#~ msgstr "50/15 ms"
+
+#~ msgid "CCIT J.17"
+#~ msgstr "CCIT J.17"
+
+#~ msgid "No"
+#~ msgstr "Nej"
+
+#~ msgid "Yes"
+#~ msgstr "Ja"
+
+#~ msgid " MPEG Info "
+#~ msgstr " MPEG-info "
+
+#~ msgid "MPEG Level:"
+#~ msgstr "MPEG-nivå:"
+
+#~ msgid "Bit rate:"
+#~ msgstr "Bit-hastighet:"
+
+#~ msgid "Sample rate:"
+#~ msgstr "Uppsamlingstakt:"
+
+#~ msgid "File size:"
+#~ msgstr "Filstorlek:"
+
+#, fuzzy
+#~ msgid "Mode:"
+#~ msgstr "Avkodare:"
+
+#~ msgid "Error Protection:"
+#~ msgstr "Felskydd:"
+
+#~ msgid "Copyright:"
+#~ msgstr "Copyright:"
+
+#~ msgid "Original:"
+#~ msgstr "Orginal:"
+
+#~ msgid "Emphasis:"
+#~ msgstr "Betoning:"
+
+#~ msgid " ID3 Tag "
+#~ msgstr " ID3-markering "
+
+#~ msgid "Year:"
+#~ msgstr "Årtal:"
+
+#~ msgid "N/A"
+#~ msgstr "N/A"
+
+#~ msgid "%s"
+#~ msgstr "%s"
+
+#~ msgid "%lu Bytes"
+#~ msgstr "%lu bytes"
+
+#, fuzzy
+#~ msgid "Couldn't connect to host %s:%d"
+#~ msgstr "Kunde ej ansluta till värd %s"
+
+#, fuzzy
+#~ msgid "PRE-BUFFERING: %zuKB/%zuKB"
+#~ msgstr "FÖR-BUFFRAR: %dKO/%dKO"
+
+#~ msgid "About MPEG Audio Plugin"
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#~ msgid "MPEG Audio Plugin"
+#~ msgstr "MPEG-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "TiMidity Configuration"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "11000 Hz"
+#~ msgstr "1:1 (44 kHz)"
+
+#, fuzzy
+#~ msgid "22000 Hz"
+#~ msgstr "1:2 (22 kHz)"
+
+#, fuzzy
+#~ msgid "44100 Hz"
+#~ msgstr "1:1 (44 kHz)"
+
+#, fuzzy
+#~ msgid "Sample Width"
+#~ msgstr "Uppsamlingstakt:"
+
+#, fuzzy
+#~ msgid "TiMidity Configuration File"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "TiMidity Plugin %s"
+#~ msgstr "Insticksmodul: %s"
+
+#, fuzzy
+#~ msgid "Couldn't load MIDI file"
+#~ msgstr "Kunde ej hitta värd %s"
+
+#~ msgid "Select the directory where you want to store the Ogg Vorbis streams:"
+#~ msgstr "Välj mappen där du vill spara OGG-Vorbis-strömmarna:"
+
+#, fuzzy
+#~ msgid "Ogg Vorbis Audio Plugin Configuration"
+#~ msgstr "bmp: Konfiguration av OGG-Vorbis-ljudinsticksmodul"
+
+#~ msgid "Ogg Vorbis Tags:"
+#~ msgstr "OGG-Vorbis-markering:"
+
+#~ msgid "ReplayGain Settings:"
+#~ msgstr "ReplayGain-inställningar:"
+
+#~ msgid "ReplayGain Type:"
+#~ msgstr "ReplayGain-typ:"
+
+#~ msgid "use Track Gain/Peak"
+#~ msgstr "använd spårets Ökning/Topp"
+
+#~ msgid "use Album Gain/Peak"
+#~ msgstr "använd albumets Ökning/Topp"
+
+#~ msgid "Enable 6dB Boost + Hard Limiting"
+#~ msgstr "Aktivera 6dB-ökning + Hård begränsning"
+
+#~ msgid ""
+#~ "An error occured:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Ett fel påträffades:\n"
+#~ "%s"
+
+#~ msgid "Error!"
+#~ msgstr "Fel!"
+
+#, fuzzy
+#~ msgid "Failed to modify tag (open)"
+#~ msgstr "Kunde ej modifiera markering"
+
+#, fuzzy
+#~ msgid "Failed to modify tag (close)"
+#~ msgstr "Kunde ej modifiera markering"
+
+#~ msgid "Failed to modify tag"
+#~ msgstr "Kunde ej modifiera markering"
+
+#~ msgid " Ogg Vorbis Tag "
+#~ msgstr " OGG-Vorbis-markering "
+
+#~ msgid "Description:"
+#~ msgstr "Beskrivning:"
+
+#~ msgid "Version:"
+#~ msgstr "Version:"
+
+#~ msgid "ISRC number:"
+#~ msgstr "ISRC-nummer:"
+
+#~ msgid "Organization:"
+#~ msgstr "Organisation:"
+
+#~ msgid " Ogg Vorbis ReplayGain "
+#~ msgstr " OGG-Vorbis-ReplayGain "
+
+#~ msgid "Album peak:"
+#~ msgstr "Albumsstopp:"
+
+#~ msgid " Ogg Vorbis Info "
+#~ msgstr " OGG-Vorbis-info "
+
+#~ msgid "Length:"
+#~ msgstr "Längd:"
+
+#~ msgid "%d KBit/s (nominal)"
+#~ msgstr "%d kbit/s (nominal)"
+
+#~ msgid "%d Hz"
+#~ msgstr "%d Hz"
+
+#~ msgid "%d"
+#~ msgstr "%d"
+
+#~ msgid "%d:%.2d"
+#~ msgstr "%d:%.2d"
+
+#~ msgid "%d Bytes"
+#~ msgstr "%d bytes"
+
+#~ msgid "Ogg Vorbis Audio Plugin"
+#~ msgstr "OGG-Vorbis-ljudinsticksmodul"
+
+#~ msgid "About Ogg Vorbis Audio Plugin"
+#~ msgstr "Om OGG-Vorbis-ljudinsticksmodul"
+
+#~ msgid ""
+#~ "Ogg Vorbis Plugin by the Xiph.org Foundation\n"
+#~ "\n"
+#~ "Original code by\n"
+#~ "Tony Arcieri <bascule@inferno.tusculum.edu>\n"
+#~ "Contributions from\n"
+#~ "Chris Montgomery <monty@xiph.org>\n"
+#~ "Peter Alm <peter@xmms.org>\n"
+#~ "Michael Smith <msmith@labyrinth.edu.au>\n"
+#~ "Jack Moffitt <jack@icecast.org>\n"
+#~ "Jorn Baayen <jorn@nl.linux.org>\n"
+#~ "Haavard Kvaalen <havardk@xmms.org>\n"
+#~ "Gian-Carlo Pascutto <gcp@sjeng.org>\n"
+#~ "\n"
+#~ "Visit the Xiph.org Foundation at http://www.xiph.org/\n"
+#~ msgstr ""
+#~ "OGG-Vorbis-insticksmodul av Xiph.org-stiftelsen\n"
+#~ "\n"
+#~ "Orginal kod\n"
+#~ "Tony Arcieri <bascule@inferno.tusculum.edu>\n"
+#~ "Tillägg från\n"
+#~ "Chris Montgomery <monty@xiph.org>\n"
+#~ "Peter Alm <peter@xmms.org>\n"
+#~ "Michael Smith <msmith@labyrinth.edu.au>\n"
+#~ "Jack Moffitt <jack@icecast.org>\n"
+#~ "Jorn Baayen <jorn@nl.linux.org>\n"
+#~ "Haavard Kvaalen <havardk@xmms.org>\n"
+#~ "Gian-Carlo Pascutto <gcp@sjeng.org>\n"
+#~ "\n"
+#~ "Besök Xiph.org-stiftelsen på http://www.xiph.org/\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "Adapted for Audacious usage by Tony Vroon <chainsaw@gentoo.org>\n"
+#~ "from the xmms_sndfile plugin which is:\n"
+#~ "Copyright (C) 2000, 2002 Erik de Castro Lopo\n"
+#~ "\n"
+#~ "This program is free software ; you can redistribute it and/or modify \n"
+#~ "it under the terms of the GNU General Public License as published by \n"
+#~ "the Free Software Foundation ; either version 2 of the License, or \n"
+#~ "(at your option) any later version. \n"
+#~ " \n"
+#~ "This program is distributed in the hope that it will be useful, \n"
+#~ "but WITHOUT ANY WARRANTY ; without even the implied warranty of \n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  \n"
+#~ "See the GNU General Public License for more details. \n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public \n"
+#~ "License along with this program ; if not, write to \n"
+#~ "the Free Software Foundation, Inc., \n"
+#~ "51 Franklin Street, Fifth Floor, \n"
+#~ "Boston, MA  02110-1301  USA"
+#~ msgstr ""
+#~ "XMMS ESounD-insticksmodul\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,\n"
+#~ "USA."
+
+#, fuzzy
+#~ msgid "sndfile WAV plugin"
+#~ msgstr "Aktivera insticksmodul"
+
+#~ msgid "WAV Audio Plugin"
+#~ msgstr "WAV-ljudinsticksmodul"
+
+#, fuzzy
+#~ msgid "About %s"
+#~ msgstr "Om"
+
+#~ msgid "OSS Output Plugin"
+#~ msgstr "OSS-uppspelningsinsticksmodul"
+
+#~ msgid "About OSS Driver"
+#~ msgstr "Om OSS-drivrutinen"
+
+#, fuzzy
+#~ msgid ""
+#~ "Audacious OSS Driver\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-"
+#~ "1301,\n"
+#~ "USA."
+#~ msgstr ""
+#~ "XMMS OSS-drivrutin\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,\n"
+#~ "USA."
+
+#~ msgid "Default (%s)"
+#~ msgstr "Förinställning (%s)"
+
+#~ msgid "OSS Driver configuration"
+#~ msgstr "Konfiguration av OSS-drivrutin"
+
+#~ msgid "Audio device:"
+#~ msgstr "Ljudenhet:"
+
+#~ msgid "Use alternate device:"
+#~ msgstr "Använd alternativ enhet:"
+
+#~ msgid "Mixer device:"
+#~ msgstr "Mixerenhet:"
+
+#~ msgid "Devices"
+#~ msgstr "Enheter:"
+
+#~ msgid "Buffer size (ms):"
+#~ msgstr "Buffertstorlek (ms):"
+
+#~ msgid "Buffering"
+#~ msgstr "Buffrande"
+
+#~ msgid "Mixer Settings:"
+#~ msgstr "Mixerinställningar:"
+
+#~ msgid "Volume controls Master not PCM"
+#~ msgstr "Master-volymkontrol och inte PCM"
+
+#~ msgid "Mixer"
+#~ msgstr "Mixer"
+
+#~ msgid "About ALSA Driver"
+#~ msgstr "Om ALSA-drivrutinen"
+
+#, fuzzy
+#~ msgid ""
+#~ "Audacious ALSA Driver\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-"
+#~ "1301,\n"
+#~ "USA.\n"
+#~ "Author: Matthieu Sozeau (mattam@altern.org)"
+#~ msgstr ""
+#~ "XMMS ALSA-drivrutin\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,\n"
+#~ "USA.\n"
+#~ "Auteur: Matthieu Sozeau (mattam@altern.org)"
+
+#, fuzzy
+#~ msgid "ALSA %s output plugin"
+#~ msgstr "Insticksmodul för ALSA-uppspelning %s"
+
+#, fuzzy
+#~ msgid "Default PCM device (%s)"
+#~ msgstr "Förinställning (%s)"
+
+#~ msgid "ALSA Driver configuration"
+#~ msgstr "Konfiguration av ALSA-drivrutin"
+
+#, fuzzy
+#~ msgid "Mixer:"
+#~ msgstr "Mixer"
+
+#~ msgid "Mixer card:"
+#~ msgstr "Mixerkort:"
+
+#~ msgid "Device settings"
+#~ msgstr "Enhetsinställningar"
+
+#, fuzzy
+#~ msgid "Soundcard:"
+#~ msgstr "Soundtrack"
+
+#~ msgid "Buffer time (ms):"
+#~ msgstr "Bufferttid (ms):"
+
+#~ msgid "Period time (ms):"
+#~ msgstr "Tidsperiod (ms):"
+
+#~ msgid "Advanced settings"
+#~ msgstr "Avancerade inställningar"
+
+#, fuzzy
+#~ msgid "aRts Driver configuration"
+#~ msgstr "Konfiguration av OSS-drivrutin"
+
+#, fuzzy
+#~ msgid "Select the directory where you want to store the output files:"
+#~ msgstr "Välj mappen där du vill spara MPEG-strömmen:"
+
+#, fuzzy
+#~ msgid "Disk Writer Configuration"
+#~ msgstr "Konfiguration av OSS-drivrutin"
+
+#~ msgid "About ESounD Plugin"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid ""
+#~ "Audacious ESounD Plugin\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-"
+#~ "1301,\n"
+#~ "USA."
+#~ msgstr ""
+#~ "XMMS ESounD-insticksmodul\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,\n"
+#~ "USA."
+
+#~ msgid "Host:"
+#~ msgstr "Värd:"
+
+#~ msgid "Use remote host"
+#~ msgstr "Använd fjärrvärd"
+
+#~ msgid "Volume controls OSS mixer"
+#~ msgstr "Volym kontrollerar OSS-mixer"
+
+#~ msgid "Port:"
+#~ msgstr "Port:"
+
+#~ msgid "Server"
+#~ msgstr "Server"
+
+#~ msgid "eSound Output Plugin"
+#~ msgstr "eSound-uppspelningsinsticksmodul"
+
+#, fuzzy
+#~ msgid "About JACK Output Plugin 0.15"
+#~ msgstr "eSound-uppspelningsinsticksmodul"
+
+#, fuzzy
+#~ msgid "About the Sun Driver"
+#~ msgstr "Om OSS-drivrutinen"
+
+#, fuzzy
+#~ msgid "Audio control device:"
+#~ msgstr "Ljudenhet:"
+
+#, fuzzy
+#~ msgid "Volume controls device:"
+#~ msgstr "Volymkontrol:"
+
+#, fuzzy
+#~ msgid "Sun driver configuration"
+#~ msgstr "Konfiguration av OSS-drivrutin"
+
+#~ msgid "/Toggle Decorations"
+#~ msgstr "/Växla dekorationer"
+
+#~ msgid "Blur scope"
+#~ msgstr "Blur scope"
+
+#~ msgid "Blur Scope: Color selection"
+#~ msgstr "Blur scope: Färgval"
+
+#, fuzzy
+#~ msgid "<b>_Transparency</b>"
+#~ msgstr "/Kontroll"
+
+#, fuzzy
+#~ msgid "Scrobbler Configuration"
+#~ msgstr "bmp: Konfiguration av MPEG-ljudinsticksmodul"
+
+#~ msgid "Warning"
+#~ msgstr "Varning"
+
+#, fuzzy
+#~ msgid "Song Change Configuration"
+#~ msgstr "Konfiguration av CD-ljudspelare"
+
+#, fuzzy
+#~ msgid "Song Metadata"
+#~ msgstr "Sonat"
+
+#, fuzzy
+#~ msgid "Port"
+#~ msgstr "Port:"
+
+#, fuzzy
+#~ msgid "Client name"
+#~ msgstr "Filnamn"
+
+#, fuzzy
+#~ msgid "Port name"
+#~ msgstr "Spårnamn"
+
+#, fuzzy
+#~ msgid "ALSA output ports"
+#~ msgstr "Insticksmodul för ALSA-uppspelning %s"
+
+#, fuzzy
+#~ msgid "Mixer settings"
+#~ msgstr "Mixerinställningar:"
+
+#, fuzzy
+#~ msgid "<b>Name:</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "<b>WMA Version:</b>"
+#~ msgstr "/Visualiseringsläge"
+
+#, fuzzy
+#~ msgid "<b>Channels:</b>"
+#~ msgstr "Kanaler:"
+
+#, fuzzy
+#~ msgid "<b>Filesize:</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "WMA Info"
+#~ msgstr "CD-info"
+
+#, fuzzy
+#~ msgid "<b>Comments:</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "<b>Track:</b>"
+#~ msgstr "/Kontroll"
+
+#, fuzzy
+#~ msgid "Tags"
+#~ msgstr "Tango"
+
+#, fuzzy
+#~ msgid "_Media plugin list:"
+#~ msgstr "Teman"
+
+#~ msgid "Use proxy"
+#~ msgstr "Använd en proxy"
+
+#~ msgid "Frames:"
+#~ msgstr "Rutor:"
+
+#~ msgid ""
+#~ "Variable,\n"
+#~ "avg. bitrate: %d KBit/s"
+#~ msgstr ""
+#~ "Variabel,\n"
+#~ "g.s. bit-hastighet: %d kbit/s"
+
+#~ msgid ""
+#~ "%s\n"
+#~ "Unable to write to file: %s"
+#~ msgstr ""
+#~ "%s\n"
+#~ "Kunde ej skriva till fil: %s"
+
+#~ msgid "Couldn't write tag!"
+#~ msgstr "Kunde ej skriva markering!"
+
+#~ msgid ""
+#~ "%s\n"
+#~ "Unable to open file: %s"
+#~ msgstr ""
+#~ "%s\n"
+#~ "Kunde ej öppna fil: %s"
+
+#~ msgid ""
+#~ "%s\n"
+#~ "Unable to truncate file: %s"
+#~ msgstr ""
+#~ "%s\n"
+#~ "Kunde ej kapa fil: %s"
+
+#~ msgid "Couldn't remove tag!"
+#~ msgstr "Kunde ej ta bort markering!"
+
+#~ msgid "No tag to remove!"
+#~ msgstr "Ingen markering att ta bort!"
+
+#, fuzzy
+#~ msgid "About TiMidity Plugin"
+#~ msgstr "Om MPEG-ljudinsticksmodulen"
+
+#, fuzzy
+#~ msgid "TiMidity Plugin"
+#~ msgstr "MPEG-ljudinsticksmodul"
+
+#~ msgid "Content"
+#~ msgstr "Innehåll"
+
+#~ msgid "Extension"
+#~ msgstr "Ändelse"
+
+#~ msgid "Extension and content"
+#~ msgstr "Ändelse och innehåll"
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "Copyright (C) 2000-2004  Peter Eisenlohr <peter@eisenlohr.org>\n"
+#~ "\n"
+#~ "based on the original OSS Output Plugin  Copyright (C) 1998-2000\n"
+#~ "Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson and 4Front "
+#~ "Technologies\n"
+#~ "\n"
+#~ "This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,\n"
+#~ "USA."
+#~ msgstr ""
+#~ "XMMS ESounD-insticksmodul\n"
+#~ "\n"
+#~ " This program is free software; you can redistribute it and/or modify\n"
+#~ "it under the terms of the GNU General Public License as published by\n"
+#~ "the Free Software Foundation; either version 2 of the License, or\n"
+#~ "(at your option) any later version.\n"
+#~ "\n"
+#~ "This program is distributed in the hope that it will be useful,\n"
+#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+#~ "GNU General Public License for more details.\n"
+#~ "\n"
+#~ "You should have received a copy of the GNU General Public License\n"
+#~ "along with this program; if not, write to the Free Software\n"
+#~ "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,\n"
+#~ "USA."
+
+#, fuzzy
+#~ msgid " Enable"
+#~ msgstr "(aktiverad)"
+
+#, fuzzy
+#~ msgid "About XMMS Crossfade Plugin"
+#~ msgstr "Om ESounD-insticksmodulen"
+
+#, fuzzy
+#~ msgid "Advanced XF"
+#~ msgstr "Avancerade inställningar"
+
+#, fuzzy
+#~ msgid "Advanced options"
+#~ msgstr "Avancerade inställningar"
+
+#~ msgid "Configure"
+#~ msgstr "Konfigurera"
+
+#, fuzzy
+#~ msgid "Crossfade"
+#~ msgstr "Crossover"
+
+#, fuzzy
+#~ msgid "Crossfader"
+#~ msgstr "Crossover"
+
+#, fuzzy
+#~ msgid "Enable volume control"
+#~ msgstr "Volymkontrol:"
+
+#, fuzzy
+#~ msgid "Limit OP buffer usage (ms):"
+#~ msgstr "Buffertstorlek (ms):"
+
+#, fuzzy
+#~ msgid "Mixing buffer size (ms):"
+#~ msgstr "Buffertstorlek (ms):"
+
+#, fuzzy
+#~ msgid "Position:"
+#~ msgstr "Beskrivning:"
+
+#, fuzzy
+#~ msgid "Quality:"
+#~ msgstr "/_Avsluta"
+
+#, fuzzy
+#~ msgid "Rate:"
+#~ msgstr "Datum:"
+
+#, fuzzy
+#~ msgid "Reopen"
+#~ msgstr "/Repetera"
+
+#, fuzzy
+#~ msgid "Set the duration for the fadein when starting playback."
+#~ msgstr "Läs sång titel och längd endast när sång börjar spelas"
+
+#, fuzzy
+#~ msgid "Use plugin"
+#~ msgstr "Aktivera insticksmodul"
+
+#, fuzzy
+#~ msgid "Volume control options"
+#~ msgstr "Volymkontrol:"
+
+#, fuzzy
+#~ msgid "Volume normalizer"
+#~ msgstr "Volymkontrol:"
+
+#, fuzzy
+#~ msgid "same file"
+#~ msgstr "/Ladda/från fil"
+
+#, fuzzy
+#~ msgid "LibVisual Audacious Plugin"
+#~ msgstr "Visualiseringsinsticksmoduler"
+
+#~ msgid "Visualization Plugins"
+#~ msgstr "Visualiseringsinsticksmoduler"
+
+#, fuzzy
+#~ msgid "All plugins"
+#~ msgstr "Aktivera insticksmodul"
+
+#, fuzzy
+#~ msgid "Only GL plugins"
+#~ msgstr "Aktivera insticksmodul"
+
+#, fuzzy
+#~ msgid " (enabled)"
+#~ msgstr "(aktiverad)"
+
+#, fuzzy
+#~ msgid "Version: "
+#~ msgstr "Version:"
+
+#, fuzzy
+#~ msgid " error"
+#~ msgstr "Terror"
+
+#, fuzzy
+#~ msgid "Cannot get options"
+#~ msgstr "Spara val"
+
+#~ msgid "DISABLE ALWAYS ON TOP (N/A)"
+#~ msgstr "INAKTIVERA ALLTID ÖVERST (N/A)"
+
+#~ msgid "ENABLE ALWAYS ON TOP (N/A)"
+#~ msgstr "AKTIVERA ALLTID ÖVERST (N/A)"
+
+#, fuzzy
+#~ msgid "Downsample:"
+#~ msgstr "Ner sampla:"
+
+#~ msgid "%s - BMP"
+#~ msgstr "%s - BMP"
+
+#~ msgid "bmp: %s"
+#~ msgstr "bmp: %s"
+
+#, fuzzy
+#~ msgid "/Play Directory"
+#~ msgstr "Enh_et:"
+
+#, fuzzy
+#~ msgid "Add Folders"
+#~ msgstr "/Lägg till filer..."
+
+#, fuzzy
+#~ msgid "/Add Folders..."
+#~ msgstr "/Lägg till filer..."
+
+#~ msgid "3DNow! optimized decoder"
+#~ msgstr "3DNow!-optimerad avkodare!"
+
+#~ msgid "MMX optimized decoder"
+#~ msgstr "MMX-optimerad avkodare"
+
+#~ msgid "FPU decoder"
+#~ msgstr "FPU-avkodare"
+
+#~ msgid ""
+#~ "mpg123 decoding engine by Michael Hipp <mh@mpg123.de>\n"
+#~ "Plugin by The XMMS team"
+#~ msgstr ""
+#~ "mpg123-avkodarmotor av Michael Hipp <mh@mpg123.de>\n"
+#~ "Insticksmodul av XMMS-laget"
+
+#~ msgid "Advanced settings:"
+#~ msgstr "Avancerade inställningar:"
+
+#, fuzzy
+#~ msgid "Thread buffer time (ms):"
+#~ msgstr "Bufferttid (ms):"
+
+#~ msgid "Mmap mode"
+#~ msgstr "Mmap-läge"
+
+#~ msgid "About BMP"
+#~ msgstr "Om BMP"
+
+#~ msgid "BMP Equalizer"
+#~ msgstr "BMP Equalizer"
+
+#~ msgid "Beep Media Player"
+#~ msgstr "Beep Media Player"
+
+#~ msgid "/About BMP"
+#~ msgstr "/Om BMP"
+
+#~ msgid "BMP"
+#~ msgstr "BMP"
+
+#, fuzzy
+#~ msgid "Add Internet Address"
+#~ msgstr "/Lägg till mappar..."
+
+#~ msgid "/Visualization plugins"
+#~ msgstr "/Visualiserings insticksmoduler"
+
+#~ msgid "/5 seconds REW"
+#~ msgstr "/5 sekunder bakåt"
+
+#~ msgid "/5 seconds FFWD"
+#~ msgstr "/5 sekunder framåt"
+
+#~ msgid "/_Options"
+#~ msgstr "/_Val"
+
+#~ msgid "/Show Graphical EQ"
+#~ msgstr "/Visa grafisk EQ"
+
+#~ msgid "/Show on all desktops"
+#~ msgstr "/Vissa på alla skrivbord"
+
+#~ msgid "/WindowShade Mode"
+#~ msgstr "/Fönsterskuggningsläge"
+
+#~ msgid "/Playlist WindowShade Mode"
+#~ msgstr "/Fönsterskuggningsläge för spellistan"
+
+#~ msgid "/Equalizer WindowShade Mode"
+#~ msgstr "/Fönsterskuggningsläge för equalizern"
+
+#~ msgid "Jump to:"
+#~ msgstr "Hoppa till:"
+
+#~ msgid "Jump"
+#~ msgstr "Hoppa"
+
+#, fuzzy
+#~ msgid "Add URL"
+#~ msgstr "Lägg till URL..."
+
+#~ msgid "/By extension"
+#~ msgstr "/Genom ändelse"
+
+#~ msgid "/Playlist"
+#~ msgstr "/Spellista"
+
+#~ msgid "/Close Window"
+#~ msgstr "/Stäng fönster"
+
+#~ msgid "/Sort by Title"
+#~ msgstr "/Sortera genom titel"
+
+#~ msgid "/Sort by Filename"
+#~ msgstr "/Sortera genom filnamn"
+
+#~ msgid "/Sort by Date"
+#~ msgstr "/Sortera genom datum"
+
+#~ msgid "Failed to delete \"%s\": %s."
+#~ msgstr "Kunde ej radera \"%s\": %s."
+
+#~ msgid "%d of %d files successfully deleted."
+#~ msgstr "%d av %d filer borttagna felfritt."
+
+#~ msgid "XMMS: Files deleted"
+#~ msgstr "BMP: Filer raderade"
+
+#~ msgid "Really delete %d files?"
+#~ msgstr "Radera %d filer?"
+
+#~ msgid "Really delete: \"%s\"?"
+#~ msgstr "Radera: \"%s\"?"
+
+#, fuzzy
+#~ msgid "Smooth title scrolling in main window"
+#~ msgstr "Jämn titelrullning"
+
+#, fuzzy
+#~ msgid "Directory browser"
+#~ msgstr "Répetoire des fichiers de pré-réglages:"
+
+#, fuzzy
+#~ msgid "Unplayable files - BMP"
+#~ msgstr "bmp: Ospelbara filer"
+
+#~ msgid ""
+#~ "The following files could not be played. They are either not accessible "
+#~ "or require a dedicated input plugin."
+#~ msgstr ""
+#~ "Följande filer kunde inte spelas upp. De var antingen otillgängliga eller "
+#~ "kräver en särskild insticksmodul."
+
+#, fuzzy
+#~ msgid "/Add/Directories..."
+#~ msgstr "/Lägg till mappar..."
+
+#, fuzzy
+#~ msgid "Add Directories... "
+#~ msgstr "/Lägg till mappar..."
+
+#, fuzzy
+#~ msgid "Look into sub_folders"
+#~ msgstr "Kolla i underkataloger"
+
+#, fuzzy
+#~ msgid "<b>Other options</b>"
+#~ msgstr "_Filter:"
+
+#, fuzzy
+#~ msgid "BMP Equalizer Preferences"
+#~ msgstr "BMP Equalizer"
+
+#~ msgid ""
+#~ "If \"Auto\" is enabled on the equalizer, xmms will try to load equalizer "
+#~ "presets like this:\n"
+#~ "1: Look for a preset file in the directory of the file we are about to "
+#~ "play.\n"
+#~ "2: Look for a directory preset file in the same directory.\n"
+#~ "3: Look for a preset saved with the \"auto-load\" feature\n"
+#~ "4: Finally, try to load the \"default\" preset"
+#~ msgstr ""
+#~ "Om \"Auto\" är aktiverat i equalizern, så kommer BMP att försöka ladda "
+#~ "equalizerinställningarna så här:\n"
+#~ "1: Söka efter en inställningsfil i mappen för filen vi pratar om.\n"
+#~ " 2: Söka efter en katalogförinställningsfil i samma katalog.\n"
+#~ "3: Söka efter en förinställning m.h.a. \"auto-laddaren\".\n"
+#~ "4: Och slutligen, försöka ladda urpsrungsinställningen."
+
+#, fuzzy
+#~ msgid "/Jump to Track"
+#~ msgstr "bmp: Hoppa till spår"
+
+#~ msgid "/Save as..."
+#~ msgstr "/Spara som..."
+
+#, fuzzy
+#~ msgid "A_dd all"
+#~ msgstr "Lägg till alla"
+
+#, fuzzy
+#~ msgid "<b>_Main window font:</b>"
+#~ msgstr "Police de la fenêtre principale:"
+
+#~ msgid "Mixer device"
+#~ msgstr "Mixerenhet"
+
+#, fuzzy
+#~ msgid "BMP: Add Directories... "
+#~ msgstr "/Lägg till mappar..."
+
+#~ msgid "Import equalizer presets"
+#~ msgstr "Importera inställningar för equalizern"
+
+#~ msgid "Version: %s"
+#~ msgstr "Version: %s"
+
+#~ msgid "/Skin Browser"
+#~ msgstr "/Bläddra bland teman"
+
+#~ msgid "Effects Plugins"
+#~ msgstr "Effektinsticksmoduler"
+
+#~ msgid "General Plugins"
+#~ msgstr "Generella insticksmoduler"
+
+#~ msgid "Demand"
+#~ msgstr "behov"
+
+#, fuzzy
+#~ msgid "Read song information as soon as the song is loaded to the playlist"
+#~ msgstr "Läs sångtitel och längd så snart som sång laddes i spellistan"
+
+#~ msgid "Warn about non-playable files"
+#~ msgstr "Varna om ej-spelbara filer"
+
+#~ msgid "Sort \"Jump to file\" alphabetically"
+#~ msgstr "Sortera \"hoppa till fil\" alfabetiskt"
+
+#~ msgid "Allow multiple instances"
+#~ msgstr "Tillåt flera instanser"
+
+#~ msgid "Always show clutterbar"
+#~ msgstr "Använd alltid snabbtillgänglighetsbård"
+
+#, fuzzy
+#~ msgid ""
+#~ "The \"clutterbar\" is the row of buttons at the left side of the main "
+#~ "window"
+#~ msgstr ""
+#~ "\"Snabbtillgänglighetsbården\" är raden med knappar på vänster sida om  "
+#~ "huvudfönstret"
+
+#~ msgid "Save window positions"
+#~ msgstr "Spara fönstrerpositioner"
+
+#~ msgid "Dim titlebar when inactive"
+#~ msgstr "Dimma titelraden vid inaktivtet"
+
+#~ msgid "Equalizer doublesize linked"
+#~ msgstr "Equalizer dubbel storlek länkad"
+
+#~ msgid "Use '\\' as a directory delimiter"
+#~ msgstr "Använd '\\' som mappavgränsare"
+
+#~ msgid "pixels"
+#~ msgstr "pixlar"
+
+#, fuzzy
+#~ msgid "%"
+#~ msgstr "%d"
+
+#~ msgid "Audio I/O Plugins"
+#~ msgstr "Ljud I/O-insticksmoduler"
+
+#~ msgid "Fonts"
+#~ msgstr "Typsnitt"
+
+#~ msgid "BMP Skin Browser"
+#~ msgstr "BMP Tema bläddrare"
+
+#~ msgid "Select random skin on play"
+#~ msgstr "Välj slumpmässigt tema vid uppspelning"
+
+#~ msgid "/E_xpand"
+#~ msgstr "U_tvidga"
+
+#~ msgid "/_Collapse"
+#~ msgstr "/_Stäng"
+
+#~ msgid "/Collapse Tree"
+#~ msgstr "/Dra ihop träd"
+
+#~ msgid "Searching folders..."
+#~ msgstr "Söker i kataloger..."
+
+#~ msgid "bmp: Add Files..."
+#~ msgstr "bmp: Lägg till filer..."
+
+#~ msgid "bmp: Configure Equalizer"
+#~ msgstr "bmp: Konfigurera equalizer"
+
+#~ msgid "bmp: Jump to time"
+#~ msgstr "bmp: Hoppa till tiden"
+
+#~ msgid "Cannot play CD"
+#~ msgstr "Kan ej spela CD"
+
+#~ msgid ""
+#~ "The inserted CD is not an Audio CD.\n"
+#~ "Unable to start playback."
+#~ msgstr ""
+#~ "Den insatta CD:n är inte en ljud-CD.\n"
+#~ "Kan ej starta uppspelning."
+
+#~ msgid ""
+#~ "Realtime priority is a way for BMP to get a higher\n"
+#~ "priority for CPU time.  This might give less \"skips\".\n"
+#~ "\n"
+#~ "This requires that BMP is run with root privileges and\n"
+#~ "may, although it's very unusal, lock up your computer.\n"
+#~ "Running BMP with root privilegies might also have\n"
+#~ "security implications.\n"
+#~ "\n"
+#~ "Using this feature is not encouraged.\n"
+#~ "To activate this you need to restart BMP."
+#~ msgstr ""
+#~ "Att sätta prioriteringen till omedelbar är ett sätt för BMP\n"
+#~ "att få högre prioritet om CPU-tiden. Det här kan leda till\n"
+#~ "färre hack.\n"
+#~ "\n"
+#~ "Detta kräver att BMP körs med root-privilegier och\n"
+#~ "kan, om än väldigt ovanligt, låsa din dator.\n"
+#~ "Att köra BMP med root-privilegier kan också ha\n"
+#~ "säkerhetsimplikationer.\n"
+#~ "\n"
+#~ "Användning av detta är inte att rekommendera.\n"
+#~ "För att aktivera den här finessen måste du starta om BMP."
+
+#~ msgid "Transparent playlist window"
+#~ msgstr "Genomskinligt spellistsfönster"
+
+#~ msgid "Run BMP with higher priority (not recomended)"
+#~ msgstr "Kör BMP med högre prioritet (ej rekommenderat)"
+
+#~ msgid "Snap windows at"
+#~ msgstr "Fäst fönstren vid"
+
+#~ msgid "bmp: Preferences and Settings"
+#~ msgstr "bmp: Preferenser och inställningar"
+
+#~ msgid "bmp: Add Url..."
+#~ msgstr "bmp: Lägg till URL..."
+
+#~ msgid "bmp"
+#~ msgstr "bmp"
+
+#~ msgid "bmp: Error: File exists!"
+#~ msgstr "bmp: Fel: Filen finns redan!"
+
+#~ msgid "Overwrite"
+#~ msgstr "Skriv över"
+
+#~ msgid "Unknown filetype for %s"
+#~ msgstr "%s är av okänd filtyp"
+
+#~ msgid "Determine file type:"
+#~ msgstr "Bestäm filtyp:"
+
+#~ msgid "bmp: Error: Delete files?"
+#~ msgstr "bmp: Fel: Radera filer?"
