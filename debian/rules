@@ -15,12 +15,6 @@ override_dh_auto_clean:
 override_dh_strip:
 	dh_strip --dbg-package=audacious-dbg
 
-override_dh_install:
-	ln -sf audacious2.1 debian/tmp/usr/share/man/man1/audacious.1
-	ln -sf audtool2.1 debian/tmp/usr/share/man/man1/audtool.1
-	dh_install --sourcedir=debian/tmp/
-
-
 override_dh_installdirs:
 	dh_installdirs
 	mkdir -p ./debian/tmp/usr/share/pixmaps
