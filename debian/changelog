@@ -15,10 +15,10 @@ audacious (2.3-1) experimental; urgency=low
 
   [ Benjamin Drung ]
   * Bump libmcs-dev version to >= 0.7 (Closes: #508630).
-  * Change build id from UNSUPPORTED VERSION to <vendor> package 
+  * Change build id from UNSUPPORTED VERSION to <vendor> package
    (Closes: #572773).
   * Add symbol files for libraries.
-
+  * Various cleanups.
 
  -- Chris Taylor <ctaylor@debian.org>  Fri, 02 Apr 2010 21:37:21 +0000
 
