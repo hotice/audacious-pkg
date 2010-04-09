@@ -22,8 +22,8 @@ override_dh_strip:
 
 override_dh_install:
 	dh_install --sourcedir=debian/tmp/
-	ln -sf /usr/share/man/man1/audacious2.1 debian/tmp/usr/share/man/man1/audacious.1
-	ln -sf /usr/share/man/man1/audtool2.1 debian/tmp/usr/share/man/man1/audtool.1
+	ln -sf audacious2.1 debian/tmp/usr/share/man/man1/audacious.1
+	ln -sf audtool2.1 debian/tmp/usr/share/man/man1/audtool.1
 
 
 override_dh_installdirs:
