@@ -16,14 +16,15 @@ Standards-Version: 3.8.4
 
 Package: audacious
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},
-         audacious-plugins (>> 2.0),
+Depends: audacious-plugins (>> 2.0),
          dbus,
          dbus-x11,
          libaudclient2 (= ${binary:Version}),
          libaudid3tag2 (= ${binary:Version}),
          libaudcore1 (= ${binary:Version}),
-         gtk2-engines-pixbuf
+         gtk2-engines-pixbuf,
+         ${misc:Depends},
+         ${shlibs:Depends}
 Provides: audacious2
 Replaces: libsad2, libaudutil1
 Recommends: unzip
@@ -49,7 +50,7 @@ Description: small and fast audio player which supports lots of formats
 
 Package: libaudid3tag2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Conflicts: audacious (<< 1.4~)
 Description: audacious id3 tag manipulation library
  Audacious is a fork of beep-media-player which supports winamp skins
@@ -73,7 +74,7 @@ Description: audacious id3 tag manipulation library
 
 Package: libaudclient2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: audacious dbus remote control library
  Audacious is a fork of beep-media-player which supports winamp skins
  and many codecs.
@@ -96,7 +97,7 @@ Description: audacious dbus remote control library
 
 Package: libaudcore1
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: audacious core engine library
  Audacious is a fork of beep-media-player which supports winamp skins
  and many codecs.
@@ -131,7 +132,7 @@ Depends: libaudclient2 (= ${binary:Version}),
          libmcs-dev (>= 0.4.1),
          libmowgli-dev (>= 0.4),
          libsamplerate0-dev | libsamplerate-dev,
-	 ${misc:Depends}
+         ${misc:Depends}
 Provides: libaudid3tag-dev, libaudclient-dev, libaudcore-dev
 Description: audacious development files
  Audacious is a fork of beep-media-player which supports winamp skins
@@ -161,7 +162,7 @@ Description: audacious development files
 Package: audacious-dbg
 Section: debug
 Architecture: any
-Depends: audacious, , ${misc:Depends}
+Depends: audacious, ${misc:Depends}
 Provides: libaudid3tag2-dbg, libaudclient2-dbg, libaudcore1-dbg
 Recommends: audacious-plugins-dbg
 Priority: extra
