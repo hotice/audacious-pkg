@@ -1,5 +1,6 @@
 audacious (2.3-1) experimental; urgency=low
 
+  -Chris Taylor
   * New uploader.
   * New upstream release. (Closes: #559055)
   * Use source format 3.0 (quilt)
@@ -9,9 +10,14 @@ audacious (2.3-1) experimental; urgency=low
   * Remove libaudutil* from packaging.
     - Add replaces in debian/control.
   * Add libaudtag and libaudgui to libaudcore1.
-  * Update debian/control.
   * Bump standards-version.
   * Update debian/copyright.
+
+  -Benjamin Drung <bdrung@ubuntu.com>
+  * Bump libmcs-dev version to >= 0.7 (Closes: #508630).
+  * Change build id from UNSUPPORTED VERSION to <vendor> package (Closes: #572773).
+  * Add symbol files for libraries.
+
 
  -- Chris Taylor <ctaylor@debian.org>  Fri, 02 Apr 2010 21:37:21 +0000
 

@@ -4,9 +4,13 @@
 	dh $@
 
 override_dh_auto_configure:
+	ln -sf /usr/share/misc/config.sub .
+	ln -sf /usr/share/misc/config.guess .
 	dh_auto_configure -- --disable-rpath --enable-chardet
 
 override_dh_auto_clean:
+	rm -f config.sub
+	rm -f config.guess
 	dh_auto_clean
 	rm -f man/*.1 config.status config.log config.h *.pc buildsys.mk
 	rm -f src/audacious/dbus-client-bindings.h src/audacious/dbus-server-bindings.h
