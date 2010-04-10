@@ -167,7 +167,7 @@ Description: audacious development files
 Package: audacious-dbg
 Section: debug
 Architecture: any
-Depends: audacious, ${misc:Depends}
+Depends: audacious (= ${binary:Version}), ${misc:Depends}
 Provides: libaudid3tag2-dbg, libaudclient2-dbg, libaudcore1-dbg
 Recommends: audacious-plugins-dbg
 Priority: extra
