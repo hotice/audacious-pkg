@@ -4,7 +4,6 @@ Priority: optional
 Maintainer: Debian Audacious Packagers <pkg-audacious-maintainers@lists.alioth.debian.org>
 Uploaders: Chris Taylor <ctaylor@debian.org>,
            Benjamin Drung <bdrung@ubuntu.com>
-DM-Upload-Allowed: yes
 Homepage: http://www.audacious-media-player.org/
 Build-Depends: autotools-dev,
                debhelper (>= 7.0.50~),
