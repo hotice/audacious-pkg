@@ -2,7 +2,9 @@ audacious (2.3-1) experimental; urgency=low
 
   [ Chris Taylor ]
   * New uploader.
-  * New upstream release. (Closes: #559055, #531214, #497769, #534113, #567839)
+  * New upstream release. 
+    - (Closes: #559055, #531214, #497769, #534113, #567839, #491615, #500634)
+    - (Closes: #512911, #543449, #543561, #550550, #561826) 
   * Use source format 3.0 (quilt)
   * Use dh7 in debian/rules
   * Remove libsad* from packaging.
