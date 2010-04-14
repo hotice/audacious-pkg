@@ -1,12 +1,18 @@
 #!/usr/bin/make -f
 
+DEB_BUILD_ARCH ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+
+ifeq ($(DEB_BUILD_ARCH),i386)
+additional_confflags := --disable-sse2
+endif
+
 %:
 	dh $@ --parallel
 
 override_dh_auto_configure:
 	ln -sf /usr/share/misc/config.sub .
 	ln -sf /usr/share/misc/config.guess .
-	dh_auto_configure -- --disable-rpath --enable-chardet
+	dh_auto_configure -- --disable-rpath --enable-chardet $(additional_confflags)
 
 override_dh_auto_clean:
 	dh_auto_clean
