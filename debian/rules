@@ -19,10 +19,20 @@ override_dh_auto_clean:
 	rm -f man/*.1 config.status config.log config.h *.pc buildsys.mk
 	rm -f src/audacious/dbus-client-bindings.h src/audacious/dbus-server-bindings.h
 	find -name '.deps' -delete
+	# Drop this png file cleanup after the next upstream release (probably 2.4)
+	rm -f pixmaps/*.png src/audacious/images/audacious_player.xpm
 
 override_dh_auto_build:
 	# Change build id from UNSUPPORTED VERSION to <vendor> package
 	echo "const char *build_stamp = \"$(shell dpkg-vendor --query vendor) package\";" > src/audacious/build_stamp.c;
+	# Drop this png file creation after the next upstream release (probably 2.4)
+	for size in 16 22 32 36; do \
+		rsvg -h $${size} -w $${size} pixmaps/audacious2.svg pixmaps/audacious2-$${size}.png || exit 1; \
+	done
+	rsvg pixmaps/audacious2.svg pixmaps/audacious2.png
+	convert -bordercolor Transparent -border 1x1 pixmaps/audacious2-22.png pixmaps/audacious2-24.png
+	convert pixmaps/audacious2.png src/audacious/images/audacious_player.xpm
+	sed -i "s/audacious_player/audacious_player_xpm/" src/audacious/images/audacious_player.xpm
 	dh_auto_build --parallel
 
 override_dh_strip:
@@ -30,12 +40,6 @@ override_dh_strip:
 
 override_dh_installdirs:
 	dh_installdirs
-	mkdir -p ./debian/tmp/usr/share/pixmaps
-	for size in 16 22 24 32 36 48; do \
-		convert $(CURDIR)/pixmaps/audacious2.png -resize $${size} \
-			./debian/tmp/usr/share/pixmaps/audacious-$${size}.xpm || exit 1; \
-		mkdir -p ./debian/tmp/usr/share/icons/hicolor/$${size}x$${size}/apps || exit 1;  \
-		convert $(CURDIR)/pixmaps/audacious2.png -resize $${size} \
-			./debian/tmp/usr/share/icons/hicolor/$${size}x$${size}/apps/audacious2.png || exit 1; \
-	done
-	rm -f ./debian/tmp/usr/share/pixmaps/audacious2.png
+	mkdir -p debian/tmp/usr/share/pixmaps
+	convert pixmaps/audacious2-16.png debian/tmp/usr/share/pixmaps/audacious2-16.xpm
+	convert pixmaps/audacious2-32.png debian/tmp/usr/share/pixmaps/audacious2-32.xpm
