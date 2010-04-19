@@ -43,3 +43,8 @@ override_dh_installdirs:
 	mkdir -p debian/tmp/usr/share/pixmaps
 	convert pixmaps/audacious-16.png debian/tmp/usr/share/pixmaps/audacious-16.xpm
 	convert pixmaps/audacious-32.png debian/tmp/usr/share/pixmaps/audacious-32.xpm
+
+override_dh_install:
+	dh_install
+	dh_link usr/share/man/man1/audacious2.1 usr/share/man/man1/audacious.1
+	dh_link usr/share/man/man1/audtool2.1 usr/share/man/man1/audtool.1

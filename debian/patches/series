@@ -1,2 +1,3 @@
 libid3tag.patch
 new-svg-icon.patch
+make-symlinks-relative.patch
