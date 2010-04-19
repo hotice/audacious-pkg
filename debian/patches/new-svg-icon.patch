@@ -1,7 +1,30 @@
 Description: Add new SVG icon created by Daniel Fore
 Author: Benjamin Drung <bdrung@gmail.com>
+Bug: http://jira.atheme.org/browse/AUD-176
 Bug-Ubuntu: https://launchpad.net/bugs/563043
 
+--- audacious-2.3.orig/audacious2-gtkui.desktop
++++ audacious-2.3/audacious2-gtkui.desktop
+@@ -27,7 +27,7 @@ Comment[it]=Ascoltare musica
+ Comment[lt]=Klausyti muzikos
+ Comment[nl]=Muziek luisteren
+ Comment[ru]=Слушайте музыку
+-Icon=audacious2
++Icon=audacious
+ 
+ Categories=AudioVideo;Audio;Player;GTK;
+ 
+--- audacious-2.3.orig/audacious2.desktop
++++ audacious-2.3/audacious2.desktop
+@@ -27,7 +27,7 @@ Comment[it]=Ascoltare musica
+ Comment[lt]=Klausyti muzikos
+ Comment[nl]=Muziek luisteren
+ Comment[ru]=Слушайте музыку
+-Icon=audacious2
++Icon=audacious
+ 
+ Categories=AudioVideo;Audio;Player;GTK;
+ 
 --- audacious-2.3.orig/pixmaps/Makefile
 +++ audacious-2.3/pixmaps/Makefile
 @@ -1,5 +1,28 @@
@@ -12,32 +35,32 @@ Bug-Ubuntu: https://launchpad.net/bugs/563043
 -PACKAGE = pixmaps
 +install-extra:
 +	for size in 16 22 24 32 36; do \
-+		i=audacious2-$${size}.png; \
++		i=audacious-$${size}.png; \
 +		${INSTALL_STATUS}; \
-+		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/$${size}x$${size}/apps/audacious2.png; then \
++		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/$${size}x$${size}/apps/audacious.png; then \
 +			${INSTALL_OK}; \
 +		else \
 +			${INSTALL_FAILED}; \
 +		fi \
 +	done
 +
-+	i=audacious2.png; \
++	i=audacious.png; \
 +	${INSTALL_STATUS}; \
-+	if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious2.png; then \
++	if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png; then \
 +		${INSTALL_OK}; \
 +	else \
 +		${INSTALL_FAILED}; \
 +	fi
 +
-+	i=audacious2.svg; \
++	i=audacious.svg; \
 +	${INSTALL_STATUS}; \
-+	if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious2.svg; then \
++	if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg; then \
 +		${INSTALL_OK}; \
 +	else \
 +		${INSTALL_FAILED}; \
 +	fi
 --- /dev/null
-+++ audacious-2.3/pixmaps/audacious2.svg
++++ audacious-2.3/pixmaps/audacious.svg
 @@ -0,0 +1,164 @@
 +<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 +<!-- Created with Inkscape (http://www.inkscape.org/) -->

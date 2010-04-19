@@ -27,11 +27,11 @@ override_dh_auto_build:
 	echo "const char *build_stamp = \"$(shell dpkg-vendor --query vendor) package\";" > src/audacious/build_stamp.c;
 	# Drop this png file creation after the next upstream release (probably 2.4)
 	for size in 16 22 32 36; do \
-		rsvg -h $${size} -w $${size} pixmaps/audacious2.svg pixmaps/audacious2-$${size}.png || exit 1; \
+		rsvg -h $${size} -w $${size} pixmaps/audacious.svg pixmaps/audacious-$${size}.png || exit 1; \
 	done
-	rsvg pixmaps/audacious2.svg pixmaps/audacious2.png
-	convert -bordercolor Transparent -border 1x1 pixmaps/audacious2-22.png pixmaps/audacious2-24.png
-	convert pixmaps/audacious2.png src/audacious/images/audacious_player.xpm
+	rsvg pixmaps/audacious.svg pixmaps/audacious.png
+	convert -bordercolor Transparent -border 1x1 pixmaps/audacious-22.png pixmaps/audacious-24.png
+	convert pixmaps/audacious.png src/audacious/images/audacious_player.xpm
 	sed -i "s/audacious_player/audacious_player_xpm/" src/audacious/images/audacious_player.xpm
 	dh_auto_build --parallel
 
@@ -41,5 +41,5 @@ override_dh_strip:
 override_dh_installdirs:
 	dh_installdirs
 	mkdir -p debian/tmp/usr/share/pixmaps
-	convert pixmaps/audacious2-16.png debian/tmp/usr/share/pixmaps/audacious2-16.xpm
-	convert pixmaps/audacious2-32.png debian/tmp/usr/share/pixmaps/audacious2-32.xpm
+	convert pixmaps/audacious-16.png debian/tmp/usr/share/pixmaps/audacious-16.xpm
+	convert pixmaps/audacious-32.png debian/tmp/usr/share/pixmaps/audacious-32.xpm
