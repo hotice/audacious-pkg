@@ -49,7 +49,7 @@ Description: small and fast audio player which supports lots of formats
   * Many module formats and much more!
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support and support for last.fm.
+ other useful features like LIRC support.
  .
  This package contains the core player and its localization.
 
@@ -73,7 +73,7 @@ Description: audacious id3 tag manipulation library
   * Many module formats and much more!
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support and support for last.fm.
+ other useful features like LIRC support.
  .
  This package contains a library used to manipulate id3 tags.
 
@@ -96,7 +96,7 @@ Description: audacious dbus remote control library
   * Many module formats and much more!
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support and support for last.fm.
+ other useful features like LIRC support.
  .
  This package contains a library used to remote control audacious.
 
@@ -119,7 +119,7 @@ Description: audacious core engine library
   * Many module formats and much more!
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support and support for last.fm.
+ other useful features like LIRC support.
  .
  This package contains a library which provides core functionality
  of Audacious.
@@ -155,7 +155,7 @@ Description: audacious development files
   * Many module formats and much more!
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support and support for last.fm.
+ other useful features like LIRC support.
  .
  This package contains the development libraries and header files
  required for developing components for audacious.
@@ -187,7 +187,7 @@ Description: audacious media player (debugging symbols)
   * Many module formats and much more!
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support and support for last.fm.
+ other useful features like LIRC support.
  .
  This package contains the debugging symbols. Please install it before
  reporting crashes, as this makes the backtrace output more usable.
