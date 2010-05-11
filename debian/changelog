@@ -1,13 +1,17 @@
 audacious (2.3-2) unstable; urgency=low
 
+  [Chris Taylor]
+  * Update debian/copyright.
   * Upload to unstable.
+
+  [Benjamin Drung]
   * Enable parallel build.
   * Disable SSE2 on i386 (LP: #562713).
   * Add new SVG icon created by Daniel Fore (LP: #563043).
   * Rename icons from audacious2 to audacious.
   * Install versionless symlinks audacious and audtool.
 
- -- Benjamin Drung <bdrung@ubuntu.com>  Fri, 07 May 2010 22:32:42 +0200
+ -- Chris Taylor <ctaylor@debian.org>  Mon, 10 May 2010 18:06:12 -0700
 
 audacious (2.3-1) experimental; urgency=low
 
