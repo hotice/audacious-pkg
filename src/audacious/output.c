@@ -26,7 +26,7 @@
 #include "audio.h"
 #include "audconfig.h"
 #include "effect.h"
-#include "equalizer_flow.h"
+#include "equalizer.h"
 #include "flow.h"
 #include "output.h"
 #include "playback.h"
@@ -111,7 +111,6 @@ static void drain (void);
 /* output_mutex must be locked */
 static void real_close (void)
 {
-    new_effect_flush ();
     vis_runner_start_stop (FALSE, FALSE);
     COP->close_audio ();
     output_opened = FALSE;
@@ -148,36 +147,34 @@ static gboolean output_open_audio (AFormat format, gint rate, gint channels)
 
     LOCK;
 
-    if (output_leave_open)
+    if (output_leave_open && COP->set_written_time != NULL)
     {
-        if (channels == decoder_channels && rate == decoder_rate &&
-         COP->set_written_time != NULL)
-        {
-            vis_runner_time_offset (- frames_written * 1000 / decoder_rate);
-            COP->set_written_time (0);
-            output_opened = TRUE;
-        }
-        else
-        {
-            UNLOCK;
-            drain ();
-            LOCK;
-            real_close ();
-        }
+        vis_runner_time_offset (- frames_written * (gint64) 1000 / decoder_rate);
+        COP->set_written_time (0);
     }
 
     decoder_format = format;
     decoder_channels = channels;
     decoder_rate = rate;
     frames_written = 0;
-    output_leave_open = FALSE;
-    output_paused = FALSE;
 
-    if (! output_opened)
+    effect_channels = channels;
+    effect_rate = rate;
+    new_effect_start (& effect_channels, & effect_rate);
+    eq_set_format (effect_channels, effect_rate);
+
+    if (output_leave_open && COP->set_written_time != NULL && effect_channels ==
+     output_channels && effect_rate == output_rate)
+        output_opened = TRUE;
+    else
     {
-        effect_channels = channels;
-        effect_rate = rate;
-        new_effect_start (& effect_channels, & effect_rate);
+        if (output_leave_open)
+        {
+            UNLOCK;
+            drain ();
+            LOCK;
+            real_close ();
+        }
 
         output_format = cfg.output_bit_depth == 32 ? FMT_S32_NE :
          cfg.output_bit_depth == 24 ? FMT_S24_NE : cfg.output_bit_depth == 16 ?
@@ -192,6 +189,9 @@ static gboolean output_open_audio (AFormat format, gint rate, gint channels)
         }
     }
 
+    output_leave_open = FALSE;
+    output_paused = FALSE;
+
     UNLOCK;
     return output_opened;
 }
@@ -200,8 +200,13 @@ static void output_close_audio (void)
 {
     LOCK;
 
+    output_opened = FALSE;
+
     if (! output_leave_open)
+    {
+        new_effect_flush ();
         real_close ();
+    }
 
     UNLOCK;
 }
@@ -232,7 +237,7 @@ static gint get_written_time (void)
     LOCK;
 
     if (output_opened)
-        time = frames_written * 1000 / decoder_rate;
+        time = frames_written * (gint64) 1000 / decoder_rate;
 
     UNLOCK;
     return time;
@@ -252,19 +257,6 @@ static gboolean output_buffer_playing (void)
 
     UNLOCK;
     return FALSE;
-}
-
-static Flow * get_postproc_flow (void)
-{
-    static Flow * flow = NULL;
-
-    if (flow == NULL)
-    {
-        flow = flow_new ();
-        flow_link_element (flow, equalizer_flow);
-    }
-
-    return flow;
 }
 
 static Flow * get_legacy_flow (void)
@@ -358,15 +350,7 @@ static void do_write (void * data, gint samples)
 {
     void * allocated = NULL;
 
-    samples = flow_execute (get_postproc_flow (), 0, & data, sizeof (gfloat) *
-     samples, FMT_FLOAT, effect_rate, effect_channels) / sizeof (gfloat);
-
-    if (data != allocated)
-    {
-        g_free (allocated);
-        allocated = NULL;
-    }
-
+    eq_filter (data, samples);
     apply_software_volume (data, output_channels, samples / output_channels);
 
     if (output_format != FMT_FLOAT)
@@ -436,8 +420,8 @@ static void output_write_audio (void * data, gint size)
     }
 
     apply_replay_gain (data, samples);
-    vis_runner_pass_audio (frames_written * 1000 / decoder_rate, data, samples,
-     decoder_channels);
+    vis_runner_pass_audio (frames_written * (gint64) 1000 / decoder_rate, data,
+     samples, decoder_channels);
     new_effect_process ((gfloat * *) & data, & samples);
 
     if (data != allocated)
@@ -461,8 +445,6 @@ static void write_buffers (void)
 
 static void drain (void)
 {
-    write_buffers ();
-
     if (COP->buffer_playing != NULL)
     {
         while (COP->buffer_playing ())
@@ -508,6 +490,7 @@ void output_drain (void)
     if (output_leave_open)
     {
         UNLOCK;
+        write_buffers (); /* tell effect plugins this is the last song */
         drain ();
         LOCK;
         real_close ();
@@ -529,13 +512,6 @@ void set_current_output_plugin (OutputPlugin * plugin)
         time = playback_get_time ();
         playback_stop ();
     }
-
-    LOCK;
-
-    if (output_leave_open)
-        real_close ();
-
-    UNLOCK;
 
     /* This function is also used to restart playback (for example, when
      resampling is switched on or off), in which case we don't need to do an

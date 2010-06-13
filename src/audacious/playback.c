@@ -50,8 +50,9 @@
 
 static void set_params (InputPlayback * playback, const gchar * title, gint
  length, gint bitrate, gint samplerate, gint channels);
-static void set_title (InputPlayback * playback, const gchar * title);
 static void set_tuple (InputPlayback * playback, Tuple * tuple);
+static void set_gain_from_playlist (InputPlayback * playback);
+
 static gboolean playback_segmented_end(gpointer data);
 
 static gboolean playback_play_file (gint playlist, gint entry);
@@ -60,6 +61,54 @@ static gboolean pause_when_ready;
 static gint seek_when_ready;
 static gint ready_source;
 static gint failed_entries;
+static gint set_tuple_source = 0;
+static Tuple * tuple_to_be_set = NULL;
+static ReplayGainInfo gain_from_playlist;
+
+static void cancel_set_tuple (void)
+{
+    if (set_tuple_source != 0)
+    {
+        g_source_remove (set_tuple_source);
+        set_tuple_source = 0;
+    }
+
+    if (tuple_to_be_set != NULL)
+    {
+        tuple_free (tuple_to_be_set);
+        tuple_to_be_set = NULL;
+    }
+}
+
+/* clears gain info if tuple == NULL */
+static void read_gain_from_tuple (Tuple * tuple)
+{
+    gint album_gain, album_peak, track_gain, track_peak, gain_unit, peak_unit;
+
+    memset (& gain_from_playlist, 0, sizeof gain_from_playlist);
+
+    if (tuple == NULL)
+        return;
+
+    album_gain = tuple_get_int (tuple, FIELD_GAIN_ALBUM_GAIN, NULL);
+    album_peak = tuple_get_int (tuple, FIELD_GAIN_ALBUM_PEAK, NULL);
+    track_gain = tuple_get_int (tuple, FIELD_GAIN_TRACK_GAIN, NULL);
+    track_peak = tuple_get_int (tuple, FIELD_GAIN_TRACK_PEAK, NULL);
+    gain_unit = tuple_get_int (tuple, FIELD_GAIN_GAIN_UNIT, NULL);
+    peak_unit = tuple_get_int (tuple, FIELD_GAIN_PEAK_UNIT, NULL);
+
+    if (gain_unit)
+    {
+        gain_from_playlist.album_gain = album_gain / (gfloat) gain_unit;
+        gain_from_playlist.track_gain = track_gain / (gfloat) gain_unit;
+    }
+
+    if (peak_unit)
+    {
+        gain_from_playlist.album_peak = album_peak / (gfloat) peak_unit;
+        gain_from_playlist.track_peak = track_peak / (gfloat) peak_unit;
+    }
+}
 
 static gboolean ready_cb (void * data)
 {
@@ -162,19 +211,20 @@ playback_get_time_real(void)
     return time;
 }
 
-gint
-playback_get_time(void)
+gint playback_get_time (void)
 {
     InputPlayback * playback;
 
     playback = ip_data.current_input_playback;
     g_return_val_if_fail (playback != NULL, 0);
 
-    return playback_get_time_real() - playback->start;
+    if (playback->start > 0)
+        return playback_get_time_real () - playback->start;
+    else
+        return playback_get_time_real ();
 }
 
-void
-playback_initiate(void)
+void playback_initiate (void)
 {
     gint playlist, entry;
 
@@ -241,7 +291,8 @@ void playback_pause (void)
         hook_call("playback unpause", NULL);
 
         if (playback->end > 0)
-            playback->end_timeout = g_timeout_add(playback_get_time_real() - playback->start, playback_segmented_end, playback);
+            playback->end_timeout = g_timeout_add (playback->end -
+             playback_get_time_real (), playback_segmented_end, playback);
     }
 }
 
@@ -271,6 +322,7 @@ static void playback_finalize (InputPlayback * playback)
 
     playback_free (playback);
     ip_data.current_input_playback = NULL;
+    cancel_set_tuple ();
 
     if (playback->end_timeout)
         g_source_remove(playback->end_timeout);
@@ -289,16 +341,6 @@ void playback_stop (void)
 
     output_drain ();
     hook_call ("playback stop", NULL);
-}
-
-static void
-run_no_output_plugin_dialog(void)
-{
-    const gchar *markup =
-        N_("<b><big>No output plugin selected.</big></b>\n"
-           "You have not selected an output plugin.");
-
-    interface_show_error_message(markup);
 }
 
 static gboolean playback_ended (void * user_data)
@@ -324,8 +366,7 @@ static gboolean playback_ended (void * user_data)
             if (! (play = playlist_next_song (playlist, cfg.repeat)))
                 playlist_set_position (playlist, -1);
 
-            if (failed_entries >= 100 || failed_entries >= playlist_entry_count
-             (playlist) * 2)
+            if (failed_entries >= 10)
                 play = FALSE;
         }
 
@@ -406,6 +447,10 @@ playback_monitor_thread(gpointer data)
 static void playback_set_replaygain_info (InputPlayback * playback,
  ReplayGainInfo * info)
 {
+    fprintf (stderr, "Plugin %s should be updated to use OutputAPI::"
+     "set_replaygain_info or (better) InputPlayback::set_gain_from_playlist.\n",
+     playback->plugin->description);
+
     playback->output->set_replaygain_info (info);
 }
 
@@ -413,6 +458,15 @@ static void playback_set_replaygain_info (InputPlayback * playback,
 static void playback_pass_audio (InputPlayback * playback, AFormat format, gint
  channels, gint size, void * data, gint * going)
 {
+    static gboolean warned = FALSE;
+
+    if (! warned)
+    {
+        fprintf (stderr, "Plugin %s should be updated to use OutputAPI::"
+         "write_audio.\n", playback->plugin->description);
+        warned = TRUE;
+    }
+
     playback->output->write_audio (data, size);
 }
 
@@ -434,8 +488,8 @@ playback_new(void)
     playback->set_pb_ready = playback_set_pb_ready;
     playback->set_pb_change = playback_set_pb_change;
     playback->set_params = set_params;
-    playback->set_title = set_title;
     playback->set_tuple = set_tuple;
+    playback->set_gain_from_playlist = set_gain_from_playlist;
 
     /* compatibility */
     playback->set_replaygain_info = playback_set_replaygain_info;
@@ -484,22 +538,30 @@ static gboolean playback_play_file (gint playlist, gint entry)
     const gchar * filename = playlist_entry_get_filename (playlist, entry);
     const gchar * title = playlist_entry_get_title (playlist, entry);
     InputPlugin * decoder = playlist_entry_get_decoder (playlist, entry);
+    Tuple * tuple = (Tuple *) playlist_entry_get_tuple (playlist, entry);
     InputPlayback *playback;
 
-    if (current_output_plugin == NULL)
-    {
-        run_no_output_plugin_dialog ();
-        return FALSE;
-    }
-
     if (decoder == NULL)
-        decoder = file_probe (filename, FALSE);
+        decoder = file_find_decoder (filename, FALSE);
 
     if (decoder == NULL)
     {
-        g_warning("Cannot play %s: no decoder found.\n", filename);
+        gchar * error = g_strdup_printf (_("No decoder found for %s."), filename);
+
+        interface_show_error_message (error);
+        g_free (error);
         return FALSE;
     }
+
+    if (tuple == NULL)
+    {
+        tuple = file_read_tuple (filename, decoder);
+
+        if (tuple != NULL)
+            playlist_entry_set_tuple (playlist, entry, tuple);
+    }
+
+    read_gain_from_tuple (tuple); /* even if tuple == NULL */
 
     ip_data.playing = TRUE;
     ip_data.paused = FALSE;
@@ -524,7 +586,7 @@ static gboolean playback_play_file (gint playlist, gint entry)
 #endif
 
     hook_associate ("playlist update", update_cb, NULL);
-    hook_call ("playback begin", NULL);
+    hook_call ("playback begin", playback);
     return TRUE;
 }
 
@@ -585,13 +647,6 @@ void playback_seek (gint time)
 static void set_params (InputPlayback * playback, const gchar * title, gint
  length, gint bitrate, gint samplerate, gint channels)
 {
-    g_return_if_fail (playback != NULL);
-
-    /* deprecated usage */
-    if (title != NULL || length != 0)
-        g_warning ("%s needs to be updated to use InputPlayback::set_tuple\n",
-         playback->plugin->description);
-
     playback->rate = bitrate;
     playback->freq = samplerate;
     playback->nch = channels;
@@ -599,25 +654,30 @@ static void set_params (InputPlayback * playback, const gchar * title, gint
     event_queue ("info change", NULL);
 }
 
-/* deprecated */
-static void set_title (InputPlayback * playback, const gchar * title)
-{
-    g_warning ("%s needs to be updated to use InputPlayback::set_tuple\n",
-     playback->plugin->description);
-}
-
-static gboolean set_tuple_cb (void * tuple)
+static gboolean set_tuple_cb (void * unused)
 {
     gint playlist = playlist_get_playing ();
 
-    playlist_entry_set_tuple (playlist, playlist_get_position (playlist), tuple);
+    playlist_entry_set_tuple (playlist, playlist_get_position (playlist),
+     tuple_to_be_set);
+    set_tuple_source = 0;
+    tuple_to_be_set = NULL;
     return FALSE;
 }
 
 static void set_tuple (InputPlayback * playback, Tuple * tuple)
 {
     /* playlist_entry_set_tuple must execute in main thread */
-    g_timeout_add (0, set_tuple_cb, tuple);
+    cancel_set_tuple ();
+    set_tuple_source = g_timeout_add (0, set_tuple_cb, NULL);
+    tuple_to_be_set = tuple;
+
+    read_gain_from_tuple (tuple);
+}
+
+static void set_gain_from_playlist (InputPlayback * playback)
+{
+    playback->output->set_replaygain_info (& gain_from_playlist);
 }
 
 gchar * playback_get_title (void)

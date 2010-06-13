@@ -2,7 +2,12 @@ LIB = ${LIB_PREFIX}audgui${LIB_SUFFIX}
 LIB_MAJOR = 1
 LIB_MINOR = 0
 
-SRCS = effects-menu.c \
+SRCS = confirm.c \
+       effects-menu.c \
+       infopopup.c \
+       infowin.c \
+       init.c \
+       library-store.c \
        ui_gtk.c \
        ui_fileopener.c \
        ui_urlopener.c \
@@ -10,7 +15,9 @@ SRCS = effects-menu.c \
        ui_jumptotrack_cache.c \
        icons-stock.c \
        ui_about.c \
-       ui_credits.c
+       ui_credits.c \
+       ui_playlist_manager.c \
+       util.c
 
 INCLUDES = libaudgui.h \
            libaudgui-gtk.h

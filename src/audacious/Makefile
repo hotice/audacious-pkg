@@ -3,16 +3,13 @@ include ../../extra.mk
 SUBDIRS = ${INTL_OBJECTIVE}
 
 PROG = audacious2${PROG_SUFFIX}
-SRCS = af_equalizer.c							\
-       auddrct.c								\
+SRCS = auddrct.c								\
        audconfig.c								\
-       build_stamp.c							\
        chardet.c								\
        configdb.c								\
        credits.c							\
        effect.c									\
        equalizer.c								\
-       equalizer_flow.c							\
        equalizer_preset.c						\
        eventqueue.c								\
        fft.c									\
@@ -34,16 +31,13 @@ SRCS = af_equalizer.c							\
        probe.c \
        rcfile.c									\
        signals.c								\
-       ui_fileinfopopup.c						\
        ui_headless.c							\
        ui_plugin_menu.c \
        ui_preferences.c							\
        util.c									\
        vis_runner.c \
        visualization.c							\
-       sync-menu.c								\
        ui_albumart.c						\
-       ui_fileinfo.c						\
        ui_misc.c
 
 ifeq ($(USE_DBUS),yes)
@@ -64,15 +58,11 @@ INCLUDES = auddrct.h			\
            hook.h				\
            interface.h			\
            main.h				\
-           output.h				\
            playback.h			\
            playlist_container.h	\
            plugin.h				\
            preferences.h		\
-           ui_fileinfopopup.h	\
-           ui_plugin_menu.h		\
-           ui_preferences.h		\
-           util.h
+           ui_plugin_menu.h
 
 DATA = images/about-logo.png				\
        images/appearance.png				\
@@ -96,7 +86,7 @@ DATA = images/about-logo.png				\
        ui/playlist.ui						\
        ui/carbon-menubar.ui
 
-CLEAN = build_stamp.c libaudacious.exe.a
+CLEAN = build_stamp.c dbus-client-bindings.h dbus-server-bindings.h
 EXT_DEPS = ../libguess/libguess.a
 
 ifeq ($(USE_EGGSM),yes)
@@ -131,10 +121,13 @@ CPPFLAGS += -DHAVE_CONFIG_H		\
 		-I.. -I../..			\
 		-I./intl			\
 		-I.				\
-		-I../libaudcore
+		-I../libaudcore			\
+		-I../libaudtag
 
 LIBS += ${LDADD}						\
 		-L../libaudcore -laudcore	\
+		-L../libaudgui -laudgui \
+		-L../libaudtag -laudtag		\
 		${LIBINTL}						\
 		../libguess/libguess.a			\
 		${EGGSM_LIBS}					\
@@ -151,7 +144,7 @@ LDFLAGS += ${PROG_IMPLIB_LDFLAGS} ${AUDLDFLAGS}
 build_stamp.c:
 	echo "#include <glib.h>" > build_stamp.c ; \
 	if test -d ../../.hg ; then \
-		revh=`hg tip --template 'const gchar *build_stamp = "#rev#:#node|short#";\n' 2>/dev/null`; \
+		revh=`hg tip --template 'const gchar *build_stamp = "{rev}:{node|short}";\n' 2>/dev/null`; \
 		[ -z "$$revh" ] || echo "$$revh" >> build_stamp.c; \
 	else \
 		echo "const gchar *build_stamp = \"UNSUPPORTED VERSION\";" >> build_stamp.c; \
@@ -176,7 +169,7 @@ dbus-client-bindings.h: ${DBUS_BINDINGS_SOURCES}
 
 install-extra:
 	if test -h "${DESTDIR}${bindir}/audacious" ; then ${RM} "${DESTDIR}${bindir}/audacious" ; fi
-	${LN_S} "${DESTDIR}${bindir}/audacious2" "${DESTDIR}${bindir}/audacious"
+	${LN_S} audacious2 "${DESTDIR}${bindir}/audacious"
 
 	if test x"${PROG_IMPLIB_NEEDED}" = x"yes"; then \
 		for i in ${PROG}; do \

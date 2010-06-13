@@ -93,20 +93,6 @@ str_replace_drive_letter(gchar * str)
     return str;
 }
 
-static gchar *
-str_replace_char(gchar * str, gchar o, gchar n)
-{
-    gchar *match;
-
-    g_return_val_if_fail(str != NULL, NULL);
-
-    match = str;
-    while ((match = strchr(match, o)) != NULL)
-        *match = n;
-
-    return str;
-}
-
 gchar *
 str_append(gchar * str, const gchar * add_str)
 {
@@ -312,7 +298,7 @@ convert_dos_path(gchar * path)
     str_replace_drive_letter(path);
 
     /* replace '\' with '/' */
-    str_replace_char(path, '\\', '/');
+    string_replace_char (path, '\\', '/');
 
     return path;
 }
@@ -377,6 +363,12 @@ filename_split_subtune(const gchar * filename, gint * track)
     return result;
 }
 
+void string_replace_char (gchar * string, gchar old_str, gchar new_str)
+{
+    while ((string = strchr (string, old_str)) != NULL)
+        * string = new_str;
+}
+
 static gchar get_hex_digit(gchar **get)
 {
     gchar c = **get;
@@ -394,6 +386,7 @@ static gchar get_hex_digit(gchar **get)
     return c - '0';
 }
 
+/* modifies string in place */
 void string_decode_percent(gchar *string)
 {
     gchar *get = string;
@@ -409,6 +402,58 @@ void string_decode_percent(gchar *string)
     }
 
     *set = 0;
+}
+
+/* we encode any character except the "unreserved" characters of RFC 3986 and
+ * (optionally) the forward slash */
+static gboolean is_legal_char (gchar c, gboolean is_filename)
+{
+    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <=
+     '9') || (strchr ("-_.~", c) != NULL) || (is_filename && c == '/');
+}
+
+static gchar make_hex_digit (gint i)
+{
+    if (i < 10)
+        return '0' + i;
+    else
+        return ('A' - 10) + i;
+}
+
+/* is_filename specifies whether the forward slash should be left intact */
+/* returns string allocated with g_malloc */
+gchar * string_encode_percent (const gchar * string, gboolean is_filename)
+{
+    gint length = 0;
+    const gchar * get;
+    gchar c;
+    gchar * new, * set;
+
+    for (get = string; (c = * get); get ++)
+    {
+        if (is_legal_char (c, is_filename))
+            length ++;
+        else
+            length += 3;
+    }
+
+    new = g_malloc (length + 1);
+    set = new;
+
+    for (get = string; (c = * get); get ++)
+    {
+        if (is_legal_char (c, is_filename))
+            * set ++ = c;
+        else
+        {
+            * set ++ = '%';
+            * set ++ = make_hex_digit (((guchar) c) >> 4);
+            * set ++ = make_hex_digit (c & 0xF);
+        }
+    }
+
+    * set = 0;
+    return new;
 }
 
 void string_cut_extension(gchar *string)
@@ -463,4 +508,29 @@ gint string_compare (const gchar * a, const gchar * b)
     }
 
     return 0;
+}
+
+const void * memfind (const void * mem, gint size, const void * token, gint
+ length)
+{
+    if (! length)
+        return mem;
+
+    size -= length - 1;
+
+    while (size > 0)
+    {
+        const void * maybe = memchr (mem, * (guchar *) token, size);
+
+        if (maybe == NULL)
+            return NULL;
+
+        if (! memcmp (maybe, token, length))
+            return maybe;
+
+        size -= (guchar *) maybe + 1 - (guchar *) mem;
+        mem = (guchar *) maybe + 1;
+    }
+
+    return NULL;
 }

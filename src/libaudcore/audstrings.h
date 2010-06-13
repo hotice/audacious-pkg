@@ -60,9 +60,14 @@ extern gchar *(*chardet_to_utf8)(const gchar *str, gssize len,
 gchar *filename_get_subtune(const gchar * filename, gint * track);
 gchar *filename_split_subtune(const gchar * filename, gint * track);
 
-void string_decode_percent(gchar *string);
+void string_replace_char (gchar * string, gchar old_str, gchar new_str);
+void string_decode_percent (gchar * string);
+gchar * string_encode_percent (const gchar * string, gboolean is_filename);
 void string_cut_extension(gchar *string);
 gint string_compare (const gchar * a, const gchar * b);
+
+const void * memfind (const void * mem, gint size, const void * token, gint
+ length);
 
 G_END_DECLS
 

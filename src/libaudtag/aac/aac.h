@@ -1,3 +1,23 @@
+/*
+ * Copyright 2009 Paula Stanciu
+ *
+ * This file is part of Audacious.
+ *
+ * Audacious is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation, version 3 of the License.
+ *
+ * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Audacious. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The Audacious team does not consider modular code linking to Audacious or
+ * using our public API to be a derived work.
+ */
+
 #ifndef AAC_H
 #define	AAC_H
 #include <libaudcore/tuple.h>
@@ -46,21 +66,21 @@ typedef struct strdataatom
     int type;
 }StrDataAtom;
 
-
-
-gboolean aac_can_handle_file(VFSFile *f);
-
-Tuple *aac_populate_tuple_from_file(Tuple *tuple,VFSFile *f);
-
-gboolean aac_write_tuple_to_file(Tuple* tuple, VFSFile *f);
-
-extern tag_module_t aac;
-
 Atom *ilstAtom;
 guint64 ilstFileOffset;
 guint32 newilstSize ;
 mowgli_list_t *dataAtoms;
 mowgli_dictionary_t *ilstAtoms;
 
-#endif
+/* TAG plugin API */
+gboolean aac_can_handle_file(VFSFile *f);
+gboolean aac_read_tag (Tuple * tuple, VFSFile * handle);
+gboolean aac_write_tag (Tuple * tuple, VFSFile * handle);
 
+static const tag_module_t aac = {
+    .name = "AAC",
+    .can_handle_file = aac_can_handle_file,
+    .read_tag = aac_read_tag,
+    .write_tag = aac_write_tag,
+};
+#endif
