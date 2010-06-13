@@ -2,7 +2,7 @@ LIB = ${LIB_PREFIX}audid3tag${LIB_SUFFIX}
 LIB_MAJOR = 2
 LIB_MINOR = 0
 
-LIBDIR = ${libdir}
+LIBDIR = ${plugindir}
 
 INCLUDES = id3tag.h
 
