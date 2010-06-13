@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2009  Audacious development team.
+ *  Copyright (C) 2005-2010  Audacious development team.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -42,5 +42,17 @@ void audgui_hide_filebrowser(void);
 
 void audgui_show_about_window(void);
 void audgui_hide_about_window(void);
+
+/* confirm.c */
+void audgui_confirm_playlist_delete (gint playlist);
+
+/* infopopup.c */
+void audgui_infopopup_show (gint playlist, gint entry);
+void audgui_infopopup_show_current (void);
+void audgui_infopopup_hide (void);
+
+/* infowin.c */
+void audgui_infowin_show (gint playlist, gint entry);
+void audgui_infowin_show_current (void);
 
 #endif /* LIBAUDGUI_H */

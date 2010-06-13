@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2008  Audacious development team
+ *  Copyright (C) 2005-2010  Audacious development team
  *
  *  Based on BMP:
  *  Copyright (C) 2003-2004  BMP development team
@@ -76,14 +76,18 @@ struct _AudConfig {
     gboolean clear_playlist;
     gchar * output_path;
     gint output_number;
+
+    /* libaudgui stuff */
+    gboolean no_confirm_playlist_delete;
+    gint playlist_manager_x, playlist_manager_y, playlist_manager_width,
+     playlist_manager_height;
+    gboolean playlist_manager_close_on_activate;
 };
 
 typedef struct _AudConfig AudConfig;
 
 extern AudConfig cfg;
 extern AudConfig aud_default_config;
-
-void save_all_playlists (void);
 
 void aud_config_free(void);
 void aud_config_load(void);

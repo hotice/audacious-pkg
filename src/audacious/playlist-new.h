@@ -50,6 +50,7 @@ void playlist_save_state (void);
 
 gint playlist_count (void);
 void playlist_insert (gint at);
+void playlist_reorder (gint from, gint to, gint count);
 void playlist_delete (gint playlist);
 
 void playlist_set_filename (gint playlist, const gchar * filename);
@@ -103,13 +104,12 @@ void playlist_sort_selected_by_filename (gint playlist, gint (* compare) (const
 void playlist_sort_selected_by_tuple (gint playlist, gint (* compare) (const
  Tuple * a, const Tuple * b));
 
-void playlist_reformat_titles ();
+void playlist_reformat_titles (void);
 void playlist_rescan (gint playlist);
+void playlist_rescan_file (const gchar * filename);
 
 gint64 playlist_get_total_length (gint playlist);
 gint64 playlist_get_selected_length (gint playlist);
-
-void playlist_set_shuffle (gboolean shuffle);
 
 gint playlist_queue_count (gint playlist);
 void playlist_queue_insert (gint playlist, gint at, gint entry);

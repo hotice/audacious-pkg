@@ -43,7 +43,6 @@
 #include "eggdesktopfile.h"
 #endif
 
-#include "build_stamp.h"
 #include "configdb.h"
 #include "equalizer.h"
 #include "hook.h"
@@ -58,9 +57,12 @@
 #include "util.h"
 #include "vfs.h"
 #include "chardet.h"
+#include "audtag.h"
 
 #include "ui_headless.h"
 #include "ui_misc.h"
+
+#define AUTOSAVE_INTERVAL 300 /* seconds */
 
 static const gchar *application_name = N_("Audacious");
 
@@ -89,7 +91,7 @@ MprisPlayer *mpris;
 
 static void print_version(void)
 {
-    g_printf("%s %s [%s]\n", _(application_name), VERSION, build_stamp);
+    g_printf("%s %s (%s)\n", _(application_name), VERSION, BUILDSTAMP);
 }
 
 static void aud_make_user_dir(void)
@@ -133,11 +135,7 @@ static void aud_init_paths()
     aud_paths[BMP_PATH_PLAYLISTS_DIR] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "playlists", NULL);
 
     aud_paths[BMP_PATH_CONFIG_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "config", NULL);
-#ifdef HAVE_XSPF_PLAYLIST
     aud_paths[BMP_PATH_PLAYLIST_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "playlist.xspf", NULL);
-#else
-    aud_paths[BMP_PATH_PLAYLIST_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "playlist.m3u", NULL);
-#endif
     aud_paths[BMP_PATH_ACCEL_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "accels", NULL);
     aud_paths[BMP_PATH_LOG_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "log", NULL);
 
@@ -200,7 +198,7 @@ static void parse_cmd_line_options(gint * argc, gchar *** argv)
             exit(EXIT_FAILURE);
         }
 
-    g_free(context);
+    g_option_context_free (context);
 }
 
 static void handle_cmd_line_filenames(gboolean is_running)
@@ -352,46 +350,13 @@ static void aud_setup_logger(void)
     g_atexit(aud_logger_stop);
 }
 
-static gboolean load_extra_playlist(const gchar * path, const gchar * basename, gpointer def)
-{
-    gchar * filename = g_filename_to_uri (path, NULL, NULL);
-    gint playlist = playlist_count();
-
-    playlist_insert(playlist);
-    playlist_insert_playlist(playlist, 0, filename);
-
-    g_free (filename);
-
-    return FALSE;               /* keep loading other playlists */
-}
-
-static void playlist_system_init()
-{
-    gchar * filename = g_filename_to_uri (aud_paths[BMP_PATH_PLAYLIST_FILE],
-     NULL, NULL);
-
-    playlist_init();
-
-    if (vfs_file_test (filename, G_FILE_TEST_EXISTS))
-        playlist_insert_playlist (0, 0, filename);
-
-    g_free (filename);
-
-    /* Load extra playlists */
-    if (!dir_foreach(aud_paths[BMP_PATH_PLAYLISTS_DIR], load_extra_playlist, NULL, NULL))
-        g_warning("Could not load extra playlists\n");
-
-    playlist_load_state ();
-    playlist_set_shuffle(cfg.shuffle);
-}
-
 void aud_quit(void)
 {
     Interface *i = interface_get(options.interface);
 
     g_message("Saving configuration");
     aud_config_save();
-    playlist_save_state ();
+    save_playlists ();
 
     if (playback_get_playing ())
         playback_stop ();
@@ -447,6 +412,14 @@ void init_playback_hooks(void)
 }
 #endif
 
+static gboolean autosave_cb (void * unused)
+{
+    g_message ("Saving configuration.\n");
+    aud_config_save ();
+    save_playlists ();
+    return TRUE;
+}
+
 gint main(gint argc, gchar ** argv)
 {
     Interface *i;
@@ -463,6 +436,7 @@ gint main(gint argc, gchar ** argv)
     gdk_threads_init();
     mowgli_init();
     chardet_init();
+    tag_init();
 
     hook_init();
     hook_associate("quit", quit_cb, 0);
@@ -500,6 +474,7 @@ gint main(gint argc, gchar ** argv)
 
     g_message("Loading configuration");
     aud_config_load();
+    atexit (aud_config_free);
 
     g_message("Initializing signal handlers");
     signal_handlers_init();
@@ -531,8 +506,9 @@ gint main(gint argc, gchar ** argv)
         exit(EXIT_SUCCESS);
     }
 
-    playlist_system_init();
-    init_equalizer ();
+    playlist_init ();
+    load_playlists ();
+    eq_init ();
 
     g_message("Handling commandline options, part #2");
     handle_cmd_line_options();
@@ -544,6 +520,8 @@ gint main(gint argc, gchar ** argv)
     g_message("Displaying unsupported version warning.");
     ui_display_unsupported_version_warning();
 #endif
+
+    g_timeout_add_seconds (AUTOSAVE_INTERVAL, autosave_cb, NULL);
 
     g_message("Selecting interface %s", options.interface);
     i = interface_get(options.interface);

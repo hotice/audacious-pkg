@@ -51,6 +51,7 @@
 #include "playback.h"
 #include "playlist-new.h"
 #include "playlist-utils.h"
+#include "probe.h"
 #include "audstrings.h"
 #include "util.h"
 #include "visualization.h"
@@ -59,10 +60,11 @@
 #include "vfs_buffered_file.h"
 #include "equalizer_preset.h"
 
-#include "ui_fileinfo.h"
-#include "ui_fileinfopopup.h"
+#include "ui_albumart.h"
 #include "ui_plugin_menu.h"
 #include "ui_preferences.h"
+
+#include <libaudgui/init.h>
 
 
 const gchar *plugin_dir_list[] = {
@@ -77,47 +79,45 @@ static gpointer get_pvt_data(void);
 
 static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
     .vfs_fopen = vfs_fopen,
-    .vfs_fclose = vfs_fclose,
     .vfs_dup = vfs_dup,
+    .vfs_fclose = vfs_fclose,
     .vfs_fread = vfs_fread,
     .vfs_fwrite = vfs_fwrite,
     .vfs_getc = vfs_getc,
     .vfs_ungetc = vfs_ungetc,
     .vfs_fgets = vfs_fgets,
+    .vfs_feof = vfs_feof,
+    .vfs_fprintf = vfs_fprintf,
     .vfs_fseek = vfs_fseek,
     .vfs_rewind = vfs_rewind,
     .vfs_ftell = vfs_ftell,
-    .vfs_feof = vfs_feof,
-    .vfs_file_test = vfs_file_test,
-    .vfs_is_writeable = vfs_is_writeable,
-    .vfs_truncate = vfs_truncate,
     .vfs_fsize = vfs_fsize,
-    .vfs_get_metadata = vfs_get_metadata,
-    .vfs_fprintf = vfs_fprintf,
-    .vfs_register_transport = vfs_register_transport,
-    .vfs_file_get_contents = vfs_file_get_contents,
-    .vfs_is_remote = vfs_is_remote,
-    .vfs_is_streaming = vfs_is_streaming,
-
-    .vfs_buffer_new = vfs_buffer_new,
-    .vfs_buffer_new_from_string = vfs_buffer_new_from_string,
-
-    .vfs_buffered_file_new_from_uri = vfs_buffered_file_new_from_uri,
-    .vfs_buffered_file_release_live_fd = vfs_buffered_file_release_live_fd,
-
+    .vfs_ftruncate = vfs_ftruncate,
     .vfs_fget_le16 = vfs_fget_le16,
     .vfs_fget_le32 = vfs_fget_le32,
     .vfs_fget_le64 = vfs_fget_le64,
     .vfs_fget_be16 = vfs_fget_be16,
     .vfs_fget_be32 = vfs_fget_be32,
     .vfs_fget_be64 = vfs_fget_be64,
-
     .vfs_fput_le16 = vfs_fput_le16,
     .vfs_fput_le32 = vfs_fput_le32,
     .vfs_fput_le64 = vfs_fput_le64,
     .vfs_fput_be16 = vfs_fput_be16,
     .vfs_fput_be32 = vfs_fput_be32,
     .vfs_fput_be64 = vfs_fput_be64,
+    .vfs_is_streaming = vfs_is_streaming,
+    .vfs_get_metadata = vfs_get_metadata,
+    .vfs_file_test = vfs_file_test,
+    .vfs_is_writeable = vfs_is_writeable,
+    .vfs_is_remote = vfs_is_remote,
+    .vfs_file_get_contents = vfs_file_get_contents,
+    .vfs_register_transport = vfs_register_transport,
+
+    .vfs_buffer_new = vfs_buffer_new,
+    .vfs_buffer_new_from_string = vfs_buffer_new_from_string,
+
+    .vfs_buffered_file_new_from_uri = vfs_buffered_file_new_from_uri,
+    .vfs_buffered_file_release_live_fd = vfs_buffered_file_release_live_fd,
 
     .cfg_db_open = cfg_db_open,
     .cfg_db_close = cfg_db_close,
@@ -139,10 +139,6 @@ static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
     .uri_set_plugin = input_plugin_add_scheme_compat,
     .mime_set_plugin = input_plugin_add_mime_compat,
 
-    .util_info_dialog = util_info_dialog,
-
-    .smart_realloc = smart_realloc,
-
     .util_add_url_history_entry = util_add_url_history_entry,
 
     .str_to_utf8 = cd_str_to_utf8,
@@ -156,6 +152,7 @@ static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
 
     .playlist_count = playlist_count,
     .playlist_insert = playlist_insert,
+    .playlist_reorder = playlist_reorder,
     .playlist_delete = playlist_delete,
 
     .playlist_set_filename = playlist_set_filename,
@@ -203,8 +200,6 @@ static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
 
     .playlist_get_total_length = playlist_get_total_length,
     .playlist_get_selected_length = playlist_get_selected_length,
-
-    .playlist_set_shuffle = playlist_set_shuffle,
 
     .playlist_queue_count = playlist_queue_count,
     .playlist_queue_insert = playlist_queue_insert,
@@ -307,12 +302,6 @@ static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
     .drct_pq_get_position = drct_pq_get_position,
     .drct_pq_get_queue_position = drct_pq_get_queue_position,
 
-    .fileinfopopup_create = fileinfopopup_create,
-    .fileinfopopup_destroy = fileinfopopup_destroy,
-    .fileinfopopup_show_from_title = fileinfopopup_show_from_title,
-    .fileinfopopup_show_from_tuple = fileinfopopup_show_from_tuple,
-    .fileinfopopup_hide = fileinfopopup_hide,
-
     .util_get_localdir = util_get_localdir,
 
     .flow_new = flow_new,
@@ -349,11 +338,17 @@ static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
     .equalizer_read_aud_preset = equalizer_read_aud_preset,
     .load_preset_file = load_preset_file,
 
+    .file_find_decoder = file_find_decoder,
+    .file_read_tuple = file_read_tuple,
+    .file_read_image = file_read_image,
+    .file_can_write_tuple = file_can_write_tuple,
+    .file_write_tuple = file_write_tuple,
+    .custom_infowin = custom_infowin,
+
     .get_plugin_menu = get_plugin_menu,
     .playback_get_title = playback_get_title,
-    .fileinfo_show = ui_fileinfo_show,
-    .fileinfo_show_current = ui_fileinfo_show_current,
-    .save_all_playlists = save_all_playlists,
+    .save_all_playlists = save_playlists,
+    .get_associated_image_file = get_associated_image_file,
 
     .interface_get_current = interface_get_current,
     .interface_toggle_visibility = interface_toggle_visibility,
@@ -370,7 +365,6 @@ static struct _AudaciousFuncTableV1 _aud_papi_v1 = {
 
 /*****************************************************************/
 
-GList *lowlevel_list = NULL;
 extern GList *vfs_transports;
 
 static GStaticPrivate cur_plugin_key = G_STATIC_PRIVATE_INIT;
@@ -616,7 +610,15 @@ void plugin2_unload(PluginHeader * header, mowgli_node_t * hlist_node)
         {
             if (header->ip_list[i]->cleanup != NULL)
                 header->ip_list[i]->cleanup ();
+
+            g_free (header->ip_list[i]->filename);
         }
+    }
+
+    if (header->op_list != NULL)
+    {
+        for (i = 0; header->op_list[i] != NULL; i ++)
+            g_free (header->op_list[i]->filename);
     }
 
     if (header->interface)
@@ -728,10 +730,11 @@ static OutputPlugin * output_probe (void)
 void plugin_system_init(void)
 {
     gchar *dir;
-    GList *node;
-    LowlevelPlugin *lp;
     GtkWidget *dialog;
     gint dirsel = 0;
+
+    /* give libaudgui its pointer to the API vector table */
+    audgui_init (& _aud_papi_v1);
 
     if (!g_module_supported())
     {
@@ -801,16 +804,6 @@ void plugin_system_init(void)
 
     if (current_output_plugin == NULL)
         current_output_plugin = output_probe ();
-
-    for (node = lowlevel_list; node; node = g_list_next(node))
-    {
-        lp = LOWLEVEL_PLUGIN(node->data);
-        if (lp->init)
-        {
-            plugin_set_current((Plugin *) lp);
-            lp->init();
-        }
-    }
 }
 
 void plugin_system_cleanup(void)
@@ -818,7 +811,6 @@ void plugin_system_cleanup(void)
     EffectPlugin *ep;
     GeneralPlugin *gp;
     VisPlugin *vp;
-    LowlevelPlugin *lp;
     GList *node;
     mowgli_node_t *hlist_node;
 
@@ -846,6 +838,8 @@ void plugin_system_cleanup(void)
 
             if (ep->cleanup)
                 ep->cleanup();
+            
+            g_free (ep->filename);
 
             GDK_THREADS_LEAVE();
             while (g_main_context_iteration(NULL, FALSE));
@@ -869,6 +863,8 @@ void plugin_system_cleanup(void)
             if (gp->cleanup)
                 gp->cleanup();
 
+            g_free (gp->filename);
+
             GDK_THREADS_LEAVE();
             while (g_main_context_iteration(NULL, FALSE));
             GDK_THREADS_ENTER();
@@ -891,6 +887,8 @@ void plugin_system_cleanup(void)
             if (vp->cleanup)
                 vp->cleanup();
 
+            g_free (vp->filename);
+
             GDK_THREADS_LEAVE();
             while (g_main_context_iteration(NULL, FALSE));
             GDK_THREADS_ENTER();
@@ -901,28 +899,6 @@ void plugin_system_cleanup(void)
     {
         g_list_free(vp_data.vis_list);
         vp_data.vis_list = NULL;
-    }
-
-    for (node = lowlevel_list; node; node = g_list_next(node))
-    {
-        lp = LOWLEVEL_PLUGIN(node->data);
-        if (lp)
-        {
-            plugin_set_current((Plugin *) lp);
-
-            if (lp->cleanup)
-                lp->cleanup();
-
-            GDK_THREADS_LEAVE();
-            while (g_main_context_iteration(NULL, FALSE));
-            GDK_THREADS_ENTER();
-        }
-    }
-
-    if (lowlevel_list != NULL)
-    {
-        g_list_free(lowlevel_list);
-        lowlevel_list = NULL;
     }
 
     /* XXX: vfs will crash otherwise. -nenolod */

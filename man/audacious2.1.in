@@ -37,12 +37,12 @@ Show a list of session management options.
 
 .TP
 .I -e, --enqueue
-Do not clear the current playlist before adding the files on the command line to
-it.
+Add the files on the command line to the current playlist but do not start
+playback.
 
 .TP
 .I -E, --enqueue-to-temp
-Add the files on the command line to a new playlist.
+Add the files on the command line to a temporary playlist and start playback.
 
 .PP
 .B Controlling playback:
@@ -79,8 +79,8 @@ Go to the next song in the playlist.
 Show the installed version of Audacious.
 
 .TP
-.I -i, --interface newui | skinned | headless
-Start Audacious with the given interface. "newui" is the native GTK+ interface.
+.I -i, --interface gtkui | skinned | headless
+Start Audacious with the given interface. "gtkui" is the native GTK+ interface.
 "skinned" is an interface which uses Winamp Classic skins. (Skins can be placed
 in \fI@datarootdir@/audacious/Skins\fP, \fI~/.local/share/audacious/Skins\fP,
 and the folder specified by the environment variable \fISKINSDIR\fP. They can be
@@ -162,6 +162,10 @@ Escape	Scroll to current song
 Control + a	Select all songs in playlist
 .br
 Shift + Control + a	Cancel selection
+.br
++ (plus)	Increase volume 5 percent
+.br
+- (minus)	Decrease volume 5 percent
 .br
 s	Toggle shuffle
 .br

@@ -9,6 +9,9 @@
 /* Location of the desktop file */
 #undef AUDACIOUS_DESKTOP_FILE
 
+/* Build stamp */
+#undef BUILDSTAMP
+
 /* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
    systems. This function is required for `alloca.c' support on those systems.
    */
@@ -225,9 +228,6 @@
 
 /* Define to 1 if you have the <wchar.h> header file. */
 #undef HAVE_WCHAR_H
-
-/* Define if XSPF playlists are available. */
-#undef HAVE_XSPF_PLAYLIST
 
 /* Define to 1 if you have the `__argz_count' function. */
 #undef HAVE___ARGZ_COUNT

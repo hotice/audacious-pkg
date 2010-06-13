@@ -54,8 +54,6 @@
 
 #include "ui_preferences.h"
 
-#include "build_stamp.h"
-
 #define TITLESTRING_UPDATE_TIMEOUT 3
 
 static void sw_volume_toggled (void);
@@ -157,6 +155,7 @@ static ComboBoxElements chardet_detector_presets[] = {
     { N_("Hebrew")   , N_("Hebrew") },
     { N_("Turkish")  , N_("Turkish") },
     { N_("Arabic")   , N_("Arabic") },
+    { N_("Polish")   , N_("Polish") },
     { N_("Universal"), N_("Universal") }
 };
 
@@ -170,8 +169,8 @@ static ComboBoxElements bitdepth_elements[] = {
 typedef struct {
     void *next;
     GtkWidget *container;
-    char *pg_name;
-    char *img_url;
+    const gchar * pg_name;
+    const gchar * img_url;
 } CategoryQueueEntry;
 
 CategoryQueueEntry *category_queue = NULL;
@@ -1561,7 +1560,9 @@ static void fill_table (GtkWidget * table, PreferencesWidget * elements, gint
     }
 }
 
-void create_widgets_with_domain (GtkBox * box, PreferencesWidget * widgets, gint
+/* void create_widgets_with_domain (GtkBox * box, PreferencesWidget * widgets,
+ gint amt, const gchar * domain) */
+void create_widgets_with_domain (void * box, PreferencesWidget * widgets, gint
  amt, const gchar * domain)
 {
     gint x;
@@ -2552,8 +2553,8 @@ create_plugin_pages(void)
     create_plugin_page(get_effect_enabled_list());
 }
 
-GtkWidget **
-create_prefs_window(void)
+/* GtkWidget * * create_prefs_window (void) */
+void * * create_prefs_window (void)
 {
     gchar *aud_version_string;
 
@@ -2655,16 +2656,15 @@ create_prefs_window(void)
 
     /* audacious version label */
 
-    aud_version_string = g_strdup_printf("<span size='small'>%s (%s) (%s@%s)</span>",
-                                         "Audacious " PACKAGE_VERSION ,
-                                         build_stamp ,
-                                         g_get_user_name() , g_get_host_name() );
+    aud_version_string = g_strdup_printf
+     ("<span size='small'>%s (%s)</span>", "Audacious " PACKAGE_VERSION,
+     BUILDSTAMP);
 
     gtk_label_set_markup( GTK_LABEL(audversionlabel) , aud_version_string );
     g_free(aud_version_string);
     gtk_widget_show_all(vbox);
 
-    return &prefswin;
+    return (void * *) & prefswin;
 }
 
 void
@@ -2722,8 +2722,8 @@ hide_prefs_window(void)
     gtk_widget_hide(GTK_WIDGET(prefswin));
 }
 
-static void
-prefswin_page_queue_new(GtkWidget *container, gchar *name, gchar *imgurl)
+static void prefswin_page_queue_new (GtkWidget * container, const gchar * name,
+ const gchar * imgurl)
 {
     CategoryQueueEntry *ent = g_new0(CategoryQueueEntry, 1);
 
@@ -2755,8 +2755,10 @@ prefswin_page_queue_destroy(CategoryQueueEntry *ent)
  *
  *    - nenolod
  */
-gint
-prefswin_page_new(GtkWidget *container, gchar *name, gchar *imgurl)
+/* gint prefswin_page_new (GtkWidget * container, const gchar * name,
+ const gchar * imgurl) */
+gint prefswin_page_new (void * container, const gchar * name, const gchar *
+ imgurl)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;

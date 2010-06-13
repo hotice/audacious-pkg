@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "playlist-new.h"
 #include "plugin-registry.h"
 #include "probe.h"
 
@@ -63,7 +64,8 @@ static gboolean probe_func (InputPlugin * decoder, void * data)
         if (decoder->is_our_file_from_vfs (state->filename, state->handle))
             state->decoder = decoder;
 
-        vfs_fseek (state->handle, 0, SEEK_SET);
+        if (vfs_fseek (state->handle, 0, SEEK_SET))
+            ; /* ignore errors; they are normal on streaming */
     }
     else if (decoder->is_our_file != NULL)
     {
@@ -97,7 +99,8 @@ static gboolean probe_func_fast (InputPlugin * decoder, void * data)
              state->handle))
                 return FALSE;
 
-            vfs_fseek (state->handle, 0, SEEK_SET);
+            if (vfs_fseek (state->handle, 0, SEEK_SET))
+                ; /* ignore errors; they are normal on streaming */
         }
         else if (state->decoder->is_our_file != NULL)
         {
@@ -163,7 +166,7 @@ static void probe_by_content (ProbeState * state)
     input_plugin_by_priority (probe_func, state);
 }
 
-InputPlugin * file_probe (const gchar * filename, gboolean fast)
+InputPlugin * file_find_decoder (const gchar * filename, gboolean fast)
 {
     ProbeState state;
 
@@ -196,4 +199,80 @@ DONE:
         vfs_fclose (state.handle);
 
     return state.decoder;
+}
+
+Tuple * file_read_tuple (const gchar * filename, InputPlugin * decoder)
+{
+    if (decoder->get_song_tuple != NULL)
+        return decoder->get_song_tuple (filename);
+
+    if (decoder->probe_for_tuple != NULL)
+    {
+        VFSFile * handle = vfs_fopen (filename, "r");
+        Tuple * tuple;
+
+        if (handle == NULL)
+            return NULL;
+
+        tuple = decoder->probe_for_tuple (filename, handle);
+        vfs_fclose (handle);
+        return tuple;
+    }
+
+    return NULL;
+}
+
+gboolean file_read_image (const gchar * filename, InputPlugin * decoder,
+ void * * data, gint * size)
+{
+    VFSFile * handle;
+    gboolean success;
+
+    if (decoder->get_song_image == NULL)
+        return FALSE;
+
+    handle = vfs_fopen (filename, "r");
+    success = decoder->get_song_image (filename, handle, data, size);
+
+    if (handle != NULL)
+        vfs_fclose (handle);
+
+    return success;
+}
+
+gboolean file_can_write_tuple (const gchar * filename, InputPlugin * decoder)
+{
+    return (decoder->update_song_tuple != NULL);
+}
+
+gboolean file_write_tuple (const gchar * filename, InputPlugin * decoder,
+ Tuple * tuple)
+{
+    VFSFile * handle;
+    gboolean success;
+
+    if (decoder->update_song_tuple == NULL)
+        return FALSE;
+
+    handle = vfs_fopen (filename, "r+");
+
+    if (handle == NULL)
+        return FALSE;
+
+    success = decoder->update_song_tuple (tuple, handle);
+    vfs_fclose (handle);
+
+    if (success)
+        playlist_rescan_file (filename);
+
+    return success;
+}
+
+gboolean custom_infowin (const gchar * filename, InputPlugin * decoder)
+{
+    if (decoder->file_info_box == NULL)
+        return FALSE;
+
+    decoder->file_info_box (filename);
+    return TRUE;
 }

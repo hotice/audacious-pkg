@@ -83,11 +83,6 @@ static void show_done (void)
     gtk_widget_destroy (add_window);
 }
 
-static gint compare (const void * * a, const void * * b)
-{
-    return string_compare (* (const gchar * *) a, * (const gchar * *) b);
-}
-
 static gboolean add_cb (void * unused)
 {
     static GList * stack = NULL;
@@ -113,7 +108,8 @@ static gboolean add_cb (void * unused)
             {
                 gchar * filename = g_filename_to_uri (stack->data, NULL, NULL);
 
-                if (filename != NULL && file_probe (filename, TRUE) != NULL)
+                if (filename != NULL && file_find_decoder (filename, TRUE) !=
+                 NULL)
                     index_append (index, filename);
                 else
                     g_free (filename);
@@ -159,7 +155,8 @@ static gboolean add_cb (void * unused)
 
     if (stack == NULL)
     {
-        index_sort (index, compare);
+        index_sort (index, (gint (*) (const void *, const void *))
+         string_compare);
 
         count = playlist_count ();
 
@@ -180,7 +177,7 @@ static gboolean add_cb (void * unused)
 
             if (add_at > 0)
                 playlist_set_position (add_playlist, add_at);
-            
+
             playback_initiate ();
         }
 

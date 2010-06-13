@@ -1,5 +1,5 @@
 /*  Audacious
- *  Copyright (C) 2005-2009  Audacious team.
+ *  Copyright (C) 2005-2010  Audacious team.
  *
  *  BMP - Cross-platform multimedia player
  *  Copyright (C) 2003-2004  BMP development team.
@@ -40,7 +40,7 @@
 #define AUDACIOUS_PLUGIN_H
 
 #include <glib.h>
-#include <gtk/gtk.h>
+#include <gmodule.h>
 
 #include "libaudcore/audio.h"
 #include "libaudcore/audstrings.h"
@@ -55,7 +55,6 @@
 #include "audacious/preferences.h"
 #include "audacious/interface.h"
 #include "audacious/equalizer_preset.h"
-#include "libaudtag/audtag.h"
 
 //@{
 /** Plugin type cast macros */
@@ -65,13 +64,12 @@
 #define EFFECT_PLUGIN(x)        ((EffectPlugin *)(x))
 #define GENERAL_PLUGIN(x)       ((GeneralPlugin *)(x))
 #define VIS_PLUGIN(x)           ((VisPlugin *)(x))
-#define LOWLEVEL_PLUGIN(x)      ((LowlevelPlugin *)(x))
 //@}
 
 //@{
 /** Preprocessor defines for different API features */
 #define __AUDACIOUS_NEWVFS__                /**< @deprecated define for availability of VFS API. */
-#define __AUDACIOUS_PLUGIN_API__ 13         /**< Current generic plugin API/ABI version, exact match is required for plugin to be loaded. */
+#define __AUDACIOUS_PLUGIN_API__ 14         /**< Current generic plugin API/ABI version, exact match is required for plugin to be loaded. */
 #define __AUDACIOUS_INPUT_PLUGIN_API__ 8    /**< Input plugin API version. */
 //@}
 
@@ -81,6 +79,12 @@ typedef enum {
     INPUT_VIS_VU,
     INPUT_VIS_OFF
 } InputVisType;
+
+typedef enum {
+    PLUGIN_MESSAGE_ERROR = 0,
+    PLUGIN_MESSAGE_OK = 1,
+    PLUGIN_MESSAGE_DEFERRED = 2
+} PluginMessageResponse;
 
 /** Playlist update signal types */
 enum
@@ -101,13 +105,14 @@ enum {
     PLAYLIST_SORT_SCHEMES
 };
 
+#define EQUALIZER_MAX_GAIN 12
+
 typedef struct _Plugin        Plugin;
 typedef struct _InputPlugin   InputPlugin;
 typedef struct _OutputPlugin  OutputPlugin;
 typedef struct _EffectPlugin  EffectPlugin;
 typedef struct _GeneralPlugin GeneralPlugin;
 typedef struct _VisPlugin     VisPlugin;
-typedef struct _LowlevelPlugin LowlevelPlugin;
 
 typedef struct _InputPlayback InputPlayback;
 
@@ -134,8 +139,8 @@ typedef struct {
     gint api_version;       /**< API version plugin has been compiled for,
                                  this is checked against __AUDACIOUS_PLUGIN_API__ */
     gchar *name;            /**< Module name */
-    GCallback init;
-    GCallback fini;
+    void (* init) (void);
+    void (* fini) (void);
     Plugin *priv_assoc;
     InputPlugin **ip_list;  /**< List of InputPlugin(s) in this module */
     OutputPlugin **op_list;
@@ -166,47 +171,62 @@ typedef struct {
 struct _AudaciousFuncTableV1 {
 
     /* VFS */
-    VFSFile *(*vfs_fopen)(const gchar *uri, const gchar *mode);
-    gint (*vfs_fclose)(VFSFile *fd);
-    VFSFile *(*vfs_dup)(VFSFile *in);
-    gsize (*vfs_fread)(gpointer ptr,
-                 gsize size,
-                 gsize nmemb,
-                 VFSFile * file);
-    gsize (*vfs_fwrite)(gconstpointer ptr,
-                  gsize size,
-                  gsize nmemb,
-                  VFSFile *file);
+#ifdef __GNUC__
+#define WARN_RETURN __attribute__ ((warn_unused_result))
+#else
+#define WARN_RETURN
+#endif
 
-    gint (*vfs_getc)(VFSFile *stream);
-    gint (*vfs_ungetc)(gint c,
-                       VFSFile *stream);
-    gchar *(*vfs_fgets)(gchar *s,
-                        gint n,
-                        VFSFile *stream);
+    VFSFile * (* vfs_fopen) (const gchar * path, const gchar * mode) WARN_RETURN;
+    VFSFile * (* vfs_dup) (VFSFile * in) WARN_RETURN;
+    gint (* vfs_fclose) (VFSFile * file);
 
-    gint (*vfs_fseek)(VFSFile * file,
-                      glong offset,
-                      gint whence);
-    void (*vfs_rewind)(VFSFile * file);
-    glong (*vfs_ftell)(VFSFile * file);
-    gboolean (*vfs_feof)(VFSFile * file);
+    gint64 (* vfs_fread) (void * ptr, gint64 size, gint64 nmemb, VFSFile *
+     file) WARN_RETURN;
+    gint64 (* vfs_fwrite) (const void * ptr, gint64 size, gint64 nmemb,
+     VFSFile * file) WARN_RETURN;
 
-    gboolean (*vfs_file_test)(const gchar * path,
-                              GFileTest test);
+    gint (* vfs_getc) (VFSFile * stream) WARN_RETURN;
+    gint (* vfs_ungetc) (gint c, VFSFile * stream) WARN_RETURN;
+    gchar * (* vfs_fgets) (gchar * s, gint n, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_feof) (VFSFile * file) WARN_RETURN;
+    gint (* vfs_fprintf) (VFSFile * stream, gchar const * format, ...)
+     __attribute__ ((__format__ (__printf__, 2, 3)));
 
-    gboolean (*vfs_is_writeable)(const gchar * path);
-    gboolean (*vfs_truncate)(VFSFile * file, glong length);
-    off_t (*vfs_fsize)(VFSFile * file);
-    gchar *(*vfs_get_metadata)(VFSFile * file, const gchar * field);
+    gint (* vfs_fseek) (VFSFile * file, gint64 offset, gint whence) WARN_RETURN;
+    void (* vfs_rewind) (VFSFile * file);
+    glong (* vfs_ftell) (VFSFile * file) WARN_RETURN;
+    gint64 (* vfs_fsize) (VFSFile * file) WARN_RETURN;
+    gint (* vfs_ftruncate) (VFSFile * file, gint64 length) WARN_RETURN;
 
-    int (*vfs_fprintf)(VFSFile *stream, gchar const *format, ...)
-        __attribute__ ((__format__ (__printf__, 2, 3)));
+    gboolean (* vfs_fget_le16) (guint16 * value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fget_le32) (guint32 * value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fget_le64) (guint64 * value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fget_be16) (guint16 * value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fget_be32) (guint32 * value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fget_be64) (guint64 * value, VFSFile * stream) WARN_RETURN;
 
-    gboolean (*vfs_register_transport)(VFSConstructor *vtable);
-    void (*vfs_file_get_contents)(const gchar *filename, gchar **buf, gsize *size);
-    gboolean (*vfs_is_remote)(const gchar * path);
-    gboolean (*vfs_is_streaming)(VFSFile *file);
+    gboolean (* vfs_fput_le16) (guint16 value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fput_le32) (guint32 value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fput_le64) (guint64 value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fput_be16) (guint16 value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fput_be32) (guint32 value, VFSFile * stream) WARN_RETURN;
+    gboolean (* vfs_fput_be64) (guint64 value, VFSFile * stream) WARN_RETURN;
+
+    gboolean (* vfs_is_streaming) (VFSFile * file) WARN_RETURN;
+    gchar * (* vfs_get_metadata) (VFSFile * file, const gchar * field)
+     WARN_RETURN;
+
+    gboolean (* vfs_file_test) (const gchar * path, GFileTest test) WARN_RETURN;
+    gboolean (* vfs_is_writeable) (const gchar * path) WARN_RETURN;
+    gboolean (* vfs_is_remote) (const gchar * path) WARN_RETURN;
+
+    void (* vfs_file_get_contents) (const gchar * filename, guchar * * buf,
+     gint64 * size);
+
+    void (* vfs_register_transport) (VFSConstructor * vtable);
+
+#undef WARN_RETURN
 
     /* VFS Buffer */
     VFSFile *(*vfs_buffer_new)(gpointer data, gsize size);
@@ -215,21 +235,6 @@ struct _AudaciousFuncTableV1 {
     /* VFS Buffered File */
     VFSFile *(*vfs_buffered_file_new_from_uri)(const gchar *uri);
     VFSFile *(*vfs_buffered_file_release_live_fd)(VFSFile *fd);
-
-    /* VFS endianess helper functions */
-    gboolean (*vfs_fget_le16)(guint16 *value, VFSFile *stream);
-    gboolean (*vfs_fget_le32)(guint32 *value, VFSFile *stream);
-    gboolean (*vfs_fget_le64)(guint64 *value, VFSFile *stream);
-    gboolean (*vfs_fget_be16)(guint16 *value, VFSFile *stream);
-    gboolean (*vfs_fget_be32)(guint32 *value, VFSFile *stream);
-    gboolean (*vfs_fget_be64)(guint64 *value, VFSFile *stream);
-
-    gboolean (*vfs_fput_le16)(guint16 value, VFSFile *stream);
-    gboolean (*vfs_fput_le32)(guint32 value, VFSFile *stream);
-    gboolean (*vfs_fput_le64)(guint64 value, VFSFile *stream);
-    gboolean (*vfs_fput_be16)(guint16 value, VFSFile *stream);
-    gboolean (*vfs_fput_be32)(guint32 value, VFSFile *stream);
-    gboolean (*vfs_fput_be64)(guint64 value, VFSFile *stream);
 
     /* ConfigDb */
     mcs_handle_t *(*cfg_db_open)(void);
@@ -286,14 +291,8 @@ struct _AudaciousFuncTableV1 {
     void (* mime_set_plugin) (const gchar * mimetype, InputPlugin * ip);
 
     /* Util funcs */
-    GtkWidget *(*util_info_dialog)(const gchar * title, const gchar * text,
-                                   const gchar * button_text, gboolean modal,
-                                   GCallback button_action,
-                                   gpointer action_data);
     gchar *(*util_get_localdir)(void);
     void (*util_menu_main_show)(gint x, gint y, guint button, guint time);
-
-    gpointer (*smart_realloc)(gpointer ptr, gsize *size);
     void (*util_add_url_history_entry)(const gchar * url);
 
     /* INI funcs */
@@ -321,6 +320,7 @@ struct _AudaciousFuncTableV1 {
     /* Playlist API II (core) */
     gint (* playlist_count) (void);
     void (* playlist_insert) (gint at);
+    void (* playlist_reorder) (gint from, gint to, gint count);
     void (* playlist_delete) (gint playlist);
 
     void (* playlist_set_filename) (gint playlist, const gchar * filename);
@@ -376,8 +376,6 @@ struct _AudaciousFuncTableV1 {
     gint64 (* playlist_get_total_length) (gint playlist);
     gint64 (* playlist_get_selected_length) (gint playlist);
 
-    void (* playlist_set_shuffle) (gboolean shuffle);
-
     gint (* playlist_queue_count) (gint playlist);
     void (* playlist_queue_insert) (gint playlist, gint at, gint entry);
     void (* playlist_queue_insert_selected) (gint playlist, gint at);
@@ -406,7 +404,8 @@ struct _AudaciousFuncTableV1 {
     gboolean (* playlist_save) (gint playlist, const gchar * filename);
     void (* playlist_insert_folder) (gint playlist, gint at, const gchar *
      folder);
-    void (* save_all_playlists) (void);
+    void (* playlist_insert_folder_v2) (gint playlist, gint at, const gchar *
+     folder, gboolean play);
 
     /* state vars */
     AudConfig *_cfg;
@@ -419,8 +418,10 @@ struct _AudaciousFuncTableV1 {
     void (*hook_call)(const gchar *name, gpointer hook_data);
 
     /* PluginMenu API */
-    gint (*menu_plugin_item_add)(gint, GtkWidget *);
-    gint (*menu_plugin_item_remove)(gint, GtkWidget *);
+    /* gint (* menu_plugin_item_add) (gint menu, GtkWidget * item); */
+    gint (* menu_plugin_item_add) (gint menu, void * item);
+    /* gint (* menu_plugin_item_remove) (gint, GtkWidget * item); */
+    gint (* menu_plugin_item_remove) (gint, void * item);
 
     /* DRCT API. */
     void (*drct_quit) ( void );
@@ -485,18 +486,6 @@ struct _AudaciousFuncTableV1 {
     gint (*drct_pq_get_position)( gint pos );
     gint (*drct_pq_get_queue_position)( gint pos );
 
-    /* FileInfoPopup API */
-    GtkWidget *(*fileinfopopup_create)(void);
-    void (*fileinfopopup_destroy)(GtkWidget* fileinfopopup_win);
-    void (*fileinfopopup_show_from_tuple)(GtkWidget *fileinfopopup_win, Tuple *tuple);
-    void (*fileinfopopup_show_from_title)(GtkWidget *fileinfopopup_win, gchar *title);
-    void (*fileinfopopup_hide)(GtkWidget *filepopup_win, gpointer unused);
-
-    /* InputPlayback */
-    InputPlayback *(*playback_new)(void);
-    void (*playback_free)(InputPlayback *);
-    void (*playback_run)(InputPlayback *);
-
     /* Flows */
     gsize (*flow_execute)(Flow *flow, gint time, gpointer *data, gsize len, AFormat fmt,
                           gint srate, gint channels);
@@ -525,7 +514,9 @@ struct _AudaciousFuncTableV1 {
     void (*calc_mono_pcm)(gint16 dest[2][512], gint16 src[2][512], gint nch);
     void (*calc_stereo_pcm)(gint16 dest[2][512], gint16 src[2][512], gint nch);
 
-    void (* create_widgets_with_domain) (GtkBox * box, PreferencesWidget *
+    /* void (* create_widgets_with_domain) (GtkBox * box, PreferencesWidget *
+     widgets, gint amt, const gchar * domain); */
+    void (* create_widgets_with_domain) (void * box, PreferencesWidget *
      widgets, gint amt, const gchar * domain);
 
     GList *(*equalizer_read_presets)(const gchar * basename);
@@ -535,15 +526,23 @@ struct _AudaciousFuncTableV1 {
     EqualizerPreset *(*equalizer_read_aud_preset)(const gchar * filename);
     EqualizerPreset *(*load_preset_file)(const gchar *filename);
 
-//    /* Audtag lib functions */
-//    Tuple *(*tag_tuple_read)(Tuple* tuple);
-//    gint (*tag_tuple_write_to_file)(Tuple *tuple);
+    /* File probing API */
+    InputPlugin * (* file_find_decoder) (const gchar * filename, gboolean fast);
+    Tuple * (* file_read_tuple) (const gchar * filename, InputPlugin * decoder);
+    gboolean (* file_read_image) (const gchar * filename, InputPlugin * decoder,
+     void * * data, gint * size);
+    gboolean (* file_can_write_tuple) (const gchar * filename, InputPlugin *
+     decoder);
+    gboolean (* file_write_tuple) (const gchar * filename, InputPlugin *
+     decoder, Tuple * tuple);
+    gboolean (* custom_infowin) (const gchar * filename, InputPlugin * decoder);
 
     /* Miscellaneous */
-    GtkWidget * (* get_plugin_menu) (gint id);
+    /* GtkWidget * (* get_plugin_menu) (gint id); */
+    void * (* get_plugin_menu) (gint id);
     gchar * (* playback_get_title) (void);
-    void (* fileinfo_show) (gint playlist, gint entry);
-    void (* fileinfo_show_current) (void);
+    void (* save_all_playlists) (void);
+    gchar * (* get_associated_image_file) (const gchar * filename);
 
     /* Interface API */
     const Interface * (* interface_get_current) (void);
@@ -556,57 +555,52 @@ struct _AudaciousFuncTableV1 {
     gboolean (* playlist_entry_is_segmented)(gint playlist_num, gint entry_num);
     gint (* playlist_entry_get_start_time)(gint playlist_num, gint entry_num);
     gint (* playlist_entry_get_end_time)(gint playlist_num, gint entry_num);
-
-    /* Move to proper place when API can be broken */
-    void (* playlist_insert_folder_v2) (gint playlist, gint at, const gchar *
-     folder, gboolean play);
 };
 
 
 /* Convenience macros for accessing the public API. */
-/*    public name            vtable mapping      */
+/*      public name                     vtable mapping */
+
 #define aud_vfs_fopen                   _audvt->vfs_fopen
-#define aud_vfs_fclose                  _audvt->vfs_fclose
 #define aud_vfs_dup                     _audvt->vfs_dup
+#define aud_vfs_fclose                  _audvt->vfs_fclose
 #define aud_vfs_fread                   _audvt->vfs_fread
 #define aud_vfs_fwrite                  _audvt->vfs_fwrite
 #define aud_vfs_getc                    _audvt->vfs_getc
 #define aud_vfs_ungetc                  _audvt->vfs_ungetc
 #define aud_vfs_fgets                   _audvt->vfs_fgets
+#define aud_vfs_feof                    _audvt->vfs_feof
+#define aud_vfs_fprintf                 _audvt->vfs_fprintf
 #define aud_vfs_fseek                   _audvt->vfs_fseek
 #define aud_vfs_rewind                  _audvt->vfs_rewind
 #define aud_vfs_ftell                   _audvt->vfs_ftell
-#define aud_vfs_feof                    _audvt->vfs_feof
-#define aud_vfs_file_test               _audvt->vfs_file_test
-#define aud_vfs_is_writeable            _audvt->vfs_is_writeable
-#define aud_vfs_truncate                _audvt->vfs_truncate
 #define aud_vfs_fsize                   _audvt->vfs_fsize
-#define aud_vfs_get_metadata            _audvt->vfs_get_metadata
-#define aud_vfs_fprintf                 _audvt->vfs_fprintf
-#define aud_vfs_register_transport      _audvt->vfs_register_transport
-#define aud_vfs_file_get_contents       _audvt->vfs_file_get_contents
-#define aud_vfs_is_remote               _audvt->vfs_is_remote
-#define aud_vfs_is_streaming            _audvt->vfs_is_streaming
-
-#define aud_vfs_buffer_new              _audvt->vfs_buffer_new
-#define aud_vfs_buffer_new_from_string  _audvt->vfs_buffer_new_from_string
-
-#define aud_vfs_buffered_file_new_from_uri      _audvt->vfs_buffered_file_new_from_uri
-#define aud_vfs_buffered_file_release_live_fd   _audvt->vfs_buffered_file_release_live_fd
-
+#define aud_vfs_ftruncate               _audvt->vfs_ftruncate
 #define aud_vfs_fget_le16               _audvt->vfs_fget_le16
 #define aud_vfs_fget_le32               _audvt->vfs_fget_le32
 #define aud_vfs_fget_le64               _audvt->vfs_fget_le64
 #define aud_vfs_fget_be16               _audvt->vfs_fget_be16
 #define aud_vfs_fget_be32               _audvt->vfs_fget_be32
 #define aud_vfs_fget_be64               _audvt->vfs_fget_be64
-
 #define aud_vfs_fput_le16               _audvt->vfs_fput_le16
 #define aud_vfs_fput_le32               _audvt->vfs_fput_le32
 #define aud_vfs_fput_le64               _audvt->vfs_fput_le64
 #define aud_vfs_fput_be16               _audvt->vfs_fput_be16
 #define aud_vfs_fput_be32               _audvt->vfs_fput_be32
 #define aud_vfs_fput_be64               _audvt->vfs_fput_be64
+#define aud_vfs_is_streaming            _audvt->vfs_is_streaming
+#define aud_vfs_get_metadata            _audvt->vfs_get_metadata
+#define aud_vfs_file_test               _audvt->vfs_file_test
+#define aud_vfs_is_writeable            _audvt->vfs_is_writeable
+#define aud_vfs_is_remote               _audvt->vfs_is_remote
+#define aud_vfs_file_get_contents       _audvt->vfs_file_get_contents
+#define aud_vfs_register_transport      _audvt->vfs_register_transport
+
+#define aud_vfs_buffer_new              _audvt->vfs_buffer_new
+#define aud_vfs_buffer_new_from_string  _audvt->vfs_buffer_new_from_string
+
+#define aud_vfs_buffered_file_new_from_uri      _audvt->vfs_buffered_file_new_from_uri
+#define aud_vfs_buffered_file_release_live_fd   _audvt->vfs_buffered_file_release_live_fd
 
 /* XXX: deprecation warnings */
 #define ConfigDb mcs_handle_t        /* Alias for compatibility -- ccr */
@@ -649,9 +643,6 @@ struct _AudaciousFuncTableV1 {
 #define aud_mime_set_plugin             _audvt->mime_set_plugin
 #define aud_uri_set_plugin              _audvt->uri_set_plugin
 
-#define aud_info_dialog                 _audvt->util_info_dialog
-#define audacious_info_dialog           _audvt->util_info_dialog
-#define aud_smart_realloc               _audvt->smart_realloc
 #define aud_util_add_url_history_entry  _audvt->util_add_url_history_entry
 
 #define aud_str_to_utf8                 _audvt->str_to_utf8
@@ -678,6 +669,7 @@ struct _AudaciousFuncTableV1 {
 
 #define aud_playlist_count              _audvt->playlist_count
 #define aud_playlist_insert             _audvt->playlist_insert
+#define aud_playlist_reorder            _audvt->playlist_reorder
 #define aud_playlist_delete             _audvt->playlist_delete
 
 #define aud_playlist_set_filename       _audvt->playlist_set_filename
@@ -726,7 +718,6 @@ struct _AudaciousFuncTableV1 {
 #define aud_playlist_rescan             _audvt->playlist_rescan
 #define aud_playlist_get_total_length   _audvt->playlist_get_total_length
 #define aud_playlist_get_selected_length _audvt->playlist_get_selected_length
-#define aud_playlist_set_shuffle        _audvt->playlist_set_shuffle
 
 #define aud_playlist_queue_count        _audvt->playlist_queue_count
 #define aud_playlist_queue_insert       _audvt->playlist_queue_insert
@@ -833,17 +824,7 @@ struct _AudaciousFuncTableV1 {
 #define audacious_drct_pq_get_position      _audvt->drct_pq_get_position
 #define audacious_drct_pq_get_queue_position _audvt->drct_pq_get_queue_position
 
-#define audacious_fileinfopopup_create          _audvt->fileinfopopup_create
-#define audacious_fileinfopopup_destroy         _audvt->fileinfopopup_destroy
-#define audacious_fileinfopopup_show_from_tuple _audvt->fileinfopopup_show_from_tuple
-#define audacious_fileinfopopup_show_from_title _audvt->fileinfopopup_show_from_title
-#define audacious_fileinfopopup_hide            _audvt->fileinfopopup_hide
-
 #define audacious_get_localdir          _audvt->util_get_localdir
-
-#define aud_playback_new                _audvt->playback_new
-#define aud_playback_run                _audvt->playback_run
-#define aud_playback_free(x)            _audvt->playback_free
 
 #define aud_flow_execute                _audvt->flow_execute
 #define aud_flow_new                    _audvt->flow_new
@@ -894,14 +875,17 @@ struct _AudaciousFuncTableV1 {
 #define aud_output_plugin_cleanup       _audvt->output_plugin_cleanup
 #define aud_output_plugin_reinit        _audvt->output_plugin_reinit
 
+#define aud_file_find_decoder           _audvt->file_find_decoder
+#define aud_file_read_tuple             _audvt->file_read_tuple
+#define aud_file_read_image             _audvt->file_read_image
+#define aud_file_can_write_tuple        _audvt->file_can_write_tuple
+#define aud_file_write_tuple            _audvt->file_write_tuple
+#define aud_custom_infowin              _audvt->custom_infowin
+
 #define aud_get_plugin_menu             _audvt->get_plugin_menu
 #define aud_playback_get_title          _audvt->playback_get_title
-#define aud_fileinfo_show               _audvt->fileinfo_show
-#define aud_fileinfo_show_current       _audvt->fileinfo_show_current
 #define aud_save_all_playlists          _audvt->save_all_playlists
-
-//#define aud_tag_tuple_read                  _audvt->tag_tuple_read
-//#define aud_tag_tuple_write_to_file         _audvt->tag_tuple_write
+#define aud_get_associated_image_file   _audvt->get_associated_image_file
 
 #define aud_interface_get_current       _audvt->interface_get_current
 #define aud_interface_toggle_visibility _audvt->interface_toggle_visibility
@@ -913,6 +897,7 @@ struct _AudaciousFuncTableV1 {
 #define aud_playlist_entry_is_segmented			_audvt->playlist_entry_is_segmented
 #define aud_playlist_entry_get_start_time		_audvt->playlist_entry_get_start_time
 #define aud_playlist_entry_get_end_time			_audvt->playlist_entry_get_end_time
+
 
 #include "audacious/auddrct.h"
 
@@ -959,23 +944,12 @@ G_END_DECLS
     void (*cleanup) (void);        \
     void (*about) (void);        \
     void (*configure) (void);        \
-    PluginPreferences *settings;
+    PluginPreferences *settings;     \
+    PluginMessageResponse (*sendmsg)(gint msgtype, gpointer msgdata);
 
 /* Sadly, this is the most we can generalize out of the disparate
    plugin structs usable with typecasts - descender */
 struct _Plugin {
-    PLUGIN_COMMON_FIELDS
-};
-
-/*
- * LowlevelPlugin is used for lowlevel system services, such as PlaylistContainers,
- * VFSContainers and the like.
- *
- * They are not GUI visible at this time.
- *
- * XXX: Is this still in use in 1.4? --nenolod
- */
-struct _LowlevelPlugin {
     PLUGIN_COMMON_FIELDS
 };
 
@@ -1041,16 +1015,20 @@ struct _EffectPlugin {
     void (* process) (gfloat * * data, gint * samples);
 
     /* A seek is taking place; any buffers should be discarded. */
-    void (* flush) ();
+    void (* flush) (void);
 
     /* Exactly like process() except that any buffers should be drained (i.e.
-     * the data processed and returned). */
+     * the data processed and returned).  finish() will be called a second time
+     * at the end of the last song in the playlist. */
     void (* finish) (gfloat * * data, gint * samples);
 
     /* For effects that change the length of the song, these functions allow the
      * correct time to be displayed. */
     gint (* decoder_to_output_time) (gint time);
     gint (* output_to_decoder_time) (gint time);
+
+    /* Effects with lowest order (0 to 9) are applied first. */
+    gint order;
 };
 
 struct OutputAPI
@@ -1101,12 +1079,6 @@ struct _InputPlayback {
     void (*set_params) (InputPlayback * playback, const gchar * title, gint
      length, gint bitrate, gint samplerate, gint channels);
 
-    /**
-     * Set playback entry title.
-     * @deprecated This function is deprecated, use #set_tuple() instead.
-     */
-    void (*set_title) (InputPlayback * playback, const gchar * title);
-
     void (*pass_audio) (InputPlayback *, AFormat, gint, gint, gpointer, gint *);
 
     /* called by input plugin when RG info available --asphyx */
@@ -1123,6 +1095,12 @@ struct _InputPlayback {
     gint start;
     gint end;
     gint end_timeout;
+
+    /* If replay gain settings are stored in the tuple associated with the
+     * current song, this function can be called (after opening audio) to apply
+     * those settings.  If the settings are changed in a call to set_tuple, this
+     * function must be called again to apply the updated settings. */
+    void (* set_gain_from_playlist) (InputPlayback * playback);
 };
 
 /**
@@ -1175,6 +1153,11 @@ struct _InputPlugin {
     gboolean (*update_song_tuple)(Tuple *tuple, VFSFile *fd);
 
     gint priority; /* 0 = first, 10 = last */
+
+    /* handle will be NULL if the file could not be opened.  This is normal in
+     * the case of custom URI schemes such as cdda://. */
+    gboolean (* get_song_image) (const gchar * filename, VFSFile * handle,
+     void * * data, gint * size);
 };
 
 struct _GeneralPlugin {
@@ -1203,7 +1186,8 @@ struct _VisPlugin {
      */
     void (*render_freq) (gint16 freq_data[2][256]);
 
-    GtkWidget *(*get_widget) (void);
+    /* GtkWidget * (* get_widget) (void); */
+    void * (* get_widget) (void);
 };
 
 /* undefine the macro -- struct Plugin should be used instead. */

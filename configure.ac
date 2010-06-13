@@ -6,7 +6,7 @@ dnl Require autoconf 2.59 or later
 AC_PREREQ([2.59])
 
 dnl Initialize
-AC_INIT([audacious], [2.3], [bugs+audacious@atheme.org])
+AC_INIT([audacious], [2.4-alpha1], [bugs+audacious@atheme.org])
 AC_COPYRIGHT([(C) 2005-2010 Audacious Development Team])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -31,6 +31,15 @@ BUILDSYS_PROG_IMPLIB
 BUILDSYS_SHARED_LIB
 IMPLIB_LIBS=""
 AC_SUBST([IMPLIB_LIBS])
+
+
+dnl Build stamp
+dnl ===========
+AC_ARG_WITH([buildstamp],
+ AS_HELP_STRING([--with-buildstamp=XXX], [Set build stamp to XXX]),
+ AC_DEFINE_UNQUOTED([BUILDSTAMP], "$withval", [Build stamp]),
+ AC_DEFINE_UNQUOTED([BUILDSTAMP], "UNSUPPORTED VERSION", [Build stamp]))
+
 
 dnl Debug support
 dnl ========================
@@ -141,22 +150,6 @@ AUD_CONDITIONAL([USE_DBUS], [enable_dbus])
 
 
 ### ---------------------------------------------------------------------------
-dnl xspf playlist support
-dnl =====================
-AUD_ARG_ENABLE([xspf], [yes],
-[XSPF support],
-[
-    AM_PATH_XML2([2.0.0],, [
-       AC_MSG_WARN([*** libxml2 is not installed. XSPF playlist support will not be built. ***])
-       enable_xspf="no"
-    ])
-    if test "x$enable_xspf" = "xyes"; then
-        AC_DEFINE([HAVE_XSPF_PLAYLIST], 1, [Define if XSPF playlists are available.])
-    fi
-])
-
-
-### ---------------------------------------------------------------------------
 dnl regex support (gnu/oniguruma/pcre)
 dnl ==================================
 REGEX_LIBS=
@@ -206,6 +199,10 @@ AUD_ARG_ENABLE([sm], [yes],
     ],[
         enable_sm="no"
     ])
+
+    PKG_CHECK_MODULES([ICE], [ice >= 1.0],
+     [enable_sm="${enable_sm}"],
+     [enable_sm="no"])
 ])
 AUD_CONDITIONAL([USE_EGGSM], [enable_sm])
 
