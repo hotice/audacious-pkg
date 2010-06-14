@@ -25,7 +25,6 @@ Depends: audacious-plugins (>= 2.3),
          dbus,
          dbus-x11,
          libaudclient2 (= ${binary:Version}),
-         libaudid3tag2 (= ${binary:Version}),
          libaudcore1 (= ${binary:Version}),
          gtk2-engines-pixbuf,
          ${misc:Depends},
@@ -52,30 +51,6 @@ Description: small and fast audio player which supports lots of formats
  other useful features like LIRC support.
  .
  This package contains the core player and its localization.
-
-Package: libaudid3tag2
-Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
-Conflicts: audacious (<< 1.4~)
-Description: audacious id3 tag manipulation library
- Audacious is a fork of beep-media-player which supports winamp skins
- and many codecs.
- .
- In the default install, the following codecs are supported:
- .
-  * MP3
-  * Ogg Vorbis
-  * AAC and AAC+
-  * FLAC
-  * Windows Media (WMA)
-  * Musepack
-  * TTA
-  * Many module formats and much more!
- .
- Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support.
- .
- This package contains a library used to manipulate id3 tags.
 
 Package: libaudclient2
 Architecture: any
@@ -128,7 +103,6 @@ Package: audacious-dev
 Section: libdevel
 Architecture: any
 Depends: libaudclient2 (= ${binary:Version}),
-         libaudid3tag2 (= ${binary:Version}),
          libaudcore1 (= ${binary:Version}),
          libdbus-1-dev (>= 0.60),
          libdbus-glib-1-dev (>= 0.60),
@@ -168,7 +142,7 @@ Package: audacious-dbg
 Section: debug
 Architecture: any
 Depends: audacious (= ${binary:Version}), ${misc:Depends}
-Provides: libaudid3tag2-dbg, libaudclient2-dbg, libaudcore1-dbg
+Provides: libaudclient2-dbg, libaudcore1-dbg
 Recommends: audacious-plugins-dbg
 Priority: extra
 Description: audacious media player (debugging symbols)
