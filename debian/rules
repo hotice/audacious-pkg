@@ -12,15 +12,14 @@ endif
 override_dh_auto_configure:
 	ln -sf /usr/share/misc/config.sub .
 	ln -sf /usr/share/misc/config.guess .
-	dh_auto_configure -- --disable-rpath --enable-chardet $(additional_confflags)
+	dh_auto_configure -- --disable-rpath --enable-chardet $(additional_confflags) \
+		--with-buildstamp="$(shell dpkg-vendor --query vendor) package"
 
 override_dh_auto_clean:
 	dh_auto_clean
 	rm -f pixmaps/audacious-*.png
 
 override_dh_auto_build:
-	# Change build id from UNSUPPORTED VERSION to <vendor> package
-	echo "const char *build_stamp = \"$(shell dpkg-vendor --query vendor) package\";" > src/audacious/build_stamp.c;
 	# Drop this png file creation after the next upstream release (probably 2.4)
 	for size in 16 22 32 36; do \
 		rsvg -h $${size} -w $${size} pixmaps/audacious.svg pixmaps/audacious-$${size}.png || exit 1; \
