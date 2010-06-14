@@ -16,11 +16,7 @@ override_dh_auto_configure:
 
 override_dh_auto_clean:
 	dh_auto_clean
-	rm -f man/*.1 config.status config.log config.h *.pc buildsys.mk
-	rm -f src/audacious/dbus-client-bindings.h src/audacious/dbus-server-bindings.h
-	find -name '.deps' -delete
-	# Drop this png file cleanup after the next upstream release (probably 2.4)
-	rm -f pixmaps/*.png src/audacious/images/audacious_player.xpm
+	rm -f pixmaps/audacious-*.png
 
 override_dh_auto_build:
 	# Change build id from UNSUPPORTED VERSION to <vendor> package
@@ -29,10 +25,7 @@ override_dh_auto_build:
 	for size in 16 22 32 36; do \
 		rsvg -h $${size} -w $${size} pixmaps/audacious.svg pixmaps/audacious-$${size}.png || exit 1; \
 	done
-	rsvg pixmaps/audacious.svg pixmaps/audacious.png
 	convert -bordercolor Transparent -border 1x1 pixmaps/audacious-22.png pixmaps/audacious-24.png
-	convert pixmaps/audacious.png src/audacious/images/audacious_player.xpm
-	sed -i "s/audacious_player/audacious_player_xpm/" src/audacious/images/audacious_player.xpm
 	dh_auto_build --parallel
 
 override_dh_strip:
