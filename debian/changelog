@@ -8,10 +8,10 @@ audacious (2.4~alpha1-1) experimental; urgency=low
   * Update symbols for libaudcore1.
   * Use --with-buildstamp configure flag.
   * Convert man page linking into symlink-manpages.patch.
-  * Refresh new-svg-icon.patch to additional-icons.patch.
+  * Drop new-svg-icon.patch and cherry-pick two patches from upstream.
   * Fix spelling mistake Psychadelic to Psychedelic.
 
- -- Benjamin Drung <bdrung@ubuntu.com>  Tue, 15 Jun 2010 15:53:39 +0200
+ -- Benjamin Drung <bdrung@ubuntu.com>  Tue, 15 Jun 2010 19:01:35 +0200
 
 audacious (2.3-2) unstable; urgency=low
 
