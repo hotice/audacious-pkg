@@ -1,0 +1,37 @@
+Description: Fix typo Psychadelic -> Psychedelic
+Author: Benjamin Drung <bdrung@ubuntu.com>
+Bug: http://jira.atheme.org/browse/AUD-209
+
+--- audacious-2.4~alpha1.orig/src/libaudtag/util.c
++++ audacious-2.4~alpha1/src/libaudtag/util.c
+@@ -389,7 +389,7 @@ gchar *convert_numericgenre_to_text(gint
+         {GENRE_NATIVE_AMERICAN, "Native American"},
+         {GENRE_CABARET, "Cabaret"},
+         {GENRE_NEW_WAVE, "New Wave"},
+-        {GENRE_PSYCHADELIC, "Psychadelic"},
++        {GENRE_PSYCHEDELIC, "Psychedelic"},
+         {GENRE_RAVE, "Rave"},
+         {GENRE_SHOWTUNES, "Showtunes"},
+         {GENRE_TRAILER, "Trailer"},
+--- audacious-2.4~alpha1.orig/src/libaudtag/util.h
++++ audacious-2.4~alpha1/src/libaudtag/util.h
+@@ -96,7 +96,7 @@ enum {
+     GENRE_NATIVE_AMERICAN,
+     GENRE_CABARET,
+     GENRE_NEW_WAVE,
+-    GENRE_PSYCHADELIC,
++    GENRE_PSYCHEDELIC,
+     GENRE_RAVE,
+     GENRE_SHOWTUNES,
+     GENRE_TRAILER,
+--- audacious-2.4~alpha1.orig/src/libaudtag/aac/aac.c
++++ audacious-2.4~alpha1/src/libaudtag/aac/aac.c
+@@ -37,7 +37,7 @@ static const char *ID3v1GenreList[] = {
+     "Ethnic", "Gothic", "Darkwave", "Techno-Industrial", "Electronic", "Pop-Folk",
+     "Eurodance", "Dream", "Southern Rock", "Comedy", "Cult", "Gangsta",
+     "Top 40", "Christian Rap", "Pop/Funk", "Jungle", "Native American", "Cabaret",
+-    "New Wave", "Psychadelic", "Rave", "Showtunes", "Trailer", "Lo-Fi",
++    "New Wave", "Psychedelic", "Rave", "Showtunes", "Trailer", "Lo-Fi",
+     "Tribal", "Acid Punk", "Acid Jazz", "Polka", "Retro", "Musical",
+     "Rock & Roll", "Hard Rock", "Folk", "Folk/Rock", "National Folk", "Swing",
+     "Fast-Fusion", "Bebob", "Latin", "Revival", "Celtic", "Bluegrass", "Avantgarde",
