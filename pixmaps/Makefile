@@ -1,31 +1,18 @@
+include ../buildsys.mk
+
+# These override variables in buildsys.mk and so must come after it.
+PACKAGE = pixmaps
 DATA = audacious.png \
        audacious.svg
 
-include ../buildsys.mk
-
 install-extra:
-	for size in 16 22 24 32 36; do \
-		i=audacious-$${size}.png; \
-		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/$${size}x$${size}/apps/audacious.png; then \
-			${INSTALL_OK}; \
-		else \
-			${INSTALL_FAILED}; \
-		fi \
-	done
+	if test -h "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; fi
+	if test -h "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; fi
+	${MKDIR_P} ${DESTDIR}${datadir}/icons/hicolor/48x48/apps
+	${MKDIR_P} ${DESTDIR}${datadir}/icons/hicolor/scalable/apps
+	${LN_S} ../../../../pixmaps/audacious.png "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png"
+	${LN_S} ../../../../pixmaps/audacious.svg "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg"
 
-	i=audacious.png; \
-	${INSTALL_STATUS}; \
-	if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png; then \
-		${INSTALL_OK}; \
-	else \
-		${INSTALL_FAILED}; \
-	fi
-
-	i=audacious.svg; \
-	${INSTALL_STATUS}; \
-	if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg; then \
-		${INSTALL_OK}; \
-	else \
-		${INSTALL_FAILED}; \
-	fi
+uninstall-extra:
+	if test -h "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; fi
+	if test -h "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; fi

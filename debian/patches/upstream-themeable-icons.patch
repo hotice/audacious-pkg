@@ -1,0 +1,48 @@
+Author: John Lindgren <john.lindgren@tds.net>
+Description: Use themeable, antialiased icons rather than the embedded XPM.
+Origin: upstream, http://hg.atheme.org/audacious/audacious/rev/527313d7e816
+
+diff -r 5c7635f49ab5 -r 527313d7e816 pixmaps/Makefile
+--- a/pixmaps/Makefile	Wed Jun 09 12:16:52 2010 -0400
++++ b/pixmaps/Makefile	Wed Jun 09 13:53:00 2010 -0400
+@@ -1,6 +1,17 @@
++PACKAGE = pixmaps
+ DATA = audacious.png \
+        audacious.svg
+ 
+ include ../buildsys.mk
+ 
+-PACKAGE = pixmaps
++install-extra:
++	if test -h "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; fi
++	if test -h "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; fi
++	${MKDIR_P} ${DESTDIR}${datadir}/icons/hicolor/48x48/apps
++	${MKDIR_P} ${DESTDIR}${datadir}/icons/hicolor/scalable/apps
++	${LN_S} ../../../../pixmaps/audacious.png "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png"
++	${LN_S} ../../../../pixmaps/audacious.svg "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg"
++
++uninstall-extra:
++	if test -h "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; fi
++	if test -h "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; fi
+diff -r 5c7635f49ab5 -r 527313d7e816 src/libaudgui/ui_gtk.c
+--- a/src/libaudgui/ui_gtk.c	Wed Jun 09 12:16:52 2010 -0400
++++ b/src/libaudgui/ui_gtk.c	Wed Jun 09 13:53:00 2010 -0400
+@@ -18,15 +18,9 @@
+  */
+ 
+ #include <gtk/gtk.h>
+-#include "audacious/images/audacious_player.xpm"
+ 
+-void
+-audgui_set_default_icon(void)
++void audgui_set_default_icon (void)
+ {
+-    GdkPixbuf *icon;
+-
+-    icon = gdk_pixbuf_new_from_xpm_data((const gchar **) audacious_player_xpm);
+-    gtk_window_set_default_icon(icon);
+-    g_object_unref(icon);
++    gtk_window_set_default_icon_name ("audacious");
+ }
+ 
+

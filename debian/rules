@@ -15,23 +15,11 @@ override_dh_auto_configure:
 	dh_auto_configure -- --disable-rpath --enable-chardet $(additional_confflags) \
 		--with-buildstamp="$(shell dpkg-vendor --query vendor) package"
 
-override_dh_auto_clean:
-	dh_auto_clean
-	rm -f pixmaps/audacious-*.png
-
-override_dh_auto_build:
-	# Drop this png file creation after the next upstream release (probably 2.4)
-	for size in 16 22 32 36; do \
-		rsvg -h $${size} -w $${size} pixmaps/audacious.svg pixmaps/audacious-$${size}.png || exit 1; \
-	done
-	convert -bordercolor Transparent -border 1x1 pixmaps/audacious-22.png pixmaps/audacious-24.png
-	dh_auto_build --parallel
-
 override_dh_strip:
 	dh_strip --dbg-package=audacious-dbg
 
 override_dh_installdirs:
 	dh_installdirs
 	mkdir -p debian/tmp/usr/share/pixmaps
-	convert pixmaps/audacious-16.png debian/tmp/usr/share/pixmaps/audacious-16.xpm
-	convert pixmaps/audacious-32.png debian/tmp/usr/share/pixmaps/audacious-32.xpm
+	convert pixmaps/audacious.png -resize 16x16 debian/tmp/usr/share/pixmaps/audacious-16.xpm
+	convert pixmaps/audacious.png -resize 32x32 debian/tmp/usr/share/pixmaps/audacious-32.xpm

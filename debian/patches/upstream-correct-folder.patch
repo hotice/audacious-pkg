@@ -1,0 +1,22 @@
+Author: John Lindgren <john.lindgren@tds.net>
+Description: Install icons to the correct folder, and document how we do so.
+ Closes: AUD-206.
+Origin: upstream, http://hg.atheme.org/audacious/audacious/rev/52cdcb2732be
+
+diff -r 54c503d0db5a -r 52cdcb2732be pixmaps/Makefile
+--- a/pixmaps/Makefile	Mon Jun 14 18:24:58 2010 -0500
++++ b/pixmaps/Makefile	Mon Jun 14 21:59:55 2010 -0400
+@@ -1,9 +1,10 @@
++include ../buildsys.mk
++
++# These override variables in buildsys.mk and so must come after it.
+ PACKAGE = pixmaps
+ DATA = audacious.png \
+        audacious.svg
+ 
+-include ../buildsys.mk
+-
+ install-extra:
+ 	if test -h "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/48x48/apps/audacious.png" ; fi
+ 	if test -h "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; then ${RM} "${DESTDIR}${datadir}/icons/hicolor/scalable/apps/audacious.svg" ; fi
+
