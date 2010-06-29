@@ -8,8 +8,9 @@ typedef struct _guess_impl {
 
 static guess_impl *guess_impl_list = NULL;
 
-void guess_impl_register(const char *lang,
-    const char *(*impl)(const char *buf, int len))
+static void
+guess_impl_register(const char *lang,
+                    const char *(*impl)(const char *buf, int len))
 {
     guess_impl *iptr = calloc(sizeof(guess_impl), 1);
 
@@ -20,7 +21,8 @@ void guess_impl_register(const char *lang,
     guess_impl_list = iptr;
 }
 
-void guess_init(void)
+static void
+guess_init(void)
 {
     /* check if already initialized */
     if (guess_impl_list != NULL)
@@ -38,7 +40,8 @@ void guess_init(void)
     guess_impl_register(GUESS_REGION_PL, guess_pl);
 }
 
-const char *guess_encoding(const char *inbuf, int buflen, const char *lang)
+const char *
+guess_encoding(const char *inbuf, int buflen, const char *lang)
 {
     guess_impl *iter;
 

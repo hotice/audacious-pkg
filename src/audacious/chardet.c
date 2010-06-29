@@ -17,6 +17,7 @@
  *  Audacious or using our public API to be a derived work.
  */
 
+#define DEBUG
 #include "config.h"
 #include "chardet.h"
 #include "audstrings.h"
@@ -95,12 +96,31 @@ cd_chardet_to_utf8(const gchar * str, gssize len, gsize * arg_bytes_read,
     g_return_val_if_fail(str != NULL, NULL);
 
 #ifdef USE_CHARDET
+    if (dfa_validate_utf8(str, len))
+    {
+        if (len < 0)
+            len = strlen (str);
+
+        ret = g_malloc (len + 1);
+        memcpy (ret, str, len);
+        ret[len] = 0;
+
+        if (arg_bytes_read != NULL)
+            * arg_bytes_read = len;
+        if (arg_bytes_write != NULL)
+            * arg_bytes_write = len;
+
+        return ret;
+    }
+
     if (cfg.chardet_detector)
         det = cfg.chardet_detector;
 
     if (det)
     {
-        encoding = (gchar *) guess_encoding(str, strlen(str), det);
+	AUDDBG("guess encoding (%s) %s\n", det, str);
+        encoding = (gchar *) guess_encoding(str, len, det);
+        AUDDBG("encoding = %s\n", encoding);
         if (encoding == NULL)
             goto fallback;
 
@@ -150,7 +170,4 @@ void chardet_init(void)
 {
     str_to_utf8 = cd_str_to_utf8;
     chardet_to_utf8 = cd_chardet_to_utf8;
-#ifdef USE_CHARDET
-    guess_init();
-#endif
 }

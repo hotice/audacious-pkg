@@ -114,8 +114,6 @@ static const gchar * genre_table[] =
     N_("Anime"), N_("JPop"), N_("Synthpop")
 };
 
-static GList * genre_list = NULL;
-
 static void set_entry_str_from_field (GtkWidget * widget, Tuple * tuple,
  gint fieldn, gboolean editable)
 {
@@ -353,6 +351,24 @@ static GdkPixbuf * mime_icon_lookup (gint size, const gchar * mime_type)
     return icon;
 }
 
+gboolean genre_fill (GtkWidget * combo)
+{
+    GList * list = NULL;
+    GList * node;
+    gint i;
+
+    for (i = 0; i < G_N_ELEMENTS (genre_table); i ++)
+        list = g_list_prepend (list, _(genre_table[i]));
+
+    list = g_list_sort (list, (GCompareFunc) strcmp);
+
+    for (node = list; node != NULL; node = node->next)
+        gtk_combo_box_append_text ((GtkComboBox *) combo, node->data);
+
+    g_list_free (list);
+    return FALSE;
+}
+
 void create_infowin (void)
 {
     GtkWidget * hbox;
@@ -383,7 +399,6 @@ void create_infowin (void)
     GtkWidget * scrolledwindow;
     GtkTreeViewColumn * column;
     GtkCellRenderer * renderer;
-    gint i;
 
     infowin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_container_set_border_width ((GtkContainer *) infowin, 6);
@@ -533,21 +548,9 @@ void create_infowin (void)
     gtk_alignment_set_padding ((GtkAlignment *) alignment, 0, 6, 0, 0);
     entry_genre = gtk_combo_box_entry_new_text ();
 
-    if (genre_list == NULL)
-    {
-        GList * iter;
-
-        for (i = 0; i < G_N_ELEMENTS (genre_table); i ++)
-            genre_list = g_list_prepend (genre_list, _(genre_table[i]));
-
-        genre_list = g_list_sort (genre_list, (GCompareFunc) g_utf8_collate);
-
-        for (iter = genre_list; iter != NULL; iter = iter->next)
-            gtk_combo_box_append_text ((GtkComboBox *) entry_genre, iter->data);
-    }
-
     gtk_container_add ((GtkContainer *) alignment, entry_genre);
     g_signal_connect (entry_genre, "changed", (GCallback) entry_changed, NULL);
+    g_idle_add ((GSourceFunc) genre_fill, entry_genre);
 
     alignment = gtk_alignment_new (0.5, 0.5, 1, 1);
     gtk_box_pack_start ((GtkBox *) vbox2, alignment, FALSE, FALSE, 0);
@@ -861,7 +864,7 @@ void audgui_infowin_show (gint playlist, gint entry)
 {
     const gchar * filename = aud_playlist_entry_get_filename (playlist, entry);
     InputPlugin * decoder = aud_playlist_entry_get_decoder (playlist, entry);
-    Tuple * tuple;
+    Tuple * tuple = (Tuple *) aud_playlist_entry_get_tuple (playlist, entry);
 
     g_return_if_fail (filename != NULL);
 
@@ -876,23 +879,25 @@ void audgui_infowin_show (gint playlist, gint entry)
     if (aud_custom_infowin (filename, decoder))
         return;
 
-    tuple = aud_file_read_tuple (filename, decoder);
-
     if (tuple == NULL)
     {
-        gchar * message = g_strdup_printf (_("No info available for %s.\n"),
-         filename);
+        tuple = aud_file_read_tuple (filename, decoder);
 
-        aud_hook_call ("interface show error", message);
-        g_free (message);
-        return;
+        if (tuple == NULL)
+        {
+            gchar * message = g_strdup_printf (_("No info available for %s.\n"),
+             filename);
+
+            aud_hook_call ("interface show error", message);
+            g_free (message);
+            return;
+        }
+
+        aud_playlist_entry_set_tuple (playlist, entry, tuple);
     }
 
     infowin_show (filename, tuple, decoder, aud_file_can_write_tuple (filename,
      decoder));
-
-    aud_playlist_entry_set_tuple (playlist, entry, tuple);
-    /* We do not unref the tuple, as the playlist takes ownership. */
 }
 
 void audgui_infowin_show_current (void)
