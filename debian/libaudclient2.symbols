@@ -43,6 +43,7 @@ libaudclient.so.2 libaudclient2 #MINVER#
  audacious_remote_playlist_clear@Base 2.3
  audacious_remote_playlist_delete@Base 2.3
  audacious_remote_playlist_enqueue_to_temp@Base 2.3
+ audacious_remote_playlist_get_active_name@Base 2.4~alpha2
  audacious_remote_playlist_ins_url_string@Base 2.3
  audacious_remote_playlist_next@Base 2.3
  audacious_remote_playlist_open_list@Base 2.3
