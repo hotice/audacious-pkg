@@ -139,7 +139,7 @@ libaudcore.so.1 libaudcore1 #MINVER#
  vfs_register_transport@Base 2.3
  vfs_rewind@Base 2.3
  vfs_transports@Base 2.3
-#MISSING: 2.4~alpha1-1# vfs_truncate@Base 2.3
+#MISSING: 2.4~alpha1# vfs_truncate@Base 2.3
  vfs_ungetc@Base 2.3
  vfs_vfprintf@Base 2.3
 libaudgui.so.1 libaudcore1 #MINVER#
@@ -150,6 +150,7 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_destroy_on_escape@Base 2.4~alpha1
  audgui_get_library_store@Base 2.4~alpha1
  audgui_hide_about_window@Base 2.3
+ audgui_hide_equalizer_window@Base 2.4~alpha2
  audgui_hide_filebrowser@Base 2.3
  audgui_hide_on_delete@Base 2.4~alpha1
  audgui_hide_on_escape@Base 2.4~alpha1
@@ -171,115 +172,123 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_show_about_window@Base 2.3
  audgui_show_add_url_window@Base 2.3
  audgui_show_credits_window@Base 2.3
+ audgui_show_equalizer_window@Base 2.4~alpha2
  audgui_simple_message@Base 2.4~alpha1
+ audgui_urilist_create_from_selected@Base 2.4~alpha2
+ audgui_urilist_insert@Base 2.4~alpha2
+ audgui_urilist_open@Base 2.4~alpha2
  create_infowin@Base 2.4~alpha1
+ genre_fill@Base 2.4~alpha2
  library_store_row_drop_possible@Base 2.4~alpha1
  ui_jump_to_track_cache_free@Base 2.3
  ui_jump_to_track_cache_new@Base 2.3
  ui_jump_to_track_cache_search@Base 2.3
  urlopener_add_url_dialog_new@Base 2.3
 libaudtag.so.1 libaudcore1 #MINVER#
-#MISSING: 2.4~alpha1-1# aac@Base 2.3
-#MISSING: 2.4~alpha1-1# aac_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1-1# aac_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1-1# aac_write_tuple_to_file@Base 2.3
-#MISSING: 2.4~alpha1-1# add_frameFromTupleInt@Base 2.3
-#MISSING: 2.4~alpha1-1# add_frameFromTupleStr@Base 2.3
-#MISSING: 2.4~alpha1-1# add_newFrameFromTupleInt@Base 2.3
-#MISSING: 2.4~alpha1-1# add_newFrameFromTupleStr@Base 2.3
-#MISSING: 2.4~alpha1-1# add_newISO8859_1FrameFromString@Base 2.3
-#MISSING: 2.4~alpha1-1# add_tagItemFromTuple@Base 2.3
+#MISSING: 2.4~alpha1# aac@Base 2.3
+#MISSING: 2.4~alpha1# aac_can_handle_file@Base 2.3
+#MISSING: 2.4~alpha1# aac_populate_tuple_from_file@Base 2.3
+#MISSING: 2.4~alpha1# aac_write_tuple_to_file@Base 2.3
+#MISSING: 2.4~alpha1# add_frameFromTupleInt@Base 2.3
+#MISSING: 2.4~alpha1# add_frameFromTupleStr@Base 2.3
+#MISSING: 2.4~alpha1# add_newFrameFromTupleInt@Base 2.3
+#MISSING: 2.4~alpha1# add_newFrameFromTupleStr@Base 2.3
+#MISSING: 2.4~alpha1# add_newISO8859_1FrameFromString@Base 2.3
+#MISSING: 2.4~alpha1# add_tagItemFromTuple@Base 2.3
  ape@Base 2.3
-#MISSING: 2.4~alpha1-1# ape_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1-1# ape_items@Base 2.3
-#MISSING: 2.4~alpha1-1# ape_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1-1# ape_write_tuple_to_file@Base 2.3
-#MISSING: 2.4~alpha1-1# assocIntInfo@Base 2.3
-#MISSING: 2.4~alpha1-1# assocStrInfo@Base 2.3
-#MISSING: 2.4~alpha1-1# atom_types@Base 2.3
-#MISSING: 2.4~alpha1-1# computeNewHeader@Base 2.3
+#MISSING: 2.4~alpha1# ape_can_handle_file@Base 2.3
+#MISSING: 2.4~alpha1# ape_items@Base 2.3
+#MISSING: 2.4~alpha1# ape_populate_tuple_from_file@Base 2.3
+#MISSING: 2.4~alpha1# ape_write_tuple_to_file@Base 2.3
+#MISSING: 2.4~alpha1# assocIntInfo@Base 2.3
+#MISSING: 2.4~alpha1# assocStrInfo@Base 2.3
+#MISSING: 2.4~alpha1# atom_types@Base 2.3
+#MISSING: 2.4~alpha1# computeNewHeader@Base 2.3
  convert_numericgenre_to_text@Base 2.4~alpha1
+ convert_text@Base 2.4~alpha2
  copyAudioData@Base 2.3
  copyAudioToFile@Base 2.3
  cut_beginning_tag@Base 2.4~alpha1
-#MISSING: 2.4~alpha1-1# dataAtoms@Base 2.3
-#MISSING: 2.4~alpha1-1# findAtom@Base 2.3
+#MISSING: 2.4~alpha1# dataAtoms@Base 2.3
+#MISSING: 2.4~alpha1# findAtom@Base 2.3
  find_tag_module@Base 2.3
-#MISSING: 2.4~alpha1-1# frameIDs@Base 2.3
-#MISSING: 2.4~alpha1-1# frames@Base 2.3
+#MISSING: 2.4~alpha1# frameIDs@Base 2.3
+#MISSING: 2.4~alpha1# frames@Base 2.3
  fread_utf16@Base 2.3
-#MISSING: 2.4~alpha1-1# free_content_descr@Base 2.3
-#MISSING: 2.4~alpha1-1# free_content_descr_obj@Base 2.3
-#MISSING: 2.4~alpha1-1# free_ext_content_descr_obj@Base 2.3
-#MISSING: 2.4~alpha1-1# getAtomID@Base 2.3
-#MISSING: 2.4~alpha1-1# getFrameID@Base 2.3
-#MISSING: 2.4~alpha1-1# getTagItemID@Base 2.3
+#MISSING: 2.4~alpha1# free_content_descr@Base 2.3
+#MISSING: 2.4~alpha1# free_content_descr_obj@Base 2.3
+#MISSING: 2.4~alpha1# free_ext_content_descr_obj@Base 2.3
+#MISSING: 2.4~alpha1# getAtomID@Base 2.3
+#MISSING: 2.4~alpha1# getFrameID@Base 2.3
+#MISSING: 2.4~alpha1# getTagItemID@Base 2.3
  get_complete_filepath@Base 2.3
-#MISSING: 2.4~alpha1-1# get_guid_type@Base 2.3
+#MISSING: 2.4~alpha1# get_guid_type@Base 2.3
  get_year@Base 2.3
-#MISSING: 2.4~alpha1-1# getilstAtom@Base 2.3
-#MISSING: 2.4~alpha1-1# guid_convert_from_string@Base 2.3
-#MISSING: 2.4~alpha1-1# guid_convert_to_string@Base 2.3
-#MISSING: 2.4~alpha1-1# guid_equal@Base 2.3
-#MISSING: 2.4~alpha1-1# guid_read_from_file@Base 2.3
-#MISSING: 2.4~alpha1-1# guid_write_to_file@Base 2.3
-#MISSING: 2.4~alpha1-1# headerPosition@Base 2.3
-#MISSING: 2.4~alpha1-1# id3@Base 2.3
-#MISSING: 2.4~alpha1-1# id3_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1-1# id3_frames@Base 2.3
-#MISSING: 2.4~alpha1-1# id3_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1-1# id3_write_tuple_to_file@Base 2.3
+#MISSING: 2.4~alpha1# getilstAtom@Base 2.3
+#MISSING: 2.4~alpha1# guid_convert_from_string@Base 2.3
+#MISSING: 2.4~alpha1# guid_convert_to_string@Base 2.3
+#MISSING: 2.4~alpha1# guid_equal@Base 2.3
+#MISSING: 2.4~alpha1# guid_read_from_file@Base 2.3
+#MISSING: 2.4~alpha1# guid_write_to_file@Base 2.3
+#MISSING: 2.4~alpha1# headerPosition@Base 2.3
+#MISSING: 2.4~alpha1# id3@Base 2.3
+#MISSING: 2.4~alpha1# id3_can_handle_file@Base 2.3
+#MISSING: 2.4~alpha1# id3_frames@Base 2.3
+#MISSING: 2.4~alpha1# id3_populate_tuple_from_file@Base 2.3
+#MISSING: 2.4~alpha1# id3_write_tuple_to_file@Base 2.3
  id3v1@Base 2.4~alpha1
  id3v1_can_handle_file@Base 2.4~alpha1
  id3v1_read_tag@Base 2.4~alpha1
  id3v1_write_tag@Base 2.4~alpha1
+ id3v22@Base 2.4~alpha2
+ id3v22_read_tag@Base 2.4~alpha2
  id3v24@Base 2.4~alpha1
-#MISSING: 2.4~alpha1-1# ilstAtom@Base 2.3
-#MISSING: 2.4~alpha1-1# ilstAtoms@Base 2.3
-#MISSING: 2.4~alpha1-1# ilstFileOffset@Base 2.3
+#MISSING: 2.4~alpha1# ilstAtom@Base 2.3
+#MISSING: 2.4~alpha1# ilstAtoms@Base 2.3
+#MISSING: 2.4~alpha1# ilstFileOffset@Base 2.3
  init_tag_modules@Base 2.3
-#MISSING: 2.4~alpha1-1# isExperimental@Base 2.3
-#MISSING: 2.4~alpha1-1# isExtendedHeader@Base 2.3
-#MISSING: 2.4~alpha1-1# isUnsynchronisation@Base 2.3
-#MISSING: 2.4~alpha1-1# isValidFrame@Base 2.3
-#MISSING: 2.4~alpha1-1# makeAtomWithData@Base 2.3
+#MISSING: 2.4~alpha1# isExperimental@Base 2.3
+#MISSING: 2.4~alpha1# isExtendedHeader@Base 2.3
+#MISSING: 2.4~alpha1# isUnsynchronisation@Base 2.3
+#MISSING: 2.4~alpha1# isValidFrame@Base 2.3
+#MISSING: 2.4~alpha1# makeAtomWithData@Base 2.3
  makeTuple@Base 2.3
-#MISSING: 2.4~alpha1-1# make_temp_file@Base 2.3
-#MISSING: 2.4~alpha1-1# newilstSize@Base 2.3
+#MISSING: 2.4~alpha1# make_temp_file@Base 2.3
+#MISSING: 2.4~alpha1# newilstSize@Base 2.3
  number_of_modules@Base 2.3
-#MISSING: 2.4~alpha1-1# printAtom@Base 2.3
+#MISSING: 2.4~alpha1# printAtom@Base 2.3
  print_tuple@Base 2.3
-#MISSING: 2.4~alpha1-1# readAPEHeader@Base 2.3
-#MISSING: 2.4~alpha1-1# readAPETagItem@Base 2.3
-#MISSING: 2.4~alpha1-1# readAllFrames@Base 2.3
-#MISSING: 2.4~alpha1-1# readAtom@Base 2.3
-#MISSING: 2.4~alpha1-1# readExtendedHeader@Base 2.3
-#MISSING: 2.4~alpha1-1# readFrameBody@Base 2.3
-#MISSING: 2.4~alpha1-1# readGenericFrame@Base 2.3
-#MISSING: 2.4~alpha1-1# readHeader@Base 2.3
-#MISSING: 2.4~alpha1-1# readID3v2FrameHeader@Base 2.3
-#MISSING: 2.4~alpha1-1# readStrDataAtom@Base 2.3
-#MISSING: 2.4~alpha1-1# readTextFrame@Base 2.3
-#MISSING: 2.4~alpha1-1# readUTF_8@Base 2.3
+#MISSING: 2.4~alpha1# readAPEHeader@Base 2.3
+#MISSING: 2.4~alpha1# readAPETagItem@Base 2.3
+#MISSING: 2.4~alpha1# readAllFrames@Base 2.3
+#MISSING: 2.4~alpha1# readAtom@Base 2.3
+#MISSING: 2.4~alpha1# readExtendedHeader@Base 2.3
+#MISSING: 2.4~alpha1# readFrameBody@Base 2.3
+#MISSING: 2.4~alpha1# readGenericFrame@Base 2.3
+#MISSING: 2.4~alpha1# readHeader@Base 2.3
+#MISSING: 2.4~alpha1# readID3v2FrameHeader@Base 2.3
+#MISSING: 2.4~alpha1# readStrDataAtom@Base 2.3
+#MISSING: 2.4~alpha1# readTextFrame@Base 2.3
+#MISSING: 2.4~alpha1# readUTF_8@Base 2.3
  read_BEuint16@Base 2.3
  read_BEuint32@Base 2.3
  read_BEuint64@Base 2.3
  read_LEuint16@Base 2.3
  read_LEuint32@Base 2.3
  read_LEuint64@Base 2.3
-#MISSING: 2.4~alpha1-1# read_NULLterminatedString@Base 2.3
+#MISSING: 2.4~alpha1# read_NULLterminatedString@Base 2.3
  read_char_data@Base 2.3
-#MISSING: 2.4~alpha1-1# read_iso8859_1@Base 2.3
-#MISSING: 2.4~alpha1-1# read_syncsafe_int32@Base 2.3
+#MISSING: 2.4~alpha1# read_iso8859_1@Base 2.3
+#MISSING: 2.4~alpha1# read_syncsafe_int32@Base 2.3
  read_uint8@Base 2.3
-#MISSING: 2.4~alpha1-1# read_unicode@Base 2.3
-#MISSING: 2.4~alpha1-1# seek@Base 2.3
-#MISSING: 2.4~alpha1-1# skip@Base 2.3
-#MISSING: 2.4~alpha1-1# skipFrame@Base 2.3
+#MISSING: 2.4~alpha1# read_unicode@Base 2.3
+#MISSING: 2.4~alpha1# seek@Base 2.3
+#MISSING: 2.4~alpha1# skip@Base 2.3
+#MISSING: 2.4~alpha1# skipFrame@Base 2.3
  syncsafe32@Base 2.4~alpha1
-#MISSING: 2.4~alpha1-1# tagContainsHeader@Base 2.3
-#MISSING: 2.4~alpha1-1# tagItems@Base 2.3
-#MISSING: 2.4~alpha1-1# tagKeys@Base 2.3
+#MISSING: 2.4~alpha1# tagContainsHeader@Base 2.3
+#MISSING: 2.4~alpha1# tagItems@Base 2.3
+#MISSING: 2.4~alpha1# tagKeys@Base 2.3
  tag_image_read@Base 2.4~alpha1
  tag_init@Base 2.3
  tag_modules@Base 2.3
@@ -289,30 +298,30 @@ libaudtag.so.1 libaudcore1 #MINVER#
  unix_time@Base 2.3
  unsyncsafe32@Base 2.4~alpha1
  utf8@Base 2.3
-#MISSING: 2.4~alpha1-1# wma@Base 2.3
-#MISSING: 2.4~alpha1-1# wma_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1-1# wma_guid_map@Base 2.3
-#MISSING: 2.4~alpha1-1# wma_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1-1# wma_write_tuple_to_file@Base 2.3
-#MISSING: 2.4~alpha1-1# writeAllFramesToFile@Base 2.3
-#MISSING: 2.4~alpha1-1# writeAtom@Base 2.3
-#MISSING: 2.4~alpha1-1# writeAtomListToFile@Base 2.3
-#MISSING: 2.4~alpha1-1# writeGenericFrame@Base 2.3
-#MISSING: 2.4~alpha1-1# writeID3FrameHeaderToFile@Base 2.3
-#MISSING: 2.4~alpha1-1# writeID3HeaderToFile@Base 2.3
-#MISSING: 2.4~alpha1-1# writePaddingToFile@Base 2.3
-#MISSING: 2.4~alpha1-1# writeStrDataAtom@Base 2.3
-#MISSING: 2.4~alpha1-1# write_ASCII@Base 2.3
+#MISSING: 2.4~alpha1# wma@Base 2.3
+#MISSING: 2.4~alpha1# wma_can_handle_file@Base 2.3
+#MISSING: 2.4~alpha1# wma_guid_map@Base 2.3
+#MISSING: 2.4~alpha1# wma_populate_tuple_from_file@Base 2.3
+#MISSING: 2.4~alpha1# wma_write_tuple_to_file@Base 2.3
+#MISSING: 2.4~alpha1# writeAllFramesToFile@Base 2.3
+#MISSING: 2.4~alpha1# writeAtom@Base 2.3
+#MISSING: 2.4~alpha1# writeAtomListToFile@Base 2.3
+#MISSING: 2.4~alpha1# writeGenericFrame@Base 2.3
+#MISSING: 2.4~alpha1# writeID3FrameHeaderToFile@Base 2.3
+#MISSING: 2.4~alpha1# writeID3HeaderToFile@Base 2.3
+#MISSING: 2.4~alpha1# writePaddingToFile@Base 2.3
+#MISSING: 2.4~alpha1# writeStrDataAtom@Base 2.3
+#MISSING: 2.4~alpha1# write_ASCII@Base 2.3
  write_BEuint32@Base 2.3
  write_LEuint16@Base 2.3
  write_LEuint32@Base 2.3
  write_LEuint64@Base 2.3
-#MISSING: 2.4~alpha1-1# write_allTagsToFile@Base 2.3
-#MISSING: 2.4~alpha1-1# write_apeHeaderToFile@Base 2.3
+#MISSING: 2.4~alpha1# write_allTagsToFile@Base 2.3
+#MISSING: 2.4~alpha1# write_apeHeaderToFile@Base 2.3
  write_char_data@Base 2.3
-#MISSING: 2.4~alpha1-1# write_int32@Base 2.3
-#MISSING: 2.4~alpha1-1# write_syncsafe_int32@Base 2.3
-#MISSING: 2.4~alpha1-1# write_tagItemToFile@Base 2.3
+#MISSING: 2.4~alpha1# write_int32@Base 2.3
+#MISSING: 2.4~alpha1# write_syncsafe_int32@Base 2.3
+#MISSING: 2.4~alpha1# write_tagItemToFile@Base 2.3
  write_uint8@Base 2.3
  write_utf16@Base 2.3
-#MISSING: 2.4~alpha1-1# write_utf8@Base 2.3
+#MISSING: 2.4~alpha1# write_utf8@Base 2.3
