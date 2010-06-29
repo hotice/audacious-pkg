@@ -6,14 +6,18 @@ dnl Require autoconf 2.59 or later
 AC_PREREQ([2.59])
 
 dnl Initialize
-AC_INIT([audacious], [2.4-alpha1], [bugs+audacious@atheme.org])
+AC_INIT([audacious], [2.4-alpha2], [bugs+audacious@atheme.org])
 AC_COPYRIGHT([(C) 2005-2010 Audacious Development Team])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AC_GNU_SOURCE
+
 AC_CONFIG_HEADERS([config.h])
 PKG_PROG_PKG_CONFIG
 
+dnl Build flags
+dnl ===========
+LDFLAGS="$LDFLAGS -z defs"
 
 dnl buildsystem bootstrap
 dnl =====================
@@ -40,6 +44,10 @@ AC_ARG_WITH([buildstamp],
  AC_DEFINE_UNQUOTED([BUILDSTAMP], "$withval", [Build stamp]),
  AC_DEFINE_UNQUOTED([BUILDSTAMP], "UNSUPPORTED VERSION", [Build stamp]))
 
+
+dnl Large file support
+dnl ==================
+CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
 
 dnl Debug support
 dnl ========================
@@ -200,9 +208,15 @@ AUD_ARG_ENABLE([sm], [yes],
         enable_sm="no"
     ])
 
+    AC_SUBST([SM_CFLAGS])
+    AC_SUBST([SM_LIBS])
+
     PKG_CHECK_MODULES([ICE], [ice >= 1.0],
      [enable_sm="${enable_sm}"],
      [enable_sm="no"])
+
+    AC_SUBST([ICE_CFLAGS])
+    AC_SUBST([ICE_LIBS])
 ])
 AUD_CONDITIONAL([USE_EGGSM], [enable_sm])
 

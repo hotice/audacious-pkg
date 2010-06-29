@@ -46,6 +46,10 @@ void audgui_hide_about_window(void);
 /* confirm.c */
 void audgui_confirm_playlist_delete (gint playlist);
 
+/* equalizer.c */
+void audgui_show_equalizer_window (void);
+void audgui_hide_equalizer_window (void);
+
 /* infopopup.c */
 void audgui_infopopup_show (gint playlist, gint entry);
 void audgui_infopopup_show_current (void);
@@ -54,5 +58,10 @@ void audgui_infopopup_hide (void);
 /* infowin.c */
 void audgui_infowin_show (gint playlist, gint entry);
 void audgui_infowin_show_current (void);
+
+/* urilist.c */
+void audgui_urilist_open (const gchar * list);
+void audgui_urilist_insert (gint playlist, gint position, const gchar * list);
+gchar * audgui_urilist_create_from_selected (gint playlist);
 
 #endif /* LIBAUDGUI_H */

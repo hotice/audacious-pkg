@@ -5,11 +5,11 @@
 
 /*
  *   Copyright (c) 2000-2003 Shiro Kawai, All rights reserved.
- * 
+ *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions
  *   are met:
- * 
+ *
  *   1. Redistributions of source code must retain the above copyright
  *      notice, this list of conditions and the following disclaimer.
  *
@@ -66,8 +66,5 @@ int dfa_validate_utf8(const char *buf, int buflen);
 #define GUESS_REGION_PL		"polish"
 
 const char *guess_encoding(const char *buf, int buflen, const char *lang);
-void guess_init(void);
-void guess_impl_register(const char *name,
-	const char *(impl)(const char *buf, int buflen));
 
 #endif

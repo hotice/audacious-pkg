@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "audconfig.h"
+#include <libaudcore/audstrings.h>
 
 static gboolean
 has_front_cover_extension(const gchar *name)
@@ -122,6 +123,9 @@ static gchar * fileinfo_recursive_get_image (const gchar * path, const gchar *
 
 	if (cfg.recurse_for_cover && depth > cfg.recurse_for_cover_depth)
 		return NULL;
+
+	if (str_has_prefix_nocase(path, "file://"))
+		path += 7;
 
 	d = g_dir_open(path, 0, NULL);
 

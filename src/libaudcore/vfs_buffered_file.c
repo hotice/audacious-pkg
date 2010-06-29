@@ -103,7 +103,7 @@ buffered_file_vfs_ungetc_impl(gint c, VFSFile *stream)
 
 gint
 buffered_file_vfs_fseek_impl(VFSFile * file,
-          glong offset,
+          gint64 offset,
           gint whence)
 {
     VFSBufferedFile *handle = (VFSBufferedFile *) file->handle;
@@ -117,10 +117,18 @@ buffered_file_vfs_fseek_impl(VFSFile * file,
             vfs_fseek(handle->fd, offset, whence);
             break;
         case SEEK_CUR:
-            if (vfs_ftell(handle->buffer) + offset > ((VFSBuffer *) handle->buffer->handle)->size)
+            if (vfs_ftell(handle->buffer) + offset >= ((VFSBuffer *) handle->buffer->handle)->size)
             {
                 handle->which = TRUE;
                 vfs_fseek(handle->fd, offset, whence);
+            }
+            else
+            {
+                gint64 noff;
+
+                handle->which = FALSE;
+                noff = ((VFSBuffer *) handle->buffer->handle)->size - (vfs_ftell(handle->buffer) + offset);
+                vfs_fseek(handle->buffer, noff, whence);
             }
             break;
         case SEEK_SET:
@@ -146,10 +154,11 @@ buffered_file_vfs_rewind_impl(VFSFile * file)
     VFSBufferedFile *handle = (VFSBufferedFile *) file->handle;
 
     vfs_rewind(handle->buffer);
+    vfs_rewind(handle->fd);
     handle->which = FALSE;
 }
 
-glong
+gint64
 buffered_file_vfs_ftell_impl(VFSFile * file)
 {
     VFSBufferedFile *handle = (VFSBufferedFile *) file->handle;
@@ -166,12 +175,12 @@ buffered_file_vfs_feof_impl(VFSFile * file)
 }
 
 gint
-buffered_file_vfs_truncate_impl(VFSFile * file, glong size)
+buffered_file_vfs_truncate_impl (VFSFile * file, gint64 size)
 {
     return 0;
 }
 
-off_t
+gint64
 buffered_file_vfs_fsize_impl(VFSFile * file)
 {
     VFSBufferedFile *handle = (VFSBufferedFile *) file->handle;
