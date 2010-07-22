@@ -29,7 +29,11 @@
 #ifndef __AUDACIOUS2_INTERFACE_H__
 #define __AUDACIOUS2_INTERFACE_H__
 
+#include <glib.h>
 #include <mowgli.h>
+
+#include <audacious/plugins.h>
+#include <audacious/types.h>
 
 typedef struct {
     /* GtkWidget * * (* create_prefs_window) (void); */
@@ -61,23 +65,19 @@ typedef struct {
     void * (* stop_gtk_plugin) (void * parent);
 } InterfaceCbs;
 
-typedef struct _Interface {
+struct _Interface {
     gchar *id;                           /* simple ID like 'skinned' */
     gchar *desc;                         /* description like 'Skinned Interface' */
     gboolean (*init)(InterfaceCbs *cbs); /* init UI */
     gboolean (*fini)(void);              /* shutdown UI */
 
     InterfaceOps *ops;
-} Interface;
+};
 
-void interface_register(Interface *i);
-void interface_deregister(Interface *i);
-void interface_run(Interface *i);
-void interface_destroy(Interface *i);
-
-Interface *interface_get(gchar *id);
-const Interface *interface_get_current(void);
-void interface_foreach(int (*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata), void *privdata);
+PluginHandle * interface_get_default (void);
+void interface_set_default (PluginHandle * plugin);
+gboolean interface_load (PluginHandle * plugin);
+void interface_unload (void);
 
 /* These functions have to be called from main thread
    Use event_queue if you need to call those from other threads */

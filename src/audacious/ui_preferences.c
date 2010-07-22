@@ -22,7 +22,6 @@
 #endif
 
 #include <glib.h>
-#include <glib/gi18n.h>
 #include <gtk/gtk.h>
 #include <string.h>
 #include <stddef.h>
@@ -35,19 +34,23 @@
 #include <sys/stat.h>
 #include <gdk/gdkkeysyms.h>
 
-#include "compatibility.h"
+#include <libaudcore/hook.h>
 
+#include "audconfig.h"
+#include "compatibility.h"
+#include "debug.h"
+#include "i18n.h"
+#include "misc.h"
+#include "playback.h"
 #include "plugin.h"
 #include "pluginenum.h"
-#include "plugin-registry.h"
-#include "input.h"
+#include "plugins.h"
 #include "effect.h"
 #include "general.h"
 #include "output.h"
-#include "playlist-new.h"
+#include "playlist.h"
 #include "playlist-utils.h"
 #include "visualization.h"
-#include "audstrings.h"
 #include "util.h"
 #include "configdb.h"
 #include "preferences.h"
@@ -156,6 +159,7 @@ static ComboBoxElements chardet_detector_presets[] = {
     { N_("Turkish")  , N_("Turkish") },
     { N_("Arabic")   , N_("Arabic") },
     { N_("Polish")   , N_("Polish") },
+    { N_("Baltic")   , N_("Baltic") },
     { N_("Universal"), N_("Universal") }
 };
 
@@ -318,16 +322,16 @@ plugin_toggle(GtkCellRendererToggle * cell,
     switch (plugin_type)
     {
     case PLUGIN_VIEW_TYPE_INPUT:
-        input_plugin_set_enabled ((InputPlugin *) plugin, enabled);
+        plugin_set_enabled (plugin_by_header (plugin), enabled);
         break;
     case PLUGIN_VIEW_TYPE_GENERAL:
-        general_enable_plugin ((GeneralPlugin *) plugin, enabled);
+        general_plugin_enable (plugin_by_header (plugin), enabled);
         break;
     case PLUGIN_VIEW_TYPE_VIS:
-        vis_enable_plugin ((VisPlugin *) plugin, enabled);
+        vis_plugin_enable (plugin_by_header (plugin), enabled);
         break;
     case PLUGIN_VIEW_TYPE_EFFECT:
-        effect_enable_plugin ((EffectPlugin *) plugin, enabled);
+        effect_plugin_enable (plugin_by_header (plugin), enabled);
         break;
     }
 
@@ -446,23 +450,7 @@ on_plugin_view_realize(GtkTreeView * treeview,
     MOWGLI_ITER_FOREACH(ilist, list)
     {
         Plugin *plugin = PLUGIN(ilist->data);
-        gboolean enabled = FALSE;
-
-        switch (plugin_type)
-        {
-        case PLUGIN_VIEW_TYPE_INPUT:
-            enabled = input_plugin_get_enabled ((InputPlugin *) plugin);
-            break;
-        case PLUGIN_VIEW_TYPE_GENERAL:
-            enabled = ((GeneralPlugin *) plugin)->enabled;
-            break;
-        case PLUGIN_VIEW_TYPE_VIS:
-            enabled = ((VisPlugin *) plugin)->enabled;
-            break;
-        case PLUGIN_VIEW_TYPE_EFFECT:
-            enabled = ((EffectPlugin *) plugin)->enabled;
-            break;
-        }
+        gboolean enabled = plugin_get_enabled (plugin_by_header (plugin));
 
         description[0] = g_strdup(plugin->description);
         description[1] = g_strdup(plugin->filename);
@@ -486,29 +474,30 @@ static void
 on_input_plugin_view_realize(GtkTreeView * treeview,
                              gpointer data)
 {
-    on_plugin_view_realize (treeview, (GCallback) plugin_toggle,
-     get_input_list (), PLUGIN_VIEW_TYPE_INPUT);
+    on_plugin_view_realize (treeview, (GCallback) plugin_toggle, plugin_get_list(PLUGIN_TYPE_INPUT), PLUGIN_VIEW_TYPE_INPUT);
 }
 
 static void
 on_effect_plugin_view_realize(GtkTreeView * treeview,
                               gpointer data)
 {
-    on_plugin_view_realize(treeview, G_CALLBACK(plugin_toggle), ep_data.effect_list, PLUGIN_VIEW_TYPE_EFFECT);
+    on_plugin_view_realize (treeview, (GCallback) plugin_toggle, plugin_get_list
+     (PLUGIN_TYPE_EFFECT), PLUGIN_VIEW_TYPE_EFFECT);
 }
 
 static void
 on_general_plugin_view_realize(GtkTreeView * treeview,
                                gpointer data)
 {
-    on_plugin_view_realize(treeview, G_CALLBACK(plugin_toggle), gp_data.general_list, PLUGIN_VIEW_TYPE_GENERAL);
+    on_plugin_view_realize (treeview, (GCallback) plugin_toggle, plugin_get_list
+     (PLUGIN_TYPE_GENERAL), PLUGIN_VIEW_TYPE_GENERAL);
 }
 
 static void
 on_vis_plugin_view_realize(GtkTreeView * treeview,
                            gpointer data)
 {
-    on_plugin_view_realize(treeview, G_CALLBACK(plugin_toggle), vp_data.vis_list, PLUGIN_VIEW_TYPE_VIS);
+    on_plugin_view_realize(treeview, G_CALLBACK(plugin_toggle), plugin_get_list(PLUGIN_TYPE_VIS), PLUGIN_VIEW_TYPE_VIS);
 }
 
 static void
@@ -765,7 +754,6 @@ plugin_treeview_open_prefs(GtkTreeView *treeview)
     g_return_if_fail((plugin->configure != NULL) ||
                      ((plugin->settings != NULL) && (plugin->settings->type == PREFERENCES_WINDOW)));
 
-    plugin_set_current(plugin);
     if (plugin->configure != NULL)
         plugin->configure();
     else
@@ -786,8 +774,6 @@ plugin_treeview_open_info(GtkTreeView *treeview)
     gtk_tree_model_get(model, &iter, PLUGIN_VIEW_COL_PLUGIN_PTR, &plugin, -1);
 
     g_return_if_fail(plugin != NULL);
-
-    plugin_set_current(plugin);
     plugin->about();
 }
 
@@ -2351,7 +2337,7 @@ create_plugin_category(void)
     gtk_box_pack_start (GTK_BOX (vbox25), alignment58, FALSE, FALSE, 4);
     gtk_alignment_set_padding (GTK_ALIGNMENT (alignment58), 0, 6, 0, 0);
 
-    label64 = gtk_label_new (_("Effect plugins (for 16-bit output only):"));
+    label64 = gtk_label_new (_("Effect plugins:"));
     gtk_container_add (GTK_CONTAINER (alignment58), label64);
     gtk_misc_set_alignment (GTK_MISC (label64), 0, 0.5);
 
@@ -2512,10 +2498,10 @@ destroy_plugin_page(GList *list)
 static void
 destroy_plugin_pages(void)
 {
-    destroy_plugin_page(get_input_list());
-    destroy_plugin_page(get_general_enabled_list());
-    destroy_plugin_page(get_vis_enabled_list());
-    destroy_plugin_page(get_effect_enabled_list());
+    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_INPUT));
+    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_GENERAL));
+    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_VIS));
+    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_EFFECT));
 }
 
 static gboolean
@@ -2547,10 +2533,10 @@ create_plugin_page(GList *list)
 static void
 create_plugin_pages(void)
 {
-    create_plugin_page(get_input_list());
-    create_plugin_page(get_general_enabled_list());
-    create_plugin_page(get_vis_enabled_list());
-    create_plugin_page(get_effect_enabled_list());
+    create_plugin_page(plugin_get_list(PLUGIN_TYPE_INPUT));
+    create_plugin_page(plugin_get_list(PLUGIN_TYPE_GENERAL));
+    create_plugin_page(plugin_get_list(PLUGIN_TYPE_VIS));
+    create_plugin_page(plugin_get_list(PLUGIN_TYPE_EFFECT));
 }
 
 /* GtkWidget * * create_prefs_window (void) */

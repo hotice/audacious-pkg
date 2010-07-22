@@ -3,22 +3,18 @@ include ../../extra.mk
 SUBDIRS = ${INTL_OBJECTIVE}
 
 PROG = audacious2${PROG_SUFFIX}
-SRCS = auddrct.c								\
-       audconfig.c								\
+SRCS = audconfig.c								\
        chardet.c								\
        configdb.c								\
        credits.c							\
+       drct.c \
        effect.c									\
        equalizer.c								\
        equalizer_preset.c						\
-       eventqueue.c								\
        fft.c									\
-       flow.c									\
        folder-add.c \
        general.c								\
-       hook.c									\
        interface.c								\
-       input.c									\
        logger.c									\
        main.c									\
        output.c									\
@@ -29,9 +25,8 @@ SRCS = auddrct.c								\
        pluginenum.c								\
        plugin-registry.c \
        probe.c \
-       rcfile.c									\
+       probe-buffer.c \
        signals.c								\
-       ui_headless.c							\
        ui_plugin_menu.c \
        ui_preferences.c							\
        util.c									\
@@ -44,25 +39,30 @@ ifeq ($(USE_DBUS),yes)
 SRCS += dbus.c
 endif
 
-INCLUDES = auddrct.h			\
-           audconfig.h			\
+INCLUDES = api.h \
+           api-alias-begin.h \
+           api-alias-end.h \
+           api-define-begin.h \
+           api-define-end.h \
+           audconfig.h \
            configdb.h			\
+           configdb-api.h \
            dbus.h				\
            dbus-service.h		\
-           equalizer_preset.h			\
-           eventqueue.h			\
-           flow.h				\
-           rcfile.h				\
+           debug.h \
+           drct.h \
+           drct-api.h \
            i18n.h				\
-           input.h				\
-           hook.h				\
            interface.h			\
-           main.h				\
-           playback.h			\
-           playlist_container.h	\
+           misc.h \
+           misc-api.h \
+           playlist.h \
+           playlist-api.h \
            plugin.h				\
+           plugins.h \
+           plugins-api.h \
            preferences.h		\
-           ui_plugin_menu.h
+           types.h
 
 DATA = images/about-logo.png				\
        images/appearance.png				\
@@ -82,7 +82,6 @@ DATA = images/about-logo.png				\
        images/replay_gain.png
 
 CLEAN = build_stamp.c dbus-client-bindings.h dbus-server-bindings.h
-EXT_DEPS = ../libguess/libguess.a
 
 ifeq ($(USE_EGGSM),yes)
 EXT_DEPS += ../libeggsmclient/libeggsmclient.a
@@ -100,7 +99,8 @@ endif
 
 pre-depend: ${DBUS_BINDINGS}
 
-CPPFLAGS += -DHAVE_CONFIG_H		\
+CPPFLAGS += -std=gnu99 \
+            -DHAVE_CONFIG_H \
 		${MOWGLI_CFLAGS}		\
 		${GLIB_CFLAGS}			\
 		${GTHREAD_CFLAGS}		\
@@ -113,11 +113,9 @@ CPPFLAGS += -DHAVE_CONFIG_H		\
 		${SIMD_CFLAGS}			\
 		-D_AUDACIOUS_CORE		\
 		${EGGSM_CFLAGS}			\
+		${LIBGUESS_CFLAGS}		\
 		-I.. -I../..			\
-		-I./intl			\
-		-I.				\
-		-I../libaudcore			\
-		-I../libaudtag
+		-I./intl
 
 LIBS += ${LDADD}						\
         -lm \
@@ -125,7 +123,6 @@ LIBS += ${LDADD}						\
 		-L../libaudgui -laudgui \
 		-L../libaudtag -laudtag		\
 		${LIBINTL}						\
-		../libguess/libguess.a			\
 		${EGGSM_LIBS}					\
 		${GLIB_LIBS}					\
 		${GTHREAD_LIBS}					\
@@ -133,7 +130,8 @@ LIBS += ${LDADD}						\
 		${DBUS_LIBS}					\
 		${MOWGLI_LIBS}					\
 		${LIBMCS_LIBS}					\
-		${REGEX_LIBS}
+		${REGEX_LIBS}					\
+		${LIBGUESS_LIBS}
 
 LDFLAGS += ${PROG_IMPLIB_LDFLAGS} ${AUDLDFLAGS}
 

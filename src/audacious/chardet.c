@@ -17,15 +17,18 @@
  *  Audacious or using our public API to be a derived work.
  */
 
-#define DEBUG
-#include "config.h"
+#include <string.h>
+#include <libaudcore/audstrings.h>
+
+#include "audconfig.h"
 #include "chardet.h"
-#include "audstrings.h"
-#include <glib/gi18n.h>
+#include "config.h"
+#include "i18n.h"
 #include "main.h"
+#include "debug.h"
 
 #ifdef USE_CHARDET
-#  include "../libguess/libguess.h"
+#  include <libguess.h>
 #endif
 
 gchar *
@@ -60,7 +63,7 @@ cd_str_to_utf8(const gchar * str)
 
     /* Already UTF-8? */
 #ifdef USE_CHARDET
-    if (dfa_validate_utf8(str, strlen(str)))
+    if (libguess_validate_utf8(str, strlen(str)))
         return g_strdup(str);
 #else
     if (g_utf8_validate(str, strlen(str), NULL))
@@ -96,7 +99,7 @@ cd_chardet_to_utf8(const gchar * str, gssize len, gsize * arg_bytes_read,
     g_return_val_if_fail(str != NULL, NULL);
 
 #ifdef USE_CHARDET
-    if (dfa_validate_utf8(str, len))
+    if (libguess_validate_utf8(str, len))
     {
         if (len < 0)
             len = strlen (str);
@@ -119,7 +122,7 @@ cd_chardet_to_utf8(const gchar * str, gssize len, gsize * arg_bytes_read,
     if (det)
     {
 	AUDDBG("guess encoding (%s) %s\n", det, str);
-        encoding = (gchar *) guess_encoding(str, len, det);
+        encoding = (gchar *) libguess_determine_encoding(str, len, det);
         AUDDBG("encoding = %s\n", encoding);
         if (encoding == NULL)
             goto fallback;

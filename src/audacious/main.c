@@ -27,11 +27,14 @@
 #  include "config.h"
 #endif
 
-#include "platform/smartinclude.h"
+#include <gtk/gtk.h>
 
 #include "main.h"
 
 #include <glib/gprintf.h>
+
+#include <libaudcore/hook.h>
+#include <libaudtag/audtag.h>
 
 #ifdef USE_DBUS
 #  include "dbus-service.h"
@@ -43,23 +46,22 @@
 #include "eggdesktopfile.h"
 #endif
 
+#include "audconfig.h"
+#include "chardet.h"
 #include "configdb.h"
+#include "drct.h"
 #include "equalizer.h"
-#include "hook.h"
-#include "input.h"
+#include "i18n.h"
+#include "interface.h"
 #include "logger.h"
 #include "output.h"
 #include "playback.h"
-#include "playlist-new.h"
-#include "playlist-utils.h"
+#include "playlist.h"
 #include "pluginenum.h"
 #include "signals.h"
 #include "util.h"
-#include "vfs.h"
-#include "chardet.h"
-#include "audtag.h"
+#include "visualization.h"
 
-#include "ui_headless.h"
 #include "ui_misc.h"
 
 #define AUTOSAVE_INTERVAL 300 /* seconds */
@@ -76,7 +78,6 @@ struct _AudCmdLineOpt
     gboolean enqueue_to_temp;
     gboolean version;
     gchar *previous_session_id;
-    gchar *interface;
     gboolean macpack;
 };
 typedef struct _AudCmdLineOpt AudCmdLineOpt;
@@ -156,13 +157,12 @@ static GOptionEntry cmd_entries[] = {
     {"play-pause", 't', 0, G_OPTION_ARG_NONE, &options.play_pause, N_("Pause if playing, play otherwise"), NULL},
     {"fwd", 'f', 0, G_OPTION_ARG_NONE, &options.fwd, N_("Skip forward in playlist"), NULL},
     {"show-jump-box", 'j', 0, G_OPTION_ARG_NONE, &options.show_jump_box, N_("Display Jump to File dialog"), NULL},
-    {"enqueue", 'e', 0, G_OPTION_ARG_NONE, &options.enqueue, N_("Don't clear the playlist"), NULL},
+    {"enqueue", 'e', 0, G_OPTION_ARG_NONE, &options.enqueue, N_("Add files to the playlist"), NULL},
     {"enqueue-to-temp", 'E', 0, G_OPTION_ARG_NONE, &options.enqueue_to_temp, N_("Add new files to a temporary playlist"), NULL},
     {"show-main-window", 'm', 0, G_OPTION_ARG_NONE, &options.mainwin, N_("Display the main window"), NULL},
     {"activate", 'a', 0, G_OPTION_ARG_NONE, &options.activate, N_("Display all open Audacious windows"), NULL},
     {"no-log", 'N', 0, G_OPTION_ARG_NONE, &options.no_log, N_("Print all errors and warnings to stdout"), NULL},
     {"version", 'v', 0, G_OPTION_ARG_NONE, &options.version, N_("Show version"), NULL},
-    {"interface", 'i', 0, G_OPTION_ARG_STRING, &options.interface, N_("Interface to use (use -i list to view available interfaces)"), NULL},
 #ifdef GDK_WINDOWING_QUARTZ
     {"macpack", 'n', 0, G_OPTION_ARG_NONE, &options.macpack, N_("Used in macpacking"), NULL},   /* Make this hidden */
 #endif
@@ -247,11 +247,11 @@ static void handle_cmd_line_filenames(gboolean is_running)
     {
         if (options.enqueue_to_temp)
         {
-            drct_pl_temp_open_list (fns);
+            drct_pl_open_temp_list (fns);
             cfg.resume_state = 0;
         }
         else if (options.enqueue)
-            drct_pl_add (fns);
+            drct_pl_add_list (fns, -1);
         else
         {
             drct_pl_open_list (fns);
@@ -301,15 +301,6 @@ static void handle_cmd_line_options_first(void)
         exit(EXIT_SUCCESS);
     }
 #endif
-
-    if (options.interface == NULL)
-    {
-        mcs_handle_t *db = cfg_db_open();
-        cfg_db_get_string(db, NULL, "interface", &options.interface);
-        if (options.interface == NULL)
-            options.interface = g_strdup("skinned");
-        cfg_db_close(db);
-    }
 }
 
 static void handle_cmd_line_options(void)
@@ -317,29 +308,21 @@ static void handle_cmd_line_options(void)
     handle_cmd_line_filenames(FALSE);
 
     if (cfg.resume_playback_on_startup && cfg.resume_state > 0)
-    {
-        playback_initiate ();
-
-        if (cfg.resume_state == 2)
-            playback_pause ();
-
-        playback_seek (cfg.resume_playback_on_startup_time);
-    }
+        playback_play (cfg.resume_playback_on_startup_time, cfg.resume_state ==
+         2);
 
     if (options.play || options.play_pause)
     {
         if (! playback_get_playing ())
-            playback_initiate ();
+            playback_play (0, FALSE);
         else if (playback_get_paused ())
             playback_pause ();
     }
 
     if (options.show_jump_box)
-        drct_jtf_show();
+        interface_show_jump_to_track ();
     if (options.mainwin)
-        drct_main_win_toggle(TRUE);
-    if (options.activate)
-        drct_activate();
+        interface_toggle_visibility ();
 }
 
 static void aud_setup_logger(void)
@@ -350,10 +333,14 @@ static void aud_setup_logger(void)
     g_atexit(aud_logger_stop);
 }
 
-void aud_quit(void)
+void aud_quit (void)
 {
-    Interface *i = interface_get(options.interface);
+    g_message ("Ending main loop.");
+    gtk_main_quit ();
+}
 
+static void shut_down (void)
+{
     g_message("Saving configuration");
     aud_config_save();
     save_playlists ();
@@ -362,30 +349,17 @@ void aud_quit(void)
         playback_stop ();
 
     g_message("Shutting down user interface subsystem");
-    interface_destroy(i);
+    interface_unload ();
 
     output_cleanup ();
 
     g_message("Plugin subsystem shutdown");
     plugin_system_cleanup();
 
+    cfg_db_flush (); /* must be after plugin cleanup */
+
     g_message("Playlist cleanup");
     playlist_end();
-
-    g_message("Shutdown finished, bye.");
-    exit(EXIT_SUCCESS);
-}
-
-static int print_interface_info(mowgli_dictionary_elem_t * delem, void *privdata)
-{
-    Interface *i = (Interface *) delem->data;
-    g_print("  %-15s - %s\n", i->id, i->desc);
-    return 0;
-}
-
-static void quit_cb(void *hook_data, void *user_data)
-{
-    aud_quit();
 }
 
 #ifdef USE_DBUS
@@ -414,16 +388,44 @@ void init_playback_hooks(void)
 
 static gboolean autosave_cb (void * unused)
 {
-    g_message ("Saving configuration.\n");
+    g_message ("Saving configuration.");
     aud_config_save ();
+    cfg_db_flush ();
     save_playlists ();
     return TRUE;
 }
 
+static PluginHandle * current_iface = NULL;
+
+PluginHandle * iface_plugin_get_active (void)
+{
+    return current_iface;
+}
+
+void iface_plugin_set_active (PluginHandle * plugin)
+{
+    g_message ("Unloading visualizers.");
+    vis_cleanup ();
+
+    g_message ("Unloading %s.", plugin_get_name (current_iface));
+    interface_unload ();
+
+    g_message ("Starting %s.", plugin_get_name (plugin));
+    if (! interface_load (plugin))
+    {
+        fprintf (stderr, "%s failed to start.\n", plugin_get_name (plugin));
+        exit (EXIT_FAILURE);
+    }
+
+    current_iface = plugin;
+    interface_set_default (plugin);
+
+    g_message ("Loading visualizers.");
+    vis_init ();
+}
+
 gint main(gint argc, gchar ** argv)
 {
-    Interface *i;
-
     /* glib-2.13.0 requires g_thread_init() to be called before all
        other GLib functions */
     g_thread_init(NULL);
@@ -439,7 +441,7 @@ gint main(gint argc, gchar ** argv)
     tag_init();
 
     hook_init();
-    hook_associate("quit", quit_cb, 0);
+    hook_associate ("quit", (HookFunction) gtk_main_quit, NULL);
 
     /* Setup l10n early so we can print localized error messages */
     gtk_set_locale();
@@ -493,19 +495,6 @@ gint main(gint argc, gchar ** argv)
     g_message("Initializing plugin subsystems...");
     plugin_system_init();
 
-    g_message("Populating included interfaces");
-    ui_populate_headless_interface();
-
-    /* Check if user wants to list available interfaces */
-    if (!g_ascii_strcasecmp(options.interface, "list"))
-    {
-        g_print(_("Available interfaces:\n\n"));
-        interface_foreach(print_interface_info, NULL);
-        g_print("\n");
-        plugin_system_cleanup();
-        exit(EXIT_SUCCESS);
-    }
-
     playlist_init ();
     load_playlists ();
     eq_init ();
@@ -523,20 +512,29 @@ gint main(gint argc, gchar ** argv)
 
     g_timeout_add_seconds (AUTOSAVE_INTERVAL, autosave_cb, NULL);
 
-    g_message("Selecting interface %s", options.interface);
-    i = interface_get(options.interface);
-
-    if (i != NULL)
+    if ((current_iface = interface_get_default ()) == NULL)
     {
-        g_message("Running interface %s@%p", options.interface, (void *) i);
-        interface_run(i);
-    }
-    else
-    {
-        g_print("%s: unable to launch selected interface %s\n", argv[0], options.interface);
+        fprintf (stderr, "No interface plugin found.\n");
         return EXIT_FAILURE;
     }
 
-    aud_quit();
+    g_message ("Starting %s.", plugin_get_name (current_iface));
+    if (! interface_load (current_iface))
+    {
+        fprintf (stderr, "%s failed to start.\n", plugin_get_name (current_iface));
+        return EXIT_FAILURE;
+    }
+
+    g_message ("Loading visualizers.");
+    vis_init ();
+
+    g_message ("Starting main loop.");
+    gtk_main ();
+
+    g_message ("Unloading visualizers.");
+    vis_cleanup ();
+
+    g_message ("Shutting down.");
+    shut_down ();
     return EXIT_SUCCESS;
 }

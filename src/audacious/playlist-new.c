@@ -1,6 +1,6 @@
 /*
  * playlist-new.c
- * Copyright 2009 John Lindgren
+ * Copyright 2009-2010 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -19,22 +19,30 @@
  * using our public API to be a derived work.
  */
 
-#include <glib.h>
+#include <assert.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <time.h>
 
+#include <glib.h>
+
+#include <libaudcore/audstrings.h>
+#include <libaudcore/hook.h>
+#include <libaudcore/tuple_formatter.h>
+
+#include "audconfig.h"
 #include "config.h"
-#include "audstrings.h"
 #include "i18n.h"
+#include "main.h"
+#include "misc.h"
 #include "playback.h"
-#include "playlist-new.h"
+#include "playlist.h"
 #include "playlist-utils.h"
 #include "plugin.h"
-#include "probe.h"
 
 #define SCAN_DEBUG(...)
 
+#define SCAN_THREADS 4
 #define STATE_FILE "playlist-state"
 
 #define DECLARE_PLAYLIST \
@@ -137,13 +145,14 @@ static struct playlist *playing_playlist;
 static gint update_source, update_level;
 static gint scan_source;
 static GMutex * scan_mutex;
-static GCond * scan_cond;
-static const gchar * scan_filename;
-static InputPlugin * scan_decoder;
-static Tuple * scan_tuple;
+static GCond * scan_conds[SCAN_THREADS];
+static const gchar * scan_filenames[SCAN_THREADS];
+static InputPlugin * scan_decoders[SCAN_THREADS];
+static Tuple * scan_tuples[SCAN_THREADS];
 static gboolean scan_quit;
-static GThread * scan_thread;
-static gint scan_position, updated_ago;
+static GThread * scan_threads[SCAN_THREADS];
+static gint scan_positions[SCAN_THREADS];
+gint updated_ago;
 
 static void * scanner (void * unused);
 
@@ -159,18 +168,12 @@ static gchar *title_from_tuple(Tuple * tuple)
 
 static void entry_set_tuple_real (struct entry * entry, Tuple * tuple)
 {
-    gint start;
-    gint end;
-
-    if (entry->segmented == TRUE && entry->tuple)
+    /* Hack: We cannot refresh segmented entries (since their info is read from
+     * the cue sheet when it is first loaded), so leave them alone. -jlindgren */
+    if (entry->segmented)
     {
-        if (entry->end > 0)
-            return;
-
-        entry->length = tuple_get_int(tuple, FIELD_LENGTH, NULL);
-        entry->length -= entry->start;
-
-        tuple_associate_int(entry->tuple, FIELD_LENGTH, NULL, entry->length);
+        if (tuple != NULL)
+            tuple_free (tuple);
 
         return;
     }
@@ -194,18 +197,19 @@ static void entry_set_tuple_real (struct entry * entry, Tuple * tuple)
         entry->length = tuple_get_int (tuple, FIELD_LENGTH, NULL);
         entry->length = MAX (entry->length, 0);
 
-        if ((tuple_get_int (tuple, FIELD_SEGMENT_START, NULL)) || (tuple_get_int (tuple, FIELD_SEGMENT_END, NULL)))
+        if (tuple_get_value_type (tuple, FIELD_SEGMENT_START, NULL) == TUPLE_INT)
         {
-            start = tuple_get_int (tuple, FIELD_SEGMENT_START, NULL);
-            end = tuple_get_int (tuple, FIELD_SEGMENT_END, NULL);
-
-            if (start == end)
-                end = 0;
-
             entry->segmented = TRUE;
-            entry->start = start ? start : 0;
-            entry->end = end ? end : -1;
+            entry->start = tuple_get_int (tuple, FIELD_SEGMENT_START, NULL);
+
+            if (tuple_get_value_type (tuple, FIELD_SEGMENT_END, NULL) ==
+             TUPLE_INT)
+                entry->end = tuple_get_int (tuple, FIELD_SEGMENT_END, NULL);
+            else
+                entry->end = -1;
         }
+        else
+            entry->segmented = FALSE;
     }
 }
 
@@ -267,7 +271,7 @@ static void entry_check_has_decoder (struct entry * entry)
     if (entry->decoder != NULL || entry->failed)
         return;
 
-    entry->decoder = file_find_decoder (entry->filename, TRUE);
+    entry->decoder = file_find_decoder (entry->filename, FALSE);
 
     if (entry->decoder == NULL)
         entry->failed = TRUE;
@@ -367,65 +371,80 @@ static void queue_update (gint level)
 /* scan_mutex must be locked! */
 void scan_receive (void)
 {
-    struct entry * entry = index_get (active_playlist->entries, scan_position);
+    for (gint i = 0; i < SCAN_THREADS; i ++)
+    {
+        struct entry * entry;
 
-    SCAN_DEBUG ("scan_receive\n");
-    entry_set_tuple (active_playlist, entry, scan_tuple);
+        if (! scan_filenames[i] || scan_decoders[i])
+            continue; /* thread not in use or still working */
 
-    if (scan_tuple == NULL)
-        entry->failed = TRUE;
+        SCAN_DEBUG ("receive (#%d): %d\n", i, scan_positions[i]);
+        entry = index_get (active_playlist->entries, scan_positions[i]);
+        entry_set_tuple (active_playlist, entry, scan_tuples[i]);
 
-    scan_filename = NULL;
-    scan_decoder = NULL;
-    scan_tuple = NULL;
+        if (! scan_tuples[i])
+            entry->failed = TRUE;
+
+        scan_filenames[i] = NULL;
+        scan_tuples[i] = NULL;
+
+        updated_ago ++;
+    }
 }
 
 static gboolean scan_next (void * unused)
 {
-    gint entries;
+    gint entries = index_count (active_playlist->entries);
+    gint search = 0;
 
-    SCAN_DEBUG ("scan_next: locking...\n");
     g_mutex_lock (scan_mutex);
-    SCAN_DEBUG (" ...ok\n");
 
-    if (scan_filename != NULL)
+    if (scan_source)
     {
-        scan_receive ();
-        scan_position ++;
-        updated_ago ++;
+        g_source_remove (scan_source);
+        scan_source = 0;
     }
 
-    entries = index_count (active_playlist->entries);
+    scan_receive ();
 
-    for (; scan_position < entries; scan_position ++)
+    for (gint i = 0; i < SCAN_THREADS; i ++)
+        search = MAX (search, scan_positions[i] + 1);
+
+    for (gint i = 0; i < SCAN_THREADS; i ++)
     {
-        struct entry * entry = index_get (active_playlist->entries,
-         scan_position);
+        if (scan_filenames[i])
+            continue; /* thread already in use */
 
-        if (entry->tuple != NULL)
-            continue;
-
-        entry_check_has_decoder (entry);
-
-        if (! entry->failed)
+        for (; search < entries; search ++)
         {
-            SCAN_DEBUG (" ...waking scanner\n");
-            scan_filename = entry->filename;
-            scan_decoder = entry->decoder;
-            g_cond_signal (scan_cond);
+            struct entry * entry = index_get (active_playlist->entries, search);
+
+            if (entry->tuple)
+                continue;
+
+            entry_check_has_decoder (entry);
+
+            if (entry->failed)
+                continue;
+
+            SCAN_DEBUG ("start (#%d): %d\n", i, search);
+            scan_positions[i] = search;
+            scan_filenames[i] = entry->filename;
+            scan_decoders[i] = entry->decoder;
+            g_cond_signal (scan_conds[i]);
+
+            search ++;
             break;
         }
     }
 
-    if (updated_ago >= 10 || (scan_position == entries && updated_ago > 0))
+    if (updated_ago >= 10 || (search == entries && updated_ago > 0))
     {
-        SCAN_DEBUG (" ...queueing update\n");
+        SCAN_DEBUG ("queue update\n");
         queue_update (PLAYLIST_UPDATE_METADATA);
         updated_ago = 0;
     }
 
-    SCAN_DEBUG (" ...unlocking\n");
-    scan_source = 0;
     g_mutex_unlock (scan_mutex);
     return FALSE;
 }
@@ -433,22 +452,28 @@ static gboolean scan_next (void * unused)
 static void scan_continue (void)
 {
     SCAN_DEBUG ("scan_continue\n");
-    scan_source = g_idle_add_full (G_PRIORITY_LOW, scan_next, NULL, NULL);
+    if (! scan_source)
+        scan_source = g_idle_add_full (G_PRIORITY_LOW, scan_next, NULL, NULL);
 }
 
 static void scan_reset (void)
 {
     SCAN_DEBUG ("scan_reset\n");
-    scan_position = 0;
+
+    for (gint i = 0; i < SCAN_THREADS; i ++)
+    {
+        assert (! scan_filenames[i]); /* scan in progress == very, very bad */
+        scan_positions[i] = -1;
+    }
+
     updated_ago = 0;
     scan_continue ();
 }
 
 static void scan_stop (void)
 {
-    SCAN_DEBUG ("scan_stop: locking...\n");
+    SCAN_DEBUG ("scan_stop\n");
     g_mutex_lock (scan_mutex);
-    SCAN_DEBUG (" ...ok\n");
 
     if (scan_source != 0)
     {
@@ -456,58 +481,130 @@ static void scan_stop (void)
         scan_source = 0;
     }
 
-    if (scan_filename != NULL)
-        scan_receive ();
+    for (gint i = 0; i < SCAN_THREADS; i ++)
+    {
+        if (! scan_filenames[i])
+            continue;
 
-    SCAN_DEBUG (" ...unlocking\n");
+        while (scan_decoders[i])
+        {
+            SCAN_DEBUG ("wait for stop (#%d)\n", i);
+            g_cond_wait (scan_conds[i], scan_mutex);
+        }
+    }
+
+    scan_receive ();
     g_mutex_unlock (scan_mutex);
 }
 
-/* scan_mutex must be locked! */
-static void * scanner (void * unused)
+static void * scanner (void * data)
 {
-    for (;;)
+    gint i = GPOINTER_TO_INT (data);
+
+    g_mutex_lock (scan_mutex);
+    g_cond_signal (scan_conds[i]);
+
+    while (1)
     {
-        SCAN_DEBUG ("scanner: waiting...\n");
-        g_cond_wait (scan_cond, scan_mutex);
+        SCAN_DEBUG ("scanner (#%d): wait\n", i);
+        g_cond_wait (scan_conds[i], scan_mutex);
 
         if (scan_quit)
-        {
-            SCAN_DEBUG (" ...exiting\n");
-            return NULL;
-        }
+            break;
 
-        if (scan_filename == NULL)
+        if (! scan_filenames[i])
         {
-            SCAN_DEBUG (" ...nothing to scan\n");
+            SCAN_DEBUG ("scanner (#%d): idle\n", i);
             continue;
         }
 
-        SCAN_DEBUG (" ...scanning\n");
-        scan_tuple = file_read_tuple (scan_filename, scan_decoder);
+        SCAN_DEBUG ("scanner (#%d): scan %s\n", i, scan_filenames[i]);
+        scan_tuples[i] = file_read_tuple (scan_filenames[i], scan_decoders[i]);
+        scan_decoders[i] = NULL;
+        g_cond_signal (scan_conds[i]);
         scan_continue ();
     }
+
+    SCAN_DEBUG ("scanner (#%d): exit\n", i);
+    g_mutex_unlock (scan_mutex);
+    return NULL;
+}
+
+/* As soon as we know the caller is looking for metadata, we start the threaded
+ * scanner.  Though it may be faster in the short run simply to scan the entry
+ * we are concerned with in the main thread, this is better in the long run
+ * because the scanner can work on the following entries while the caller is
+ * processing this one. */
+static gboolean scan_threaded (struct playlist * playlist, struct entry * entry)
+{
+    gint i;
+
+    if (playlist != active_playlist)
+        return FALSE;
+
+    scan_next (NULL);
+
+    if (entry->tuple != NULL || entry->failed)
+        return TRUE;
+
+    for (i = 0; i < SCAN_THREADS; i ++)
+    {
+        if (entry->number == scan_positions[i])
+            goto FOUND;
+    }
+
+    SCAN_DEBUG ("manual scan of %d\n", entry->number);
+    return FALSE;
+
+FOUND:
+    SCAN_DEBUG ("threaded scan (#%d) of %d\n", i, entry->number);
+    g_mutex_lock (scan_mutex);
+    scan_receive ();
+
+    while (scan_filenames[i])
+    {
+        SCAN_DEBUG ("wait (#%d) for %d\n", i, entry->number);
+        g_cond_wait (scan_conds[i], scan_mutex);
+        scan_receive ();
+    }
+
+    g_mutex_unlock (scan_mutex);
+    return TRUE;
 }
 
 static void check_scanned (struct playlist * playlist, struct entry * entry)
 {
     if (entry->tuple != NULL || entry->failed)
         return;
-
-    METADATA_WILL_CHANGE;
+    if (scan_threaded (playlist, entry))
+        return;
 
     entry_check_has_decoder (entry);
+    entry_set_tuple (playlist, entry, file_read_tuple (entry->filename,
+     entry->decoder));
 
-    if (entry->tuple == NULL && ! entry->failed) /* scanner did it for us? */
+    if (! entry->tuple)
+        entry->failed = TRUE;
+
+    queue_update (PLAYLIST_UPDATE_METADATA);
+}
+
+static void check_selected_scanned (struct playlist * playlist)
+{
+    gint entries = index_count (playlist->entries);
+    for (gint count = 0; count < entries; count++)
     {
-        entry_set_tuple (playlist, entry, file_read_tuple (entry->filename,
-         entry->decoder));
-
-        if (entry->tuple == NULL)
-            entry->failed = TRUE;
+        struct entry * entry = index_get (playlist->entries, count);
+        if (entry->selected)
+            check_scanned (playlist, entry);
     }
+}
 
-    METADATA_HAS_CHANGED;
+static void check_all_scanned (struct playlist * playlist)
+{
+    gint entries = index_count (playlist->entries);
+    for (gint count = 0; count < entries; count++)
+        check_scanned (playlist, index_get (playlist->entries, count));
 }
 
 void playlist_init (void)
@@ -527,14 +624,24 @@ void playlist_init (void)
     update_level = 0;
 
     scan_mutex = g_mutex_new ();
-    scan_cond = g_cond_new ();
-    scan_filename = NULL;
-    scan_decoder = NULL;
-    scan_tuple = NULL;
+    memset (scan_filenames, 0, sizeof scan_filenames);
+    memset (scan_decoders, 0, sizeof scan_decoders);
+    memset (scan_tuples, 0, sizeof scan_tuples);
     scan_source = 0;
-    g_mutex_lock (scan_mutex);
     scan_quit = FALSE;
-    scan_thread = g_thread_create (scanner, NULL, TRUE, NULL);
+
+    g_mutex_lock (scan_mutex);
+
+    for (gint i = 0; i < SCAN_THREADS; i ++)
+    {
+        scan_conds[i] = g_cond_new ();
+        scan_threads[i] = g_thread_create (scanner, GINT_TO_POINTER (i), TRUE,
+         NULL);
+        g_cond_wait (scan_conds[i], scan_mutex);
+    }
+
+    g_mutex_unlock (scan_mutex);
+
     scan_reset ();
 }
 
@@ -543,11 +650,18 @@ void playlist_end(void)
     gint count;
 
     scan_stop ();
-    g_mutex_lock (scan_mutex);
     scan_quit = TRUE;
-    g_cond_signal (scan_cond);
-    g_mutex_unlock (scan_mutex);
-    g_thread_join (scan_thread);
+
+    for (gint i = 0; i < SCAN_THREADS; i ++)
+    {
+        g_mutex_lock (scan_mutex);
+        g_cond_signal (scan_conds[i]);
+        g_mutex_unlock (scan_mutex);
+        g_thread_join (scan_threads[i]);
+        g_cond_free (scan_conds[i]);
+    }
+
+    g_mutex_free (scan_mutex);
 
     if (update_source != 0)
         g_source_remove(update_source);
@@ -922,55 +1036,39 @@ void playlist_entry_set_tuple (gint playlist_num, gint entry_num, Tuple * tuple)
     METADATA_HAS_CHANGED;
 }
 
-const Tuple *playlist_entry_get_tuple(gint playlist_num, gint entry_num)
+const Tuple * playlist_entry_get_tuple (gint playlist_num, gint entry_num,
+ gboolean fast)
 {
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY_RET (NULL);
 
-    check_scanned (playlist, entry);
+    if (! fast)
+        check_scanned (playlist, entry);
+
     return entry->tuple;
 }
 
-const gchar *playlist_entry_get_title(gint playlist_num, gint entry_num)
+const gchar * playlist_entry_get_title (gint playlist_num, gint entry_num,
+ gboolean fast)
 {
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY_RET (NULL);
 
-    check_scanned (playlist, entry);
+    if (! fast)
+        check_scanned (playlist, entry);
+
     return (entry->title == NULL) ? entry->filename : entry->title;
 }
 
-gint playlist_entry_get_length(gint playlist_num, gint entry_num)
+gint playlist_entry_get_length (gint playlist_num, gint entry_num, gboolean fast)
 {
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY_RET (0);
 
-    check_scanned (playlist, entry);
+    if (! fast)
+        check_scanned (playlist, entry);
+
     return entry->length;
-}
-
-void playlist_entry_set_segmentation(gint playlist_num, gint entry_num, gint start, gint end)
-{
-    DECLARE_PLAYLIST_ENTRY;
-
-    LOOKUP_PLAYLIST_ENTRY;
-    if (entry == NULL)
-        return;
-
-    if (start != -1)
-    {
-        entry->segmented = TRUE;
-        entry->start = start;
-        entry->end = end;
-    }
-    else
-    {
-        entry->segmented = FALSE;
-        entry->start = entry->end = -1;
-    }
 }
 
 gboolean playlist_entry_is_segmented(gint playlist_num, gint entry_num)
@@ -1178,64 +1276,6 @@ gint playlist_shift (gint playlist_num, gint entry_num, gint distance)
     return shift;
 }
 
-gint playlist_shift_selected(gint playlist_num, gint distance)
-{
-    DECLARE_PLAYLIST;
-    gint entries, shifted, count;
-    struct entry *entry;
-
-    LOOKUP_PLAYLIST_RET (0);
-    PLAYLIST_WILL_CHANGE;
-
-    entries = index_count(playlist->entries);
-
-    if (entries == 0)
-        return 0;
-
-    for (shifted = 0; shifted > distance; shifted--)
-    {
-        entry = index_get(playlist->entries, 0);
-
-        if (entry->selected)
-            break;
-
-        for (count = 1; count < entries; count++)
-        {
-            entry = index_get(playlist->entries, count);
-
-            if (!entry->selected)
-                continue;
-
-            index_set(playlist->entries, count, index_get(playlist->entries, count - 1));
-            index_set(playlist->entries, count - 1, entry);
-        }
-    }
-
-    for (; shifted < distance; shifted++)
-    {
-        entry = index_get(playlist->entries, entries - 1);
-
-        if (entry->selected)
-            break;
-
-        for (count = entries - 1; count--;)
-        {
-            entry = index_get(playlist->entries, count);
-
-            if (!entry->selected)
-                continue;
-
-            index_set(playlist->entries, count, index_get(playlist->entries, count + 1));
-            index_set(playlist->entries, count + 1, entry);
-        }
-    }
-
-    number_entries(playlist, 0, entries);
-
-    PLAYLIST_HAS_CHANGED;
-    return shifted;
-}
-
 void playlist_delete_selected(gint playlist_num)
 {
     DECLARE_PLAYLIST;
@@ -1302,30 +1342,6 @@ void playlist_reverse(gint playlist_num)
 
     index_free(playlist->entries);
     playlist->entries = reversed;
-
-    number_entries(playlist, 0, entries);
-
-    PLAYLIST_HAS_CHANGED;
-}
-
-void playlist_randomize(gint playlist_num)
-{
-    DECLARE_PLAYLIST;
-    gint entries, count;
-
-    LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
-
-    entries = index_count(playlist->entries);
-
-    for (count = 0; count < entries; count++)
-    {
-        gint replace = count + random() % (entries - count);
-        struct entry *entry = index_get(playlist->entries, replace);
-
-        index_set(playlist->entries, replace, index_get(playlist->entries, count));
-        index_set(playlist->entries, count, entry);
-    }
 
     number_entries(playlist, 0, entries);
 
@@ -1415,18 +1431,8 @@ void playlist_sort_by_tuple (gint playlist_num, gint (* compare)
  (const Tuple * a, const Tuple * b))
 {
     DECLARE_PLAYLIST;
-    gint entries, count;
-
     LOOKUP_PLAYLIST;
-    entries = index_count(playlist->entries);
-
-    for (count = 0; count < entries; count++)
-    {
-        struct entry *entry = index_get(playlist->entries, count);
-
-        check_scanned (playlist, entry);
-    }
-
+    check_all_scanned (playlist);
     sort (playlist, tuple_compare, compare);
 }
 
@@ -1444,19 +1450,8 @@ void playlist_sort_selected_by_tuple (gint playlist_num, gint (* compare)
  (const Tuple * a, const Tuple * b))
 {
     DECLARE_PLAYLIST;
-    gint entries, count;
-
     LOOKUP_PLAYLIST;
-    entries = index_count(playlist->entries);
-
-    for (count = 0; count < entries; count++)
-    {
-        struct entry *entry = index_get(playlist->entries, count);
-
-        if (entry->selected)
-            check_scanned (playlist, entry);
-    }
-
+    check_selected_scanned (playlist);
     sort_selected (playlist, tuple_compare, compare);
 }
 
@@ -1533,20 +1528,24 @@ void playlist_rescan_file (const gchar * filename)
     METADATA_HAS_CHANGED;
 }
 
-gint64 playlist_get_total_length(gint playlist_num)
+gint64 playlist_get_total_length (gint playlist_num, gboolean fast)
 {
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST_RET (0);
+
+    if (! fast)
+        check_all_scanned (playlist);
 
     return playlist->total_length;
 }
 
-gint64 playlist_get_selected_length(gint playlist_num)
+gint64 playlist_get_selected_length (gint playlist_num, gboolean fast)
 {
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST_RET (0);
+
+    if (! fast)
+        check_selected_scanned (playlist);
 
     return playlist->selected_length;
 }
@@ -1668,6 +1667,23 @@ void playlist_queue_delete(gint playlist_num, gint at, gint number)
     }
 
 DONE:
+    SELECTION_HAS_CHANGED;
+}
+
+void playlist_queue_delete_selected (gint playlist_num)
+{
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST;
+
+    for (GList * node = playlist->queued; node != NULL; )
+    {
+        GList * next = node->next;
+        struct entry * entry = node->data;
+        if (entry->selected)
+            playlist->queued = g_list_delete_link (playlist->queued, node);
+        node = next;
+    }
+
     SELECTION_HAS_CHANGED;
 }
 

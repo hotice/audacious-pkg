@@ -24,9 +24,13 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
+#include <audacious/audconfig.h>
+#include <audacious/drct.h>
 #include <audacious/i18n.h>
-#include <audacious/plugin.h>
+#include <audacious/misc.h>
+#include <audacious/playlist.h>
 
+#include "config.h"
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
 
@@ -98,7 +102,7 @@ static gboolean infopopup_progress_cb (void * unused)
     g_return_val_if_fail (tooltip_file != NULL, FALSE);
     g_return_val_if_fail (length > 0, FALSE);
 
-    if (! aud_cfg->filepopup_showprogressbar || ! audacious_drct_get_playing ())
+    if (! aud_cfg->filepopup_showprogressbar || ! aud_drct_get_playing ())
         goto HIDE;
 
     playlist = aud_playlist_get_playing ();
@@ -116,7 +120,7 @@ static gboolean infopopup_progress_cb (void * unused)
     if (strcmp (filename, tooltip_file))
         goto HIDE;
 
-    time = audacious_drct_get_time ();
+    time = aud_drct_get_time ();
     gtk_progress_bar_set_fraction ((GtkProgressBar *) progressbar, time /
      (gfloat) length);
     progress_time = g_strdup_printf ("%d:%02d", time / 60000, (time / 1000) % 60);
@@ -299,13 +303,14 @@ static void infopopup_clear (void)
     gtk_window_resize ((GtkWindow *) infopopup, 1, 1);
 }
 
-static void infopopup_show (const gchar * filename, Tuple * tuple, const gchar *
- title)
+static void infopopup_show (const gchar * filename, const Tuple * tuple,
+ const gchar * title)
 {
     gint x, y, h, w;
     gchar * last_artwork;
     gint length, value;
-    gchar * tmp, * markup;
+    gchar * tmp;
+    const gchar * title2;
 
     if (infopopup == NULL)
         infopopup_create ();
@@ -315,13 +320,11 @@ static void infopopup_show (const gchar * filename, Tuple * tuple, const gchar *
     g_free (g_object_get_data ((GObject *) infopopup, "file"));
     g_object_set_data ((GObject *) infopopup, "file", g_strdup (filename));
 
-    markup = g_markup_printf_escaped ("<span style=\"italic\">%s</span>",
-     _("Title"));
-    gtk_label_set_markup ((GtkLabel *) g_object_get_data ((GObject *) infopopup,
-     "header_title"), markup);
-    g_free (markup);
-    infopopup_entry_set_text ("label_title", title);
+    /* use title from tuple if possible */
+    if ((title2 = tuple_get_string (tuple, FIELD_TITLE, NULL)))
+        title = title2;
 
+    infopopup_update_data (title, "label_title", "header_title");
     infopopup_update_data (tuple_get_string (tuple, FIELD_ARTIST, NULL),
      "label_artist", "header_artist");
     infopopup_update_data (tuple_get_string (tuple, FIELD_ALBUM, NULL),
@@ -394,7 +397,7 @@ static void infopopup_show (const gchar * filename, Tuple * tuple, const gchar *
 void audgui_infopopup_show (gint playlist, gint entry)
 {
     const gchar * filename = aud_playlist_entry_get_filename (playlist, entry);
-    Tuple * tuple = (Tuple *) aud_playlist_entry_get_tuple (playlist, entry);
+    const Tuple * tuple = aud_playlist_entry_get_tuple (playlist, entry, FALSE);
 
     g_return_if_fail (filename != NULL);
 
@@ -402,7 +405,7 @@ void audgui_infopopup_show (gint playlist, gint entry)
         return;
 
     infopopup_show (filename, tuple, aud_playlist_entry_get_title (playlist,
-     entry));
+     entry, FALSE));
 }
 
 void audgui_infopopup_show_current (void)

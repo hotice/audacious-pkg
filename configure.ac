@@ -6,7 +6,7 @@ dnl Require autoconf 2.59 or later
 AC_PREREQ([2.59])
 
 dnl Initialize
-AC_INIT([audacious], [2.4-alpha2], [bugs+audacious@atheme.org])
+AC_INIT([audacious], [2.4-beta1], [bugs+audacious@atheme.org])
 AC_COPYRIGHT([(C) 2005-2010 Audacious Development Team])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -121,7 +121,11 @@ dnl ===============
 AUD_ARG_ENABLE([chardet], [yes],
 [charset detection support],
 [
-    AC_DEFINE([USE_CHARDET], 1, [Define if character set detection enabled])
+    PKG_CHECK_MODULES([LIBGUESS], [libguess], [enable_chardet=yes], [enable_chardet=no])
+
+    if test "x$enable_chardet" = "xyes"; then
+        AC_DEFINE([USE_CHARDET], 1, [Define if character set detection enabled])
+    fi
 ])
 AUD_CONDITIONAL([USE_CHARDET], [enable_chardet])
 
@@ -340,14 +344,12 @@ if test "x$AUDACIOUS_PATH" != "xno"; then
 echo "  Current Audacious executable:           $AUDACIOUS_PATH"
 fi
 
-echo "  Use one plugin dir:                     $enable_one_plugin_dir"
 echo "  Allow user plugin dir:                  $enable_user_plugin_dir"
 echo ""
 echo "  Additional debugging output:            $enable_debug"
 echo "  Automatic character code detection:     $enable_chardet"
 echo "  D-Bus support:                          $enable_dbus"
 echo "  Session management (eggsm)              $enable_sm"
-echo "  XSPF playlists                          $enable_xspf"
 echo ""
 echo "  SSE2:                                   $enable_sse2"
 echo "  AltiVec:                                $enable_altivec"
