@@ -1,4 +1,4 @@
-audacious (2.4~alpha2-1) experimental; urgency=low
+audacious (2.4~beta1-1) experimental; urgency=low
 
   * New upstream release.
   * Refer to versioned copyright file.
@@ -10,8 +10,12 @@ audacious (2.4~alpha2-1) experimental; urgency=low
   * Fix spelling mistake Psychadelic to Psychedelic.
   * Use --with autotools_dev instead of replacing the config files manually.
   * Bump Standards-Version to 3.9.0 (no changes required).
+  * Bump libmowgli-dev to 0.7.
+  * Do not link against unused libraries (make dpkg-shlibdeps happy).
+  * Drop libglade2-dev and libsamplerate-dev from audacious-dev.
+  * Bump audacious-plugins dependency to 2.4~beta1.
 
- -- Benjamin Drung <bdrung@ubuntu.com>  Tue, 29 Jun 2010 10:03:17 +0200
+ -- Benjamin Drung <bdrung@ubuntu.com>  Thu, 22 Jul 2010 20:44:57 +0200
 
 audacious (2.3-2) unstable; urgency=low
 
