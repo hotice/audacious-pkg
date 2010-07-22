@@ -6,6 +6,9 @@ ifeq ($(DEB_BUILD_ARCH),i386)
 additional_confflags := --disable-sse2
 endif
 
+# Do not link against unused libraries (make dpkg-shlibdeps happy).
+LDFLAGS += -Wl,-z,defs -Wl,--as-needed
+
 %:
 	dh --with autotools_dev --parallel $@
 
