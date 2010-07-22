@@ -13,7 +13,7 @@ Build-Depends: autotools-dev (>= 20100122.1~),
                libglade2-dev (>= 2.3.1),
                libgtk2.0-dev (>= 2.10),
                libmcs-dev (>= 0.7),
-               libmowgli-dev (>= 0.4),
+               libmowgli-dev (>= 0.7),
                librsvg2-bin
 Standards-Version: 3.9.0
 VCS-Browser: http://git.debian.org/?p=pkg-audacious/audacious.git;a=summary
@@ -109,7 +109,7 @@ Depends: libaudclient2 (= ${binary:Version}),
          libglade2-dev (>= 2.3.1),
          libgtk2.0-dev (>= 2.6),
          libmcs-dev (>= 0.7),
-         libmowgli-dev (>= 0.4),
+         libmowgli-dev (>= 0.7),
          libsamplerate0-dev | libsamplerate-dev,
          ${misc:Depends}
 Provides: libaudid3tag-dev, libaudclient-dev, libaudcore-dev
