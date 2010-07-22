@@ -7,7 +7,8 @@
 #   have been introduced, and then continue with 'make update-po' or
 #   'make update-pot' respectively.
 #
-LOCALES = be.po \
+LOCALES = ast.po \
+	  be.po \
 	  bg.po \
 	  br.po \
 	  ca.po \
@@ -54,6 +55,7 @@ update-pot:
 	@echo Updating $(POTTEMPLATE) ...
 	xgettext --default-domain=$(PACKAGE) --language=C \
 	--keyword=_ --keyword=N_ --from-code="utf-8" \
+	--msgid-bugs-address="http://jira.atheme.org/" \
 	--directory=.. --files-from=POTFILES.in -o $(POTTEMPLATE)
 
 update-po: update-pot

@@ -23,15 +23,10 @@
 #ifndef AUDACIOUS_PLAYBACK_H
 #define AUDACIOUS_PLAYBACK_H
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
 #include <glib.h>
-#include "plugin.h"
 
+void playback_play (gint seek_time, gboolean pause);
 gint playback_get_time(void);
-void playback_initiate(void);
 void playback_pause(void);
 void playback_stop(void);
 gboolean playback_get_playing(void);
@@ -41,5 +36,8 @@ void playback_seek(gint time);
 gchar * playback_get_title (void);
 gint playback_get_length (void);
 void playback_get_info (gint * bitrate, gint * samplerate, gint * channels);
+
+void input_get_volume(gint * l, gint * r);
+void input_set_volume(gint l, gint r);
 
 #endif /* AUDACIOUS_PLAYBACK_H */

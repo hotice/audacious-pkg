@@ -27,17 +27,12 @@
 #  include "config.h"
 #endif
 
-#include "util.h"
 
 #include <glib.h>
-#include <glib/gi18n.h>
-#include <gtk/gtk.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 
-#include "platform/smartinclude.h"
 #include <errno.h>
 
 #ifdef HAVE_FTS_H
@@ -46,9 +41,14 @@
 #  include <fts.h>
 #endif
 
-#include "input.h"
-#include "playback.h"
-#include "audstrings.h"
+#include <libaudcore/audstrings.h>
+
+#include "audconfig.h"
+#include "debug.h"
+#include "i18n.h"
+#include "misc.h"
+#include "plugins.h"
+#include "util.h"
 
 /*
  * find <file> in directory <dirname> or subdirectories.  return
@@ -123,335 +123,6 @@ find_path_recursively(const gchar * path, const gchar * filename)
     return context.match;
 }
 
-static void
-strip_string(GString *string)
-{
-    while (string->len > 0 && string->str[0] == ' ')
-        g_string_erase(string, 0, 1);
-
-    while (string->len > 0 && string->str[string->len - 1] == ' ')
-        g_string_erase(string, string->len - 1, 1);
-}
-
-static void
-strip_lower_string(GString *string)
-{
-    gchar *lower;
-    strip_string(string);
-
-    lower = g_ascii_strdown(string->str, -1);
-    g_free(string->str);
-    string->str = lower;
-}
-
-static void
-close_ini_file_free_value(gpointer value)
-{
-    g_free((gchar*)value);
-}
-
-static void
-close_ini_file_free_section(gpointer section)
-{
-    g_hash_table_destroy((GHashTable*)section);
-}
-
-INIFile *
-open_ini_file(const gchar *filename)
-{
-    GHashTable *ini_file = NULL;
-    GHashTable *section = NULL;
-    GString *section_name, *key_name, *value;
-    gpointer section_hash, key_hash;
-    guchar * buffer = NULL;
-    gsize off = 0;
-    gint64 filesize = 0;
-
-    unsigned char x[] = { 0xff, 0xfe, 0x00 };
-
-    g_return_val_if_fail(filename, NULL);
-    vfs_file_get_contents(filename, &buffer, &filesize);
-    if (buffer == NULL)
-        return NULL;
-
-    /*
-     * Convert UTF-16 into something useful. Original implementation
-     * by incomp@#audacious. Cleanups \nenolod
-     * FIXME: can't we use a GLib function for that? -- 01mf02
-     */
-    if (filesize > 2 && !memcmp(&buffer[0],&x,2))
-    {
-        guchar * outbuf = g_malloc (filesize); /* it's safe to waste memory. */
-        guint counter;
-
-        for (counter = 2; counter < filesize; counter += 2)
-        {
-            if (!memcmp(&buffer[counter+1], &x[2], 1)) {
-                outbuf[(counter-2)/2] = buffer[counter];
-            } else {
-                g_free(buffer);
-                g_free(outbuf);
-                return NULL;
-            }
-        }
-
-        outbuf[(counter-2)/2] = '\0';
-
-        if ((filesize - 2) / 2 == (counter - 2) / 2)
-        {
-            g_free(buffer);
-            buffer = outbuf;
-        }
-        else
-        {
-            g_free(buffer);
-            g_free(outbuf);
-            return NULL;    /* XXX wrong encoding */
-        }
-    }
-
-    section_name = g_string_new("");
-    key_name = g_string_new(NULL);
-    value = g_string_new(NULL);
-
-    ini_file = g_hash_table_new_full(NULL, NULL, NULL,
-                                     close_ini_file_free_section);
-    section = g_hash_table_new_full(NULL, NULL, NULL,
-                                    close_ini_file_free_value);
-    /* make a nameless section which should store all entries that are not
-     * embedded in a section */
-    section_hash = GINT_TO_POINTER(g_string_hash(section_name));
-    g_hash_table_insert(ini_file, section_hash, section);
-
-    while (off < filesize)
-    {
-        /* ignore the following characters */
-        if (buffer[off] == '\r' || buffer[off] == '\n' ||
-            buffer[off] == ' '  || buffer[off] == '\t')
-        {
-            if (buffer[off] == '\n')
-            {
-                g_string_free(key_name, TRUE);
-                g_string_free(value, TRUE);
-                key_name = g_string_new(NULL);
-                value = g_string_new(NULL);
-            }
-
-            off++;
-            continue;
-        }
-
-        /* if we encounter a possible section statement */
-        if (buffer[off] == '[')
-        {
-            g_string_free(section_name, TRUE);
-            section_name = g_string_new(NULL);
-            off++;
-
-            if (off >= filesize)
-                goto return_sequence;
-
-            while (buffer[off] != ']')
-            {
-                /* if the section statement has not been closed before a
-                 * linebreak */
-                if (buffer[off] == '\n')
-                    break;
-
-                g_string_append_c(section_name, buffer[off]);
-                off++;
-                if (off >= filesize)
-                    goto return_sequence;
-            }
-            if (buffer[off] == '\n')
-                continue;
-            if (buffer[off] == ']')
-            {
-                off++;
-                if (off >= filesize)
-                    goto return_sequence;
-
-                strip_lower_string(section_name);
-                section_hash = GINT_TO_POINTER(g_string_hash(section_name));
-
-                /* if this section already exists, we don't make a new one,
-                 * but reuse the old one */
-                if (g_hash_table_lookup(ini_file, section_hash) != NULL)
-                    section = g_hash_table_lookup(ini_file, section_hash);
-                else
-                {
-                    section = g_hash_table_new_full(NULL, NULL, NULL,
-                                                    close_ini_file_free_value);
-                    g_hash_table_insert(ini_file, section_hash, section);
-                }
-
-                continue;
-            }
-        }
-
-        if (buffer[off] == '=')
-        {
-            off++;
-            if (off >= filesize)
-                goto return_sequence;
-
-            while (buffer[off] != '\n' && buffer[off] != '\r')
-            {
-                g_string_append_c(value, buffer[off]);
-                off++;
-                if (off >= filesize)
-                    break;
-            }
-
-            strip_lower_string(key_name);
-            key_hash = GINT_TO_POINTER(g_string_hash(key_name));
-            strip_string(value);
-
-            if (key_name->len > 0 && value->len > 0)
-                g_hash_table_insert(section, key_hash, g_strdup(value->str));
-        }
-        else
-        {
-            g_string_append_c(key_name, buffer[off]);
-            off++;
-            if (off >= filesize)
-                goto return_sequence;
-        }
-    }
-
-return_sequence:
-    g_string_free(section_name, TRUE);
-    g_string_free(key_name, TRUE);
-    g_string_free(value, TRUE);
-    g_free(buffer);
-    return ini_file;
-}
-
-/**
- * Frees the memory allocated for inifile.
- */
-void
-close_ini_file(INIFile *inifile)
-{
-    g_return_if_fail(inifile);
-    g_hash_table_destroy(inifile);
-}
-
-/**
- * Returns a string that corresponds to correct section and key in inifile.
- *
- * Returns NULL if value was not found in inifile. Otherwise returns a copy
- * of string pointed by "section" and "key". Returned string should be freed
- * after use.
- */
-gchar *
-read_ini_string(INIFile *inifile, const gchar *section, const gchar *key)
-{
-    GString *section_string;
-    GString *key_string;
-    gchar *value = NULL;
-    gpointer section_hash, key_hash;
-    GHashTable *section_table;
-
-    g_return_val_if_fail(inifile, NULL);
-
-    section_string = g_string_new(section);
-    key_string = g_string_new(key);
-    value = NULL;
-
-    strip_lower_string(section_string);
-    strip_lower_string(key_string);
-    section_hash = GINT_TO_POINTER(g_string_hash(section_string));
-    key_hash = GINT_TO_POINTER(g_string_hash(key_string));
-    section_table = g_hash_table_lookup(inifile, section_hash);
-
-    if (section_table) {
-        value = g_strdup(g_hash_table_lookup(section_table,
-                                             GINT_TO_POINTER(key_hash)));
-    }
-
-    g_string_free(section_string, TRUE);
-    g_string_free(key_string, TRUE);
-
-    return value;
-}
-
-GArray *
-read_ini_array(INIFile *inifile, const gchar *section, const gchar *key)
-{
-    gchar *temp;
-    GArray *a;
-
-    if ((temp = read_ini_string(inifile, section, key)) == NULL)
-        return NULL;
-
-    a = string_to_garray(temp);
-    g_free(temp);
-    return a;
-}
-
-GArray *
-string_to_garray(const gchar * str)
-{
-    GArray *array;
-    gint temp;
-    const gchar *ptr = str;
-    gchar *endptr;
-
-    array = g_array_new(FALSE, TRUE, sizeof(gint));
-    for (;;) {
-        temp = strtol(ptr, &endptr, 10);
-        if (ptr == endptr)
-            break;
-        g_array_append_val(array, temp);
-        ptr = endptr;
-        while (!isdigit((int) *ptr) && (*ptr) != '\0')
-            ptr++;
-        if (*ptr == '\0')
-            break;
-    }
-    return (array);
-}
-
-void
-glist_movedown(GList * list)
-{
-    gpointer temp;
-
-    if (g_list_next(list)) {
-        temp = list->data;
-        list->data = list->next->data;
-        list->next->data = temp;
-    }
-}
-
-void
-glist_moveup(GList * list)
-{
-    gpointer temp;
-
-    if (g_list_previous(list)) {
-        temp = list->data;
-        list->data = list->prev->data;
-        list->prev->data = temp;
-    }
-}
-
-/* counts number of digits in a gint */
-guint
-gint_count_digits(gint n)
-{
-    guint count = 0;
-
-    n = ABS(n);
-    do {
-        count++;
-        n /= 10;
-    } while (n > 0);
-
-    return count;
-}
-
 gboolean
 dir_foreach(const gchar * path, DirForeachFunc function,
             gpointer user_data, GError ** error)
@@ -505,8 +176,7 @@ util_get_localdir(void)
 }
 
 
-gchar *
-construct_uri(gchar *string, const gchar *playlist_name) // uri, path and anything else
+gchar * construct_uri (const gchar * string, const gchar * playlist_name)
 {
     gchar *filename = g_strdup(string);
     gchar *tmp, *path;
@@ -582,4 +252,26 @@ util_add_url_history_entry(const gchar * url)
         g_free(node->data);
         cfg.url_history = g_list_delete_link(cfg.url_history, node);
     }
+}
+
+static gboolean plugin_list_func (PluginHandle * plugin, GList * * list)
+{
+    gpointer p_hdr = plugin_get_header(plugin);
+    g_return_val_if_fail(p_hdr != NULL, TRUE);
+    *list = g_list_prepend (*list, p_hdr);
+    return TRUE;
+}
+
+/* Deprecated: This loads all the plugins at once, causing a major slowdown. */
+GList * plugin_get_list (gint type)
+{
+    static GList *list[PLUGIN_TYPES] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+
+    if (list[type] == NULL)
+    {
+        plugin_for_each (type, (PluginForEachFunc) plugin_list_func, & list[type]);
+        list[type] = g_list_reverse (list[type]);
+    }
+
+    return list[type];
 }

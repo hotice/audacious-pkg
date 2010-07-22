@@ -23,12 +23,9 @@
  *  Audacious or using our public API to be a derived work.
  */
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-#include <glib/gi18n.h>
-#include "credits.h"
+#include "config.h"
+#include "i18n.h"
+#include "misc.h"
 
 static const gchar *audacious_brief =
     N_("<big><b>Audacious %s</b></big>\n"
@@ -108,6 +105,7 @@ static const gchar *credit_text[] = {
     "Henrik Johansson",
     "Rodrigo Martins de Matos Ventura",
     "Diego Pettenò",
+    "Mike Ryan",
     "Michael Schwendt",
     "Edward Sheldrake",
     "Kirill Shendrikowski",

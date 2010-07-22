@@ -17,17 +17,15 @@
  *  Audacious or using our public API to be a derived work.
  */
 
-#include "ui_fileopener.h"
+#include <gtk/gtk.h>
 
-#include <glib/gi18n.h>
-#include <string.h>
-#include <gdk/gdkkeysyms.h>
+#include <audacious/audconfig.h>
+#include <audacious/i18n.h>
+#include <audacious/drct.h>
 
-#include "audacious/plugin.h"
-#include "audacious/input.h"
-#include "audacious/main.h"
-#include "audacious/playback.h"
-#include "libaudcore/audstrings.h"
+#include "config.h"
+#include "libaudgui.h"
+#include "libaudgui-gtk.h"
 
 static void filebrowser_add_files (GtkFileChooser * browser, GSList * files,
  gboolean play)
@@ -41,9 +39,9 @@ static void filebrowser_add_files (GtkFileChooser * browser, GSList * files,
     list = g_list_reverse (list);
 
     if (play)
-        audacious_drct_pl_open_list (list);
+        aud_drct_pl_open_list (list);
     else
-        audacious_drct_pl_add (list);
+        aud_drct_pl_add_list (list, -1);
 
     g_list_free (list);
 
@@ -78,19 +76,6 @@ static void
 close_button_cb(GtkWidget *widget, gpointer data)
 {
     gtk_widget_destroy(GTK_WIDGET(data));
-}
-
-static gboolean
-filebrowser_on_keypress(GtkWidget * browser,
-                        GdkEventKey * event,
-                        gpointer data)
-{
-    if (event->keyval == GDK_Escape) {
-        gtk_widget_destroy(browser);
-        return TRUE;
-    }
-
-    return FALSE;
 }
 
 static void
@@ -177,11 +162,8 @@ run_filebrowser_gtk2style(gboolean play_button, gboolean show)
     g_signal_connect(window, "destroy",
                      G_CALLBACK(gtk_widget_destroyed), &window);
 
-    g_signal_connect(window, "key_press_event",
-                     G_CALLBACK(filebrowser_on_keypress),
-                     NULL);
-
-    gtk_widget_show_all(window);
+    audgui_destroy_on_escape (window);
+    gtk_widget_show_all (window);
 }
 
 /*

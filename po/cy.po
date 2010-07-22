@@ -13,297 +13,303 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Audacious 1.3.0\n"
-"Report-Msgid-Bugs-To: http://bugzilla.atheme.org/\n"
-"POT-Creation-Date: 2009-09-16 02:06+0300\n"
+"Report-Msgid-Bugs-To: http://jira.atheme.org/\n"
+"POT-Creation-Date: 2010-07-19 16:42-0500\n"
 "PO-Revision-Date: 2008-04-15 04:17-0600\n"
 "Last-Translator: William Pitcock <nenolod+i18n@sacredspiral.co.uk>\n"
 "Language-Team: Cynmaeg <nenolod+cy@sacredspiral.co.uk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 "X-Poedit-Language: Welsh\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: src/audacious/credits.c:34
+#: src/audacious/credits.c:31
 #, fuzzy, c-format
 msgid ""
 "<big><b>Audacious %s</b></big>\n"
 "An audio player for many platforms.\n"
-"Copyright (C) 2005-2009 Audacious Development Team"
+"Copyright (C) 2005-2010 Audacious Development Team"
 msgstr ""
 "<big><b>Audacious %s</b></big>\n"
 "Y amlgyfrwng chwarae am lot platfformau.\n"
 "\n"
 "Hawlfraint (C) 2005-2007 Audacious Development Team\n"
 
-#: src/audacious/credits.c:39
+#: src/audacious/credits.c:36
 #, fuzzy
 msgid "Core developers:"
 msgstr "Diolchiadau 0.1.x:"
 
-#: src/audacious/credits.c:53
+#: src/audacious/credits.c:50
 msgid "Graphics:"
 msgstr "Diolchiadau graphi:"
 
-#: src/audacious/credits.c:58
+#: src/audacious/credits.c:55
 msgid "Default skin:"
 msgstr "Croen rhagosodedig:"
 
-#: src/audacious/credits.c:64
+#: src/audacious/credits.c:61
 msgid "Plugin development:"
 msgstr "Diolchiadau ategynnau:"
 
-#: src/audacious/credits.c:85
+#: src/audacious/credits.c:84
 msgid "Patch authors:"
 msgstr "Diolchiadau patch:"
 
-#: src/audacious/credits.c:120
+#: src/audacious/credits.c:123
 #, fuzzy
 msgid "1.x developers:"
 msgstr "Diolchiadau 0.1.x:"
 
-#: src/audacious/credits.c:142
+#: src/audacious/credits.c:145
 msgid "BMP Developers:"
 msgstr "Diolchiadau BMP:"
 
-#: src/audacious/credits.c:174
+#: src/audacious/credits.c:177
+#, fuzzy
+msgid "Belarusian:"
+msgstr "Bwlgareg:"
+
+#: src/audacious/credits.c:180
 msgid "Basque:"
 msgstr ""
 
-#: src/audacious/credits.c:177
+#: src/audacious/credits.c:183
 msgid "Brazilian Portuguese:"
 msgstr "Portiwgaleg Brasilaidd:"
 
-#: src/audacious/credits.c:181
+#: src/audacious/credits.c:187
 msgid "Breton:"
 msgstr "Bretwig:"
 
-#: src/audacious/credits.c:184
+#: src/audacious/credits.c:190
 msgid "Bulgarian:"
 msgstr "Bwlgareg:"
 
-#: src/audacious/credits.c:187
+#: src/audacious/credits.c:193
 msgid "Catalan:"
 msgstr "Catalaneg:"
 
-#: src/audacious/credits.c:190
+#: src/audacious/credits.c:196
 msgid "Croatian:"
 msgstr "Croataidd:"
 
-#: src/audacious/credits.c:193
+#: src/audacious/credits.c:199
 msgid "Czech:"
 msgstr "Tsiec:"
 
-#: src/audacious/credits.c:196
+#: src/audacious/credits.c:202
 msgid "Dutch:"
 msgstr "Isalmaeneg:"
 
-#: src/audacious/credits.c:200
+#: src/audacious/credits.c:206
 msgid "Estonian:"
 msgstr "Estonieg:"
 
-#: src/audacious/credits.c:203
+#: src/audacious/credits.c:209
 msgid "Finnish:"
 msgstr "Ffineg:"
 
-#: src/audacious/credits.c:207
+#: src/audacious/credits.c:213
 msgid "French:"
 msgstr "Ffrangeg:"
 
-#: src/audacious/credits.c:212
+#: src/audacious/credits.c:218
 msgid "German:"
 msgstr "Almaeneg:"
 
-#: src/audacious/credits.c:217
+#: src/audacious/credits.c:225
 msgid "Georgian:"
 msgstr "Georgieg:"
 
-#: src/audacious/credits.c:220
+#: src/audacious/credits.c:228
 msgid "Greek:"
 msgstr "Groeg:"
 
-#: src/audacious/credits.c:225
+#: src/audacious/credits.c:233
 msgid "Hindi:"
 msgstr "Hyndig:"
 
-#: src/audacious/credits.c:228
+#: src/audacious/credits.c:236
 msgid "Hungarian:"
 msgstr "Hwngareg:"
 
-#: src/audacious/credits.c:231
+#: src/audacious/credits.c:239
 msgid "Italian:"
 msgstr "Eidaleg:"
 
-#: src/audacious/credits.c:235
+#: src/audacious/credits.c:243
 msgid "Japanese:"
 msgstr "Siapanëeg:"
 
-#: src/audacious/credits.c:238
+#: src/audacious/credits.c:246
 msgid "Korean:"
 msgstr "Corëeg:"
 
-#: src/audacious/credits.c:241
+#: src/audacious/credits.c:249
 msgid "Lithuanian:"
 msgstr "Lithueneg:"
 
-#: src/audacious/credits.c:244
+#: src/audacious/credits.c:253
 msgid "Macedonian:"
 msgstr "Macedonieg:"
 
-#: src/audacious/credits.c:247
+#: src/audacious/credits.c:256
 msgid "Polish:"
 msgstr "Pwyleg:"
 
-#: src/audacious/credits.c:250
+#: src/audacious/credits.c:259
+#, fuzzy
+msgid "Portugese:"
+msgstr "Portiwgaleg Brasilaidd:"
+
+#: src/audacious/credits.c:262
 msgid "Romanian:"
 msgstr "Romaneg:"
 
-#: src/audacious/credits.c:254
+#: src/audacious/credits.c:266
 msgid "Russian:"
 msgstr "Rwsieg:"
 
-#: src/audacious/credits.c:257
+#: src/audacious/credits.c:270
 msgid "Serbian (Latin):"
 msgstr "Serbeg (Lladin):"
 
-#: src/audacious/credits.c:260
+#: src/audacious/credits.c:273
 msgid "Serbian (Cyrillic):"
 msgstr "Serbeg (Cwyrileg):"
 
-#: src/audacious/credits.c:263
+#: src/audacious/credits.c:276
 msgid "Simplified Chinese:"
 msgstr "Tsieineaidd Seml:"
 
-#: src/audacious/credits.c:266
+#: src/audacious/credits.c:279
 msgid "Slovak:"
 msgstr "Slofaceg:"
 
-#: src/audacious/credits.c:269
+#: src/audacious/credits.c:282
 msgid "Spanish:"
 msgstr "Spaeneg:"
 
-#: src/audacious/credits.c:272
+#: src/audacious/credits.c:285
 msgid "Swedish:"
 msgstr "Swedeg:"
 
-#: src/audacious/credits.c:275
+#: src/audacious/credits.c:288
 msgid "Traditional Chinese:"
 msgstr "Tsieineaidd Traddodiadol:"
 
-#: src/audacious/credits.c:280
+#: src/audacious/credits.c:293
 msgid "Turkish:"
 msgstr "Twrceg:"
 
-#: src/audacious/credits.c:284
+#: src/audacious/credits.c:297
 msgid "Ukrainian:"
 msgstr "Wcraneg:"
 
-#: src/audacious/credits.c:287
+#: src/audacious/credits.c:300
 msgid "Welsh:"
 msgstr "Cymraeg:"
 
-#: src/audacious/equalizer_preset.c:174
+#: src/audacious/drct.c:317
+#, fuzzy
+msgid "Temporary Playlist"
+msgstr "Llwytho'r rhestr chwarae"
+
+#: src/audacious/equalizer_preset.c:187
 #, c-format
 msgid "Error importing Winamp EQF file '%s'"
 msgstr ""
 
-#: src/audacious/input.c:439
+#: src/audacious/folder-add.c:55
+msgid "Searching ..."
+msgstr ""
+
+#: src/audacious/folder-add.c:79
 #, c-format
-msgid "audacious: %s"
-msgstr "audacious: %s"
-
-#: src/audacious/input.c:455
-msgid "Filename:"
-msgstr "Enw ffeil:"
-
-#: src/audacious/input.c:474
-msgid "No input plugin recognized this file"
-msgstr "Ategyn mewnbwn heb adnabod y ffeil"
-
-#: src/audacious/input.c:476
-#, c-format
-msgid "Input plugin: %s"
-msgstr "Ategyn mewnbwn: %s"
+msgid "%d file found"
+msgid_plural "%d files found"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/audacious/logger.c:125
 #, c-format
 msgid "Unable to create log file (%s)!\n"
 msgstr "Methu creu'r ffeil gofnod (%s)!\n"
 
-#: src/audacious/main.c:72
+#: src/audacious/main.c:69
 msgid "Audacious"
 msgstr "Audacious"
 
-#: src/audacious/main.c:163
+#: src/audacious/main.c:153
 msgid "Skip backwards in playlist"
 msgstr "Sgipio nôl yn y rhestr chwarae"
 
-#: src/audacious/main.c:164
+#: src/audacious/main.c:154
 msgid "Start playing current playlist"
 msgstr "Cychwyn chwarae'r rhestr chwarae"
 
-#: src/audacious/main.c:165
+#: src/audacious/main.c:155
 msgid "Pause current song"
 msgstr "Oedi'r gân"
 
-#: src/audacious/main.c:166
+#: src/audacious/main.c:156
 msgid "Stop current song"
 msgstr "Atal y gân"
 
-#: src/audacious/main.c:167
+#: src/audacious/main.c:157
 msgid "Pause if playing, play otherwise"
 msgstr "Oedi os yn chwarae, chwarae fel arall"
 
-#: src/audacious/main.c:168
+#: src/audacious/main.c:158
 msgid "Skip forward in playlist"
 msgstr "Sgipio mlaen yn y rhestr chwarae"
 
-#: src/audacious/main.c:169
+#: src/audacious/main.c:159
 msgid "Display Jump to File dialog"
 msgstr "Dangos Neidio i Ffeil"
 
-#: src/audacious/main.c:170
-msgid "Don't clear the playlist"
-msgstr "Peidio clirio'r rhestr chwarae"
+#: src/audacious/main.c:160
+#, fuzzy
+msgid "Add files to the playlist"
+msgstr "Adio y ffeil at ar rhestr chwarae."
 
-#: src/audacious/main.c:171
+#: src/audacious/main.c:161
 msgid "Add new files to a temporary playlist"
 msgstr "Adio y ffeil at ar rhestr chwarae ni parahol"
 
-#: src/audacious/main.c:172
+#: src/audacious/main.c:162
 msgid "Display the main window"
 msgstr "Dangos y prif ffenestr."
 
-#: src/audacious/main.c:173
+#: src/audacious/main.c:163
 msgid "Display all open Audacious windows"
 msgstr "Dangos pob agor Audacious ffenestrau"
 
-#: src/audacious/main.c:174
+#: src/audacious/main.c:164
 msgid "Print all errors and warnings to stdout"
 msgstr "Argaffu gwallau a rhybudd i stdout"
 
-#: src/audacious/main.c:175
+#: src/audacious/main.c:165
 #, fuzzy
 msgid "Show version"
 msgstr "Dangos Y Brif Ffenestr"
 
-#: src/audacious/main.c:176
-msgid "Interface to use (use -i list to view available interfaces)"
-msgstr ""
-
-#: src/audacious/main.c:178
+#: src/audacious/main.c:167
 msgid "Used in macpacking"
 msgstr ""
 
-#: src/audacious/main.c:180
+#: src/audacious/main.c:169
 msgid "FILE..."
 msgstr "FFEIL..."
 
-#: src/audacious/main.c:197
+#: src/audacious/main.c:186
 msgid "- play multimedia files"
 msgstr "- chwarae ffeil amlgyfrwng"
 
-#: src/audacious/main.c:208
+#: src/audacious/main.c:197
 #, c-format
 msgid ""
 "%s: %s\n"
@@ -312,800 +318,49 @@ msgstr ""
 "%s: %s\n"
 "Ceisio `%s --help' am ychwaneg gwybodaeth.\n"
 
-#: src/audacious/main.c:458
+#: src/audacious/main.c:434
 msgid "Sorry, threads aren't supported on your platform.\n"
 msgstr ""
 
-#: src/audacious/main.c:496
+#: src/audacious/main.c:473
 #, c-format
 msgid "%s: Unable to open display, exiting.\n"
 msgstr "%s: Methu agor dangosydd, yn gadael.\n"
 
-#: src/audacious/main.c:530
-#, fuzzy
-msgid ""
-"Available interfaces:\n"
-"\n"
-msgstr "_Rhagosodiadau ar gael:"
+#: src/audacious/playback.c:476
+#, c-format
+msgid "No decoder found for %s."
+msgstr ""
 
-#: src/audacious/playback.c:266
-msgid ""
-"<b><big>No output plugin selected.</big></b>\n"
-"You have not selected an output plugin."
-msgstr "<b><big>Allbwn o ategyn heb ei ddewis</big></b>"
+#: src/audacious/playback.c:600
+msgid "Buffering ..."
+msgstr ""
 
-#: src/audacious/playlist-new.c:227
+#: src/audacious/playlist-new.c:286
 #, fuzzy
 msgid "Untitled Playlist"
 msgstr "Rhestr Chwarae Newydd"
 
-#: src/audacious/pluginenum.c:780
+#: src/audacious/pluginenum.c:371
 msgid "Module loading not supported! Plugins will not be loaded.\n"
 msgstr ""
 
-#: src/audacious/ui_fileinfo.c:96
-#, fuzzy
-msgid "Blues"
-msgstr "Glas"
-
-#: src/audacious/ui_fileinfo.c:96
-msgid "Classic Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:96
-msgid "Country"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:96
-#, fuzzy
-msgid "Dance"
-msgstr "Dyddiad"
-
-#: src/audacious/ui_fileinfo.c:97
-msgid "Disco"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:97
-msgid "Funk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:97
-msgid "Grunge"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:97
-msgid "Hip-Hop"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:98
-msgid "Jazz"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:98
-msgid "Metal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:98
-msgid "New Age"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:98
-#, fuzzy
-msgid "Oldies"
-msgstr "rhesi"
-
-#: src/audacious/ui_fileinfo.c:99
-msgid "Other"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:99
-msgid "Pop"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:99
-msgid "R&B"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:99
-msgid "Rap"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:99
-#, fuzzy
-msgid "Reggae"
-msgstr "_Cyfnewid"
-
-#: src/audacious/ui_fileinfo.c:100
-msgid "Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:100
-msgid "Techno"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:100
-msgid "Industrial"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:100
-msgid "Alternative"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:101
-msgid "Ska"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:101
-msgid "Death Metal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:101
-#, fuzzy
-msgid "Pranks"
-msgstr "Brigau"
-
-#: src/audacious/ui_fileinfo.c:101
-msgid "Soundtrack"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:102
-msgid "Euro-Techno"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:102
-msgid "Ambient"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:102
-msgid "Trip-Hop"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:102
-msgid "Vocal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:103
-msgid "Jazz+Funk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:103
-#, fuzzy
-msgid "Fusion"
-msgstr "Rwsieg:"
-
-#: src/audacious/ui_fileinfo.c:103
-#, fuzzy
-msgid "Trance"
-msgstr "Tremiant"
-
-#: src/audacious/ui_fileinfo.c:103
-msgid "Classical"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:104
-msgid "Instrumental"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:104
-msgid "Acid"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:104
-#, fuzzy
-msgid "House"
-msgstr "Llygod"
-
-#: src/audacious/ui_fileinfo.c:104
-msgid "Game"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:105
-msgid "Sound Clip"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:105
-msgid "Gospel"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:105
-#, fuzzy
-msgid "Noise"
-msgstr "Llygod"
-
-#: src/audacious/ui_fileinfo.c:105
-msgid "AlternRock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:106
-#, fuzzy
-msgid "Bass"
-msgstr "Barau"
-
-#: src/audacious/ui_fileinfo.c:106
-msgid "Soul"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:106
-msgid "Punk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:106
-#, fuzzy
-msgid "Space"
-msgstr "Cadw"
-
-#: src/audacious/ui_fileinfo.c:107
-msgid "Meditative"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:107
-msgid "Instrumental Pop"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:108
-msgid "Instrumental Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:108
-msgid "Ethnic"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:108
-msgid "Gothic"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:109
-msgid "Darkwave"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:109
-msgid "Techno-Industrial"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:109
-msgid "Electronic"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:110
-msgid "Pop-Folk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:110
-msgid "Eurodance"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:110
-msgid "Dream"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:111
-msgid "Southern Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:111
-#, fuzzy
-msgid "Comedy"
-msgstr "Sylwad"
-
-#: src/audacious/ui_fileinfo.c:111
-#, fuzzy
-msgid "Cult"
-msgstr "Cynefod:"
-
-#: src/audacious/ui_fileinfo.c:112
-msgid "Gangsta Rap"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:112
-msgid "Top 40"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:112
-msgid "Christian Rap"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:113
-msgid "Pop/Funk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:113
-msgid "Jungle"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:113
-msgid "Native American"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:114
-msgid "Cabaret"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:114
-msgid "New Wave"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:114
-msgid "Psychedelic"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:114
-#, fuzzy
-msgid "Rave"
-msgstr "Cadw"
-
-#: src/audacious/ui_fileinfo.c:115
-#, fuzzy
-msgid "Showtunes"
-msgstr "Arafaf"
-
-#: src/audacious/ui_fileinfo.c:115
-#, fuzzy
-msgid "Trailer"
-msgstr "Teitl"
-
-#: src/audacious/ui_fileinfo.c:115
-msgid "Lo-Fi"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:115
-msgid "Tribal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:116
-msgid "Acid Punk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:116
-msgid "Acid Jazz"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:116
-#, fuzzy
-msgid "Polka"
-msgstr "Chwarae"
-
-#: src/audacious/ui_fileinfo.c:116
-#, fuzzy
-msgid "Retro"
-msgstr "Amhleidiol"
-
-#: src/audacious/ui_fileinfo.c:117
-msgid "Musical"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:117
-msgid "Rock & Roll"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:117
-msgid "Hard Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:117
-msgid "Folk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:118
-msgid "Folk/Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:118
-msgid "National Folk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:118
-msgid "Swing"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:119
-msgid "Fast-Fusion"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:119
-msgid "Bebob"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:119
-#, fuzzy
-msgid "Latin"
-msgstr "Eidaleg:"
-
-#: src/audacious/ui_fileinfo.c:119
-msgid "Revival"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:120
-msgid "Celtic"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:120
-#, fuzzy
-msgid "Bluegrass"
-msgstr "Glas"
-
-#: src/audacious/ui_fileinfo.c:120
-msgid "Avantgarde"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:121
-msgid "Gothic Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:121
-msgid "Progressive Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:122
-msgid "Psychedelic Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:122
-msgid "Symphonic Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:122
-#, fuzzy
-msgid "Slow Rock"
-msgstr "Araf"
-
-#: src/audacious/ui_fileinfo.c:123
-msgid "Big Band"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:123
-msgid "Chorus"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:123
-msgid "Easy Listening"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:124
-msgid "Acoustic"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:124
-msgid "Humour"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:124
-msgid "Speech"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:124
-msgid "Chanson"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:125
-msgid "Opera"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:125
-msgid "Chamber Music"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:125
-msgid "Sonata"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:125
-msgid "Symphony"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:126
-msgid "Booty Bass"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:126
-#, fuzzy
-msgid "Primus"
-msgstr "Blaenorol"
-
-#: src/audacious/ui_fileinfo.c:126
-msgid "Porn Groove"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:127
-#, fuzzy
-msgid "Satire"
-msgstr "Tân"
-
-#: src/audacious/ui_fileinfo.c:127
-#, fuzzy
-msgid "Slow Jam"
-msgstr "Araf"
-
-#: src/audacious/ui_fileinfo.c:127
-msgid "Club"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:127
-msgid "Tango"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:128
-msgid "Samba"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:128
-msgid "Folklore"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:128
-msgid "Ballad"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:128
-msgid "Power Ballad"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:129
-msgid "Rhythmic Soul"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:129
-msgid "Freestyle"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:129
-#, fuzzy
-msgid "Duet"
-msgstr "Isalmaeneg:"
-
-#: src/audacious/ui_fileinfo.c:130
-msgid "Punk Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:130
-msgid "Drum Solo"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:130
-msgid "A Cappella"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:131
-msgid "Euro-House"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:131
-msgid "Dance Hall"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:131
-msgid "Goa"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:132
-msgid "Drum & Bass"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:132
-#, fuzzy
-msgid "Club-House"
-msgstr "Llygod"
-
-#: src/audacious/ui_fileinfo.c:132
-msgid "Hardcore"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:133
-#, fuzzy
-msgid "Terror"
-msgstr "Amhleidiol"
-
-#: src/audacious/ui_fileinfo.c:133
-#, fuzzy
-msgid "Indie"
-msgstr "Cynnwys:"
-
-#: src/audacious/ui_fileinfo.c:133
-msgid "BritPop"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:133
-msgid "Negerpunk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:134
-msgid "Polsk Punk"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:134
-#, fuzzy
-msgid "Beat"
-msgstr "Ailadrodd"
-
-#: src/audacious/ui_fileinfo.c:134
-msgid "Christian Gangsta Rap"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:135
-msgid "Heavy Metal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:135
-msgid "Black Metal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:135
-msgid "Crossover"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:136
-msgid "Contemporary Christian"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:136
-msgid "Christian Rock"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:137
-msgid "Merengue"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:137
-msgid "Salsa"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:137
-msgid "Thrash Metal"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:138
-msgid "Anime"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:138
-msgid "JPop"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:138
-#, fuzzy
-msgid "Synthpop"
-msgstr "Atal"
-
-#: src/audacious/ui_fileinfo.c:216 src/audacious/ui_fileinfo.c:550
-#: src/audacious/ui_fileinfo.c:553 src/audacious/ui_fileinfo.c:556
-msgid "<span size=\"small\">n/a</span>"
-msgstr "<span size=\"small\">n/a</span>"
-
-#: src/audacious/ui_fileinfo.c:330
-msgid "Metadata updated successfully"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:336
-msgid "Metadata updating failed"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:488
-msgid "Track Information"
-msgstr "Cynnydd trac:"
-
-#: src/audacious/ui_fileinfo.c:520
-msgid "<span size=\"small\">General</span>"
-msgstr "<span size=\"small\">Cyffredin</span>"
-
-#: src/audacious/ui_fileinfo.c:540
-msgid "<span size=\"small\">Format:</span>"
-msgstr "<span size=\"small\">Rhywogaeth:</span>"
-
-#: src/audacious/ui_fileinfo.c:543
-msgid "<span size=\"small\">Quality:</span>"
-msgstr "<span size=\"small\">Ansawdd:</span>"
-
-#: src/audacious/ui_fileinfo.c:546
-msgid "<span size=\"small\">Bitrate:</span>"
-msgstr "<span size=\"small\">Cyfradd bit:</span>"
-
-#: src/audacious/ui_fileinfo.c:579
-msgid "<span size=\"small\">Title</span>"
-msgstr "<span size=\"small\">Tietl</span>"
-
-#: src/audacious/ui_fileinfo.c:591
-msgid "<span size=\"small\">Artist</span>"
-msgstr "<span size=\"small\">Cyflawnwr</span>"
-
-#: src/audacious/ui_fileinfo.c:603
-msgid "<span size=\"small\">Album</span>"
-msgstr "<span size=\"small\">Crynoadau</span>"
-
-#: src/audacious/ui_fileinfo.c:615
-msgid "<span size=\"small\">Comment</span>"
-msgstr "<span size=\"small\">Sylw</span>"
-
-#: src/audacious/ui_fileinfo.c:627
-msgid "<span size=\"small\">Genre</span>"
-msgstr "<span size=\"small\">Ffurf lenyddol</span>"
-
-#: src/audacious/ui_fileinfo.c:658
-msgid "<span size=\"small\">Year</span>"
-msgstr "<span size=\"small\">Blwyddyn</span>"
-
-#: src/audacious/ui_fileinfo.c:671
-msgid "<span size=\"small\">Track Number</span>"
-msgstr "<span size=\"small\">Rhif y Trac</span>"
-
-#: src/audacious/ui_fileinfo.c:684
-msgid "<span size=\"small\">Location</span>"
-msgstr "<span size=\"small\">Lleoliad</span>"
-
-#: src/audacious/ui_fileinfo.c:704
-msgid "<span size=\"small\">Raw Metadata</span>"
-msgstr "<span size=\"small\">Noeth Gwybodaeth</span>"
-
-#: src/audacious/ui_fileinfo.c:721
-msgid "Key"
-msgstr ""
-
-#: src/audacious/ui_fileinfo.c:734
-msgid "Value"
-msgstr "Tâl"
-
-#: src/audacious/ui_fileinfo.c:824
-#, c-format
-msgid "%d kb/s"
-msgstr ""
-
-#: src/audacious/ui_fileinfopopup.c:254 src/audacious/ui_fileinfopopup.c:366
-#: src/audacious/ui_preferences.c:140
-msgid "Title"
-msgstr "Teitl"
-
-#: src/audacious/ui_fileinfopopup.c:257 src/audacious/ui_preferences.c:138
-msgid "Artist"
-msgstr "Cyflawnwr"
-
-#: src/audacious/ui_fileinfopopup.c:260 src/audacious/ui_preferences.c:139
-msgid "Album"
-msgstr "Albwm"
-
-#: src/audacious/ui_fileinfopopup.c:263 src/audacious/ui_preferences.c:142
-msgid "Genre"
-msgstr "Math"
-
-#: src/audacious/ui_fileinfopopup.c:266 src/audacious/ui_preferences.c:146
-msgid "Year"
-msgstr "Blwyddyn"
-
-#: src/audacious/ui_fileinfopopup.c:269
-msgid "Track Number"
-msgstr "Rhif y Trac"
-
-#: src/audacious/ui_fileinfopopup.c:273
-msgid "Track Length"
-msgstr "Hyd trac"
-
-#: src/audacious/ui_fileinfopopup.c:375 src/audacious/ui_preferences.c:143
-#: src/audacious/ui_preferences.c:492
-msgid "Filename"
-msgstr "Enw ffeil"
-
-#: src/audacious/ui_headless.c:132
-#, fuzzy, c-format
-msgid "Available Plugin Preferences:\n"
-msgstr "_Rhagosodiadau ar gael:"
-
-#: src/audacious/ui_headless.c:150
-msgid "Headless Interface"
-msgstr ""
-
-#: src/audacious/ui_misc.c:48
+#: src/audacious/ui_misc.c:50
 #, fuzzy
 msgid "Audacious - Unsupported Version Warning"
 msgstr "Audacious - rhybudd gwelededd"
 
-#: src/audacious/ui_misc.c:55
+#: src/audacious/ui_misc.c:57
 msgid "<big><b>Audacious2 is not ready yet!</b></big>"
 msgstr ""
 
-#: src/audacious/ui_misc.c:61
+#: src/audacious/ui_misc.c:63
 msgid ""
 "<b>Please don't file bugs at this point unless they represent major problems."
 "</b>"
 msgstr ""
 
-#: src/audacious/ui_misc.c:64
+#: src/audacious/ui_misc.c:66
 msgid ""
 "This is an <i>alpha</i> build of Audacious2. It is still fairly incomplete "
 "and unpolished.\n"
@@ -1120,11 +375,11 @@ msgid ""
 "and to please refrain from doing so. Thanks in advance!"
 msgstr ""
 
-#: src/audacious/ui_misc.c:74
+#: src/audacious/ui_misc.c:76
 msgid "<b>Blogging about bugs in it is also not helpful.</b>"
 msgstr ""
 
-#: src/audacious/ui_misc.c:77
+#: src/audacious/ui_misc.c:79
 msgid ""
 "Likewise, we're developers. We don't read blogs on a regular basis. If there "
 "is a major bug,\n"
@@ -1137,298 +392,245 @@ msgid ""
 "not know about otherwise."
 msgstr ""
 
-#: src/audacious/ui_preferences.c:127
+#: src/audacious/ui_preferences.c:124
 msgid "Audio"
 msgstr "Seniau"
 
-#: src/audacious/ui_preferences.c:128
+#: src/audacious/ui_preferences.c:125
 msgid "Replay Gain"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:129
-msgid "Connectivity"
-msgstr "Cysylltu"
+#: src/audacious/ui_preferences.c:126
+msgid "Network"
+msgstr ""
 
-#: src/audacious/ui_preferences.c:130
+#: src/audacious/ui_preferences.c:127
 msgid "Playback"
 msgstr "Chwarae Nôl"
 
-#: src/audacious/ui_preferences.c:131
+#: src/audacious/ui_preferences.c:128 src/libaudgui/ui_playlist_manager.c:198
 msgid "Playlist"
 msgstr "Chwarae"
 
-#: src/audacious/ui_preferences.c:132
+#: src/audacious/ui_preferences.c:129
 msgid "Plugins"
 msgstr "Ategynnau"
 
-#: src/audacious/ui_preferences.c:141
+#: src/audacious/ui_preferences.c:135 src/libaudgui/infopopup.c:231
+msgid "Artist"
+msgstr "Cyflawnwr"
+
+#: src/audacious/ui_preferences.c:136 src/libaudgui/infopopup.c:233
+msgid "Album"
+msgstr "Albwm"
+
+#: src/audacious/ui_preferences.c:137 src/libaudgui/infopopup.c:229
+msgid "Title"
+msgstr "Teitl"
+
+#: src/audacious/ui_preferences.c:138
 msgid "Tracknumber"
 msgstr "Rhif y Trac:"
 
-#: src/audacious/ui_preferences.c:144
+#: src/audacious/ui_preferences.c:139 src/libaudgui/infopopup.c:235
+msgid "Genre"
+msgstr "Math"
+
+#: src/audacious/ui_preferences.c:140 src/audacious/ui_preferences.c:438
+msgid "Filename"
+msgstr "Enw ffeil"
+
+#: src/audacious/ui_preferences.c:141
 msgid "Filepath"
 msgstr "Llwybr ffeil"
 
-#: src/audacious/ui_preferences.c:145
+#: src/audacious/ui_preferences.c:142
 msgid "Date"
 msgstr "Dyddiad"
 
-#: src/audacious/ui_preferences.c:147
+#: src/audacious/ui_preferences.c:143 src/libaudgui/infopopup.c:237
+msgid "Year"
+msgstr "Blwyddyn"
+
+#: src/audacious/ui_preferences.c:144
 msgid "Comment"
 msgstr "Sylwad"
 
-#: src/audacious/ui_preferences.c:148
+#: src/audacious/ui_preferences.c:145
 msgid "Codec"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:149
+#: src/audacious/ui_preferences.c:146
 msgid "Quality"
 msgstr "Ansawdd"
 
-#: src/audacious/ui_preferences.c:154
+#: src/audacious/ui_preferences.c:151
 msgid "None"
 msgstr "Dim"
 
-#: src/audacious/ui_preferences.c:155
+#: src/audacious/ui_preferences.c:152
 msgid "Japanese"
 msgstr "Siapanëeg"
 
-#: src/audacious/ui_preferences.c:156
+#: src/audacious/ui_preferences.c:153
 #, fuzzy
 msgid "Taiwanese"
 msgstr "Siapanëeg:"
 
-#: src/audacious/ui_preferences.c:157
+#: src/audacious/ui_preferences.c:154
 #, fuzzy
 msgid "Chinese"
 msgstr "Llinellau"
 
-#: src/audacious/ui_preferences.c:158
+#: src/audacious/ui_preferences.c:155
 msgid "Korean"
 msgstr "Corëeg"
 
-#: src/audacious/ui_preferences.c:159
+#: src/audacious/ui_preferences.c:156
 msgid "Russian"
 msgstr "Rwsieg"
 
-#: src/audacious/ui_preferences.c:160
+#: src/audacious/ui_preferences.c:157
 msgid "Greek"
 msgstr "Groeg"
 
-#: src/audacious/ui_preferences.c:161
+#: src/audacious/ui_preferences.c:158
 msgid "Hebrew"
 msgstr "Hebraeg"
 
-#: src/audacious/ui_preferences.c:162
+#: src/audacious/ui_preferences.c:159
 msgid "Turkish"
 msgstr "Twrceg"
 
-#: src/audacious/ui_preferences.c:163
+#: src/audacious/ui_preferences.c:160
 msgid "Arabic"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:164
+#: src/audacious/ui_preferences.c:161
+#, fuzzy
+msgid "Polish"
+msgstr "Pwyleg:"
+
+#: src/audacious/ui_preferences.c:162
+msgid "Baltic"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:163
 msgid "Universal"
 msgstr "Cyfanfydol"
 
-#: src/audacious/ui_preferences.c:176
-msgid "Best Sinc Interpolation"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:177
-msgid "Medium Sinc Interpolation"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:178
-msgid "Fastest Sinc Interpolation"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:179
-msgid "ZOH Interpolation"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:180
-msgid "Linear Interpolation"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:195 src/audacious/ui_preferences.c:198
-msgid "Sampling Rate [Hz]:"
-msgstr "Graddfa samplo [Hz]:"
-
-#: src/audacious/ui_preferences.c:196 src/audacious/ui_preferences.c:199
-msgid "Interpolation Engine:"
-msgstr "Interpolation Trefnau:"
-
-#: src/audacious/ui_preferences.c:201
-msgid ""
-"<span size=\"small\">All streams will be converted to this sampling rate.\n"
-"This should be the max supported sampling rate of\n"
-"the sound card or output plugin.</span>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:206
-msgid "<b>Format Detection</b>"
-msgstr "<b>Awtoganfod trefniad</b>"
-
-#: src/audacious/ui_preferences.c:207
-msgid "Detect file formats by extension."
-msgstr "Awtoganfawd ffiel trefniad at ymestyniad."
-
-#: src/audacious/ui_preferences.c:208
-msgid ""
-"When checked, Audacious will detect file formats based by extension. Only "
-"files with extensions of supported formats will be loaded."
-msgstr ""
-"Os dewisedig, Audacious ewyllys awtoganfod ffiel trefniad at ymestyniad."
-
-#: src/audacious/ui_preferences.c:209
+#: src/audacious/ui_preferences.c:183
 msgid "<b>Bit Depth</b>"
 msgstr "<b>Bit Dyfnder</b>"
 
-#: src/audacious/ui_preferences.c:210
+#: src/audacious/ui_preferences.c:184
 msgid "Output bit depth:"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:211
+#: src/audacious/ui_preferences.c:185
 msgid ""
 "All streams will be converted to this bit depth.\n"
 "This should be the max supported bit depth of\n"
 "the sound card or output plugin."
 msgstr ""
 
-#: src/audacious/ui_preferences.c:214
-msgid "<b>Sampling Rate Converter</b>"
-msgstr "<b>Dychweliad Graddfa Samplo</b>"
-
-#: src/audacious/ui_preferences.c:216 src/audacious/ui_preferences.c:218
-msgid "Enable Sampling Rate Converter"
-msgstr "Galluogi Dychweliad Graddfa Samplo"
-
-#: src/audacious/ui_preferences.c:221
+#: src/audacious/ui_preferences.c:188
 msgid "<b>Volume Control</b>"
 msgstr "<b>Rheolydd Cyfrol</b>"
 
-#: src/audacious/ui_preferences.c:222
+#: src/audacious/ui_preferences.c:189
 msgid "Use software volume control"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:224
+#: src/audacious/ui_preferences.c:191
 msgid ""
 "Use software volume control. This may be useful for situations where your "
 "audio system does not support controlling the playback volume."
 msgstr ""
 
-#: src/audacious/ui_preferences.c:225
-msgid "<b>Advanced</b>"
-msgstr "<b>Datblygedig</b>"
-
-#: src/audacious/ui_preferences.c:226
-msgid "Bypass all of signal processing if possible"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:227
-msgid ""
-"Try to pass input plugin's output directly to output plugin, if the latter "
-"supports format produced by input plugin. If it's true, all signal "
-"processing will be disabled (i.e. DSP plugins, equalizer, resampling, Replay "
-"Gain and software volume control)."
-msgstr ""
-
-#: src/audacious/ui_preferences.c:230
-msgid "Use fast floating-point conversion (16-bit output only)"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:235
+#: src/audacious/ui_preferences.c:195
 msgid "Preamp:"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:235 src/audacious/ui_preferences.c:236
+#: src/audacious/ui_preferences.c:195 src/audacious/ui_preferences.c:196
 msgid "dB"
 msgstr "dB"
 
-#: src/audacious/ui_preferences.c:236
+#: src/audacious/ui_preferences.c:196
 msgid "Default gain:"
 msgstr "Cynnydd rhagosodedig:"
 
-#: src/audacious/ui_preferences.c:236
+#: src/audacious/ui_preferences.c:196
 msgid "This gain will be used if file doesn't contain Replay Gain metadata."
 msgstr ""
 
-#: src/audacious/ui_preferences.c:237
+#: src/audacious/ui_preferences.c:197
 msgid ""
 "<span size=\"small\">Please remember that the most efficient way to prevent "
 "signal clipping is not to use positive values above.</span>"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:241
+#: src/audacious/ui_preferences.c:201
 msgid "<b>Replay Gain configuration</b>"
 msgstr "<b>Ffurfweddiad Cyfraint Cynnydd</b>"
 
-#: src/audacious/ui_preferences.c:242
+#: src/audacious/ui_preferences.c:202
 msgid "Enable Replay Gain"
 msgstr "Galluogi Cyfraint Cynnydd"
 
-#: src/audacious/ui_preferences.c:243
+#: src/audacious/ui_preferences.c:203
 msgid "<b>Replay Gain mode</b>"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:244
+#: src/audacious/ui_preferences.c:204
 msgid "Track gain/peak"
 msgstr "Trac cynnydd/ban"
 
-#: src/audacious/ui_preferences.c:245
+#: src/audacious/ui_preferences.c:205
 msgid "Album gain/peak"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:246 src/audacious/ui_preferences.c:1342
+#: src/audacious/ui_preferences.c:206 src/audacious/ui_preferences.c:1289
 msgid "<b>Miscellaneous</b>"
 msgstr "<b>Amrywiol</b>"
 
-#: src/audacious/ui_preferences.c:247
+#: src/audacious/ui_preferences.c:207
 msgid "Enable peak info clipping prevention"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:248
+#: src/audacious/ui_preferences.c:208
 msgid "Use peak value from Replay Gain info for clipping prevention"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:249
-msgid "Dynamically adjust scale factor to prevent clipping"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:250
-msgid "Decrease scale factor (gain) if clipping nevertheless occurred"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:255
+#: src/audacious/ui_preferences.c:213
 msgid "Proxy hostname:"
 msgstr "Gwesteiwr ddirprwy:"
 
-#: src/audacious/ui_preferences.c:256
+#: src/audacious/ui_preferences.c:214
 msgid "Proxy port:"
 msgstr "Porth dirprwy:"
 
-#: src/audacious/ui_preferences.c:260
+#: src/audacious/ui_preferences.c:218
 msgid "Proxy username:"
 msgstr "Dirprwy enw defnyddiwr:"
 
-#: src/audacious/ui_preferences.c:261
+#: src/audacious/ui_preferences.c:219
 msgid "Proxy password:"
 msgstr "Cyfrinair dirprwy:"
 
-#: src/audacious/ui_preferences.c:265
+#: src/audacious/ui_preferences.c:223
 msgid "<b>Proxy Configuration</b>"
 msgstr "<b>Ffurfweddiad Dirprwy</b>"
 
-#: src/audacious/ui_preferences.c:266
+#: src/audacious/ui_preferences.c:224
 msgid "Enable proxy usage"
 msgstr "Galluogi defnyddiwch ddirprwy"
 
-#: src/audacious/ui_preferences.c:268
+#: src/audacious/ui_preferences.c:227
 msgid "Use authentication with proxy"
 msgstr "Defnyddiwch ddilysu am dirprwy"
 
-#: src/audacious/ui_preferences.c:270
+#: src/audacious/ui_preferences.c:230
 msgid ""
 "<span size=\"small\">Changing these settings will require a restart of "
 "Audacious.</span>"
@@ -1436,37 +638,41 @@ msgstr ""
 "<span size=\"small\">Cyfnewidau machludiad angen ailddechrau Audacious.</"
 "span>"
 
-#: src/audacious/ui_preferences.c:274
+#: src/audacious/ui_preferences.c:234
 msgid "<b>Playback</b>"
 msgstr "<b>Chwarae</b>"
 
-#: src/audacious/ui_preferences.c:275
+#: src/audacious/ui_preferences.c:235
 msgid "Continue playback on startup"
 msgstr "Parhau Chrawae am Cychwyn"
 
-#: src/audacious/ui_preferences.c:276
+#: src/audacious/ui_preferences.c:236
 msgid ""
 "When Audacious starts, automatically begin playing from the point where we "
 "stopped before."
 msgstr "Ar cychwyn am Audacious, awtomatig cychwyn chwarae."
 
-#: src/audacious/ui_preferences.c:277
+#: src/audacious/ui_preferences.c:237
 msgid "Don't advance in the playlist"
 msgstr "Peidio clirio'r rhestr chwarae"
 
-#: src/audacious/ui_preferences.c:278
+#: src/audacious/ui_preferences.c:238
 msgid "When finished playing a song, don't automatically advance to the next."
 msgstr "Pryd ar ben chwarae y cerddi, na awtomatig darparu."
 
-#: src/audacious/ui_preferences.c:282
+#: src/audacious/ui_preferences.c:239
+msgid "Clear current playlist when opening new files"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:244
 msgid "Auto character encoding detector for:"
 msgstr "Awtoganfod cymeriad am:"
 
-#: src/audacious/ui_preferences.c:290
+#: src/audacious/ui_preferences.c:252
 msgid "Fallback character encodings:"
 msgstr "Arallddewisiol cymeriad mathau:"
 
-#: src/audacious/ui_preferences.c:290
+#: src/audacious/ui_preferences.c:252
 msgid ""
 "List of character encodings used for fall back conversion of metadata. If "
 "automatic character encoding detector failed or has been disabled, encodings "
@@ -1476,194 +682,195 @@ msgstr ""
 "Rhestr am arallddewisiol cymeriad cynefino am mathau trawsnewidiau am "
 "metadata. Os awtoganfod cymeriad ffaelu ai ys anablu, yr rhestr ys defnyddio."
 
-#: src/audacious/ui_preferences.c:294
+#: src/audacious/ui_preferences.c:256
 msgid "<b>Metadata</b>"
 msgstr "<b>Gwybodaeth</b>"
 
-#: src/audacious/ui_preferences.c:462
+#: src/audacious/ui_preferences.c:408
 msgid "Enabled"
 msgstr " (galluog)"
 
-#: src/audacious/ui_preferences.c:478
+#: src/audacious/ui_preferences.c:424
 msgid "Description"
 msgstr "Disgrifiad:"
 
-#: src/audacious/ui_preferences.c:955
+#: src/audacious/ui_preferences.c:901
 msgid "Category"
 msgstr "Categori"
 
-#: src/audacious/ui_preferences.c:1261
+#: src/audacious/ui_preferences.c:1208
 msgid "Popup Information Settings"
 msgstr "Gwybodaeth Popup"
 
-#: src/audacious/ui_preferences.c:1270
+#: src/audacious/ui_preferences.c:1217
 msgid "<b>Cover image retrieve</b>"
 msgstr "<b>Albwm celf adennill</b>"
 
-#: src/audacious/ui_preferences.c:1275
+#: src/audacious/ui_preferences.c:1222
 msgid ""
 "While searching for the album's cover, Audacious looks for certain words in "
 "the filename. You can specify those words in the lists below, separated "
 "using commas."
 msgstr "Chi enwi y allweddair yng chwilio am tannod."
 
-#: src/audacious/ui_preferences.c:1292
+#: src/audacious/ui_preferences.c:1239
 msgid "Exclude:"
 msgstr "Allgau:"
 
-#: src/audacious/ui_preferences.c:1299
+#: src/audacious/ui_preferences.c:1246
 msgid "Include:"
 msgstr "Cynnwys:"
 
-#: src/audacious/ui_preferences.c:1316
+#: src/audacious/ui_preferences.c:1263
 msgid "Recursively search for cover"
 msgstr "Archwilio amrfyal gwastad am pictiwr"
 
-#: src/audacious/ui_preferences.c:1326
+#: src/audacious/ui_preferences.c:1273
 msgid "Search depth: "
 msgstr "Archwilio dyfndra:"
 
-#: src/audacious/ui_preferences.c:1339
+#: src/audacious/ui_preferences.c:1286
 msgid "Use per-file cover"
 msgstr "Defnyddio amgenach pictiwr am y pen ffiel"
 
-#: src/audacious/ui_preferences.c:1351
+#: src/audacious/ui_preferences.c:1298
 msgid "Show Progress bar for the current track"
 msgstr "Dangos cynnydd dangosydd am y cerrynt trac"
 
-#: src/audacious/ui_preferences.c:1361
+#: src/audacious/ui_preferences.c:1308
 msgid "Delay until filepopup comes up: "
 msgstr "Oediad tan filepopup ys dangosydd"
 
-#: src/audacious/ui_preferences.c:1886
+#: src/audacious/ui_preferences.c:1853
 msgid "<b>Song Display</b>"
 msgstr "<b>Dangos cerddi</b>"
 
-#: src/audacious/ui_preferences.c:1895
+#: src/audacious/ui_preferences.c:1862
 msgid "Show song numbers"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:1916
+#: src/audacious/ui_preferences.c:1883
 msgid "Show information about titlestring format"
 msgstr "Dangos gwybodaeth am titlestring"
 
-#: src/audacious/ui_preferences.c:1927
+#: src/audacious/ui_preferences.c:1894
 msgid "TITLE"
 msgstr "TEITL"
 
-#: src/audacious/ui_preferences.c:1928
+#: src/audacious/ui_preferences.c:1895
 msgid "ARTIST - TITLE"
 msgstr "CYFLAWNWR - TEITL"
 
-#: src/audacious/ui_preferences.c:1929
+#: src/audacious/ui_preferences.c:1896
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "CYFLAWNWR - ALBWM - TEITL"
 
-#: src/audacious/ui_preferences.c:1930
+#: src/audacious/ui_preferences.c:1897
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "CYFLAWNWR - ALBWM - TRAC. TEITL"
 
-#: src/audacious/ui_preferences.c:1931
+#: src/audacious/ui_preferences.c:1898
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "CYFLAWNWR [ ALBWM ] - TRAC. TEITL"
 
-#: src/audacious/ui_preferences.c:1932
+#: src/audacious/ui_preferences.c:1899
 msgid "ALBUM - TITLE"
 msgstr "ALBWM - TEITL"
 
-#: src/audacious/ui_preferences.c:1933
+#: src/audacious/ui_preferences.c:1900
 msgid "Custom"
 msgstr "Cynefod"
 
-#: src/audacious/ui_preferences.c:1940
+#: src/audacious/ui_preferences.c:1907
 msgid "Custom string:"
 msgstr "Cynefod:"
 
-#: src/audacious/ui_preferences.c:1947
+#: src/audacious/ui_preferences.c:1914
 msgid "Title format:"
 msgstr "Fformat y teitl:"
 
-#: src/audacious/ui_preferences.c:1958
+#: src/audacious/ui_preferences.c:1925
 msgid "<b>Popup Information</b>"
 msgstr "<b>Gwybodaeth Popup</b>"
 
-#: src/audacious/ui_preferences.c:1973
+#: src/audacious/ui_preferences.c:1940
 msgid "Show popup information for playlist entries"
 msgstr "Dangos gwybodaeth am chwarae llyfrifiadau"
 
-#: src/audacious/ui_preferences.c:1975
+#: src/audacious/ui_preferences.c:1942
 msgid ""
 "Toggles popup information window for the pointed entry in the playlist. The "
 "window shows title of song, name of album, genre, year of publish, track "
 "number, track length, and artwork."
 msgstr "Toglo ffenestr celfyddydau."
 
-#: src/audacious/ui_preferences.c:1980
+#: src/audacious/ui_preferences.c:1947
 msgid "Edit settings for popup information"
 msgstr "Golygyddion ffenestr celfyddydau machludiadau"
 
-#: src/audacious/ui_preferences.c:2060
+#: src/audacious/ui_preferences.c:2027
 msgid "<b>Audio System</b>"
 msgstr "<b>System Seniau</b>"
 
-#: src/audacious/ui_preferences.c:2077
+#: src/audacious/ui_preferences.c:2044
 msgid "Buffer size:"
 msgstr "Maint y byffer:"
 
-#: src/audacious/ui_preferences.c:2095
+#: src/audacious/ui_preferences.c:2062
 msgid "Current output plugin:"
 msgstr "Ategyn allbwn:"
 
-#: src/audacious/ui_preferences.c:2124
+#: src/audacious/ui_preferences.c:2091
 msgid "Output Plugin Preferences"
 msgstr "Ffurfwedd Ategyn Allbwn"
 
-#: src/audacious/ui_preferences.c:2141
+#: src/audacious/ui_preferences.c:2108
 msgid "Output Plugin Information"
 msgstr "Ynghylch Ategyn Allbwn"
 
-#: src/audacious/ui_preferences.c:2246
+#: src/audacious/ui_preferences.c:2213
 msgid "_Decoder list:"
 msgstr "Ategynnau mewnbwn taflen:"
 
-#: src/audacious/ui_preferences.c:2276
+#: src/audacious/ui_preferences.c:2243
 msgid "<span size=\"medium\"><b>Decoders</b></span>"
 msgstr "<span size=\"medium\"><b>Mewnbwn</b></span>"
 
-#: src/audacious/ui_preferences.c:2289
+#: src/audacious/ui_preferences.c:2256
 msgid "_General plugin list:"
 msgstr "Ategynnau cyffredinol taflen:"
 
-#: src/audacious/ui_preferences.c:2319
+#: src/audacious/ui_preferences.c:2286
 msgid "<span size=\"medium\"><b>General</b></span>"
 msgstr "<span size=\"medium\"><b>Cyffredinol</b></span>"
 
-#: src/audacious/ui_preferences.c:2331
+#: src/audacious/ui_preferences.c:2298
 msgid "_Visualization plugin list:"
 msgstr "Ategynnau delweddu taflen:"
 
-#: src/audacious/ui_preferences.c:2361
+#: src/audacious/ui_preferences.c:2328
 msgid "<b>Visualization</b>"
 msgstr "<b>Delweddu</b>"
 
-#: src/audacious/ui_preferences.c:2373
-msgid "Effect plugins (for 16-bit output only):"
-msgstr ""
+#: src/audacious/ui_preferences.c:2340
+#, fuzzy
+msgid "Effect plugins:"
+msgstr "Ategynnau effeithiau taflen:"
 
-#: src/audacious/ui_preferences.c:2402
+#: src/audacious/ui_preferences.c:2369
 msgid "<b>Effects</b>"
 msgstr "<b>Effeithiau</b>"
 
-#: src/audacious/ui_preferences.c:2597
+#: src/audacious/ui_preferences.c:2564
 msgid "Audacious Preferences"
 msgstr "Ffurfwedd Audacious"
 
-#: src/audacious/util.c:708
+#: src/audacious/util.c:236
 #, c-format
 msgid "Could not create directory (%s): %s\n"
 msgstr "Methu Creu Cyfrifiadur (%s): %s\n"
 
-#: src/audtool/handlers_playlist.c:241
+#: src/audtool/handlers_playlist.c:248
 msgid "Position not found."
 msgstr ""
 
@@ -1671,107 +878,910 @@ msgstr ""
 msgid "No song playing."
 msgstr ""
 
-#: src/libaudcore/audstrings.c:171
+#: src/libaudcore/audstrings.c:157
 msgid "  (invalid UTF-8)"
 msgstr "  (UTF-8 annilys)"
 
-#: src/libaudgui/ui_about.c:126 src/libaudgui/ui_credits.c:138
+#: src/libaudgui/confirm.c:62
+#, c-format
+msgid ""
+"Are you sure you want to close %s?  If you do, any changes made since the "
+"playlist was exported will be lost."
+msgstr ""
+
+#: src/libaudgui/confirm.c:74
+#, fuzzy
+msgid "_Don't show this message again"
+msgstr "Peidio â dangos y r rhybydd yma eto."
+
+#: src/libaudgui/effects-menu.c:61
+msgid "settings ..."
+msgstr ""
+
+#: src/libaudgui/equalizer.c:68
+#, fuzzy
+msgid "_Enable"
+msgstr " (galluog)"
+
+#: src/libaudgui/equalizer.c:140
+msgid "60 Hz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:141
+msgid "170 Hz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:141
+msgid "310 Hz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:141
+msgid "600 Hz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:141
+msgid "1 kHz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:141
+msgid "3 kHz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:142
+msgid "6 kHz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:142
+msgid "12 kHz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:142
+msgid "14 kHz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:142
+msgid "16 kHz"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:147
+msgid "Equalizer"
+msgstr "Hafalydd"
+
+#: src/libaudgui/equalizer.c:163
+msgid "Preamp"
+msgstr ""
+
+#: src/libaudgui/infopopup.c:239
+msgid "Track Number"
+msgstr "Rhif y Trac"
+
+#: src/libaudgui/infopopup.c:241
+msgid "Track Length"
+msgstr "Hyd trac"
+
+#: src/libaudgui/infowin.c:76
+#, fuzzy
+msgid "Blues"
+msgstr "Glas"
+
+#: src/libaudgui/infowin.c:76
+msgid "Classic Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:76
+msgid "Country"
+msgstr ""
+
+#: src/libaudgui/infowin.c:76
+#, fuzzy
+msgid "Dance"
+msgstr "Dyddiad"
+
+#: src/libaudgui/infowin.c:77
+msgid "Disco"
+msgstr ""
+
+#: src/libaudgui/infowin.c:77
+msgid "Funk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:77
+msgid "Grunge"
+msgstr ""
+
+#: src/libaudgui/infowin.c:77
+msgid "Hip-Hop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:78
+msgid "Jazz"
+msgstr ""
+
+#: src/libaudgui/infowin.c:78
+msgid "Metal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:78
+msgid "New Age"
+msgstr ""
+
+#: src/libaudgui/infowin.c:78
+#, fuzzy
+msgid "Oldies"
+msgstr "rhesi"
+
+#: src/libaudgui/infowin.c:79
+msgid "Other"
+msgstr ""
+
+#: src/libaudgui/infowin.c:79
+msgid "Pop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:79
+msgid "R&B"
+msgstr ""
+
+#: src/libaudgui/infowin.c:79
+msgid "Rap"
+msgstr ""
+
+#: src/libaudgui/infowin.c:79
+#, fuzzy
+msgid "Reggae"
+msgstr "_Cyfnewid"
+
+#: src/libaudgui/infowin.c:80
+msgid "Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:80
+msgid "Techno"
+msgstr ""
+
+#: src/libaudgui/infowin.c:80
+msgid "Industrial"
+msgstr ""
+
+#: src/libaudgui/infowin.c:80
+msgid "Alternative"
+msgstr ""
+
+#: src/libaudgui/infowin.c:81
+msgid "Ska"
+msgstr ""
+
+#: src/libaudgui/infowin.c:81
+msgid "Death Metal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:81
+#, fuzzy
+msgid "Pranks"
+msgstr "Brigau"
+
+#: src/libaudgui/infowin.c:81
+msgid "Soundtrack"
+msgstr ""
+
+#: src/libaudgui/infowin.c:82
+msgid "Euro-Techno"
+msgstr ""
+
+#: src/libaudgui/infowin.c:82
+msgid "Ambient"
+msgstr ""
+
+#: src/libaudgui/infowin.c:82
+msgid "Trip-Hop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:82
+msgid "Vocal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:83
+msgid "Jazz+Funk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:83
+#, fuzzy
+msgid "Fusion"
+msgstr "Rwsieg:"
+
+#: src/libaudgui/infowin.c:83
+#, fuzzy
+msgid "Trance"
+msgstr "Tremiant"
+
+#: src/libaudgui/infowin.c:83
+msgid "Classical"
+msgstr ""
+
+#: src/libaudgui/infowin.c:84
+msgid "Instrumental"
+msgstr ""
+
+#: src/libaudgui/infowin.c:84
+msgid "Acid"
+msgstr ""
+
+#: src/libaudgui/infowin.c:84
+#, fuzzy
+msgid "House"
+msgstr "Llygod"
+
+#: src/libaudgui/infowin.c:84
+msgid "Game"
+msgstr ""
+
+#: src/libaudgui/infowin.c:85
+msgid "Sound Clip"
+msgstr ""
+
+#: src/libaudgui/infowin.c:85
+msgid "Gospel"
+msgstr ""
+
+#: src/libaudgui/infowin.c:85
+#, fuzzy
+msgid "Noise"
+msgstr "Llygod"
+
+#: src/libaudgui/infowin.c:85
+msgid "AlternRock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:86
+#, fuzzy
+msgid "Bass"
+msgstr "Barau"
+
+#: src/libaudgui/infowin.c:86
+msgid "Soul"
+msgstr ""
+
+#: src/libaudgui/infowin.c:86
+msgid "Punk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:86
+#, fuzzy
+msgid "Space"
+msgstr "Cadw"
+
+#: src/libaudgui/infowin.c:87
+msgid "Meditative"
+msgstr ""
+
+#: src/libaudgui/infowin.c:87
+msgid "Instrumental Pop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:88
+msgid "Instrumental Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:88
+msgid "Ethnic"
+msgstr ""
+
+#: src/libaudgui/infowin.c:88
+msgid "Gothic"
+msgstr ""
+
+#: src/libaudgui/infowin.c:89
+msgid "Darkwave"
+msgstr ""
+
+#: src/libaudgui/infowin.c:89
+msgid "Techno-Industrial"
+msgstr ""
+
+#: src/libaudgui/infowin.c:89
+msgid "Electronic"
+msgstr ""
+
+#: src/libaudgui/infowin.c:90
+msgid "Pop-Folk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:90
+msgid "Eurodance"
+msgstr ""
+
+#: src/libaudgui/infowin.c:90
+msgid "Dream"
+msgstr ""
+
+#: src/libaudgui/infowin.c:91
+msgid "Southern Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:91
+#, fuzzy
+msgid "Comedy"
+msgstr "Sylwad"
+
+#: src/libaudgui/infowin.c:91
+#, fuzzy
+msgid "Cult"
+msgstr "Cynefod:"
+
+#: src/libaudgui/infowin.c:92
+msgid "Gangsta Rap"
+msgstr ""
+
+#: src/libaudgui/infowin.c:92
+msgid "Top 40"
+msgstr ""
+
+#: src/libaudgui/infowin.c:92
+msgid "Christian Rap"
+msgstr ""
+
+#: src/libaudgui/infowin.c:93
+msgid "Pop/Funk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:93
+msgid "Jungle"
+msgstr ""
+
+#: src/libaudgui/infowin.c:93
+msgid "Native American"
+msgstr ""
+
+#: src/libaudgui/infowin.c:94
+msgid "Cabaret"
+msgstr ""
+
+#: src/libaudgui/infowin.c:94
+msgid "New Wave"
+msgstr ""
+
+#: src/libaudgui/infowin.c:94
+msgid "Psychedelic"
+msgstr ""
+
+#: src/libaudgui/infowin.c:94
+#, fuzzy
+msgid "Rave"
+msgstr "Cadw"
+
+#: src/libaudgui/infowin.c:95
+#, fuzzy
+msgid "Showtunes"
+msgstr "Arafaf"
+
+#: src/libaudgui/infowin.c:95
+#, fuzzy
+msgid "Trailer"
+msgstr "Teitl"
+
+#: src/libaudgui/infowin.c:95
+msgid "Lo-Fi"
+msgstr ""
+
+#: src/libaudgui/infowin.c:95
+msgid "Tribal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:96
+msgid "Acid Punk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:96
+msgid "Acid Jazz"
+msgstr ""
+
+#: src/libaudgui/infowin.c:96
+#, fuzzy
+msgid "Polka"
+msgstr "Chwarae"
+
+#: src/libaudgui/infowin.c:96
+#, fuzzy
+msgid "Retro"
+msgstr "Amhleidiol"
+
+#: src/libaudgui/infowin.c:97
+msgid "Musical"
+msgstr ""
+
+#: src/libaudgui/infowin.c:97
+msgid "Rock & Roll"
+msgstr ""
+
+#: src/libaudgui/infowin.c:97
+msgid "Hard Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:97
+msgid "Folk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:98
+msgid "Folk/Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:98
+msgid "National Folk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:98
+msgid "Swing"
+msgstr ""
+
+#: src/libaudgui/infowin.c:99
+msgid "Fast-Fusion"
+msgstr ""
+
+#: src/libaudgui/infowin.c:99
+msgid "Bebob"
+msgstr ""
+
+#: src/libaudgui/infowin.c:99
+#, fuzzy
+msgid "Latin"
+msgstr "Eidaleg:"
+
+#: src/libaudgui/infowin.c:99
+msgid "Revival"
+msgstr ""
+
+#: src/libaudgui/infowin.c:100
+msgid "Celtic"
+msgstr ""
+
+#: src/libaudgui/infowin.c:100
+#, fuzzy
+msgid "Bluegrass"
+msgstr "Glas"
+
+#: src/libaudgui/infowin.c:100
+msgid "Avantgarde"
+msgstr ""
+
+#: src/libaudgui/infowin.c:101
+msgid "Gothic Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:101
+msgid "Progressive Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:102
+msgid "Psychedelic Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:102
+msgid "Symphonic Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:102
+#, fuzzy
+msgid "Slow Rock"
+msgstr "Araf"
+
+#: src/libaudgui/infowin.c:103
+msgid "Big Band"
+msgstr ""
+
+#: src/libaudgui/infowin.c:103
+msgid "Chorus"
+msgstr ""
+
+#: src/libaudgui/infowin.c:103
+msgid "Easy Listening"
+msgstr ""
+
+#: src/libaudgui/infowin.c:104
+msgid "Acoustic"
+msgstr ""
+
+#: src/libaudgui/infowin.c:104
+msgid "Humour"
+msgstr ""
+
+#: src/libaudgui/infowin.c:104
+msgid "Speech"
+msgstr ""
+
+#: src/libaudgui/infowin.c:104
+msgid "Chanson"
+msgstr ""
+
+#: src/libaudgui/infowin.c:105
+msgid "Opera"
+msgstr ""
+
+#: src/libaudgui/infowin.c:105
+msgid "Chamber Music"
+msgstr ""
+
+#: src/libaudgui/infowin.c:105
+msgid "Sonata"
+msgstr ""
+
+#: src/libaudgui/infowin.c:105
+msgid "Symphony"
+msgstr ""
+
+#: src/libaudgui/infowin.c:106
+msgid "Booty Bass"
+msgstr ""
+
+#: src/libaudgui/infowin.c:106
+#, fuzzy
+msgid "Primus"
+msgstr "Blaenorol"
+
+#: src/libaudgui/infowin.c:106
+msgid "Porn Groove"
+msgstr ""
+
+#: src/libaudgui/infowin.c:107
+#, fuzzy
+msgid "Satire"
+msgstr "Tân"
+
+#: src/libaudgui/infowin.c:107
+#, fuzzy
+msgid "Slow Jam"
+msgstr "Araf"
+
+#: src/libaudgui/infowin.c:107
+msgid "Club"
+msgstr ""
+
+#: src/libaudgui/infowin.c:107
+msgid "Tango"
+msgstr ""
+
+#: src/libaudgui/infowin.c:108
+msgid "Samba"
+msgstr ""
+
+#: src/libaudgui/infowin.c:108
+msgid "Folklore"
+msgstr ""
+
+#: src/libaudgui/infowin.c:108
+msgid "Ballad"
+msgstr ""
+
+#: src/libaudgui/infowin.c:108
+msgid "Power Ballad"
+msgstr ""
+
+#: src/libaudgui/infowin.c:109
+msgid "Rhythmic Soul"
+msgstr ""
+
+#: src/libaudgui/infowin.c:109
+msgid "Freestyle"
+msgstr ""
+
+#: src/libaudgui/infowin.c:109
+#, fuzzy
+msgid "Duet"
+msgstr "Isalmaeneg:"
+
+#: src/libaudgui/infowin.c:110
+msgid "Punk Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:110
+msgid "Drum Solo"
+msgstr ""
+
+#: src/libaudgui/infowin.c:110
+msgid "A Cappella"
+msgstr ""
+
+#: src/libaudgui/infowin.c:111
+msgid "Euro-House"
+msgstr ""
+
+#: src/libaudgui/infowin.c:111
+msgid "Dance Hall"
+msgstr ""
+
+#: src/libaudgui/infowin.c:111
+msgid "Goa"
+msgstr ""
+
+#: src/libaudgui/infowin.c:112
+msgid "Drum & Bass"
+msgstr ""
+
+#: src/libaudgui/infowin.c:112
+#, fuzzy
+msgid "Club-House"
+msgstr "Llygod"
+
+#: src/libaudgui/infowin.c:112
+msgid "Hardcore"
+msgstr ""
+
+#: src/libaudgui/infowin.c:113
+#, fuzzy
+msgid "Terror"
+msgstr "Amhleidiol"
+
+#: src/libaudgui/infowin.c:113
+#, fuzzy
+msgid "Indie"
+msgstr "Cynnwys:"
+
+#: src/libaudgui/infowin.c:113
+msgid "BritPop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:113
+msgid "Negerpunk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:114
+msgid "Polsk Punk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:114
+#, fuzzy
+msgid "Beat"
+msgstr "Ailadrodd"
+
+#: src/libaudgui/infowin.c:114
+msgid "Christian Gangsta Rap"
+msgstr ""
+
+#: src/libaudgui/infowin.c:115
+msgid "Heavy Metal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:115
+msgid "Black Metal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:115
+msgid "Crossover"
+msgstr ""
+
+#: src/libaudgui/infowin.c:116
+msgid "Contemporary Christian"
+msgstr ""
+
+#: src/libaudgui/infowin.c:116
+msgid "Christian Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:117
+msgid "Merengue"
+msgstr ""
+
+#: src/libaudgui/infowin.c:117
+msgid "Salsa"
+msgstr ""
+
+#: src/libaudgui/infowin.c:117
+msgid "Thrash Metal"
+msgstr ""
+
+#: src/libaudgui/infowin.c:118
+msgid "Anime"
+msgstr ""
+
+#: src/libaudgui/infowin.c:118
+msgid "JPop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:118
+#, fuzzy
+msgid "Synthpop"
+msgstr "Atal"
+
+#: src/libaudgui/infowin.c:179 src/libaudgui/infowin.c:474
+#: src/libaudgui/infowin.c:477 src/libaudgui/infowin.c:480
+msgid "<span size=\"small\">n/a</span>"
+msgstr "<span size=\"small\">n/a</span>"
+
+#: src/libaudgui/infowin.c:274
+msgid "Metadata updated successfully"
+msgstr ""
+
+#: src/libaudgui/infowin.c:279
+msgid "Metadata updating failed"
+msgstr ""
+
+#: src/libaudgui/infowin.c:409
+msgid "Track Information"
+msgstr "Cynnydd trac:"
+
+#: src/libaudgui/infowin.c:442
+msgid "<span size=\"small\">General</span>"
+msgstr "<span size=\"small\">Cyffredin</span>"
+
+#: src/libaudgui/infowin.c:463
+msgid "<span size=\"small\">Format:</span>"
+msgstr "<span size=\"small\">Rhywogaeth:</span>"
+
+#: src/libaudgui/infowin.c:467
+msgid "<span size=\"small\">Quality:</span>"
+msgstr "<span size=\"small\">Ansawdd:</span>"
+
+#: src/libaudgui/infowin.c:470
+msgid "<span size=\"small\">Bitrate:</span>"
+msgstr "<span size=\"small\">Cyfradd bit:</span>"
+
+#: src/libaudgui/infowin.c:497
+msgid "<span size=\"small\">Title</span>"
+msgstr "<span size=\"small\">Tietl</span>"
+
+#: src/libaudgui/infowin.c:509
+msgid "<span size=\"small\">Artist</span>"
+msgstr "<span size=\"small\">Cyflawnwr</span>"
+
+#: src/libaudgui/infowin.c:521
+msgid "<span size=\"small\">Album</span>"
+msgstr "<span size=\"small\">Crynoadau</span>"
+
+#: src/libaudgui/infowin.c:533
+msgid "<span size=\"small\">Comment</span>"
+msgstr "<span size=\"small\">Sylw</span>"
+
+#: src/libaudgui/infowin.c:545
+msgid "<span size=\"small\">Genre</span>"
+msgstr "<span size=\"small\">Ffurf lenyddol</span>"
+
+#: src/libaudgui/infowin.c:566
+msgid "<span size=\"small\">Year</span>"
+msgstr "<span size=\"small\">Blwyddyn</span>"
+
+#: src/libaudgui/infowin.c:577
+msgid "<span size=\"small\">Track Number</span>"
+msgstr "<span size=\"small\">Rhif y Trac</span>"
+
+#: src/libaudgui/infowin.c:588
+msgid "<span size=\"small\">Location</span>"
+msgstr "<span size=\"small\">Lleoliad</span>"
+
+#: src/libaudgui/infowin.c:615
+msgid "<span size=\"small\">Raw Metadata</span>"
+msgstr "<span size=\"small\">Noeth Gwybodaeth</span>"
+
+#: src/libaudgui/infowin.c:634
+msgid "Key"
+msgstr ""
+
+#: src/libaudgui/infowin.c:647
+msgid "Value"
+msgstr "Tâl"
+
+#: src/libaudgui/infowin.c:792
+#, c-format
+msgid "%d kb/s"
+msgstr ""
+
+#: src/libaudgui/infowin.c:883
+#, c-format
+msgid "No info available for %s.\n"
+msgstr ""
+
+#: src/libaudgui/ui_about.c:129 src/libaudgui/ui_credits.c:140
 msgid "About Audacious"
 msgstr "Ynghylch Audacious"
 
-#: src/libaudgui/ui_about.c:175 src/libaudgui/ui_credits.c:181
+#: src/libaudgui/ui_about.c:178 src/libaudgui/ui_credits.c:183
 msgid "Credits"
 msgstr "Diolchiadau"
 
-#: src/libaudgui/ui_credits.c:185
+#: src/libaudgui/ui_credits.c:187
 msgid "Translators"
 msgstr "Cyfieithwyr"
 
-#: src/libaudgui/ui_fileopener.c:149
+#: src/libaudgui/ui_fileopener.c:107
 msgid "Open Files"
 msgstr "Tocio Ffeiliau"
 
-#: src/libaudgui/ui_fileopener.c:149
+#: src/libaudgui/ui_fileopener.c:107
 msgid "Add Files"
 msgstr "Ychwanegu Ffeiliau"
 
-#: src/libaudgui/ui_fileopener.c:151
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Close dialog on Open"
 msgstr "Closio am Tocio"
 
-#: src/libaudgui/ui_fileopener.c:151
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Close dialog on Add"
 msgstr "Closio am Ychwanegu"
 
-#: src/libaudgui/ui_jumptotrack.c:142
+#: src/libaudgui/ui_jumptotrack.c:144
 msgid "Un_queue"
 msgstr "_Rhes tynnu"
 
-#: src/libaudgui/ui_jumptotrack.c:144 src/libaudgui/ui_jumptotrack.c:515
+#: src/libaudgui/ui_jumptotrack.c:146 src/libaudgui/ui_jumptotrack.c:528
 msgid "_Queue"
 msgstr "_Rhes"
 
-#: src/libaudgui/ui_jumptotrack.c:401
+#: src/libaudgui/ui_jumptotrack.c:415
 msgid "Jump to Track"
 msgstr "Neidio i trac"
 
-#: src/libaudgui/ui_jumptotrack.c:444
+#: src/libaudgui/ui_jumptotrack.c:458
 msgid "Filter: "
 msgstr "Hidl:"
 
-#: src/libaudgui/ui_jumptotrack.c:445
+#: src/libaudgui/ui_jumptotrack.c:459
 msgid "_Filter:"
 msgstr "_Hidl:"
 
-#: src/libaudgui/ui_jumptotrack.c:463
+#: src/libaudgui/ui_jumptotrack.c:477
 msgid "Remember"
 msgstr ""
 
-#: src/libaudgui/ui_jumptotrack.c:472
+#: src/libaudgui/ui_jumptotrack.c:486
 #, fuzzy
 msgid "Clea_r"
 msgstr "Clirio A-B"
 
-#: src/libaudgui/ui_jumptotrack.c:507
+#: src/libaudgui/ui_jumptotrack.c:520
 msgid "Close on Jump"
 msgstr "Closio am Naid"
 
+#: src/libaudgui/ui_playlist_manager.c:165
+msgid "Playlist Manager"
+msgstr "Rheolwyr am y Rhestr Chwarae"
+
+#: src/libaudgui/ui_playlist_manager.c:205
+msgid "Entries"
+msgstr "Llyfrifiadau"
+
+#: src/libaudgui/ui_playlist_manager.c:224
+msgid "_Rename"
+msgstr "_Cyfnewid"
+
+#: src/libaudgui/ui_playlist_manager.c:252
+#, fuzzy
+msgid "_Close dialog on activating playlist"
+msgstr "Closio am Tocio"
+
 #: src/libaudgui/ui_urlopener.c:57
-msgid "Add/Open URL Dialog"
-msgstr "Ffenestr am y Adio/Llwytho URL"
+msgid "Open URL"
+msgstr ""
 
-#: src/libaudgui/ui_urlopener.c:176
-msgid "Enter location to play:"
-msgstr "Rhowch leoliad i chwarae:"
+#: src/libaudgui/ui_urlopener.c:57
+msgid "Add URL"
+msgstr ""
 
-#: src/libeggsmclient/eggdesktopfile.c:140
+#: src/libeggsmclient/eggdesktopfile.c:138
 msgid "File is not a valid .desktop file"
 msgstr ""
 
-#: src/libeggsmclient/eggdesktopfile.c:162
+#: src/libeggsmclient/eggdesktopfile.c:160
 #, c-format
 msgid "Unrecognized desktop file Version '%s'"
 msgstr "Anadnabyddus ffeil desktop fersiwn '%s'"
 
-#: src/libeggsmclient/eggdesktopfile.c:873
+#: src/libeggsmclient/eggdesktopfile.c:871
 #, c-format
 msgid "Starting %s"
 msgstr "Cychwyn %s"
 
-#: src/libeggsmclient/eggdesktopfile.c:1009
+#: src/libeggsmclient/eggdesktopfile.c:1007
 msgid "Application does not accept documents on command line"
 msgstr ""
 
-#: src/libeggsmclient/eggdesktopfile.c:1077
+#: src/libeggsmclient/eggdesktopfile.c:1075
 #, c-format
 msgid "Unrecognized launch option: %d"
 msgstr "Anadnabyddus cychwyn dewis: %d"
 
-#: src/libeggsmclient/eggdesktopfile.c:1279
+#: src/libeggsmclient/eggdesktopfile.c:1277
 msgid "Can't pass document URIs to a 'Type=Link' desktop entry"
 msgstr ""
 
-#: src/libeggsmclient/eggdesktopfile.c:1298
+#: src/libeggsmclient/eggdesktopfile.c:1296
 msgid "Not a launchable item"
 msgstr ""
 
@@ -1805,6 +1815,72 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 
 #, fuzzy
 #~ msgid ""
+#~ "Available interfaces:\n"
+#~ "\n"
+#~ msgstr "_Rhagosodiadau ar gael:"
+
+#, fuzzy
+#~ msgid "Available Plugin Preferences:\n"
+#~ msgstr "_Rhagosodiadau ar gael:"
+
+#~ msgid "Add/Open URL Dialog"
+#~ msgstr "Ffenestr am y Adio/Llwytho URL"
+
+#~ msgid "Enter location to play:"
+#~ msgstr "Rhowch leoliad i chwarae:"
+
+#~ msgid "Don't clear the playlist"
+#~ msgstr "Peidio clirio'r rhestr chwarae"
+
+#~ msgid "audacious: %s"
+#~ msgstr "audacious: %s"
+
+#~ msgid "Filename:"
+#~ msgstr "Enw ffeil:"
+
+#~ msgid "No input plugin recognized this file"
+#~ msgstr "Ategyn mewnbwn heb adnabod y ffeil"
+
+#~ msgid "Input plugin: %s"
+#~ msgstr "Ategyn mewnbwn: %s"
+
+#~ msgid ""
+#~ "<b><big>No output plugin selected.</big></b>\n"
+#~ "You have not selected an output plugin."
+#~ msgstr "<b><big>Allbwn o ategyn heb ei ddewis</big></b>"
+
+#~ msgid "Connectivity"
+#~ msgstr "Cysylltu"
+
+#~ msgid "Sampling Rate [Hz]:"
+#~ msgstr "Graddfa samplo [Hz]:"
+
+#~ msgid "Interpolation Engine:"
+#~ msgstr "Interpolation Trefnau:"
+
+#~ msgid "<b>Format Detection</b>"
+#~ msgstr "<b>Awtoganfod trefniad</b>"
+
+#~ msgid "Detect file formats by extension."
+#~ msgstr "Awtoganfawd ffiel trefniad at ymestyniad."
+
+#~ msgid ""
+#~ "When checked, Audacious will detect file formats based by extension. Only "
+#~ "files with extensions of supported formats will be loaded."
+#~ msgstr ""
+#~ "Os dewisedig, Audacious ewyllys awtoganfod ffiel trefniad at ymestyniad."
+
+#~ msgid "<b>Sampling Rate Converter</b>"
+#~ msgstr "<b>Dychweliad Graddfa Samplo</b>"
+
+#~ msgid "Enable Sampling Rate Converter"
+#~ msgstr "Galluogi Dychweliad Graddfa Samplo"
+
+#~ msgid "<b>Advanced</b>"
+#~ msgstr "<b>Datblygedig</b>"
+
+#, fuzzy
+#~ msgid ""
 #~ "\n"
 #~ "Bugs can be reported at http://jira.atheme.org/ against the Audacious or "
 #~ "Audacious Plugins product.\n"
@@ -1823,15 +1899,6 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 #~ "\n"
 #~ "Hawlfraint (C) 2005-2008 Audacious Development Team"
 
-#~ msgid "Playlist Manager"
-#~ msgstr "Rheolwyr am y Rhestr Chwarae"
-
-#~ msgid "Entries"
-#~ msgstr "Llyfrifiadau"
-
-#~ msgid "_Rename"
-#~ msgstr "_Cyfnewid"
-
 #~ msgid "Detect file formats on demand, instead of immediately."
 #~ msgstr "Awtoganfod ffiel trefniad am gofyn."
 
@@ -1846,9 +1913,6 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 
 #~ msgid "Load metadata (tag information) from music files."
 #~ msgstr "Llwytho'r metadata o ffeil cerdd."
-
-#~ msgid "_Effect plugin list:"
-#~ msgstr "Ategynnau effeithiau taflen:"
 
 #~ msgid "Jump to Time"
 #~ msgstr "Neidio i Amser"
@@ -1880,9 +1944,6 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 
 #~ msgid "Save Playlist"
 #~ msgstr "Cadw'r Rhestr Chwarae"
-
-#~ msgid "Load Playlist"
-#~ msgstr "Llwytho'r rhestr chwarae"
 
 #~ msgid "Presets"
 #~ msgstr "Rhagosodau"
@@ -2047,9 +2108,6 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 
 #~ msgid "Add Files..."
 #~ msgstr "Ychwanegu Ffeiliau..."
-
-#~ msgid "Adds files to the playlist."
-#~ msgstr "Adio y ffeil at ar rhestr chwarae."
 
 #~ msgid "Search and Select"
 #~ msgstr "Archwilio y Dewis"
@@ -2386,9 +2444,6 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 
 #~ msgid "Ignore"
 #~ msgstr "Anwybyddu"
-
-#~ msgid "Do not display this warning again"
-#~ msgstr "Peidio â dangos y r rhybydd yma eto."
 
 #~ msgid "Seek to: %d:%-2.2d/%d:%-2.2d (%d%%)"
 #~ msgstr "Chwilio hyd: %d:%-2.2d/%d:%-2.2d (%d%%)"
@@ -2735,9 +2790,6 @@ msgstr "Dangos dewis sesiwn goruchwyliaeth"
 #, fuzzy
 #~ msgid "Enable 'Doublesize'"
 #~ msgstr "Maint Dwbwl"
-
-#~ msgid "Equalizer"
-#~ msgstr "Hafalydd"
 
 #~ msgid "<b>Presets</b>"
 #~ msgstr "<b>Rhagosodau</b>"

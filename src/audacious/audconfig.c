@@ -23,18 +23,21 @@
  *  Audacious or using our public API to be a derived work.
  */
 
+#include <glib.h>
+#include <libaudcore/hook.h>
+
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
 #endif
 
 #include "audconfig.h"
-
+#include "configdb.h"
 #include "effect.h"
 #include "general.h"
 #include "output.h"
 #include "playback.h"
 #include "pluginenum.h"
-#include "plugin-registry.h"
+#include "plugins.h"
 #include "util.h"
 #include "visualization.h"
 
@@ -56,10 +59,6 @@ AudConfig aud_default_config = {
     .equalizer_bands = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
     .filesel_path = NULL,
     .playlist_path = NULL,
-    .enabled_gplugins = NULL,          /* enabled general plugins */
-    .enabled_vplugins = NULL,          /* enabled visualization plugins */
-    .enabled_eplugins = NULL,          /* enabled effect plugins */
-    .enabled_dplugins = NULL,          /* enabled discovery plugins */
     .eqpreset_default_file = NULL,
     .eqpreset_extension = NULL,
     .url_history = NULL,
@@ -93,6 +92,8 @@ AudConfig aud_default_config = {
     .clear_playlist = TRUE,
     .output_path = NULL,
     .output_number = -1,
+    .iface_path = NULL,
+    .iface_number = -1,
 
     /* libaudgui stuff */
     .no_confirm_playlist_delete = FALSE,
@@ -165,6 +166,7 @@ static aud_cfg_nument aud_numents[] = {
     {"sw_volume_left", & cfg.sw_volume_left, TRUE},
     {"sw_volume_right", & cfg.sw_volume_right, TRUE},
     {"output_number", & cfg.output_number, TRUE},
+    {"iface_number", & cfg.iface_number, TRUE},
     {"playlist_manager_x", & cfg.playlist_manager_x, TRUE},
     {"playlist_manager_y", & cfg.playlist_manager_y, TRUE},
     {"playlist_manager_width", & cfg.playlist_manager_width, TRUE},
@@ -176,9 +178,6 @@ static gint ncfgient = G_N_ELEMENTS(aud_numents);
 static aud_cfg_strent aud_strents[] = {
     {"eqpreset_default_file", &cfg.eqpreset_default_file, TRUE},
     {"eqpreset_extension", &cfg.eqpreset_extension, TRUE},
-    {"enabled_gplugins", &cfg.enabled_gplugins, FALSE},
-    {"enabled_vplugins", &cfg.enabled_vplugins, FALSE},
-    {"enabled_eplugins", &cfg.enabled_eplugins, FALSE},
     {"filesel_path", &cfg.filesel_path, FALSE},
     {"playlist_path", &cfg.playlist_path, FALSE},
     {"generic_title_format", &cfg.gentitle_format, TRUE},
@@ -187,6 +186,7 @@ static aud_cfg_strent aud_strents[] = {
     {"cover_name_include", &cfg.cover_name_include, TRUE},
     {"cover_name_exclude", &cfg.cover_name_exclude, TRUE},
     {"output_path", & cfg.output_path, TRUE},
+    {"iface_path", & cfg.iface_path, TRUE},
 };
 
 static gint ncfgsent = G_N_ELEMENTS(aud_strents);
@@ -289,7 +289,8 @@ static void save_output_path (void)
     gint type, number = -1;
 
     if (current_output_plugin != NULL)
-        plugin_get_path (current_output_plugin, & path, & type, & number);
+        plugin_get_path (plugin_by_header (current_output_plugin), & path,
+         & type, & number);
 
     cfg.output_path = (path != NULL) ? g_strdup (path) : NULL;
     cfg.output_number = number;
@@ -344,30 +345,6 @@ aud_config_save(void)
         cfg_db_set_float(db, NULL, str, cfg.equalizer_bands[i]);
         g_free(str);
     }
-
-    str = general_stringify_enabled_list();
-    if (str) {
-        cfg_db_set_string(db, NULL, "enabled_gplugins", str);
-        g_free(str);
-    }
-    else
-        cfg_db_unset_key(db, NULL, "enabled_gplugins");
-
-    str = vis_stringify_enabled_list();
-    if (str) {
-        cfg_db_set_string(db, NULL, "enabled_vplugins", str);
-        g_free(str);
-    }
-    else
-        cfg_db_unset_key(db, NULL, "enabled_vplugins");
-
-    str = effect_stringify_enabled_list();
-    if (str) {
-        cfg_db_set_string(db, NULL, "enabled_eplugins", str);
-        g_free(str);
-    }
-    else
-        cfg_db_unset_key(db, NULL, "enabled_eplugins");
 
     if (cfg.filesel_path)
         cfg_db_set_string(db, NULL, "filesel_path", cfg.filesel_path);

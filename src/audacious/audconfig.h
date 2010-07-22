@@ -27,8 +27,12 @@
 #define AUDACIOUS_AUDCONFIG_H
 
 #include <glib.h>
+#include <audacious/types.h>
 
-#define AUD_EQUALIZER_NBANDS    (10)
+#ifndef _AUDACIOUS_CORE
+#include <audacious/api.h>
+#define aud_cfg (_aud_api_table->cfg)
+#endif
 
 struct _AudConfig {
     gboolean shuffle, repeat;
@@ -41,7 +45,6 @@ struct _AudConfig {
     gfloat equalizer_preamp, equalizer_bands[AUD_EQUALIZER_NBANDS];
     gchar *filesel_path;
     gchar *playlist_path;
-    gchar *enabled_gplugins, *enabled_vplugins, *enabled_eplugins, *enabled_dplugins ;
     gchar *eqpreset_default_file, *eqpreset_extension;
     GList *url_history;
     gint titlestring_preset;
@@ -76,6 +79,8 @@ struct _AudConfig {
     gboolean clear_playlist;
     gchar * output_path;
     gint output_number;
+    gchar * iface_path;
+    gint iface_number;
 
     /* libaudgui stuff */
     gboolean no_confirm_playlist_delete;
