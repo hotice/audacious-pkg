@@ -30,9 +30,18 @@ libaudcore.so.1 libaudcore1 #MINVER#
  convert_dos_path@Base 2.3
  convert_table@Base 2.3
  escape_shell_chars@Base 2.3
+ event_queue@Base 2.4~beta1
+ event_queue_timed@Base 2.4~beta1
+ event_queue_with_data_free@Base 2.4~beta1
  filename_get_subtune@Base 2.3
  filename_split_subtune@Base 2.3
  filename_to_utf8@Base 2.3
+ hook_associate@Base 2.4~beta1
+ hook_call@Base 2.4~beta1
+ hook_dissociate@Base 2.4~beta1
+ hook_dissociate_full@Base 2.4~beta1
+ hook_init@Base 2.4~beta1
+ hook_register@Base 2.4~beta1
  index_append@Base 2.3
  index_copy_append@Base 2.4~alpha1
  index_copy_insert@Base 2.4~alpha1
@@ -99,6 +108,9 @@ libaudcore.so.1 libaudcore1 #MINVER#
  tuple_set_filename@Base 2.3
  uri_to_display_basename@Base 2.3
  uri_to_display_dirname@Base 2.3
+ vfs_async_file_get_contents@Base 2.4~beta1
+ vfs_async_file_get_contents_trampoline@Base 2.4~beta1
+ vfs_async_file_get_contents_worker@Base 2.4~beta1
  vfs_buffer_new@Base 2.3
  vfs_buffer_new_from_string@Base 2.3
  vfs_buffered_file_new_from_uri@Base 2.3
@@ -143,10 +155,11 @@ libaudcore.so.1 libaudcore1 #MINVER#
  vfs_ungetc@Base 2.3
  vfs_vfprintf@Base 2.3
 libaudgui.so.1 libaudcore1 #MINVER#
- _audvt@Base 2.4~alpha1
+ _aud_api_table@Base 2.4~beta1
  audgui_confirm_playlist_delete@Base 2.4~alpha1
  audgui_connect_check_box@Base 2.4~alpha1
  audgui_create_effects_menu@Base 2.3
+ audgui_create_iface_menu@Base 2.4~beta1
  audgui_destroy_on_escape@Base 2.4~alpha1
  audgui_get_library_store@Base 2.4~alpha1
  audgui_hide_about_window@Base 2.3
@@ -239,7 +252,6 @@ libaudtag.so.1 libaudcore1 #MINVER#
  id3v1@Base 2.4~alpha1
  id3v1_can_handle_file@Base 2.4~alpha1
  id3v1_read_tag@Base 2.4~alpha1
- id3v1_write_tag@Base 2.4~alpha1
  id3v22@Base 2.4~alpha2
  id3v22_read_tag@Base 2.4~alpha2
  id3v24@Base 2.4~alpha1
