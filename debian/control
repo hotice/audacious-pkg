@@ -15,7 +15,7 @@ Build-Depends: autotools-dev (>= 20100122.1~),
                libmcs-dev (>= 0.7),
                libmowgli-dev (>= 0.7),
                librsvg2-bin
-Standards-Version: 3.9.0
+Standards-Version: 3.9.1
 VCS-Browser: http://git.debian.org/?p=pkg-audacious/audacious.git;a=summary
 VCS-Git: git://git.debian.org/pkg-audacious/audacious.git
 
