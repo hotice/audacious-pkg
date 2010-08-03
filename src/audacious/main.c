@@ -88,6 +88,7 @@ gchar * aud_paths[BMP_PATH_COUNT];
 
 #ifdef USE_DBUS
 MprisPlayer *mpris;
+MprisTrackList *mpris_tracklist;
 #endif
 
 static void print_version(void)
@@ -123,9 +124,13 @@ static void aud_init_paths()
     gchar *xdg_data_home;
     gchar *xdg_cache_home;
 
-    xdg_config_home = (getenv("XDG_CONFIG_HOME") == NULL ? g_build_filename(g_get_home_dir(), ".config", NULL) : g_strdup(getenv("XDG_CONFIG_HOME")));
-    xdg_data_home = (getenv("XDG_DATA_HOME") == NULL ? g_build_filename(g_get_home_dir(), ".local", "share", NULL) : g_strdup(getenv("XDG_DATA_HOME")));
-    xdg_cache_home = (getenv("XDG_CACHE_HOME") == NULL ? g_build_filename(g_get_home_dir(), ".cache", NULL) : g_strdup(getenv("XDG_CACHE_HOME")));
+    xdg_config_home = (getenv ("XDG_CONFIG_HOME") == NULL) ? g_build_filename
+     (getenv ("HOME"), ".config", NULL) : g_strdup (getenv ("XDG_CONFIG_HOME"));
+    xdg_data_home = (getenv ("XDG_DATA_HOME") == NULL) ? g_build_filename
+     (getenv ("HOME"), ".local", "share", NULL) : g_strdup (getenv
+     ("XDG_DATA_HOME"));
+    xdg_cache_home = (getenv ("XDG_CACHE_HOME") == NULL) ? g_build_filename
+     (getenv ("HOME"), ".cache", NULL) : g_strdup (getenv ("XDG_CACHE_HOME"));
 
     aud_paths[BMP_PATH_USER_DIR] = g_build_filename(xdg_config_home, "audacious", NULL);
     aud_paths[BMP_PATH_USER_SKIN_DIR] = g_build_filename(xdg_data_home, "audacious", "Skins", NULL);
@@ -177,11 +182,6 @@ static void parse_cmd_line_options(gint * argc, gchar *** argv)
 
     memset(&options, '\0', sizeof(AudCmdLineOpt));
     options.session = -1;
-
-    /* If audacious2 is run with no arguments, bring it to the top. This is
-       handy when the user forgets that Audacious is already running. */
-    if (*argc == 1)
-        options.mainwin = 1;
 
     context = g_option_context_new(_("- play multimedia files"));
     g_option_context_add_main_entries(context, cmd_entries, PACKAGE_NAME);
@@ -410,15 +410,15 @@ void iface_plugin_set_active (PluginHandle * plugin)
     g_message ("Unloading %s.", plugin_get_name (current_iface));
     interface_unload ();
 
+    current_iface = plugin;
+    interface_set_default (plugin);
+
     g_message ("Starting %s.", plugin_get_name (plugin));
     if (! interface_load (plugin))
     {
         fprintf (stderr, "%s failed to start.\n", plugin_get_name (plugin));
         exit (EXIT_FAILURE);
     }
-
-    current_iface = plugin;
-    interface_set_default (plugin);
 
     g_message ("Loading visualizers.");
     vis_init ();

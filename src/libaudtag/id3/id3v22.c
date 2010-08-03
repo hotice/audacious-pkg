@@ -21,7 +21,6 @@
  * using our public API to be a derived work.
  */
 
-#define DEBUG
 #include <glib.h>
 
 #include <libaudcore/audstrings.h>
@@ -96,7 +95,7 @@ static gboolean validate_header (ID3v2Header * header)
     if ((header->version != 2))
         return FALSE;
 
-    header->size = GUINT32_FROM_BE (header->size);
+    header->size = unsyncsafe32(GUINT32_FROM_BE(header->size));
 
     AUDDBG ("Found ID3v2 header:\n");
     AUDDBG (" magic = %.3s\n", header->magic);
@@ -545,7 +544,7 @@ static gboolean parse_pic (const guchar * data, gint size, gchar * * mime,
 static gboolean id3v22_read_image (VFSFile * handle, void * * image_data, gint *
  image_size)
 {
-    gint version, header_size, data_size, parsed, i;
+    gint version, header_size, data_size, parsed;
     gboolean syncsafe;
     gsize offset;
     gboolean found = FALSE;
