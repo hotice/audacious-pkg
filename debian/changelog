@@ -1,4 +1,4 @@
-audacious (2.4~rc1-1) experimental; urgency=low
+audacious (2.4~rc2-1) experimental; urgency=low
 
   * New upstream release (LP: #579605).
   * Refer to versioned copyright file.
@@ -15,7 +15,7 @@ audacious (2.4~rc1-1) experimental; urgency=low
   * Drop libglade2-dev and libsamplerate-dev from audacious-dev.
   * Bump audacious-plugins dependency to 2.4~beta1.
 
- -- Benjamin Drung <bdrung@ubuntu.com>  Thu, 12 Aug 2010 02:36:03 +0200
+ -- Benjamin Drung <bdrung@ubuntu.com>  Thu, 19 Aug 2010 17:57:28 +0200
 
 audacious (2.3-2) unstable; urgency=low
 
