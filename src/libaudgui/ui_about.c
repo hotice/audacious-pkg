@@ -37,6 +37,8 @@
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
 
+#include "audacious/compatibility.h"
+
 #include "ui_credits.h"
 
 static GtkWidget *about_window = NULL;
@@ -49,11 +51,14 @@ static GdkBitmap *mask_bitmap_window1 = NULL,
 static gboolean
 on_about_window_expose(GtkWidget *widget, GdkEventExpose *expose, gpointer data)
 {
+	GdkWindow *window;
+
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(GTK_IS_WIDGET (widget), FALSE);
 
-	gdk_window_set_back_pixmap(GDK_WINDOW(widget->window), mask_pixmap_window2, 0);
-	gdk_window_clear(GDK_WINDOW(widget->window));
+	window = gtk_widget_get_window(widget);
+	gdk_window_set_back_pixmap(window, mask_pixmap_window2, 0);
+	gdk_window_clear(window);
 
 	return FALSE;
 }
