@@ -300,7 +300,7 @@ static gboolean read_frame (VFSFile * handle, gint max_size, gint version,
      (GUINT32_FROM_BE (header.size));
     header.flags = GUINT16_FROM_BE (header.flags);
 
-    if (header.size > max_size)
+    if (header.size > max_size || header.size == 0)
         return FALSE;
 
     AUDDBG ("Found frame:\n");
@@ -322,7 +322,7 @@ static gboolean read_frame (VFSFile * handle, gint max_size, gint version,
     if (header.flags & ID3_FRAME_HAS_LENGTH)
         skip += 4;
 
-    if (skip > 0 && vfs_fseek (handle, skip, SEEK_CUR))
+    if ((skip > 0 && vfs_fseek (handle, skip, SEEK_CUR)) || skip >= header.size)
         return FALSE;
 
     * size = header.size - skip;
@@ -484,7 +484,7 @@ static void associate_string (Tuple * tuple, gint field, const gchar *
 {
     gchar * text = decode_text_frame (data, size);
 
-    if (text == NULL)
+    if (text == NULL || ! text[0])
         return;
 
     if (customfield != NULL)
@@ -501,7 +501,7 @@ static void associate_int (Tuple * tuple, gint field, const gchar *
 {
     gchar * text = decode_text_frame (data, size);
 
-    if (text == NULL)
+    if (text == NULL || ! text[0])
         return;
 
     if (customfield != NULL)

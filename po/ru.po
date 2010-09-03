@@ -11,21 +11,22 @@
 # Eugene Zagidullin <e.asphyx@gmail.com>, 2007.
 # serg0 <serg0@ulx.ru>, 2009.
 # Eugene Paskevich <eugene@raptor.kiev.ua>, 2010.
+# Sergey V. Mironov <sergo@bk.ru>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: audacious 2.4\n"
 "Report-Msgid-Bugs-To: http://jira.atheme.org/\n"
 "POT-Creation-Date: 2010-08-03 17:50-0400\n"
-"PO-Revision-Date: 2010-07-20 02:24+0300\n"
-"Last-Translator: Eugene Paskevich <eugene@raptor.kiev.ua>\n"
+"PO-Revision-Date: 2010-08-22 22:15+0400\n"
+"Last-Translator: Sergey V. Mironov <sergo@bk.ru>\n"
 "Language-Team: Russian <kde-russian@lists.kde.ru>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Lokalize 1.0\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Poedit-Language: Russian\n"
 "X-Poedit-Basepath: /home/asphyx/ahinea/audacious\n"
 
@@ -37,7 +38,7 @@ msgid ""
 "Copyright (C) 2005-2010 Audacious Development Team"
 msgstr ""
 "<big><b>Audacious %s</b></big>\n"
-"Аудио проигрыватель для различных платформ.\n"
+"Звуковой проигрыватель для различных платформ.\n"
 "Copyright (C) 2005-2010 команда разработчиков Audacious"
 
 #: src/audacious/credits.c:36
@@ -93,9 +94,8 @@ msgid "Catalan:"
 msgstr "Каталонский:"
 
 #: src/audacious/credits.c:197
-#, fuzzy
 msgid "Chinese:"
-msgstr "Китайский"
+msgstr "Китайский:"
 
 #: src/audacious/credits.c:200
 msgid "Croatian:"
@@ -277,7 +277,7 @@ msgstr "Показать диалог перехода к файлу"
 
 #: src/audacious/main.c:165
 msgid "Add files to the playlist"
-msgstr "Добавить файлы в список воспроизведения."
+msgstr "Добавить файлы в список воспроизведения"
 
 #: src/audacious/main.c:166
 msgid "Add new files to a temporary playlist"
@@ -336,7 +336,7 @@ msgstr "Не найден декодер для %s."
 
 #: src/audacious/playback.c:599
 msgid "Buffering ..."
-msgstr "Буферизация ..."
+msgstr "Буферизация..."
 
 #: src/audacious/playlist-new.c:292
 msgid "Untitled Playlist"
@@ -595,7 +595,7 @@ msgid ""
 "signal clipping is not to use positive values above.</span>"
 msgstr ""
 "<span size=\"small\">Помните, что наиболее эффективный способ избежать "
-"срезания, ― не использовать выше положительные значения.</span>"
+"срезания, ― не использовать положительные значения.</span>"
 
 #: src/audacious/ui_preferences.c:201
 msgid "<b>Replay Gain configuration</b>"
@@ -637,7 +637,7 @@ msgstr "Прокси сервер:"
 
 #: src/audacious/ui_preferences.c:214
 msgid "Proxy port:"
-msgstr "Прокси порт:"
+msgstr "Порт прокси:"
 
 #: src/audacious/ui_preferences.c:218
 msgid "Proxy username:"
@@ -695,7 +695,7 @@ msgstr ""
 
 #: src/audacious/ui_preferences.c:239
 msgid "Clear current playlist when opening new files"
-msgstr "Очистить текущий список воспроизведения при открытии новых файлов "
+msgstr "О_чистить текущий список воспроизведения при открытии новых файлов "
 
 #: src/audacious/ui_preferences.c:244
 msgid "Auto character encoding detector for:"
@@ -723,7 +723,7 @@ msgstr "<b>Мета-информация о дорожке</b>"
 
 #: src/audacious/ui_preferences.c:408
 msgid "Enabled"
-msgstr "Включен"
+msgstr "Включён"
 
 #: src/audacious/ui_preferences.c:424
 msgid "Description"
@@ -938,7 +938,7 @@ msgstr "Больше не _показывать это предупрежден�
 
 #: src/libaudgui/effects-menu.c:61
 msgid "settings ..."
-msgstr "настройки ..."
+msgstr "настройки..."
 
 #: src/libaudgui/equalizer.c:68
 msgid "_Enable"
@@ -946,44 +946,39 @@ msgstr "_Включить"
 
 #: src/libaudgui/equalizer.c:140
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Гц"
 
 #: src/libaudgui/equalizer.c:140
 msgid "63 Hz"
-msgstr ""
+msgstr "63 Гц"
 
 #: src/libaudgui/equalizer.c:141
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Гц"
 
 #: src/libaudgui/equalizer.c:141
-#, fuzzy
 msgid "250 Hz"
-msgstr "60 Гц"
+msgstr "250 Гц"
 
 #: src/libaudgui/equalizer.c:141
-#, fuzzy
 msgid "500 Hz"
-msgstr "600 Гц"
+msgstr "500 Гц"
 
 #: src/libaudgui/equalizer.c:141
 msgid "1 kHz"
 msgstr "1 кГц"
 
 #: src/libaudgui/equalizer.c:141
-#, fuzzy
 msgid "2 kHz"
-msgstr "12 кГц"
+msgstr "2 кГц"
 
 #: src/libaudgui/equalizer.c:142
-#, fuzzy
 msgid "4 kHz"
-msgstr "14 кГц"
+msgstr "4 кГц"
 
 #: src/libaudgui/equalizer.c:142
-#, fuzzy
 msgid "8 kHz"
-msgstr "1 кГц"
+msgstr "8 кГц"
 
 #: src/libaudgui/equalizer.c:142
 msgid "16 kHz"
@@ -1722,7 +1717,7 @@ msgstr "В _очередь"
 
 #: src/libaudgui/ui_jumptotrack.c:415
 msgid "Jump to Track"
-msgstr "Перейти на дорожку"
+msgstr "Перейти к дорожке"
 
 #: src/libaudgui/ui_jumptotrack.c:458
 msgid "Filter: "
@@ -1746,7 +1741,7 @@ msgstr "Закрыть после перехода"
 
 #: src/libaudgui/ui_playlist_manager.c:165
 msgid "Playlist Manager"
-msgstr "Управление списками"
+msgstr "Менеджер списков"
 
 #: src/libaudgui/ui_playlist_manager.c:205
 msgid "Entries"
@@ -1762,11 +1757,11 @@ msgstr "_Закрыть окно при выборе списка"
 
 #: src/libaudgui/ui_urlopener.c:57
 msgid "Open URL"
-msgstr "Открыть URL"
+msgstr "Открыть адрес"
 
 #: src/libaudgui/ui_urlopener.c:57
 msgid "Add URL"
-msgstr "Добавить URL"
+msgstr "Добавить адрес"
 
 #: src/libeggsmclient/eggdesktopfile.c:138
 msgid "File is not a valid .desktop file"
@@ -1789,7 +1784,7 @@ msgstr "Приложение не поддерживает указание им
 #: src/libeggsmclient/eggdesktopfile.c:1075
 #, c-format
 msgid "Unrecognized launch option: %d"
-msgstr "Неизвестная опция: %d"
+msgstr "Неизвестный параметр: %d"
 
 #: src/libeggsmclient/eggdesktopfile.c:1277
 msgid "Can't pass document URIs to a 'Type=Link' desktop entry"
