@@ -175,6 +175,7 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_init@Base 2.4~alpha1
  audgui_jump_to_track@Base 2.3
  audgui_jump_to_track_hide@Base 2.3
+ audgui_pixbuf_for_file@Base 2.4.0
  audgui_pixbuf_from_data@Base 2.4~alpha1
  audgui_pixbuf_scale_within@Base 2.4~alpha1
  audgui_playlist_manager_destroy@Base 2.4~alpha1
