@@ -1,0 +1,36 @@
+Description: Use VFS for writing equalizer presets.
+Author: John Lindgren <john.lindgren@tds.net>
+Bug-Ubuntu: https://launchpad.net/bugs/559287
+Bug: http://jira.atheme.org/browse/AUD-265
+Origin: upstream, http://hg.atheme.org/audacious/audacious/rev/fc61e92b1258
+
+diff -r e50ba93f6078 -r fc61e92b1258 src/audacious/equalizer_preset.c
+--- a/src/audacious/equalizer_preset.c	Thu Sep 23 20:12:50 2010 -0400
++++ b/src/audacious/equalizer_preset.c	Thu Sep 23 20:44:41 2010 -0400
+@@ -194,6 +194,7 @@
+     return NULL;
+ }
+ 
++/* This should not return void, as that makes reporting errors impossible. */
+ void
+ save_preset_file(EqualizerPreset *preset, const gchar * filename)
+ {
+@@ -214,9 +215,15 @@
+     }
+ 
+     data = g_key_file_to_data(rcfile, &len, &error);
+-    g_file_set_contents(filename, data, len, &error);
++
++    VFSFile * file = vfs_fopen (filename, "w");
++    if (file == NULL)
++        goto DONE;
++    vfs_fwrite (data, 1, strlen (data), file);
++    vfs_fclose (file);
++
++DONE:
+     g_free(data);
+-
+     g_key_file_free(rcfile);
+ }
+ 
+
