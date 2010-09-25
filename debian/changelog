@@ -1,6 +1,6 @@
 audacious (2.4.0-1) experimental; urgency=low
 
-  * New upstream release (LP: #579605, #625208).
+  * New upstream release (Closes: #597179, LP: #579605, #625208).
     - Fixes manpage suggests '-i newui' instead of '-i gtkui' (Closes: #588333).
     - Builds with binutils-gold (Closes: #553935).
   * Refer to versioned copyright file.
@@ -16,8 +16,9 @@ audacious (2.4.0-1) experimental; urgency=low
   * Do not link against unused libraries (make dpkg-shlibdeps happy).
   * Drop libglade2-dev and libsamplerate-dev from audacious-dev.
   * Bump audacious-plugins dependency to 2.4.0.
+  * Backport fix for writing equalizer presets (LP: #559287).
 
- -- Benjamin Drung <bdrung@ubuntu.com>  Sat, 04 Sep 2010 22:21:58 +0200
+ -- Benjamin Drung <bdrung@ubuntu.com>  Sat, 25 Sep 2010 14:03:06 +0200
 
 audacious (2.3-2) unstable; urgency=low
 
