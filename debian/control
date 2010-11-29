@@ -1,7 +1,7 @@
 Source: audacious
 Section: sound
 Priority: optional
-Maintainer: Debian Audacious Packagers <pkg-audacious-maintainers@lists.alioth.debian.org>
+Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Chris Taylor <ctaylor@debian.org>,
            Benjamin Drung <bdrung@ubuntu.com>
 Homepage: http://www.audacious-media-player.org/
