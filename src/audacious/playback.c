@@ -145,8 +145,7 @@ static void update_cb (void * hook_data, void * user_data)
 
     g_return_if_fail (current_playback != NULL);
 
-    if (GPOINTER_TO_INT (hook_data) < PLAYLIST_UPDATE_METADATA ||
-     ! playback_is_ready ())
+    if (GPOINTER_TO_INT (hook_data) < PLAYLIST_UPDATE_METADATA)
         return;
 
     playlist = playlist_get_playing ();
@@ -164,7 +163,9 @@ static void update_cb (void * hook_data, void * user_data)
     g_free (current_playback->title);
     current_playback->title = g_strdup (title);
     current_playback->length = length;
-    hook_call ("title change", NULL);
+
+    if (playback_is_ready ())
+        hook_call ("title change", NULL);
 }
 
 gint playback_get_time (void)
@@ -314,6 +315,7 @@ static gboolean playback_ended (void * unused)
         if (! play)
         {
             complete_stop ();
+            hook_call ("playlist end reached", NULL);
             break;
         }
 

@@ -695,7 +695,7 @@ msgstr ""
 
 #: src/audacious/ui_preferences.c:239
 msgid "Clear current playlist when opening new files"
-msgstr "О_чистить текущий список воспроизведения при открытии новых файлов "
+msgstr "Очистить текущий список воспроизведения при открытии новых файлов "
 
 #: src/audacious/ui_preferences.c:244
 msgid "Auto character encoding detector for:"
@@ -934,7 +934,7 @@ msgstr ""
 
 #: src/libaudgui/confirm.c:74
 msgid "_Don't show this message again"
-msgstr "Больше не _показывать это предупреждение"
+msgstr "Больше не показывать это предупреждение"
 
 #: src/libaudgui/effects-menu.c:61
 msgid "settings ..."
@@ -942,7 +942,7 @@ msgstr "настройки..."
 
 #: src/libaudgui/equalizer.c:68
 msgid "_Enable"
-msgstr "_Включить"
+msgstr "Включить"
 
 #: src/libaudgui/equalizer.c:140
 msgid "31 Hz"
@@ -1709,11 +1709,11 @@ msgstr "Закрыть окно при добавлении"
 
 #: src/libaudgui/ui_jumptotrack.c:144
 msgid "Un_queue"
-msgstr "_Убрать из очереди"
+msgstr "Убрать из очереди"
 
 #: src/libaudgui/ui_jumptotrack.c:146 src/libaudgui/ui_jumptotrack.c:528
 msgid "_Queue"
-msgstr "В _очередь"
+msgstr "В очередь"
 
 #: src/libaudgui/ui_jumptotrack.c:415
 msgid "Jump to Track"
@@ -1725,7 +1725,7 @@ msgstr "Фильтр: "
 
 #: src/libaudgui/ui_jumptotrack.c:459
 msgid "_Filter:"
-msgstr "_Фильтр:"
+msgstr "Фильтр:"
 
 #: src/libaudgui/ui_jumptotrack.c:477
 msgid "Remember"
@@ -1733,7 +1733,7 @@ msgstr "Запомнить"
 
 #: src/libaudgui/ui_jumptotrack.c:486
 msgid "Clea_r"
-msgstr "О_чистить"
+msgstr "Очистить"
 
 #: src/libaudgui/ui_jumptotrack.c:520
 msgid "Close on Jump"
@@ -1749,11 +1749,11 @@ msgstr "Элементов"
 
 #: src/libaudgui/ui_playlist_manager.c:224
 msgid "_Rename"
-msgstr "_Переименовать"
+msgstr "Переименовать"
 
 #: src/libaudgui/ui_playlist_manager.c:252
 msgid "_Close dialog on activating playlist"
-msgstr "_Закрыть окно при выборе списка"
+msgstr "Закрыть окно при выборе списка"
 
 #: src/libaudgui/ui_urlopener.c:57
 msgid "Open URL"

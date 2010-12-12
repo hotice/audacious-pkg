@@ -49,11 +49,11 @@
 #include "audconfig.h"
 #include "chardet.h"
 #include "configdb.h"
+#include "debug.h"
 #include "drct.h"
 #include "equalizer.h"
 #include "i18n.h"
 #include "interface.h"
-#include "logger.h"
 #include "output.h"
 #include "playback.h"
 #include "playlist.h"
@@ -61,8 +61,6 @@
 #include "signals.h"
 #include "util.h"
 #include "visualization.h"
-
-#include "ui_misc.h"
 
 #define AUTOSAVE_INTERVAL 300 /* seconds */
 
@@ -74,11 +72,9 @@ struct _AudCmdLineOpt
     gint session;
     gboolean play, stop, pause, fwd, rew, play_pause, show_jump_box;
     gboolean enqueue, mainwin, remote, activate;
-    gboolean no_log;
     gboolean enqueue_to_temp;
     gboolean version;
     gchar *previous_session_id;
-    gboolean macpack;
 };
 typedef struct _AudCmdLineOpt AudCmdLineOpt;
 
@@ -143,7 +139,6 @@ static void aud_init_paths()
     aud_paths[BMP_PATH_CONFIG_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "config", NULL);
     aud_paths[BMP_PATH_PLAYLIST_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "playlist.xspf", NULL);
     aud_paths[BMP_PATH_ACCEL_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "accels", NULL);
-    aud_paths[BMP_PATH_LOG_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "log", NULL);
 
     aud_paths[BMP_PATH_GTKRC_FILE] = g_build_filename(aud_paths[BMP_PATH_USER_DIR], "gtkrc", NULL);
 
@@ -166,11 +161,8 @@ static GOptionEntry cmd_entries[] = {
     {"enqueue-to-temp", 'E', 0, G_OPTION_ARG_NONE, &options.enqueue_to_temp, N_("Add new files to a temporary playlist"), NULL},
     {"show-main-window", 'm', 0, G_OPTION_ARG_NONE, &options.mainwin, N_("Display the main window"), NULL},
     {"activate", 'a', 0, G_OPTION_ARG_NONE, &options.activate, N_("Display all open Audacious windows"), NULL},
-    {"no-log", 'N', 0, G_OPTION_ARG_NONE, &options.no_log, N_("Print all errors and warnings to stdout"), NULL},
     {"version", 'v', 0, G_OPTION_ARG_NONE, &options.version, N_("Show version"), NULL},
-#ifdef GDK_WINDOWING_QUARTZ
-    {"macpack", 'n', 0, G_OPTION_ARG_NONE, &options.macpack, N_("Used in macpacking"), NULL},   /* Make this hidden */
-#endif
+    {"verbose", 'V', 0, G_OPTION_ARG_NONE, &cfg.verbose, N_("Print debugging messages"), NULL},
     {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, N_("FILE..."), NULL},
     {NULL},
 };
@@ -216,17 +208,27 @@ static void handle_cmd_line_filenames(gboolean is_running)
     working = g_get_current_dir();
     for (i = 0; filenames[i] != NULL; i++)
     {
+        gchar * utf8 = g_locale_to_utf8 (filenames[i], -1, NULL, NULL, NULL);
+        if (! utf8)
+            utf8 = g_strdup (filenames[i]);
+
         gchar *uri;
-        if (strstr(filenames[i], "://"))
-            uri = g_strdup(filenames[i]);
-        else if (g_path_is_absolute(filenames[i]))
-            uri = g_filename_to_uri(filenames[i], NULL, NULL);
+
+        if (strstr (utf8, "://"))
+        {
+            uri = utf8;
+            utf8 = NULL;
+        }
+        else if (g_path_is_absolute (utf8))
+            uri = g_filename_to_uri (utf8, NULL, NULL);
         else
         {
-            gchar *absolute = g_build_filename(working, filenames[i], NULL);
+            gchar * absolute = g_build_filename (working, utf8, NULL);
             uri = g_filename_to_uri(absolute, NULL, NULL);
             g_free(absolute);
         }
+        
+        g_free (utf8);
         fns = g_list_prepend(fns, uri);
     }
     fns = g_list_reverse(fns);
@@ -325,40 +327,32 @@ static void handle_cmd_line_options(void)
         interface_toggle_visibility ();
 }
 
-static void aud_setup_logger(void)
-{
-    if (!aud_logger_start(aud_paths[BMP_PATH_LOG_FILE]))
-        return;
-
-    g_atexit(aud_logger_stop);
-}
-
 void aud_quit (void)
 {
-    g_message ("Ending main loop.");
+    AUDDBG ("Ending main loop.\n");
     gtk_main_quit ();
 }
 
 static void shut_down (void)
 {
-    g_message("Saving configuration");
+    AUDDBG ("Saving configuration.\n");
     aud_config_save();
     save_playlists ();
 
     if (playback_get_playing ())
         playback_stop ();
 
-    g_message("Shutting down user interface subsystem");
+    AUDDBG ("Shutting down user interface subsystem.\n");
     interface_unload ();
 
     output_cleanup ();
 
-    g_message("Plugin subsystem shutdown");
+    AUDDBG ("Plugin subsystem shutdown.\n");
     plugin_system_cleanup();
 
     cfg_db_flush (); /* must be after plugin cleanup */
 
-    g_message("Playlist cleanup");
+    AUDDBG ("Playlist cleanup.\n");
     playlist_end();
 }
 
@@ -388,7 +382,7 @@ void init_playback_hooks(void)
 
 static gboolean autosave_cb (void * unused)
 {
-    g_message ("Saving configuration.");
+    AUDDBG ("Saving configuration.\n");
     aud_config_save ();
     cfg_db_flush ();
     save_playlists ();
@@ -404,23 +398,23 @@ PluginHandle * iface_plugin_get_active (void)
 
 void iface_plugin_set_active (PluginHandle * plugin)
 {
-    g_message ("Unloading visualizers.");
+    AUDDBG ("Unloading visualizers.\n");
     vis_cleanup ();
 
-    g_message ("Unloading %s.", plugin_get_name (current_iface));
+    AUDDBG ("Unloading %s.\n", plugin_get_name (current_iface));
     interface_unload ();
 
     current_iface = plugin;
     interface_set_default (plugin);
 
-    g_message ("Starting %s.", plugin_get_name (plugin));
+    AUDDBG ("Starting %s.\n", plugin_get_name (plugin));
     if (! interface_load (plugin))
     {
         fprintf (stderr, "%s failed to start.\n", plugin_get_name (plugin));
         exit (EXIT_FAILURE);
     }
 
-    g_message ("Loading visualizers.");
+    AUDDBG ("Loading visualizers.\n");
     vis_init ();
 }
 
@@ -461,10 +455,6 @@ gint main(gint argc, gchar ** argv)
 
     parse_cmd_line_options(&argc, &argv);
 
-    if (options.no_log == FALSE)
-        aud_setup_logger();
-
-    g_message("Initializing Gtk+");
     if (!gtk_init_check(&argc, &argv))
     {                           /* XXX */
         /* GTK check failed, and no arguments passed to indicate
@@ -474,41 +464,36 @@ gint main(gint argc, gchar ** argv)
         exit(EXIT_FAILURE);
     }
 
-    g_message("Loading configuration");
+    AUDDBG ("Loading configuration.\n");
     aud_config_load();
     atexit (aud_config_free);
 
-    g_message("Initializing signal handlers");
+    AUDDBG ("Initializing signal handlers.\n");
     signal_handlers_init();
 
-    g_message("Handling commandline options, part #1");
+    AUDDBG ("Handling commandline options, part #1.\n");
     handle_cmd_line_options_first();
 
     output_init ();
 
 #ifdef USE_DBUS
-    g_message("Initializing D-Bus");
+    AUDDBG ("Initializing D-Bus.\n");
     init_dbus();
     init_playback_hooks();
 #endif
 
-    g_message("Initializing plugin subsystems...");
+    AUDDBG ("Initializing plugin subsystems.\n");
     plugin_system_init();
 
     playlist_init ();
     load_playlists ();
     eq_init ();
 
-    g_message("Handling commandline options, part #2");
+    AUDDBG ("Handling commandline options, part #2.\n");
     handle_cmd_line_options();
 
-    g_message("Registering interface hooks");
+    AUDDBG ("Registering interface hooks.\n");
     register_interface_hooks();
-
-#ifndef NOT_ALPHA_RELEASE
-    g_message("Displaying unsupported version warning.");
-    ui_display_unsupported_version_warning();
-#endif
 
     g_timeout_add_seconds (AUTOSAVE_INTERVAL, autosave_cb, NULL);
 
@@ -518,23 +503,23 @@ gint main(gint argc, gchar ** argv)
         return EXIT_FAILURE;
     }
 
-    g_message ("Starting %s.", plugin_get_name (current_iface));
+    AUDDBG ("Starting %s.\n", plugin_get_name (current_iface));
     if (! interface_load (current_iface))
     {
         fprintf (stderr, "%s failed to start.\n", plugin_get_name (current_iface));
         return EXIT_FAILURE;
     }
 
-    g_message ("Loading visualizers.");
+    AUDDBG ("Loading visualizers.\n");
     vis_init ();
 
-    g_message ("Starting main loop.");
+    AUDDBG ("Starting main loop.\n");
     gtk_main ();
 
-    g_message ("Unloading visualizers.");
+    AUDDBG ("Unloading visualizers.\n");
     vis_cleanup ();
 
-    g_message ("Shutting down.");
+    AUDDBG ("Shutting down.\n");
     shut_down ();
     return EXIT_SUCCESS;
 }

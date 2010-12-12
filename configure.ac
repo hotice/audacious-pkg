@@ -6,7 +6,7 @@ dnl Require autoconf 2.59 or later
 AC_PREREQ([2.59])
 
 dnl Initialize
-AC_INIT([audacious], [2.4.0], [bugs+audacious@atheme.org])
+AC_INIT([audacious], [2.4.2], [bugs+audacious@atheme.org])
 AC_COPYRIGHT([(C) 2005-2010 Audacious Development Team])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -44,17 +44,6 @@ AC_ARG_WITH([buildstamp],
 dnl Large file support
 dnl ==================
 CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
-
-dnl Debug support
-dnl ========================
-AC_SUBST(DEBUG)
-AUD_ARG_ENABLE([debug], [no],
-[additional debugging output],
-[
-    AC_DEFINE([DEBUG], 1, [Define if debugging output is required])
-])
-AUD_CONDITIONAL([DEBUG], [enable_debug])
-
 
 dnl Plugin stuff
 dnl ========================
@@ -342,7 +331,6 @@ fi
 
 echo "  Allow user plugin dir:                  $enable_user_plugin_dir"
 echo ""
-echo "  Additional debugging output:            $enable_debug"
 echo "  Automatic character code detection:     $enable_chardet"
 echo "  D-Bus support:                          $enable_dbus"
 echo "  Session management (eggsm)              $enable_sm"

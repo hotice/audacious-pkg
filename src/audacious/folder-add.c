@@ -159,7 +159,7 @@ static gboolean add_cb (void * unused)
     if (stack == NULL)
     {
         index_sort (index, (gint (*) (const void *, const void *))
-         string_compare);
+         string_compare_encoded);
 
         count = playlist_count ();
 
@@ -204,7 +204,7 @@ void playlist_insert_folder (gint playlist, gint at, const gchar * folder,
 
     add_playlist = playlist;
     add_at = at;
-    add_play = play;
+    add_play |= play;
 
     if (unix_name == NULL)
         return;
