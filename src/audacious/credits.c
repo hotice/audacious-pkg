@@ -263,7 +263,7 @@ static const gchar *translators_text[] = {
     "Michał Kiedrowicz",
     "Szymon Weihs",
     NULL,
-    N_("Portugese:"),
+    N_("Portuguese:"),
     "Luís Picciochi Oliveira",
     NULL,
     N_("Romanian:"),

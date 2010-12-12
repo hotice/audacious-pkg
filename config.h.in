@@ -23,9 +23,6 @@
 /* Location of D-Bus services directory */
 #undef DBUS_SERVICES_DIR
 
-/* Define if debugging output is required */
-#undef DEBUG
-
 /* Define to disable per user plugin directory */
 #undef DISABLE_USER_PLUGIN_DIR
 

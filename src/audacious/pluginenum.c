@@ -43,6 +43,7 @@
 #include "plugins.h"
 
 #include "audconfig.h"
+#include "debug.h"
 #include "effect.h"
 #include "general.h"
 #include "i18n.h"
@@ -114,7 +115,7 @@ static void plugin2_dispose(GModule * module, const gchar * str, ...)
     buf = g_strdup_vprintf(str, va);
     va_end(va);
 
-    g_message("*** %s\n", buf);
+    AUDDBG ("*** %s\n", buf);
     g_free(buf);
 
     g_module_close(module);
@@ -277,7 +278,7 @@ void module_load (const gchar * filename)
     GModule *module;
     PluginHeader * (* func) (AudAPITable * table);
 
-    g_message("Loaded plugin (%s)", filename);
+    AUDDBG ("Loading plugin: %s.\n", filename);
 
     if (!(module = g_module_open(filename, G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL)))
     {
@@ -335,7 +336,7 @@ static OutputPlugin * output_load_selected (void)
 
 static gboolean output_probe_func (PluginHandle * handle, OutputPlugin * * result)
 {
-    g_message ("Probing output plugin %s", plugin_get_name (handle));
+    AUDDBG ("Probing output plugin %s.\n", plugin_get_name (handle));
     OutputPlugin * plugin = plugin_get_header (handle);
 
     if (plugin == NULL || plugin->init == NULL || plugin->init () !=
@@ -415,7 +416,7 @@ void plugin_system_cleanup(void)
 {
     mowgli_node_t *hlist_node;
 
-    g_message("Shutting down plugin system");
+    AUDDBG ("Shutting down plugin system.\n");
 
     if (current_output_plugin != NULL)
     {
