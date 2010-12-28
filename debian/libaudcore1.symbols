@@ -71,6 +71,7 @@ libaudcore.so.1 libaudcore1 #MINVER#
  str_to_utf8@Base 2.3
  str_to_utf8_fallback@Base 2.3
  string_compare@Base 2.3
+ string_compare_encoded@Base 2.4.2
  string_cut_extension@Base 2.3
  string_decode_percent@Base 2.3
  string_encode_percent@Base 2.4~alpha1
@@ -305,9 +306,11 @@ libaudtag.so.1 libaudcore1 #MINVER#
  tag_image_read@Base 2.4~alpha1
  tag_init@Base 2.3
  tag_modules@Base 2.3
+ tag_set_verbose@Base 2.4.2
  tag_tuple_read@Base 2.3
  tag_tuple_write@Base 2.4~alpha1
  tag_tuple_write_to_file@Base 2.3
+ tag_verbose@Base 2.4.2
  unix_time@Base 2.3
  unsyncsafe32@Base 2.4~alpha1
  utf8@Base 2.3
