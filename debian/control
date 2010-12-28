@@ -20,7 +20,7 @@ VCS-Git: git://git.debian.org/pkg-audacious/audacious.git
 
 Package: audacious
 Architecture: any
-Depends: audacious-plugins (>= 2.4.0),
+Depends: audacious-plugins (>= 2.4.2),
          dbus,
          dbus-x11,
          gtk2-engines-pixbuf,
