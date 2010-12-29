@@ -27,8 +27,9 @@ audacious (2.4.2-1) experimental; urgency=low
   * Add backported bp-audtag-debugging-output.patch: Implement debugging output
     in audtag without linking to core's cfg variable.
   * Put Audacious under the umbrella of the Multimedia Maintainers team.
+  * Update my email address.
 
- -- Benjamin Drung <bdrung@ubuntu.com>  Tue, 28 Dec 2010 17:04:50 +0100
+ -- Benjamin Drung <bdrung@debian.org>  Wed, 29 Dec 2010 22:53:25 +0100
 
 audacious (2.3-2) unstable; urgency=low
 
