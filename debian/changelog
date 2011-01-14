@@ -1,3 +1,11 @@
+audacious (2.4.3-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+  * debian/patches/bp-audtag-debugging-output.patch: Refresh to make patch
+    apply without fuzz.
+
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 14 Jan 2011 10:34:44 +0300
+
 audacious (2.4.2-1) experimental; urgency=low
 
   * New upstream release (Closes: #597179, LP: #579605, #625208).
