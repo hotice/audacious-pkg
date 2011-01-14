@@ -6,7 +6,7 @@ dnl Require autoconf 2.59 or later
 AC_PREREQ([2.59])
 
 dnl Initialize
-AC_INIT([audacious], [2.4.2], [bugs+audacious@atheme.org])
+AC_INIT([audacious], [2.4.3], [bugs+audacious@atheme.org])
 AC_COPYRIGHT([(C) 2005-2010 Audacious Development Team])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -68,6 +68,11 @@ dnl GNU gettext
 dnl ===========
 AM_GNU_GETTEXT
 AM_GNU_GETTEXT_VERSION([0.14.0])
+
+if test "$MSGFMT" = ":" ; then
+    AC_MSG_ERROR([msgfmt was not found!  You may need to install gettext.])
+fi
+
 
 dnl Checks common for core and plugins
 dnl ==================================
@@ -292,7 +297,7 @@ if test "x$prefix" = "xNONE"; then
 fi
 
 if test -z "$datadir"; then
-	datadir="${prefix}/share"
+    datadir="${prefix}/share"
 fi
 
 localedir="$datadir/locale"

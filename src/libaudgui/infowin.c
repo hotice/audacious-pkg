@@ -774,6 +774,15 @@ static void infowin_show (const gchar * filename, const Tuple * tuple,
 
     tmp = g_strdup (filename);
     string_decode_percent (tmp);
+
+    /* Convert invalid UTF-8 URI's quietly. */
+    if (! g_utf8_validate (tmp, -1, NULL))
+    {
+        gchar * copy = str_to_utf8 (tmp);
+        g_free (tmp);
+        tmp = copy;
+    }
+
     gtk_label_set_text ((GtkLabel *) location_text, easy_read_filename (tmp));
     g_free (tmp);
 

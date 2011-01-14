@@ -172,67 +172,8 @@ gchar *(*chardet_to_utf8)(const gchar *str, gssize len,
                        gsize *arg_bytes_read, gsize *arg_bytes_write,
                        GError **arg_error) = NULL;
 
-/**
- * Convert name of absolute path in local file system encoding
- * into UTF-8 string.
- *
- * @param filename Local filename/path to convert.
- * @return Filename converted to UTF-8 encoding.
- */
-gchar *
-filename_to_utf8(const gchar * filename)
-{
-    gchar *out_str;
-
-    /* NULL in NULL out */
-    if (filename == NULL)
-        return NULL;
-
-    if ((out_str = g_filename_to_utf8(filename, -1, NULL, NULL, NULL)))
-        return out_str;
-
-    return str_to_utf8_fallback(filename);
-}
-
-/* derives basename from uri. basename is in utf8 */
-gchar *
-uri_to_display_basename(const gchar * uri)
-{
-    gchar *realfn, *utf8fn, *basename;
-
-    g_return_val_if_fail(uri, NULL);
-
-    realfn = g_filename_from_uri(uri, NULL, NULL);
-    utf8fn = g_filename_display_name(realfn ? realfn : uri); // guaranteed to be non-NULL
-    basename = g_path_get_basename(utf8fn);
-
-    g_free(realfn);
-    g_free(utf8fn);
-
-    return basename;
-}
-
-/* derives dirname from uri. dirname is in utf8 */
-gchar *
-uri_to_display_dirname(const gchar * uri)
-{
-    gchar *realfn, *utf8fn, *dirname;
-
-    g_return_val_if_fail(uri, NULL);
-
-    realfn = g_filename_from_uri(uri, NULL, NULL);
-    utf8fn = g_filename_display_name(realfn ? realfn : uri);  // guaranteed to be non-NULL
-    dirname = g_path_get_dirname(utf8fn);
-
-    g_free(realfn);
-    g_free(utf8fn);
-
-    return dirname;
-}
-
-#if defined(__GLIBC__) && (__GLIBC__ >= 2)
-#define HAVE_EXECINFO 1
-#include <execinfo.h>
+#ifdef HAVE_EXECINFO_H
+# include <execinfo.h>
 #endif
 
 /**
@@ -258,26 +199,26 @@ str_assert_utf8(const gchar * str)
 
     /* already UTF-8? */
     if (!g_utf8_validate(str, -1, NULL)) {
-#ifdef HAVE_EXECINFO
-		gint i, nsymbols;
-		const gint nsymmax = 50;
-		void *addrbuf[nsymmax];
-		gchar **symbols;
-		nsymbols = backtrace(addrbuf, nsymmax);
-		symbols = backtrace_symbols(addrbuf, nsymbols);
+#ifdef HAVE_EXECINFO_H
+        gint i, nsymbols;
+        const gint nsymmax = 50;
+        void *addrbuf[nsymmax];
+        gchar **symbols;
+        nsymbols = backtrace(addrbuf, nsymmax);
+        symbols = backtrace_symbols(addrbuf, nsymbols);
 
-		fprintf(stderr, "String '%s' was not UTF-8! Backtrace (%d):\n", str, nsymbols);
+        fprintf(stderr, "String '%s' was not UTF-8! Backtrace (%d):\n", str, nsymbols);
 
-		for (i = 0; i < nsymbols; i++)
-			fprintf(stderr, "  #%d: %s\n", i, symbols[i]);
+        for (i = 0; i < nsymbols; i++)
+            fprintf(stderr, "  #%d: %s\n", i, symbols[i]);
 
-		free(symbols);
+        free(symbols);
 #else
-		g_warning("String '%s' was not UTF-8!", str);
+        g_warning("String '%s' was not UTF-8!", str);
 #endif
-		return str_to_utf8(str);
+        return str_to_utf8(str);
     } else
-    	return g_strdup(str);
+        return g_strdup(str);
 }
 
 
@@ -481,6 +422,96 @@ gchar * string_encode_percent (const gchar * string, gboolean is_filename)
 
     * set = 0;
     return new;
+}
+
+/* Determines whether a URI is valid UTF-8.  If not and <warn> is nonzero,
+ * prints a warning to stderr. */
+
+gboolean uri_is_utf8 (const gchar * uri, gboolean warn)
+{
+    gchar buf[strlen (uri) + 1];
+    string_decode_percent_2 (uri, buf);
+
+    if (g_utf8_validate (buf, -1, NULL))
+        return TRUE;
+
+    if (warn)
+        fprintf (stderr, "URI is not UTF-8: %s.\n", buf);
+
+    return FALSE;
+}
+
+/* Converts a URI to UTF-8 encoding.  The returned URI must be freed with g_free.
+ *
+ * Note: The function intentionally converts only URI's that are encoded in the
+ * system locale and refer to local files.
+ *
+ * Rationale:
+ *
+ * 1. Local files.  The URI was probably created by percent-encoding a raw
+ *    filename.
+ *    a. If that filename was in the system locale, then we can convert the URI
+ *       to a UTF-8 one, allowing us to display the name correctly and to access
+ *       the file by converting back to the system locale.
+ *    b. If that filename was in a different locale (perhaps copied from another
+ *       machine), then we do not want to convert it to UTF-8 (even assuming we
+ *       can do so correctly), because we will not know what encoding to convert
+ *       back to when we want to access the file.
+ * 2. Remote files.  The URI was probably created by percent-encoding a raw
+ *    filename in whatever locale the remote system is using.  We do not want
+ *    to convert it to UTF-8 because we do not know whether the remote system
+ *    can handle UTF-8 requests. */
+
+gchar * uri_to_utf8 (const gchar * uri)
+{
+    if (strncmp (uri, "file://", 7))
+        return g_strdup (uri);
+
+    /* recover the raw filename */
+    gchar buf[strlen (uri + 7) + 1];
+    string_decode_percent_2 (uri + 7, buf);
+
+    /* convert it to a URI again, in UTF-8 if possible */
+    return filename_to_uri (buf);
+}
+
+/* Check that a URI is valid UTF-8.  If not, prints a warning to stderr if
+ * <warn> is nonzero, frees the old URI with g_free, and sets <uri> to the
+ * converted URI, which must be freed with g_free when no longer needed. */
+
+void uri_check_utf8 (gchar * * uri, gboolean warn)
+{
+    if (uri_is_utf8 (* uri, warn))
+        return;
+
+    gchar * copy = uri_to_utf8 (* uri);
+    g_free (* uri);
+    * uri = copy;
+}
+
+/* Like g_filename_to_uri, but converts the filename from the system locale to
+ * UTF-8 before percent-encoding. */
+
+gchar * filename_to_uri (const gchar * name)
+{
+    gchar * utf8 = g_locale_to_utf8 (name, -1, NULL, NULL, NULL);
+    gchar * enc = string_encode_percent (utf8 ? utf8 : name, TRUE);
+    g_free (utf8);
+    gchar * uri = g_strdup_printf ("file://%s", enc);
+    g_free (enc);
+    return uri;
+}
+
+/* Like g_filename_from_uri, but converts the filename from UTF-8 to the system
+ * locale after percent-decoding. */
+
+gchar * uri_to_filename (const gchar * uri)
+{
+    g_return_val_if_fail (! strncmp (uri, "file://", 7), NULL);
+    gchar buf[strlen (uri + 7) + 1];
+    string_decode_percent_2 (uri + 7, buf);
+    gchar * name = g_locale_from_utf8 (buf, -1, NULL, NULL, NULL);
+    return name ? name : g_strdup (buf);
 }
 
 void string_cut_extension(gchar *string)
