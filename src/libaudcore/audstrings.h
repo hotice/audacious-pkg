@@ -47,10 +47,6 @@ gchar *str_to_utf8_fallback(const gchar * str);
 extern gchar * (* chardet_to_utf8) (const gchar * string, gssize length, gsize *
  bytes_read, gsize * bytes_written, GError * * error);
 
-gchar *filename_to_utf8(const gchar * filename);
-gchar *uri_to_display_basename(const gchar * uri);
-gchar *uri_to_display_dirname(const gchar * uri);
-
 const gchar *str_skip_chars(const gchar * str, const gchar * chars);
 
 gchar *convert_dos_path(gchar * text);
@@ -65,6 +61,13 @@ gchar *filename_split_subtune(const gchar * filename, gint * track);
 void string_replace_char (gchar * string, gchar old_str, gchar new_str);
 void string_decode_percent (gchar * string);
 gchar * string_encode_percent (const gchar * string, gboolean is_filename);
+
+gboolean uri_is_utf8 (const gchar * uri, gboolean warn);
+gchar * uri_to_utf8 (const gchar * uri);
+void uri_check_utf8 (gchar * * uri, gboolean warn);
+gchar * filename_to_uri (const gchar * filename);
+gchar * uri_to_filename (const gchar * uri);
+
 void string_cut_extension(gchar *string);
 gint string_compare (const gchar * a, const gchar * b);
 gint string_compare_encoded (const gchar * a, const gchar * b);
