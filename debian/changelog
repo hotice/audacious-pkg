@@ -1,11 +1,11 @@
-audacious (2.4.3-1) UNRELEASED; urgency=low
+audacious (2.4.3-1) experimental; urgency=low
 
   * New upstream release.
   * debian/patches/bp-audtag-debugging-output.patch: Refresh to make patch
     apply without fuzz.
   * debian/libaudcore1.symbols: Update symbols list.
 
- -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 14 Jan 2011 10:54:25 +0300
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Tue, 25 Jan 2011 14:59:58 +0100
 
 audacious (2.4.2-1) experimental; urgency=low
 
