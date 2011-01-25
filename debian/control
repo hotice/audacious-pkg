@@ -2,7 +2,8 @@ Source: audacious
 Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-Uploaders: Chris Taylor <ctaylor@debian.org>, Benjamin Drung <bdrung@debian.org>, Bilal Akhtar <bilalakhtar@ubuntu.com>
+Uploaders: Chris Taylor <ctaylor@debian.org>,
+           Bilal Akhtar <bilalakhtar@ubuntu.com>
 Homepage: http://www.audacious-media-player.org/
 Build-Depends: autotools-dev (>= 20100122.1~),
                debhelper (>= 7.0.50~),
