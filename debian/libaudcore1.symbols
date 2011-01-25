@@ -36,6 +36,7 @@ libaudcore.so.1 libaudcore1 #MINVER#
  filename_get_subtune@Base 2.3
  filename_split_subtune@Base 2.3
  filename_to_uri@Base 2.4.3
+#MISSING: 2.4.3# filename_to_utf8@Base 2.3
  hook_associate@Base 2.4~beta1
  hook_call@Base 2.4~beta1
  hook_dissociate@Base 2.4~beta1
@@ -107,10 +108,12 @@ libaudcore.so.1 libaudcore1 #MINVER#
  tuple_new@Base 2.3
  tuple_new_from_filename@Base 2.3
  tuple_set_filename@Base 2.3
- uri_is_utf8@Base 2.4.3
  uri_check_utf8@Base 2.4.3
+ uri_is_utf8@Base 2.4.3
+#MISSING: 2.4.3# uri_to_display_basename@Base 2.3
+#MISSING: 2.4.3# uri_to_display_dirname@Base 2.3
+ uri_to_filename@Base 2.4.3
  uri_to_utf8@Base 2.4.3
- uti_to_filename@Base 2.4.3
  vfs_async_file_get_contents@Base 2.4~beta1
  vfs_async_file_get_contents_trampoline@Base 2.4~beta1
  vfs_async_file_get_contents_worker@Base 2.4~beta1
