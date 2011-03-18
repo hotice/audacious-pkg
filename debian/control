@@ -39,16 +39,16 @@ Description: small and fast audio player which supports lots of formats
  In the default install, the following codecs are supported:
  .
   * MP3
-  * Ogg Vorbis
+  * Ogg Vorbis / Theora
   * AAC and AAC+
   * FLAC
+  * ALAC
   * Windows Media (WMA)
-  * Musepack
-  * TTA
-  * Many module formats and much more!
+  * WAVE
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support.
+ other useful features like LIRC support. Support for many more codecs
+ can also be added through plugins.
  .
  This package contains the core player and its localization.
 
@@ -66,16 +66,16 @@ Description: audacious media player (debugging symbols)
  In the default install, the following codecs are supported:
  .
   * MP3
-  * Ogg Vorbis
+  * Ogg Vorbis / Theora
   * AAC and AAC+
   * FLAC
+  * ALAC
   * Windows Media (WMA)
-  * Musepack
-  * TTA
-  * Many module formats and much more!
+  * WAVE
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support.
+ other useful features like LIRC support. Support for many more codecs
+ can also be added through plugins.
  .
  This package contains the debugging symbols. Please install it before
  reporting crashes, as this makes the backtrace output more usable.
@@ -99,16 +99,16 @@ Description: audacious development files
  In the default install, the following codecs are supported:
  .
   * MP3
-  * Ogg Vorbis
+  * Ogg Vorbis / Theora
   * AAC and AAC+
   * FLAC
+  * ALAC
   * Windows Media (WMA)
-  * Musepack
-  * TTA
-  * Many module formats and much more!
+  * WAVE
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support.
+ other useful features like LIRC support. Support for many more codecs
+ can also be added through plugins.
  .
  This package contains the development libraries and header files
  required for developing components for audacious.
@@ -127,16 +127,16 @@ Description: audacious dbus remote control library
  In the default install, the following codecs are supported:
  .
   * MP3
-  * Ogg Vorbis
+  * Ogg Vorbis / Theora
   * AAC and AAC+
   * FLAC
+  * ALAC
   * Windows Media (WMA)
-  * Musepack
-  * TTA
-  * Many module formats and much more!
+  * WAVE
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support.
+ other useful features like LIRC support. Support for many more codecs
+ can also be added through plugins.
  .
  This package contains a library used to remote control audacious.
 
@@ -150,16 +150,16 @@ Description: audacious core engine library
  In the default install, the following codecs are supported:
  .
   * MP3
-  * Ogg Vorbis
+  * Ogg Vorbis / Theora
   * AAC and AAC+
   * FLAC
+  * ALAC
   * Windows Media (WMA)
-  * Musepack
-  * TTA
-  * Many module formats and much more!
+  * WAVE
  .
  Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support.
+ other useful features like LIRC support. Support for many more codecs
+ can also be added through plugins.
  .
  This package contains a library which provides core functionality
  of Audacious.

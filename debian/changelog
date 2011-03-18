@@ -5,8 +5,11 @@ audacious (2.4.4-1) UNRELEASED; urgency=low
     - Merge ld --no-add-needed FTBFS fix from experimental. (Closes: #618108)
   * debian/patches/bp-audtag-debugging-output.patch: Refresh to make patch
     apply without fuzz.
+  * debian/control: Improve package description, remove mention of codecs
+    not provided in -plugins package, add clarification on how support for
+    more codecs can be added through plugins. (Closes: #519160)
 
- -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 18 Mar 2011 14:22:33 +0300
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 18 Mar 2011 14:35:22 +0300
 
 audacious (2.4.3-1) experimental; urgency=low
 
