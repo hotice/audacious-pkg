@@ -236,6 +236,7 @@ static long ftell_object_by_guid(VFSFile * f, GUID * g)
     }
     AUDDBG("The object was not found\n");
 
+    g_free(h);
     return -1;
 }
 

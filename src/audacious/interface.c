@@ -53,7 +53,7 @@ static gboolean interface_search_cb (PluginHandle * plugin, PluginHandle * *
 
 PluginHandle * interface_get_default (void)
 {
-    PluginHandle * plugin;
+    PluginHandle * plugin = NULL;
 
     if (cfg.iface_path == NULL || (plugin = plugin_by_path (cfg.iface_path,
      PLUGIN_TYPE_IFACE, cfg.iface_number)) == NULL || ! plugin_get_enabled

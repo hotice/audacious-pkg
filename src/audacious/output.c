@@ -419,7 +419,9 @@ static void output_write_audio (void * data, gint size)
     }
 
     apply_replay_gain (data, samples);
-    effect_process ((gfloat * *) & data, & samples);
+    gfloat * fdata = data;
+    effect_process (& fdata, & samples);
+    data = fdata;
 
     if (data != allocated)
     {
