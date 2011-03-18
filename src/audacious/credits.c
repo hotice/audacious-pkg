@@ -30,7 +30,7 @@
 static const gchar *audacious_brief =
     N_("<big><b>Audacious %s</b></big>\n"
        "An audio player for many platforms.\n"
-       "Copyright (C) 2005-2010 Audacious Development Team");
+       "Copyright (C) 2005-2011 Audacious Development Team");
 
 static const gchar *credit_text[] = {
     N_("Core developers:"),
@@ -94,15 +94,15 @@ static const gchar *credit_text[] = {
     "Mike Frysinger",
     "Mark Glines",
     "Hans de Goede",
+    "Michael Hanselmann",
+    "Juho Heikkinen",
+    "Joseph Jezak",
+    "Henrik Johansson",
     "Jussi Judin",
     "Teru Kamogashira",
     "Chris Kehler",
     "Mark Loeser",
     "Alex Maclean",
-    "Michael Hanselmann",
-    "Juho Heikkinen",
-    "Joseph Jezak",
-    "Henrik Johansson",
     "Mikael Magnusson",
     "Rodrigo Martins de Matos Ventura",
     "Diego Pettenò",

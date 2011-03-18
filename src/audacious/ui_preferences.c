@@ -99,7 +99,7 @@ typedef struct {
     gint y;
 } MenuPos;
 
-static GtkWidget *prefswin = NULL;
+static /* GtkWidget * */ void * prefswin = NULL;
 static GtkWidget *filepopup_settings = NULL;
 static GtkWidget *category_treeview = NULL;
 static GtkWidget *category_notebook = NULL;
@@ -2657,7 +2657,7 @@ void * * create_prefs_window (void)
     g_free(aud_version_string);
     gtk_widget_show_all(vbox);
 
-    return (void * *) & prefswin;
+    return & prefswin;
 }
 
 void

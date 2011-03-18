@@ -1385,7 +1385,12 @@ static gint filename_compare (const void * _a, const void * _b, void * _compare)
     const struct entry * a = _a, * b = _b;
     gint (* compare) (const gchar * a, const gchar * b) = _compare;
 
-    return compare (a->filename, b->filename);
+    gint diff = compare (a->filename, b->filename);
+    if (diff)
+        return diff;
+
+    /* preserve order of "equal" entries */
+    return a->number - b->number;
 }
 
 static gint tuple_compare (const void * _a, const void * _b, void * _compare)
@@ -1398,7 +1403,12 @@ static gint tuple_compare (const void * _a, const void * _b, void * _compare)
     if (b->tuple == NULL)
         return 1;
 
-    return compare (a->tuple, b->tuple);
+    gint diff = compare (a->tuple, b->tuple);
+    if (diff)
+        return diff;
+
+    /* preserve order of "equal" entries */
+    return a->number - b->number;
 }
 
 static void sort (struct playlist * playlist, gint (* compare) (const void * a,
@@ -1846,14 +1856,14 @@ gboolean playlist_next_song(gint playlist_num, gboolean repeat)
     if (entries == 0)
         return FALSE;
 
-    if (playlist->position != NULL && playlist->position->queued)
+    /* If we have a song in queue, jump to it, _then_ remove it from queue */
+    if (playlist->queued != NULL)
     {
+        set_position (playlist, playlist->queued->data);
+
         playlist->queued = g_list_remove(playlist->queued, playlist->position);
         playlist->position->queued = FALSE;
     }
-
-    if (playlist->queued != NULL)
-        set_position (playlist, playlist->queued->data);
     else if (cfg.shuffle)
     {
         if (! shuffle_next (playlist))
