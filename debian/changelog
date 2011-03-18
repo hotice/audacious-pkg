@@ -1,12 +1,12 @@
-audacious (2.4.4-1) natty; urgency=low
+audacious (2.4.4-1) UNRELEASED; urgency=low
 
   * New upstream release.
+  * Upload to unstable.
+    - Merge ld --no-add-needed FTBFS fix from experimental. (Closes: #618108)
   * debian/patches/bp-audtag-debugging-output.patch: Refresh to make patch
     apply without fuzz.
-  * debian/patches/ld-no-add-needed-ftbfs.patch: Explicitly link libICE
-    to fix FTBFS due to ld --no-add-needed. (Closes: #618295)
 
- -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 18 Mar 2011 14:15:26 +0300
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 18 Mar 2011 14:22:33 +0300
 
 audacious (2.4.3-1) experimental; urgency=low
 
