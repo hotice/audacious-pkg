@@ -226,8 +226,8 @@ libaudtag.so.1 libaudcore1 #MINVER#
 #MISSING: 2.4~alpha1# computeNewHeader@Base 2.3
  convert_numericgenre_to_text@Base 2.4~alpha1
  convert_text@Base 2.4~alpha2
- copyAudioData@Base 2.3
- copyAudioToFile@Base 2.3
+#MISSING: 2.4.4# copyAudioData@Base 2.3
+#MISSING: 2.4.4# copyAudioToFile@Base 2.3
  cut_beginning_tag@Base 2.4~alpha1
 #MISSING: 2.4~alpha1# dataAtoms@Base 2.3
 #MISSING: 2.4~alpha1# findAtom@Base 2.3

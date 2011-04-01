@@ -8,8 +8,10 @@ audacious (2.4.4-1) UNRELEASED; urgency=low
   * debian/control: Improve package description, remove mention of codecs
     not provided in -plugins package, add clarification on how support for
     more codecs can be added through plugins. (Closes: #519160)
+  * debian/libaudcore1.symbols: Update according to changes in new upstream
+    release.
 
- -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 18 Mar 2011 14:35:22 +0300
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 01 Apr 2011 14:15:12 +0300
 
 audacious (2.4.3-1) experimental; urgency=low
 
