@@ -1,4 +1,4 @@
-audacious (2.4.4-1) UNRELEASED; urgency=low
+audacious (2.4.4-1) unstable; urgency=low
 
   * New upstream release.
   * Upload to unstable.
@@ -11,7 +11,7 @@ audacious (2.4.4-1) UNRELEASED; urgency=low
   * debian/libaudcore1.symbols: Update according to changes in new upstream
     release.
 
- -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Fri, 01 Apr 2011 14:15:12 +0300
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Mon, 04 Apr 2011 14:11:24 +0200
 
 audacious (2.4.3-1) experimental; urgency=low
 
