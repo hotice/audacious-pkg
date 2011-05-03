@@ -23,7 +23,6 @@
 #include "debug.h"
 #include "i18n.h"
 #include "interface.h"
-#include "main.h"
 #include "misc.h"
 
 static EqualizerPreset * equalizer_preset_new (const gchar * name)
@@ -43,13 +42,14 @@ equalizer_read_presets(const gchar *basename)
     gint i, p = 0;
     EqualizerPreset *preset;
 
-    filename = g_build_filename(aud_paths[BMP_PATH_USER_DIR], basename, NULL);
+    filename = g_build_filename (get_path (AUD_PATH_USER_DIR), basename, NULL);
 
     rcfile = g_key_file_new();
     if (!g_key_file_load_from_file(rcfile, filename, G_KEY_FILE_NONE, &error))
     {
         g_free(filename);
-        filename = g_build_filename(DATA_DIR, basename, NULL);
+        filename = g_build_filename (get_path (AUD_PATH_DATA_DIR), basename,
+         NULL);
 
         error = NULL;
         if (!g_key_file_load_from_file(rcfile, filename, G_KEY_FILE_NONE, &error))
@@ -131,8 +131,7 @@ gboolean equalizer_write_preset_file (GList * list, const gchar * basename)
         }
     }
 
-
-    filename = g_build_filename(aud_paths[BMP_PATH_USER_DIR], basename, NULL);
+    filename = g_build_filename (get_path (AUD_PATH_USER_DIR), basename, NULL);
 
     data = g_key_file_to_data(rcfile, &len, &error);
     gboolean success = g_file_set_contents (filename, data, len, & error);

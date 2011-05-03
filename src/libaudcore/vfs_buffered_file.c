@@ -199,7 +199,6 @@ buffered_file_vfs_metadata_impl(VFSFile * file, const gchar * field)
 }
 
 VFSConstructor buffered_file_const = {
-	NULL,			// not a normal VFS class
 	buffered_file_vfs_fopen_impl,
 	buffered_file_vfs_fclose_impl,
 	buffered_file_vfs_fread_impl,
@@ -263,6 +262,7 @@ vfs_buffered_file_new_from_uri(const gchar *uri)
     handle->base = &buffered_file_const;
     handle->uri = g_strdup(uri);
     handle->ref = 1;
+    handle->sig = VFS_SIG;
 
     return handle;
 }

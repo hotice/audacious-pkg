@@ -26,10 +26,8 @@
 #include <libaudcore/audstrings.h>
 
 #include "audconfig.h"
-#include "main.h"
 #include "misc.h"
 #include "playlist.h"
-#include "playlist_container.h"
 #include "playlist-utils.h"
 
 static const gchar * aud_titlestring_presets[] =
@@ -109,14 +107,15 @@ static gint tuple_compare_track (const Tuple * a, const Tuple * b)
     return tuple_compare_int (a, b, FIELD_TRACK_NUMBER);
 }
 
-static const PlaylistFilenameCompareFunc filename_comparisons[] = {
+static const PlaylistStringCompareFunc filename_comparisons[] = {
  [PLAYLIST_SORT_PATH] = string_compare_encoded,
  [PLAYLIST_SORT_FILENAME] = filename_compare_basename,
  [PLAYLIST_SORT_TITLE] = NULL,
  [PLAYLIST_SORT_ALBUM] = NULL,
  [PLAYLIST_SORT_ARTIST] = NULL,
  [PLAYLIST_SORT_DATE] = NULL,
- [PLAYLIST_SORT_TRACK] = NULL};
+ [PLAYLIST_SORT_TRACK] = NULL,
+ [PLAYLIST_SORT_FORMATTED_TITLE] = NULL};
 
 static const PlaylistTupleCompareFunc tuple_comparisons[] = {
  [PLAYLIST_SORT_PATH] = NULL,
@@ -125,7 +124,18 @@ static const PlaylistTupleCompareFunc tuple_comparisons[] = {
  [PLAYLIST_SORT_ALBUM] = tuple_compare_album,
  [PLAYLIST_SORT_ARTIST] = tuple_compare_artist,
  [PLAYLIST_SORT_DATE] = tuple_compare_date,
- [PLAYLIST_SORT_TRACK] = tuple_compare_track};
+ [PLAYLIST_SORT_TRACK] = tuple_compare_track,
+ [PLAYLIST_SORT_FORMATTED_TITLE] = NULL};
+
+static const PlaylistStringCompareFunc title_comparisons[] = {
+ [PLAYLIST_SORT_PATH] = NULL,
+ [PLAYLIST_SORT_FILENAME] = NULL,
+ [PLAYLIST_SORT_TITLE] = NULL,
+ [PLAYLIST_SORT_ALBUM] = NULL,
+ [PLAYLIST_SORT_ARTIST] = NULL,
+ [PLAYLIST_SORT_DATE] = NULL,
+ [PLAYLIST_SORT_TRACK] = NULL,
+ [PLAYLIST_SORT_FORMATTED_TITLE] = string_compare};
 
 const gchar * get_gentitle_format (void)
 {
@@ -142,6 +152,8 @@ void playlist_sort_by_scheme (gint playlist, gint scheme)
         playlist_sort_by_filename (playlist, filename_comparisons[scheme]);
     else if (tuple_comparisons[scheme] != NULL)
         playlist_sort_by_tuple (playlist, tuple_comparisons[scheme]);
+    else if (title_comparisons[scheme] != NULL)
+        playlist_sort_by_title (playlist, title_comparisons[scheme]);
 }
 
 void playlist_sort_selected_by_scheme (gint playlist, gint scheme)
@@ -151,6 +163,8 @@ void playlist_sort_selected_by_scheme (gint playlist, gint scheme)
          filename_comparisons[scheme]);
     else if (tuple_comparisons[scheme] != NULL)
         playlist_sort_selected_by_tuple (playlist, tuple_comparisons[scheme]);
+    else if (title_comparisons[scheme] != NULL)
+        playlist_sort_selected_by_title (playlist, title_comparisons[scheme]);
 }
 
 /* Fix me:  This considers empty fields as duplicates. */
@@ -216,8 +230,7 @@ void playlist_remove_failed (gint playlist)
 
     for (count = 0; count < entries; count ++)
     {
-        if (playlist_entry_get_decoder (playlist, count) == NULL ||
-         playlist_entry_get_tuple (playlist, count, FALSE) == NULL)
+        if (! playlist_entry_get_decoder (playlist, count, FALSE))
             playlist_entry_set_selected (playlist, count, TRUE);
     }
 
@@ -275,65 +288,14 @@ void playlist_select_by_patterns (gint playlist, const Tuple * patterns)
     }
 }
 
-gboolean filename_is_playlist (const gchar * filename)
-{
-	const gchar * period = strrchr (filename, '.');
-
-    return (period != NULL && playlist_container_find ((gchar *) period + 1) !=
-     NULL);
-}
-
-gboolean playlist_insert_playlist (gint playlist, gint at, const gchar *
- filename)
-{
-    const gchar * period = strrchr (filename, '.');
-    PlaylistContainer * container;
-    gint last;
-
-    if (period == NULL)
-        return FALSE;
-
-    container = playlist_container_find ((gchar *) period + 1);
-
-    if (container == NULL || container->plc_read == NULL)
-        return FALSE;
-
-    last = playlist_get_active ();
-    playlist_set_active (playlist);
-    container->plc_read (filename, at);
-    playlist_set_active (last);
-    return TRUE;
-}
-
-gboolean playlist_save (gint playlist, const gchar * filename)
-{
-    const gchar * period = strrchr (filename, '.');
-    PlaylistContainer * container;
-    gint last;
-
-    if (period == NULL)
-        return FALSE;
-
-    container = playlist_container_find ((gchar *) period + 1);
-
-    if (container == NULL || container->plc_write == NULL)
-        return FALSE;
-
-    last = playlist_get_active ();
-    playlist_set_active (playlist);
-    container->plc_write (filename, 0);
-    playlist_set_active (last);
-    return TRUE;
-}
-
 /* The algorithm is a bit quirky for historical reasons. -jlindgren */
 static gchar * make_playlist_path (gint playlist)
 {
     if (! playlist)
-        return g_strdup (aud_paths[BMP_PATH_PLAYLIST_FILE]);
+        return g_strdup (get_path (AUD_PATH_PLAYLIST_FILE));
 
     return g_strdup_printf ("%s/playlist_%02d.xspf",
-     aud_paths[BMP_PATH_PLAYLISTS_DIR], 1 + playlist);
+     get_path (AUD_PATH_PLAYLISTS_DIR), 1 + playlist);
 }
 
 void load_playlists (void)

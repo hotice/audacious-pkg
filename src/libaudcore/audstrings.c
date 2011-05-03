@@ -36,39 +36,6 @@
 #include <ctype.h>
 
 /**
- * Escapes characters that are special to the shell inside double quotes.
- *
- * @param string String to be escaped.
- * @return Given string with special characters escaped. Must be freed with g_free().
- */
-gchar *
-escape_shell_chars(const gchar * string)
-{
-    const gchar *special = "$`\"\\";    /* Characters to escape */
-    const gchar *in = string;
-    gchar *out, *escaped;
-    gint num = 0;
-
-    while (*in != '\0')
-        if (strchr(special, *in++))
-            num++;
-
-    escaped = g_malloc(strlen(string) + num + 1);
-
-    in = string;
-    out = escaped;
-
-    while (*in != '\0') {
-        if (strchr(special, *in))
-            *out++ = '\\';
-        *out++ = *in++;
-    }
-    *out = '\0';
-
-    return escaped;
-}
-
-/**
  * Performs in place replacement of Windows-style drive letter with '/' (slash).
  *
  * @param str String to be manipulated.
@@ -119,10 +86,10 @@ str_has_prefix_nocase(const gchar * str, const gchar * prefix)
     return (str != NULL && (strncasecmp(str, prefix, strlen(prefix)) == 0));
 }
 
-gboolean
-str_has_suffix_nocase(const gchar * str, const gchar * suffix)
+gboolean str_has_suffix_nocase (const gchar * str, const gchar * suffix)
 {
-    return (str != NULL && strcasecmp(str + strlen(str) - strlen(suffix), suffix) == 0);
+    return (str && strlen (str) >= strlen (suffix) && ! strcasecmp (str + strlen
+     (str) - strlen (suffix), suffix));
 }
 
 gboolean
@@ -140,24 +107,15 @@ str_has_suffixes_nocase(const gchar * str, gchar * const *suffixes)
     return FALSE;
 }
 
-gchar *
-str_to_utf8_fallback(const gchar * str)
+static gchar * (* str_to_utf8_impl) (const gchar *) = NULL;
+static gchar * (* str_to_utf8_full_impl) (const gchar *, gssize, gsize *,
+ gsize *, GError * *) = NULL;
+
+void str_set_utf8_impl (gchar * (* stu_impl) (const gchar *),
+ gchar * (* stuf_impl) (const gchar *, gssize, gsize *, gsize *, GError * *))
 {
-    gchar *out_str, *convert_str, *chr;
-
-    if (!str)
-        return NULL;
-
-    convert_str = g_strdup(str);
-    for (chr = convert_str; *chr; chr++) {
-        if (*chr & 0x80)
-            *chr = '?';
-    }
-
-    out_str = g_strconcat(convert_str, _("  (invalid UTF-8)"), NULL);
-    g_free(convert_str);
-
-    return out_str;
+    str_to_utf8_impl = stu_impl;
+    str_to_utf8_full_impl = stuf_impl;
 }
 
 /**
@@ -166,11 +124,19 @@ str_to_utf8_fallback(const gchar * str)
  * @param str Local filename/path to convert.
  * @return String in UTF-8 encoding. Must be freed with g_free().
  */
-gchar *(*str_to_utf8)(const gchar * str) = str_to_utf8_fallback;
 
-gchar *(*chardet_to_utf8)(const gchar *str, gssize len,
-                       gsize *arg_bytes_read, gsize *arg_bytes_write,
-                       GError **arg_error) = NULL;
+gchar * str_to_utf8 (const gchar * str)
+{
+    g_return_val_if_fail (str_to_utf8_impl, NULL);
+    return str_to_utf8_impl (str);
+}
+
+gchar * str_to_utf8_full (const gchar * str, gssize len, gsize * bytes_read,
+ gsize * bytes_written, GError * * err)
+{
+    g_return_val_if_fail (str_to_utf8_full_impl, NULL);
+    return str_to_utf8_full_impl (str, len, bytes_read, bytes_written, err);
+}
 
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
@@ -228,31 +194,6 @@ str_skip_chars(const gchar * str, const gchar * chars)
     while (strchr(chars, *str) != NULL)
         str++;
     return str;
-}
-
-const void * memfind (const void * mem, gint size, const void * token, gint
- length)
-{
-    if (! length)
-        return mem;
-
-    size -= length - 1;
-
-    while (size > 0)
-    {
-        const void * maybe = memchr (mem, * (guchar *) token, size);
-
-        if (maybe == NULL)
-            return NULL;
-
-        if (! memcmp (maybe, token, length))
-            return maybe;
-
-        size -= (guchar *) maybe + 1 - (guchar *) mem;
-        mem = (guchar *) maybe + 1;
-    }
-
-    return NULL;
 }
 
 gchar *
@@ -372,12 +313,18 @@ void string_decode_percent (gchar * s)
     string_decode_percent_2 (s, s);
 }
 
-/* we encode any character except the "unreserved" characters of RFC 3986 and
- * (optionally) the forward slash */
+/* We encode any character except the "unreserved" characters of RFC 3986 and
+ * (optionally) the forward slash.  On Windows, we also (optionally) do not
+ * encode the colon. */
 static gboolean is_legal_char (gchar c, gboolean is_filename)
 {
     return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <=
-     '9') || (strchr ("-_.~", c) != NULL) || (is_filename && c == '/');
+     '9') || (strchr ("-_.~", c) != NULL) ||
+#ifdef _WIN32
+     (is_filename && strchr ("/:", c) != NULL);
+#else
+     (is_filename && c == '/');
+#endif
 }
 
 static gchar make_hex_digit (gint i)
@@ -490,28 +437,89 @@ void uri_check_utf8 (gchar * * uri, gboolean warn)
 }
 
 /* Like g_filename_to_uri, but converts the filename from the system locale to
- * UTF-8 before percent-encoding. */
+ * UTF-8 before percent-encoding.  On Windows, replaces '\' with '/' and adds a
+ * leading '/'. */
 
 gchar * filename_to_uri (const gchar * name)
 {
     gchar * utf8 = g_locale_to_utf8 (name, -1, NULL, NULL, NULL);
+#ifdef _WIN32
+    string_replace_char (utf8, '\\', '/');
+#endif
     gchar * enc = string_encode_percent (utf8 ? utf8 : name, TRUE);
     g_free (utf8);
+#ifdef _WIN32
+    gchar * uri = g_strdup_printf ("file:///%s", enc);
+#else
     gchar * uri = g_strdup_printf ("file://%s", enc);
+#endif
     g_free (enc);
     return uri;
 }
 
 /* Like g_filename_from_uri, but converts the filename from UTF-8 to the system
- * locale after percent-decoding. */
+ * locale after percent-decoding.  On Windows, strips the leading '/' and
+ * replaces '/' with '\'. */
 
 gchar * uri_to_filename (const gchar * uri)
 {
+#ifdef _WIN32
+    g_return_val_if_fail (! strncmp (uri, "file:///", 8), NULL);
+    gchar buf[strlen (uri + 8) + 1];
+    string_decode_percent_2 (uri + 8, buf);
+#else
     g_return_val_if_fail (! strncmp (uri, "file://", 7), NULL);
     gchar buf[strlen (uri + 7) + 1];
     string_decode_percent_2 (uri + 7, buf);
+#endif
+#ifdef _WIN32
+    string_replace_char (buf, '/', '\\');
+#endif
     gchar * name = g_locale_from_utf8 (buf, -1, NULL, NULL, NULL);
     return name ? name : g_strdup (buf);
+}
+
+/* Formats a URI for human-readable display.  Percent-decodes and converts to
+ * UTF-8 (more aggressively than uri_to_utf8).  For file:// URI's, converts to
+ * filename format (but in UTF-8). */
+
+gchar * uri_to_display (const gchar * uri)
+{
+    gchar buf[strlen (uri) + 1];
+
+#ifdef _WIN32
+    if (! strncmp (uri, "file:///", 8))
+    {
+        string_decode_percent_2 (uri + 8, buf);
+        string_replace_char (buf, '/', '\\');
+    }
+#else
+    if (! strncmp (uri, "file://", 7))
+        string_decode_percent_2 (uri + 7, buf);
+#endif
+    else
+        string_decode_percent_2 (uri, buf);
+
+    return str_to_utf8 (buf);
+}
+
+gchar * uri_get_extension (const gchar * uri)
+{
+    const gchar * slash = strrchr (uri, '/');
+    if (! slash)
+        return NULL;
+    
+    gchar * lower = g_ascii_strdown (slash + 1, -1);
+
+    gchar * qmark = strchr (lower, '?');
+    if (qmark)
+        * qmark = 0;
+
+    gchar * dot = strrchr (lower, '.');
+    gchar * ext = dot ? g_strdup (dot + 1) : NULL;
+    
+    g_free (lower);
+    return ext;
 }
 
 void string_cut_extension(gchar *string)
@@ -615,4 +623,72 @@ gint string_compare_encoded (const gchar * ap, const gchar * bp)
     }
 
     return 0;
+}
+
+const void * memfind (const void * mem, gint size, const void * token, gint
+ length)
+{
+    if (! length)
+        return mem;
+
+    size -= length - 1;
+
+    while (size > 0)
+    {
+        const void * maybe = memchr (mem, * (guchar *) token, size);
+
+        if (maybe == NULL)
+            return NULL;
+
+        if (! memcmp (maybe, token, length))
+            return maybe;
+
+        size -= (guchar *) maybe + 1 - (guchar *) mem;
+        mem = (guchar *) maybe + 1;
+    }
+
+    return NULL;
+}
+
+gchar *
+str_replace_fragment(gchar *s, gint size, const gchar *old, const gchar *new)
+{
+    gchar *ptr = s;
+    gint left = strlen(s);
+    gint avail = size - (left + 1);
+    gint oldlen = strlen(old);
+    gint newlen = strlen(new);
+    gint diff = newlen - oldlen;
+
+    while (left >= oldlen)
+    {
+        if (strncmp(ptr, old, oldlen))
+        {
+            left--;
+            ptr++;
+            continue;
+        }
+
+        if (diff > avail)
+            break;
+
+        if (diff != 0)
+            memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
+
+        memcpy(ptr, new, newlen);
+        ptr += newlen;
+        left -= oldlen;
+    }
+
+    return s;
+}
+
+void
+string_canonize_case(gchar *str)
+{
+    while (*str)
+    {
+        *str = g_ascii_toupper(*str);
+        str++;
+    }
 }

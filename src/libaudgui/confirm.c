@@ -1,6 +1,6 @@
 /*
  * libaudgui/confirm.c
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -19,7 +19,10 @@
  * using our public API to be a derived work.
  */
 
+#include <gtk/gtk.h>
+
 #include <audacious/audconfig.h>
+#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/playlist.h>
 
@@ -86,9 +89,7 @@ void audgui_confirm_playlist_delete (gint playlist)
 
     button = gtk_button_new_from_stock (GTK_STOCK_YES);
     gtk_box_pack_end ((GtkBox *) hbox, button, FALSE, FALSE, 0);
-#if GTK_CHECK_VERSION (2, 18, 0)
     gtk_widget_set_can_default (button, TRUE);
-#endif
     gtk_widget_grab_default (button);
     gtk_widget_grab_focus (button);
     g_signal_connect ((GObject *) button, "clicked", (GCallback)
@@ -97,4 +98,33 @@ void audgui_confirm_playlist_delete (gint playlist)
      gtk_widget_destroy, window);
 
     gtk_widget_show_all (window);
+}
+
+static void rename_cb (GtkDialog * dialog, gint resp, void * list)
+{
+    if (resp == GTK_RESPONSE_ACCEPT && GPOINTER_TO_INT (list) < 
+     aud_playlist_count ())
+        aud_playlist_set_title (GPOINTER_TO_INT (list), gtk_entry_get_text
+         ((GtkEntry *) g_object_get_data ((GObject *) dialog, "entry")));
+
+    gtk_widget_destroy ((GtkWidget *) dialog);
+}
+
+void audgui_show_playlist_rename (gint playlist)
+{
+    GtkWidget * dialog = gtk_dialog_new_with_buttons (_("Rename Playlist"),
+     NULL, 0, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL,
+     GTK_RESPONSE_REJECT, NULL);
+    gtk_dialog_set_default_response ((GtkDialog *) dialog, GTK_RESPONSE_ACCEPT);
+
+    GtkWidget * entry = gtk_entry_new ();
+    gtk_entry_set_text ((GtkEntry *) entry, aud_playlist_get_title (playlist));
+    gtk_entry_set_activates_default ((GtkEntry *) entry, TRUE);
+    gtk_box_pack_start ((GtkBox *) gtk_dialog_get_content_area ((GtkDialog *)
+     dialog), entry, FALSE, FALSE, 0);
+    g_object_set_data ((GObject *) dialog, "entry", entry);
+
+    g_signal_connect (dialog, "response", (GCallback) rename_cb, GINT_TO_POINTER
+     (playlist));
+    gtk_widget_show_all (dialog);
 }

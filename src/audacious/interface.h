@@ -42,7 +42,7 @@ typedef struct {
      const gchar * imgurl); */
     gint (* prefswin_page_new) (void * container, const gchar * name,
      const gchar * imgurl);
-} InterfaceOps;
+} IfaceOps;
 
 typedef struct {
     void (*show_prefs_window)(gboolean show);
@@ -60,15 +60,18 @@ typedef struct {
     void * (* run_gtk_plugin) (void * parent, const gchar * name);
     /* GtkWidget * (* stop_gtk_plugin) (GtkWidget * parent); */
     void * (* stop_gtk_plugin) (void * parent);
-} InterfaceCbs;
 
-struct _Interface {
+    void (*install_toolbar)(void * button);
+    void (*uninstall_toolbar)(void * button);
+} IfaceCbs;
+
+struct _Iface {
     gchar *id;                           /* simple ID like 'skinned' */
     gchar *desc;                         /* description like 'Skinned Interface' */
-    gboolean (*init)(InterfaceCbs *cbs); /* init UI */
+    gboolean (*init)(IfaceCbs *cbs); /* init UI */
     gboolean (*fini)(void);              /* shutdown UI */
 
-    InterfaceOps *ops;
+    IfaceOps *ops;
 };
 
 #ifdef _AUDACIOUS_CORE
@@ -76,8 +79,6 @@ struct _Interface {
 #include <gtk/gtk.h>
 #include <audacious/plugins.h>
 
-PluginHandle * interface_get_default (void);
-void interface_set_default (PluginHandle * plugin);
 gboolean interface_load (PluginHandle * plugin);
 void interface_unload (void);
 
@@ -96,6 +97,10 @@ void interface_toggle_shuffle(void);
 void interface_toggle_repeat(void);
 
 void register_interface_hooks(void);
+
+PluginHandle * iface_plugin_probe (void);
+PluginHandle * iface_plugin_get_current (void);
+gboolean iface_plugin_set_current (PluginHandle * plugin);
 
 #endif
 #endif

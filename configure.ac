@@ -6,8 +6,8 @@ dnl Require autoconf 2.59 or later
 AC_PREREQ([2.59])
 
 dnl Initialize
-AC_INIT([audacious], [2.4.4], [bugs+audacious@atheme.org])
-AC_COPYRIGHT([(C) 2005-2011 Audacious Development Team])
+AC_INIT([audacious], [2.5.0])
+AC_COPYRIGHT([(C) 2005-2011 Audacious Team])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AC_GNU_SOURCE
@@ -27,6 +27,7 @@ AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
 AC_DEFINE_UNQUOTED([PACKAGE], "$PACKAGE", [Name of package])
 AC_DEFINE_UNQUOTED([VERSION], "$VERSION", [Version number of package])
 
+BUILDSYS_INIT
 BUILDSYS_PROG_IMPLIB
 BUILDSYS_SHARED_LIB
 IMPLIB_LIBS=""
@@ -45,6 +46,14 @@ dnl Large file support
 dnl ==================
 CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
 
+dnl Activation of text console (MS-Windows ONLY)
+dnl ============================================
+AC_ARG_ENABLE([text-console],
+[AS_HELP_STRING([--enable-text-console],[Enable text console for MS-Windows hosts])],
+[use_text_console=$withval],
+[use_text_console=no]
+)
+
 dnl Plugin stuff
 dnl ========================
 SHARED_SUFFIX="$PLUGIN_SUFFIX"
@@ -52,10 +61,16 @@ AC_SUBST([SHARED_SUFFIX])
 AC_DEFINE_UNQUOTED([SHARED_SUFFIX], "${SHARED_SUFFIX}",
     [Define the shared module suffix extension on your platform.])
 
-AC_MSG_CHECKING([if you are running Apple-GCC])
+AC_MSG_CHECKING([for Windows or Macintosh])
 case "$target" in
-    *-apple-*)
-        AC_MSG_RESULT([yes, sorry you poor bastard])
+    *mingw*)
+        AC_MSG_RESULT([Windows])
+        if test "x$use_text_console" = "xno"; then
+            LDFLAGS="$LDFLAGS -Wl,-subsystem,windows"
+        fi
+        ;;
+    *apple*)
+        AC_MSG_RESULT([Macintosh])
         LDFLAGS="$LDFLAGS -framework CoreFoundation -framework CoreServices -framework Carbon"
         ;;
     *)
@@ -63,11 +78,9 @@ case "$target" in
         ;;
 esac
 
-
 dnl GNU gettext
 dnl ===========
-AM_GNU_GETTEXT
-AM_GNU_GETTEXT_VERSION([0.14.0])
+AM_GNU_GETTEXT([external])
 
 if test "$MSGFMT" = ":" ; then
     AC_MSG_ERROR([msgfmt was not found!  You may need to install gettext.])
@@ -76,13 +89,18 @@ fi
 
 dnl Checks common for core and plugins
 dnl ==================================
+
+AC_ARG_ENABLE([gtk3],
+ [AS_HELP_STRING([--enable-gtk3], [Use GTK3 instead of GTK2])],
+ [use_gtk3=yes], [use_gtk3=no])
+
 AUD_COMMON_PROGS
 
 
 dnl Check for headers and functions
 dnl ===============================
-AC_CHECK_HEADERS([unistd.h fcntl.h sys/ioctl.h fnmatch.h limits.h wchar.h fts.h execinfo.h sys/signalfd.h sys/errno.h])
-AC_CHECK_FUNCS([mkdtemp getmntinfo statvfs strtoul lrintf signalfd lstat])
+AC_CHECK_HEADERS([unistd.h fcntl.h limits.h fts.h execinfo.h sys/errno.h regex.h rxposix.h rx/rxposix.h])
+AC_CHECK_FUNCS([sigwait])
 
 
 ### ---------------------------------------------------------------------------
@@ -156,10 +174,16 @@ dnl regex support (gnu/oniguruma/pcre)
 dnl ==================================
 REGEX_LIBS=
 REGEX_CFLAGS=
+
+regex_selected=
+
 AC_ARG_WITH([regexlib],
 [AS_HELP_STRING([--with-regexlib[=gnu/oniguruma/pcre]],[Use the chosen regex library (def: gnu)])],
-[
-case $withval in
+[regex_selected=$withval],
+[regex_selected=gnu]
+)
+
+case $regex_selected in
   pcre)
     AUD_CHECK_MODULE([LIBPCRE], [libpcre], [>= 6.7], [PCRE])
     AC_DEFINE([USE_REGEX_PCRE], 1, [If this macro is defined, use PCRE regex library.])
@@ -177,26 +201,47 @@ case $withval in
     ;;
   *)
     AC_DEFINE([USE_REGEX_GNU], 1, [If this macro is defined, use GNU regex library.])
+
+    AC_CHECK_LIB(c, regcomp, REGEX_LIBS="-lc",
+      [AC_CHECK_LIB(regex, regcomp, REGEX_LIBS="-lregex",
+        [AC_CHECK_LIB(rx, regcomp, REGEX_LIBS="-lrx",
+          AC_MSG_ERROR([Cannot find GNU regex library.])
+        )]
+      )]
+    )
     ;;
 esac
-],[
-    AC_DEFINE([USE_REGEX_GNU], 1, [If this macro is defined, use GNU regex library.])
-])
+
+AC_MSG_CHECKING([regex library type])
+AC_MSG_RESULT($regex_selected)
+
 AC_SUBST([REGEX_LIBS])
 AC_SUBST([REGEX_CFLAGS])
 
 
 ### ---------------------------------------------------------------------------
+dnl Pthread support
+dnl ===============
+PTHREAD_LIBS=
+PTHREAD_CFLAGS=
+
+AC_CHECK_LIB(pthread, pthread_create, PTHREAD_LIBS="-lpthread",
+  [AC_CHECK_LIB(pthreads, pthread_create, PTHREAD_LIBS="-lpthreads",
+    [AC_CHECK_LIB(pthreadGC2, pthread_create, PTHREAD_LIBS="-lpthreadGC2")]
+  )]
+)
+
+AC_SUBST([PTHREAD_LIBS])
+AC_SUBST([PTHREAD_CFLAGS])
+
+### ---------------------------------------------------------------------------
 dnl Session management support
 dnl ==========================
-AS_AC_EXPAND([desktop_file], "${datadir}/applications/audacious2.desktop")
-AC_DEFINE_UNQUOTED([AUDACIOUS_DESKTOP_FILE], "${desktop_file}", [Location of the desktop file])
 
 AUD_ARG_ENABLE([sm], [yes],
 [session management],
 [
     PKG_CHECK_MODULES([SM], [sm >= 1.0], [
-        AC_DEFINE([USE_EGGSM], 1, [Define if session management should be used.])
         enable_sm="yes"
     ],[
         enable_sm="no"
@@ -211,7 +256,15 @@ AUD_ARG_ENABLE([sm], [yes],
 
     AC_SUBST([ICE_CFLAGS])
     AC_SUBST([ICE_LIBS])
+
+    PKG_CHECK_MODULES(GLIB214, glib-2.0 >= 2.14, enable_sm=$enable_sm,
+     enable_sm=no)
+
+    if test $enable_sm = yes ; then
+        AC_DEFINE(USE_EGGSM, 1, Define if session management should be used)
+    fi
 ])
+
 AUD_CONDITIONAL([USE_EGGSM], [enable_sm])
 
 ### ---------------------------------------------------------------------------
@@ -303,7 +356,13 @@ fi
 localedir="$datadir/locale"
 AC_SUBST([localedir])
 
-AUDACIOUS_DEFINES="$CFLAGS -DDATA_DIR=\\\"$datadir/audacious\\\" -DPLUGIN_DIR=\\\"$plugindir\\\" -DPLUGINSUBS=$pluginsubs -DLOCALEDIR=\\\"$localedir\\\""
+AUDACIOUS_DEFINES="-DPLUGINSUBS=$pluginsubs"
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_BINDIR=\\\"$bindir\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_DATADIR=\\\"$datadir/audacious\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_PLUGINDIR=\\\"$plugindir\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_LOCALEDIR=\\\"$localedir\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_DESKTOPFILE=\\\"${datadir}/applications/audacious.desktop\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_ICONFILE=\\\"${datadir}/pixmaps/audacious.png\\\""
 AC_SUBST([AUDACIOUS_DEFINES])
 
 
@@ -315,8 +374,8 @@ AC_CONFIG_FILES([
     audclient.pc
     buildsys.mk
     extra.mk
-    man/audtool2.1
-    man/audacious2.1
+    man/audtool.1
+    man/audacious.1
 ])
 
 BUILDSYS_TOUCH_DEPS

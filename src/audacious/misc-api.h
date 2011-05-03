@@ -36,9 +36,8 @@ AUD_FUNC2 (gboolean, save_preset_file, EqualizerPreset *, preset, const gchar *,
  filename)
 AUD_FUNC1 (GList *, import_winamp_eqf, VFSFile *, file)
 
-/* playlist_container.c */
-AUD_FUNC1 (void, playlist_container_register, PlaylistContainer *, container)
-AUD_FUNC1 (void, playlist_container_unregister, PlaylistContainer *, container)
+/* main.c */
+AUD_FUNC1 (const gchar *, get_path, gint, path)
 
 /* playlist-utils.c */
 AUD_FUNC0 (const gchar *, get_gentitle_format)
@@ -49,17 +48,17 @@ AUD_FUNC2 (void, uri_set_plugin, const gchar *, scheme, InputPlugin *, ip)
 AUD_FUNC2 (void, mime_set_plugin, const gchar *, mimetype, InputPlugin *, ip)
 
 /* probe.c */
-AUD_FUNC2 (InputPlugin *, file_find_decoder, const gchar *, filename, gboolean,
+AUD_FUNC2 (PluginHandle *, file_find_decoder, const gchar *, filename, gboolean,
  fast)
-AUD_FUNC2 (Tuple *, file_read_tuple, const gchar *, filename, InputPlugin *,
+AUD_FUNC2 (Tuple *, file_read_tuple, const gchar *, filename, PluginHandle *,
  decoder)
-AUD_FUNC4 (gboolean, file_read_image, const gchar *, filename, InputPlugin *,
+AUD_FUNC4 (gboolean, file_read_image, const gchar *, filename, PluginHandle *,
  decoder, void * *, data, gint *, size)
 AUD_FUNC2 (gboolean, file_can_write_tuple, const gchar *, filename,
- InputPlugin *, decoder)
-AUD_FUNC3 (gboolean, file_write_tuple, const gchar *, filename, InputPlugin *,
+ PluginHandle *, decoder)
+AUD_FUNC3 (gboolean, file_write_tuple, const gchar *, filename, PluginHandle *,
  decoder, const Tuple *, tuple)
-AUD_FUNC2 (gboolean, custom_infowin, const gchar *, filename, InputPlugin *,
+AUD_FUNC2 (gboolean, custom_infowin, const gchar *, filename, PluginHandle *,
  decoder)
 
 /* ui_albumart.c */
@@ -92,3 +91,7 @@ AUD_FUNC3 (void, calc_mono_pcm, VisPCMData, buffer, const VisPCMData, data,
  gint, channels)
 AUD_FUNC3 (void, calc_stereo_pcm, VisPCMData, buffer, const VisPCMData, data,
  gint, channels)
+
+/* New in 2.5-alpha2 */
+AUD_FUNC1 (void, interface_install_toolbar, void *, button)
+AUD_FUNC1 (void, interface_uninstall_toolbar, void *, button)

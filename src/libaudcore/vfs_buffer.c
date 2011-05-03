@@ -194,7 +194,6 @@ buffer_vfs_fsize_impl(VFSFile * file)
 }
 
 static VFSConstructor buffer_const = {
-	NULL,			// not a normal VFS class
 	buffer_vfs_fopen_impl,
 	buffer_vfs_fclose_impl,
 	buffer_vfs_fread_impl,
@@ -236,6 +235,7 @@ vfs_buffer_new(gpointer data, gsize size)
     handle->handle = buffer;
     handle->base = &buffer_const;
     handle->ref = 1;
+    handle->sig = VFS_SIG;
 
     return handle;
 }

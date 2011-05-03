@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2007  Audacious development team.
+ *  Copyright (C) 2005-2010  Audacious development team.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,44 +17,29 @@
  *  Audacious or using our public API to be a derived work.
  */
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-
-#include <glib.h>
-#include <gtk/gtk.h>
 #include <string.h>
-#include <stddef.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
 #include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>
 
 #include <libaudcore/hook.h>
 
 #include "audconfig.h"
-#include "compatibility.h"
+#include "config.h"
+#include "configdb.h"
 #include "debug.h"
+#include "glib-compat.h"
+#include "gtk-compat.h"
 #include "i18n.h"
 #include "misc.h"
-#include "playback.h"
-#include "plugin.h"
-#include "pluginenum.h"
-#include "plugins.h"
-#include "effect.h"
-#include "general.h"
 #include "output.h"
+#include "playback.h"
 #include "playlist.h"
 #include "playlist-utils.h"
-#include "visualization.h"
-#include "util.h"
-#include "configdb.h"
+#include "plugin.h"
+#include "plugins.h"
 #include "preferences.h"
-
 #include "ui_preferences.h"
 
 #define TITLESTRING_UPDATE_TIMEOUT 3
@@ -68,22 +53,6 @@ enum CategoryViewCols {
     CATEGORY_VIEW_N_COLS
 };
 
-enum PluginViewCols {
-    PLUGIN_VIEW_COL_ACTIVE,
-    PLUGIN_VIEW_COL_DESC,
-    PLUGIN_VIEW_COL_FILENAME,
-    PLUGIN_VIEW_COL_ID,
-    PLUGIN_VIEW_COL_PLUGIN_PTR,
-    PLUGIN_VIEW_N_COLS
-};
-
-enum PluginViewType {
-    PLUGIN_VIEW_TYPE_INPUT,
-    PLUGIN_VIEW_TYPE_GENERAL,
-    PLUGIN_VIEW_TYPE_VIS,
-    PLUGIN_VIEW_TYPE_EFFECT
-};
-
 typedef struct {
     const gchar *icon_path;
     const gchar *name;
@@ -93,11 +62,6 @@ typedef struct {
     const gchar *name;
     const gchar *tag;
 } TitleFieldTag;
-
-typedef struct {
-    gint x;
-    gint y;
-} MenuPos;
 
 static /* GtkWidget * */ void * prefswin = NULL;
 static GtkWidget *filepopup_settings = NULL;
@@ -121,12 +85,11 @@ GtkWidget *filepopup_for_tuple_settings_button;
 static gint titlestring_timeout_counter = 0;
 
 static Category categories[] = {
-    {DATA_DIR "/images/audio.png",        N_("Audio")},
-    {DATA_DIR "/images/replay_gain.png",  N_("Replay Gain")},
-    {DATA_DIR "/images/connectivity.png", N_("Network")},
-    {DATA_DIR "/images/playback.png",     N_("Playback")},
-    {DATA_DIR "/images/playlist.png",     N_("Playlist")},
-    {DATA_DIR "/images/plugins.png",      N_("Plugins")},
+ {"audio.png", N_("Audio")},
+ {"replay_gain.png", N_("Replay Gain")},
+ {"connectivity.png", N_("Network")},
+ {"playlist.png", N_("Playlist")},
+ {"plugins.png", N_("Plugins")},
 };
 
 static gint n_categories = G_N_ELEMENTS(categories);
@@ -191,23 +154,27 @@ static PreferencesWidget audio_page_widgets[] = {
                      N_("Use software volume control. This may be useful for situations where your audio system does not support controlling the playback volume."), FALSE},
 };
 
-static PreferencesWidget rg_params_elements[] = {
-    {WIDGET_SPIN_BTN, N_("Preamp:"), &cfg.replay_gain_preamp, NULL, NULL, FALSE, {.spin_btn = {-15, 15, 0.01, N_("dB")}}, VALUE_FLOAT},
-    {WIDGET_SPIN_BTN, N_("Default gain:"), &cfg.default_gain, NULL, N_("This gain will be used if file doesn't contain Replay Gain metadata."), FALSE, {.spin_btn = {-15, 15, 0.01, N_("dB")}}, VALUE_FLOAT},
-    {WIDGET_LABEL, N_("<span size=\"small\">Please remember that the most efficient way to prevent signal clipping is not to use positive values above.</span>"), NULL, NULL, NULL, FALSE, {.label = {"gtk-info"}}},
-};
+static PreferencesWidget rg_params_elements[] =
+{{WIDGET_SPIN_BTN, N_("Amplify all files:"), & cfg.replay_gain_preamp, NULL,
+ NULL, FALSE, {.spin_btn = {-15, 15, 0.01, N_("dB")}}, VALUE_FLOAT},
+{WIDGET_SPIN_BTN, N_("Amplify untagged files:"), & cfg.default_gain, NULL,
+ NULL, FALSE, {.spin_btn = {-15, 15, 0.01, N_("dB")}}, VALUE_FLOAT}};
 
-static PreferencesWidget replay_gain_page_widgets[] = {
-    {WIDGET_LABEL, N_("<b>Replay Gain configuration</b>"), NULL, NULL, NULL, FALSE},
-    {WIDGET_CHK_BTN, N_("Enable Replay Gain"), &cfg.enable_replay_gain, NULL, NULL, FALSE},
-    {WIDGET_LABEL, N_("<b>Replay Gain mode</b>"), NULL, NULL, NULL, TRUE},
-    {WIDGET_RADIO_BTN, N_("Track gain/peak"), &cfg.replay_gain_track, NULL, NULL, TRUE},
-    {WIDGET_RADIO_BTN, N_("Album gain/peak"), &cfg.replay_gain_album, NULL, NULL, TRUE},
-    {WIDGET_LABEL, N_("<b>Miscellaneous</b>"), NULL, NULL, NULL, TRUE},
-    {WIDGET_CHK_BTN, N_("Enable peak info clipping prevention"), &cfg.enable_clipping_prevention, NULL,
-                     N_("Use peak value from Replay Gain info for clipping prevention"), TRUE},
-    {WIDGET_TABLE, NULL, NULL, NULL, NULL, TRUE, {.table = {rg_params_elements, G_N_ELEMENTS(rg_params_elements)}}},
-};
+static PreferencesWidget replay_gain_page_widgets[] =
+ {{WIDGET_LABEL, N_("<b>Replay Gain</b>"), NULL, NULL, NULL, FALSE},
+ {WIDGET_CHK_BTN, N_("Enable Replay Gain"), &cfg.enable_replay_gain, NULL,
+  NULL, FALSE},
+ {WIDGET_LABEL, N_("<b>Mode</b>"), NULL, NULL, NULL, TRUE},
+ {WIDGET_RADIO_BTN, N_("Single track mode"), &cfg.replay_gain_track, NULL,
+  NULL, TRUE},
+ {WIDGET_RADIO_BTN, N_("Album mode"), &cfg.replay_gain_album, NULL, NULL,
+  TRUE},
+ {WIDGET_LABEL, N_("<b>Adjust Levels</b>"), NULL, NULL, NULL, TRUE},
+ {WIDGET_TABLE, NULL, NULL, NULL, NULL, TRUE, {.table = {rg_params_elements,
+  G_N_ELEMENTS (rg_params_elements)}}},
+ {WIDGET_LABEL, N_("<b>Clipping Prevention</b>"), NULL, NULL, NULL, TRUE},
+ {WIDGET_CHK_BTN, N_("Enable clipping prevention"),
+  & cfg.enable_clipping_prevention, NULL, NULL, TRUE}};
 
 static PreferencesWidget proxy_host_port_elements[] = {
     {WIDGET_ENTRY, N_("Proxy hostname:"), "proxy_host", NULL, NULL, FALSE, {.entry = {FALSE}}, VALUE_CFG_STRING},
@@ -230,16 +197,6 @@ static PreferencesWidget connectivity_page_widgets[] = {
     {WIDGET_LABEL, N_("<span size=\"small\">Changing these settings will require a restart of Audacious.</span>"), NULL, NULL, NULL, FALSE, {.label = {"gtk-dialog-warning"}}},
 };
 
-static PreferencesWidget playback_page_widgets[] = {
-    {WIDGET_LABEL, N_("<b>Playback</b>"), NULL, NULL, NULL, FALSE},
-    {WIDGET_CHK_BTN, N_("Continue playback on startup"), &cfg.resume_playback_on_startup, NULL,
-        N_("When Audacious starts, automatically begin playing from the point where we stopped before."), FALSE},
-    {WIDGET_CHK_BTN, N_("Don't advance in the playlist"), &cfg.no_playlist_advance, NULL,
-        N_("When finished playing a song, don't automatically advance to the next."), FALSE},
-    {WIDGET_CHK_BTN, N_("Clear current playlist when opening new files"),
-     & cfg.clear_playlist, NULL, NULL, FALSE},
-};
-
 static PreferencesWidget chardet_elements[] = {
     {WIDGET_COMBO_BOX, N_("Auto character encoding detector for:"), &cfg.chardet_detector, NULL, NULL, TRUE,
         {.combo = {chardet_detector_presets, G_N_ELEMENTS(chardet_detector_presets),
@@ -253,25 +210,20 @@ static PreferencesWidget chardet_elements[] = {
 };
 
 static PreferencesWidget playlist_page_widgets[] = {
+    {WIDGET_LABEL, N_("<b>Behavior</b>"), NULL, NULL, NULL, FALSE},
+    {WIDGET_CHK_BTN, N_("Continue playback on startup"),
+     & cfg.resume_playback_on_startup, NULL, NULL, FALSE},
+    {WIDGET_CHK_BTN, N_("Advance when the current song is deleted"),
+     & cfg.advance_on_delete, NULL, NULL, FALSE},
+    {WIDGET_CHK_BTN, N_("Clear the playlist when opening files"),
+     & cfg.clear_playlist, NULL, NULL, FALSE},
+    {WIDGET_CHK_BTN, N_("Open files in a temporary playlist"),
+     & cfg.open_to_temporary, NULL, NULL, FALSE},
     {WIDGET_LABEL, N_("<b>Metadata</b>"), NULL, NULL, NULL, FALSE},
     {WIDGET_TABLE, NULL, NULL, NULL, NULL, TRUE, {.table = {chardet_elements, G_N_ELEMENTS(chardet_elements)}}},
 };
 
 static void prefswin_page_queue_destroy(CategoryQueueEntry *ent);
-void create_plugin_preferences_page(PluginPreferences *settings);
-void destroy_plugin_preferences_page(PluginPreferences *settings);
-
-static void output_about (OutputPlugin * plugin)
-{
-    if (plugin->about != NULL)
-        plugin->about ();
-}
-
-static void output_configure (OutputPlugin * plugin)
-{
-    if (plugin->configure != NULL)
-        plugin->configure ();
-}
 
 static void
 change_category(GtkNotebook * notebook,
@@ -286,218 +238,6 @@ change_category(GtkNotebook * notebook,
 
     gtk_tree_model_get(model, &iter, CATEGORY_VIEW_COL_ID, &index, -1);
     gtk_notebook_set_current_page(notebook, index);
-}
-
-static void output_plugin_open_prefs (GtkComboBox * combo, void * unused)
-{
-    output_configure (g_list_nth_data (get_output_list (),
-     gtk_combo_box_get_active (combo)));
-}
-
-static void output_plugin_open_info (GtkComboBox * combo, void * unused)
-{
-    output_about (g_list_nth_data (get_output_list (), gtk_combo_box_get_active
-     (combo)));
-}
-
-static void
-plugin_toggle(GtkCellRendererToggle * cell,
-              const gchar * path_str,
-              gpointer data)
-{
-    GtkTreeModel *model = GTK_TREE_MODEL(data);
-    GtkTreeIter iter;
-    GtkTreePath *path = gtk_tree_path_new_from_string(path_str);
-    Plugin *plugin = NULL;
-    gint plugin_type = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(data), "plugin_type"));
-    gboolean enabled;
-
-    /* get toggled iter */
-    gtk_tree_model_get_iter(model, &iter, path);
-
-    gtk_tree_model_get (model, & iter, PLUGIN_VIEW_COL_ACTIVE, & enabled,
-     PLUGIN_VIEW_COL_PLUGIN_PTR, & plugin, -1);
-    enabled = ! enabled;
-
-    switch (plugin_type)
-    {
-    case PLUGIN_VIEW_TYPE_INPUT:
-        plugin_set_enabled (plugin_by_header (plugin), enabled);
-        break;
-    case PLUGIN_VIEW_TYPE_GENERAL:
-        general_plugin_enable (plugin_by_header (plugin), enabled);
-        break;
-    case PLUGIN_VIEW_TYPE_VIS:
-        vis_plugin_enable (plugin_by_header (plugin), enabled);
-        break;
-    case PLUGIN_VIEW_TYPE_EFFECT:
-        effect_plugin_enable (plugin_by_header (plugin), enabled);
-        break;
-    }
-
-    gtk_list_store_set ((GtkListStore *) model, & iter, PLUGIN_VIEW_COL_ACTIVE,
-     enabled, -1);
-
-    if (plugin && plugin->settings && plugin->settings->type == PREFERENCES_PAGE) {
-        if (enabled)
-            create_plugin_preferences_page(plugin->settings);
-        else
-            destroy_plugin_preferences_page(plugin->settings);
-    }
-    /* clean up */
-    gtk_tree_path_free(path);
-}
-
-static void on_output_plugin_cbox_changed (GtkComboBox * combo, void * unused)
-{
-    set_current_output_plugin (g_list_nth_data (get_output_list (),
-     gtk_combo_box_get_active (combo)));
-}
-
-static void
-on_output_plugin_cbox_realize(GtkComboBox * cbox,
-                              gpointer data)
-{
-    GList *olist = get_output_list();
-    OutputPlugin * op;
-    gint i = 0, selected = 0;
-
-    if (olist == NULL) {
-        gtk_widget_set_sensitive(GTK_WIDGET(cbox), FALSE);
-        return;
-    }
-
-    for (i = 0; olist != NULL; i++, olist = g_list_next(olist)) {
-        op = OUTPUT_PLUGIN(olist->data);
-
-        if (olist->data == current_output_plugin)
-            selected = i;
-
-        gtk_combo_box_append_text(cbox, op->description);
-    }
-
-    gtk_combo_box_set_active(cbox, selected);
-    g_signal_connect(cbox, "changed",
-                     G_CALLBACK(on_output_plugin_cbox_changed), NULL);
-}
-
-static void
-on_plugin_view_realize(GtkTreeView * treeview,
-                       GCallback callback,
-                       gpointer data,
-                       gint plugin_type)
-{
-    GtkListStore *store;
-    GtkTreeIter iter;
-
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
-
-    GList *ilist;
-    gchar *description[2];
-    gint id = 0;
-
-    GList *list = (GList *) data;
-
-    store = gtk_list_store_new(PLUGIN_VIEW_N_COLS,
-                               G_TYPE_BOOLEAN, G_TYPE_STRING,
-                               G_TYPE_STRING, G_TYPE_INT, G_TYPE_POINTER);
-    g_object_set_data(G_OBJECT(store), "plugin_type" , GINT_TO_POINTER(plugin_type));
-
-    column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, _("Enabled"));
-    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
-    gtk_tree_view_column_set_spacing(column, 4);
-    gtk_tree_view_column_set_resizable(column, FALSE);
-    gtk_tree_view_column_set_fixed_width(column, 50);
-
-    renderer = gtk_cell_renderer_toggle_new();
-    g_signal_connect(renderer, "toggled",
-                     G_CALLBACK(callback), store);
-    gtk_tree_view_column_pack_start(column, renderer, TRUE);
-    gtk_tree_view_column_set_attributes(column, renderer, "active",
-                                        PLUGIN_VIEW_COL_ACTIVE, NULL);
-
-    gtk_tree_view_append_column(treeview, column);
-
-    column = gtk_tree_view_column_new();
-    gtk_tree_view_column_set_title(column, _("Description"));
-    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
-    gtk_tree_view_column_set_spacing(column, 4);
-    gtk_tree_view_column_set_resizable(column, TRUE);
-
-
-    renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_column_pack_start(column, renderer, FALSE);
-    gtk_tree_view_column_set_attributes(column, renderer,
-                                        "text", PLUGIN_VIEW_COL_DESC, NULL);
-    gtk_tree_view_append_column(treeview, column);
-
-    column = gtk_tree_view_column_new();
-
-    gtk_tree_view_column_set_title(column, _("Filename"));
-    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
-    gtk_tree_view_column_set_spacing(column, 4);
-    gtk_tree_view_column_set_resizable(column, TRUE);
-
-    renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_column_pack_start(column, renderer, TRUE);
-    gtk_tree_view_column_set_attributes(column, renderer, "text",
-                                        PLUGIN_VIEW_COL_FILENAME, NULL);
-
-    gtk_tree_view_append_column(treeview, column);
-
-    MOWGLI_ITER_FOREACH(ilist, list)
-    {
-        Plugin *plugin = PLUGIN(ilist->data);
-        gboolean enabled = plugin_get_enabled (plugin_by_header (plugin));
-
-        description[0] = g_strdup(plugin->description);
-        description[1] = g_strdup(plugin->filename);
-
-        gtk_list_store_append(store, &iter);
-        gtk_list_store_set(store, &iter,
-                           PLUGIN_VIEW_COL_ACTIVE, enabled,
-                           PLUGIN_VIEW_COL_DESC, description[0],
-                           PLUGIN_VIEW_COL_FILENAME, description[1],
-                           PLUGIN_VIEW_COL_ID, id++,
-                           PLUGIN_VIEW_COL_PLUGIN_PTR, plugin, -1);
-
-        g_free(description[1]);
-        g_free(description[0]);
-    }
-
-    gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(store));
-}
-
-static void
-on_input_plugin_view_realize(GtkTreeView * treeview,
-                             gpointer data)
-{
-    on_plugin_view_realize (treeview, (GCallback) plugin_toggle, plugin_get_list(PLUGIN_TYPE_INPUT), PLUGIN_VIEW_TYPE_INPUT);
-}
-
-static void
-on_effect_plugin_view_realize(GtkTreeView * treeview,
-                              gpointer data)
-{
-    on_plugin_view_realize (treeview, (GCallback) plugin_toggle, plugin_get_list
-     (PLUGIN_TYPE_EFFECT), PLUGIN_VIEW_TYPE_EFFECT);
-}
-
-static void
-on_general_plugin_view_realize(GtkTreeView * treeview,
-                               gpointer data)
-{
-    on_plugin_view_realize (treeview, (GCallback) plugin_toggle, plugin_get_list
-     (PLUGIN_TYPE_GENERAL), PLUGIN_VIEW_TYPE_GENERAL);
-}
-
-static void
-on_vis_plugin_view_realize(GtkTreeView * treeview,
-                           gpointer data)
-{
-    on_plugin_view_realize(treeview, G_CALLBACK(plugin_toggle), plugin_get_list(PLUGIN_TYPE_VIS), PLUGIN_VIEW_TYPE_VIS);
 }
 
 static void
@@ -529,51 +269,11 @@ titlestring_tag_menu_callback(GtkMenuItem * menuitem,
 }
 
 static void
-util_menu_position(GtkMenu * menu, gint * x, gint * y,
-                   gboolean * push_in, gpointer data)
-{
-    GtkRequisition requisition;
-    gint screen_width;
-    gint screen_height;
-    MenuPos *pos = data;
-
-    gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
-
-    screen_width = gdk_screen_width();
-    screen_height = gdk_screen_height();
-
-    *x = CLAMP(pos->x - 2, 0, MAX(0, screen_width - requisition.width));
-    *y = CLAMP(pos->y - 2, 0, MAX(0, screen_height - requisition.height));
-}
-
-static void
 on_titlestring_help_button_clicked(GtkButton * button,
                                    gpointer data)
 {
-    GtkMenu *menu;
-    MenuPos *pos = g_newa(MenuPos, 1);
-    GdkWindow *parent, *window;
-
-    gint x_ro, y_ro;
-    gint x_widget, y_widget;
-    gint x_size, y_size;
-
-    g_return_if_fail (button != NULL);
-    g_return_if_fail (GTK_IS_MENU (data));
-
-    parent = gtk_widget_get_parent_window(GTK_WIDGET(button));
-    window = gtk_widget_get_window(GTK_WIDGET(button));
-
-    gdk_drawable_get_size(parent, &x_size, &y_size);
-    gdk_window_get_root_origin(window, &x_ro, &y_ro);
-    gdk_window_get_position(window, &x_widget, &y_widget);
-
-    pos->x = x_size + x_ro;
-    pos->y = y_size + y_ro - 100;
-
-    menu = GTK_MENU(data);
-    gtk_menu_popup (menu, NULL, NULL, util_menu_position, pos,
-                    0, GDK_CURRENT_TIME);
+    GtkMenu * menu = data;
+    gtk_menu_popup (menu, NULL, NULL, NULL, NULL, 0, GDK_CURRENT_TIME);
 }
 
 
@@ -674,8 +374,7 @@ plugin_preferences_cancel(GtkWidget *widget, PluginPreferences *settings)
     gtk_widget_destroy(GTK_WIDGET(settings->data));
 }
 
-static void
-plugin_preferences_destroy(GtkWidget *widget, PluginPreferences *settings)
+static void plugin_preferences_destroy(GtkWidget *widget, PluginPreferences *settings)
 {
     gtk_widget_destroy(widget);
 
@@ -685,8 +384,7 @@ plugin_preferences_destroy(GtkWidget *widget, PluginPreferences *settings)
     settings->data = NULL;
 }
 
-static void
-create_plugin_preferences(PluginPreferences *settings)
+void plugin_preferences_show (PluginPreferences * settings)
 {
     GtkWidget *window;
     GtkWidget *vbox, *bbox, *ok, *apply, *cancel;
@@ -738,112 +436,13 @@ create_plugin_preferences(PluginPreferences *settings)
     settings->data = (gpointer)window;
 }
 
-static void
-plugin_treeview_open_prefs(GtkTreeView *treeview)
+void plugin_preferences_cleanup (PluginPreferences * p)
 {
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    Plugin *plugin = NULL;
-
-    selection = gtk_tree_view_get_selection(treeview);
-    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
-        return;
-    gtk_tree_model_get(model, &iter, PLUGIN_VIEW_COL_PLUGIN_PTR, &plugin, -1);
-
-    g_return_if_fail(plugin != NULL);
-    g_return_if_fail((plugin->configure != NULL) ||
-                     ((plugin->settings != NULL) && (plugin->settings->type == PREFERENCES_WINDOW)));
-
-    if (plugin->configure != NULL)
-        plugin->configure();
-    else
-        create_plugin_preferences(plugin->settings);
-}
-
-static void
-plugin_treeview_open_info(GtkTreeView *treeview)
-{
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    Plugin *plugin = NULL;
-
-    selection = gtk_tree_view_get_selection(treeview);
-    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
-        return;
-    gtk_tree_model_get(model, &iter, PLUGIN_VIEW_COL_PLUGIN_PTR, &plugin, -1);
-
-    g_return_if_fail(plugin != NULL);
-    plugin->about();
-}
-
-static void
-plugin_treeview_enable_prefs(GtkTreeView * treeview, GtkButton * button)
-{
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    Plugin *plugin = NULL;
-
-    selection = gtk_tree_view_get_selection(treeview);
-    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
-        return;
-
-    gtk_tree_model_get(model, &iter, PLUGIN_VIEW_COL_PLUGIN_PTR, &plugin, -1);
-
-    g_return_if_fail(plugin != NULL);
-
-    gtk_widget_set_sensitive(GTK_WIDGET(button),
-                             ((plugin->configure != NULL) ||
-                             (plugin->settings ? (plugin->settings->type == PREFERENCES_WINDOW) : FALSE)));
-}
-
-static void
-plugin_treeview_enable_info(GtkTreeView * treeview, GtkButton * button)
-{
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    Plugin *plugin = NULL;
-
-    selection = gtk_tree_view_get_selection(treeview);
-    if (!gtk_tree_selection_get_selected(selection, &model, &iter))
-        return;
-
-    gtk_tree_model_get(model, &iter, PLUGIN_VIEW_COL_PLUGIN_PTR, &plugin, -1);
-
-    g_return_if_fail(plugin != NULL);
-
-    gtk_widget_set_sensitive(GTK_WIDGET(button), plugin->about != NULL);
-}
-
-
-static void
-output_plugin_enable_info(GtkComboBox * cbox, GtkButton * button)
-{
-    GList *plist;
-
-    gint id = gtk_combo_box_get_active(cbox);
-
-    plist = get_output_list();
-    plist = g_list_nth(plist, id);
-
-    gtk_widget_set_sensitive(GTK_WIDGET(button),
-                             OUTPUT_PLUGIN(plist->data)->about != NULL);
-}
-
-static void
-output_plugin_enable_prefs(GtkComboBox * cbox, GtkButton * button)
-{
-    GList *plist;
-    gint id = gtk_combo_box_get_active(cbox);
-
-    plist = get_output_list();
-    plist = g_list_nth(plist, id);
-
-    gtk_widget_set_sensitive(GTK_WIDGET(button),
-                             OUTPUT_PLUGIN(plist->data)->configure != NULL);
+    if (p->data != NULL)
+    {
+        gtk_widget_destroy (p->data);
+        p->data = NULL;
+    }
 }
 
 static void
@@ -920,8 +519,13 @@ on_category_treeview_realize(GtkTreeView * treeview,
                                GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_INT);
     gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(store));
 
-    for (i = 0; i < n_categories; i++) {
-        img = gdk_pixbuf_new_from_file(categories[i].icon_path, NULL);
+    for (i = 0; i < n_categories; i ++)
+    {
+        gchar * path = g_strdup_printf ("%s/images/%s",
+         get_path (AUD_PATH_DATA_DIR), categories[i].icon_path);
+        img = gdk_pixbuf_new_from_file (path, NULL);
+        g_free (path);
+
         gtk_list_store_append(store, &iter);
         gtk_list_store_set(store, &iter,
                            CATEGORY_VIEW_COL_ICON, img,
@@ -1134,20 +738,19 @@ on_cbox_changed_string(GtkComboBox * combobox, PreferencesWidget *widget)
     gint position = 0;
 
     position = gtk_combo_box_get_active(GTK_COMBO_BOX(combobox));
-    
+
     g_free(*((gchar **)widget->cfg));
-    
+
     *((gchar **)widget->cfg) = g_strdup(widget->data.combo.elements[position].value);
 }
 
-static void
-on_cbox_realize(GtkComboBox *combobox, PreferencesWidget * widget)
+static void on_cbox_realize (GtkWidget * combobox, PreferencesWidget * widget)
 {
     guint i=0,index=0;
 
-    for(i=0; i<widget->data.combo.n_elements; i++) {
-        gtk_combo_box_append_text(combobox, _(widget->data.combo.elements[i].label));
-    }
+    for (i = 0; i < widget->data.combo.n_elements; i ++)
+        gtk_combo_box_text_append_text ((GtkComboBoxText *) combobox,
+         _(widget->data.combo.elements[i].label));
 
     if (widget->data.combo.enabled) {
         switch (widget->cfg_type) {
@@ -1198,8 +801,8 @@ create_filepopup_settings(void)
     GtkWidget *label_misc;
     GtkWidget *label_delay;
 
-    GtkObject *recurse_for_cover_depth_adj;
-    GtkObject *delay_adj;
+    GtkAdjustment *recurse_for_cover_depth_adj;
+    GtkAdjustment *delay_adj;
     GtkWidget *alignment;
 
     GtkWidget *hbox;
@@ -1278,7 +881,8 @@ create_filepopup_settings(void)
     gtk_box_pack_start(GTK_BOX(filepopup_settings_recurse_for_cover_depth_box), label_search_depth, TRUE, TRUE, 0);
     gtk_misc_set_padding(GTK_MISC(label_search_depth), 4, 0);
 
-    recurse_for_cover_depth_adj = gtk_adjustment_new(0, 0, 100, 1, 10, 0);
+    recurse_for_cover_depth_adj = (GtkAdjustment *) gtk_adjustment_new (0, 0,
+     100, 1, 10, 0);
     filepopup_settings_recurse_for_cover_depth = gtk_spin_button_new(GTK_ADJUSTMENT(recurse_for_cover_depth_adj), 1, 0);
     gtk_box_pack_start(GTK_BOX(filepopup_settings_recurse_for_cover_depth_box), filepopup_settings_recurse_for_cover_depth, TRUE, TRUE, 0);
     gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(filepopup_settings_recurse_for_cover_depth), TRUE);
@@ -1314,7 +918,7 @@ create_filepopup_settings(void)
     gtk_misc_set_alignment(GTK_MISC(label_delay), 0, 0.5);
     gtk_misc_set_padding(GTK_MISC(label_delay), 12, 0);
 
-    delay_adj = gtk_adjustment_new(0, 0, 100, 1, 10, 0);
+    delay_adj = (GtkAdjustment *) gtk_adjustment_new (0, 0, 100, 1, 10, 0);
     filepopup_settings_delay = gtk_spin_button_new(GTK_ADJUSTMENT(delay_adj), 1, 0);
     gtk_box_pack_start(GTK_BOX(hbox), filepopup_settings_delay, TRUE, TRUE, 0);
     gtk_spin_button_set_numeric(GTK_SPIN_BUTTON(filepopup_settings_delay), TRUE);
@@ -1482,7 +1086,7 @@ static void create_label (PreferencesWidget * widget, GtkWidget * * label,
 static void create_cbox (PreferencesWidget * widget, GtkWidget * * label,
  GtkWidget * * combobox, const gchar * domain)
 {
-    *combobox = gtk_combo_box_new_text();
+    * combobox = gtk_combo_box_text_new ();
 
     if (widget->label) {
         * label = gtk_label_new (dgettext (domain, widget->label));
@@ -1783,20 +1387,6 @@ create_titlestring_tag_menu(void)
 }
 
 static void
-create_playback_category(void)
-{
-    GtkWidget *playback_page_vbox;
-    GtkWidget *widgets_vbox;
-
-    playback_page_vbox = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (category_notebook), playback_page_vbox);
-
-    widgets_vbox = gtk_vbox_new (FALSE, 0);
-    create_widgets(GTK_BOX(widgets_vbox), playback_page_widgets, G_N_ELEMENTS(playback_page_widgets));
-    gtk_box_pack_start (GTK_BOX (playback_page_vbox), widgets_vbox, TRUE, TRUE, 0);
-}
-
-static void
 create_replay_gain_category(void)
 {
     GtkWidget *rg_page_vbox;
@@ -1814,14 +1404,29 @@ static void show_numbers_cb (GtkToggleButton * numbers, void * unused)
 {
     cfg.show_numbers_in_pl = gtk_toggle_button_get_active (numbers);
 
-    hook_call ("playlist update", NULL);
     hook_call ("title change", NULL);
+
+    /* trigger playlist update */
+    gchar * t = g_strdup (playlist_get_title (playlist_get_active ()));
+    playlist_set_title (playlist_get_active (), t);
+    g_free (t);
+}
+
+static void leading_zero_cb (GtkToggleButton * leading)
+{
+    cfg.leading_zero = gtk_toggle_button_get_active (leading);
+
+    hook_call ("title change", NULL);
+
+    /* trigger playlist update */
+    gchar * t = g_strdup (playlist_get_title (playlist_get_active ()));
+    playlist_set_title (playlist_get_active (), t);
+    g_free (t);
 }
 
 static void
 create_playlist_category(void)
 {
-    GtkWidget *playlist_page_vbox;
     GtkWidget *vbox5;
     GtkWidget *alignment55;
     GtkWidget *label60;
@@ -1842,11 +1447,8 @@ create_playlist_category(void)
     GtkWidget *titlestring_tag_menu = create_titlestring_tag_menu();
     GtkWidget * numbers_alignment, * numbers;
 
-    playlist_page_vbox = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (category_notebook), playlist_page_vbox);
-
     vbox5 = gtk_vbox_new (FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (playlist_page_vbox), vbox5, TRUE, TRUE, 0);
+    gtk_container_add ((GtkContainer *) category_notebook, vbox5);
 
     create_widgets(GTK_BOX(vbox5), playlist_page_widgets, G_N_ELEMENTS(playlist_page_widgets));
 
@@ -1868,6 +1470,17 @@ create_playlist_category(void)
      cfg.show_numbers_in_pl);
     g_signal_connect ((GObject *) numbers, "toggled", (GCallback)
      show_numbers_cb, 0);
+    gtk_container_add ((GtkContainer *) numbers_alignment, numbers);
+
+    numbers_alignment = gtk_alignment_new (0, 0, 0, 0);
+    gtk_alignment_set_padding ((GtkAlignment *) numbers_alignment, 0, 0, 12, 0);
+    gtk_box_pack_start ((GtkBox *) vbox5, numbers_alignment, 0, 0, 3);
+
+    numbers = gtk_check_button_new_with_label (_("Show leading zeroes (02:00 "
+     "instead of 2:00)"));
+    gtk_toggle_button_set_active ((GtkToggleButton *) numbers, cfg.leading_zero);
+    g_signal_connect ((GObject *) numbers, "toggled", (GCallback)
+     leading_zero_cb, 0);
     gtk_container_add ((GtkContainer *) numbers_alignment, numbers);
 
     alignment56 = gtk_alignment_new (0.5, 0.5, 1, 1);
@@ -1892,17 +1505,19 @@ create_playlist_category(void)
     image1 = gtk_image_new_from_stock ("gtk-index", GTK_ICON_SIZE_BUTTON);
     gtk_container_add (GTK_CONTAINER (titlestring_help_button), image1);
 
-    titlestring_cbox = gtk_combo_box_new_text ();
+    titlestring_cbox = gtk_combo_box_text_new ();
+
     gtk_table_attach (GTK_TABLE (table6), titlestring_cbox, 1, 3, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("TITLE"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("ARTIST - TITLE"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("ARTIST - ALBUM - TITLE"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("ARTIST - ALBUM - TRACK. TITLE"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("ARTIST [ ALBUM ] - TRACK. TITLE"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("ALBUM - TITLE"));
-    gtk_combo_box_append_text (GTK_COMBO_BOX (titlestring_cbox), _("Custom"));
+
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("TITLE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("ARTIST - TITLE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("ARTIST - ALBUM - TITLE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("ARTIST - ALBUM - TRACK. TITLE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("ARTIST [ ALBUM ] - TRACK. TITLE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("ALBUM - TITLE"));
+    gtk_combo_box_text_append_text ((GtkComboBoxText *) titlestring_cbox, _("Custom"));
 
     titlestring_entry = gtk_entry_new ();
     gtk_table_attach (GTK_TABLE (table6), titlestring_entry, 1, 2, 1, 2,
@@ -1995,6 +1610,68 @@ create_playlist_category(void)
     create_filepopup_settings();
 }
 
+static GtkWidget * output_config_button, * output_about_button;
+
+static gboolean output_enum_cb (PluginHandle * plugin, GList * * list)
+{
+    * list = g_list_prepend (* list, plugin);
+    return TRUE;
+}
+
+static GList * output_get_list (void)
+{
+    static GList * list = NULL;
+
+    if (list == NULL)
+    {
+        plugin_for_each (PLUGIN_TYPE_OUTPUT, (PluginForEachFunc) output_enum_cb,
+         & list);
+        list = g_list_reverse (list);
+    }
+
+    return list;
+}
+
+static void output_combo_update (GtkComboBox * combo)
+{
+    PluginHandle * plugin = plugin_get_current (PLUGIN_TYPE_OUTPUT);
+    gtk_combo_box_set_active (combo, g_list_index (output_get_list (), plugin));
+    gtk_widget_set_sensitive (output_config_button, plugin_has_configure (plugin));
+    gtk_widget_set_sensitive (output_about_button, plugin_has_about (plugin));
+}
+
+static void output_combo_changed (GtkComboBox * combo)
+{
+    PluginHandle * plugin = g_list_nth_data (output_get_list (),
+     gtk_combo_box_get_active (combo));
+    g_return_if_fail (plugin != NULL);
+
+    plugin_enable (plugin, TRUE);
+    output_combo_update (combo);
+}
+
+static void output_combo_fill (GtkComboBox * combo)
+{
+    for (GList * node = output_get_list (); node != NULL; node = node->next)
+        gtk_combo_box_text_append_text ((GtkComboBoxText *) combo,
+         plugin_get_name (node->data));
+}
+
+static void output_do_config (void)
+{
+    OutputPlugin * op = plugin_get_header (output_plugin_get_current ());
+    g_return_if_fail (op != NULL);
+    if (op->configure != NULL)
+        op->configure ();
+}
+
+static void output_do_about (void)
+{
+    OutputPlugin * op = plugin_get_header (output_plugin_get_current ());
+    g_return_if_fail (op != NULL);
+    if (op->about != NULL)
+        op->about ();
+}
 
 static void
 create_audio_category(void)
@@ -2006,22 +1683,10 @@ create_audio_category(void)
     GtkWidget *vbox33;
     GtkWidget *table11;
     GtkWidget *label79;
-    GtkObject *output_plugin_bufsize_adj;
+    GtkAdjustment * output_plugin_bufsize_adj;
     GtkWidget *output_plugin_bufsize;
     GtkWidget *output_plugin_cbox;
     GtkWidget *label78;
-    GtkWidget *alignment82;
-    GtkWidget *output_plugin_button_box;
-    GtkWidget *output_plugin_prefs;
-    GtkWidget *alignment76;
-    GtkWidget *hbox7;
-    GtkWidget *image5;
-    GtkWidget *label80;
-    GtkWidget *output_plugin_info;
-    GtkWidget *alignment77;
-    GtkWidget *hbox8;
-    GtkWidget *image6;
-    GtkWidget *label81;
 
     audio_page_vbox = gtk_vbox_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER (category_notebook), audio_page_vbox);
@@ -2053,14 +1718,15 @@ create_audio_category(void)
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label79), 1, 0.5);
 
-    output_plugin_bufsize_adj =
-        gtk_adjustment_new (0, 100, 10000, 100, 1000, 0);
+    output_plugin_bufsize_adj = (GtkAdjustment *) gtk_adjustment_new (0, 100,
+     10000, 100, 1000, 0);
     output_plugin_bufsize = gtk_spin_button_new (GTK_ADJUSTMENT (output_plugin_bufsize_adj), 100, 0);
     gtk_table_attach (GTK_TABLE (table11), output_plugin_bufsize, 1, 2, 1, 2,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
 
-    output_plugin_cbox = gtk_combo_box_new_text ();
+    output_plugin_cbox = gtk_combo_box_text_new ();
+
     gtk_table_attach (GTK_TABLE (table11), output_plugin_cbox, 1, 2, 0, 1,
                       (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                       (GtkAttachOptions) (0), 0, 0);
@@ -2071,50 +1737,25 @@ create_audio_category(void)
                       (GtkAttachOptions) (0), 0, 0);
     gtk_misc_set_alignment (GTK_MISC (label78), 0, 0.5);
 
-    alignment82 = gtk_alignment_new (0.5, 0.5, 1, 1);
-    gtk_box_pack_start (GTK_BOX (audio_page_vbox), alignment82, FALSE, FALSE, 0);
-    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment82), 0, 0, 12, 0);
+    GtkWidget * hbox = gtk_hbox_new (FALSE, 6);
+    gtk_box_pack_start ((GtkBox *) audio_page_vbox, hbox, FALSE, FALSE, 0);
 
-    output_plugin_button_box = gtk_hbutton_box_new ();
-    gtk_container_add (GTK_CONTAINER (alignment82), output_plugin_button_box);
-    gtk_button_box_set_layout (GTK_BUTTON_BOX (output_plugin_button_box), GTK_BUTTONBOX_START);
-    gtk_box_set_spacing (GTK_BOX (output_plugin_button_box), 8);
+    output_config_button = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
+    output_about_button = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
 
-    output_plugin_prefs = gtk_button_new ();
-    gtk_container_add (GTK_CONTAINER (output_plugin_button_box), output_plugin_prefs);
-    gtk_widget_set_sensitive (output_plugin_prefs, FALSE);
-    gtk_widget_set_can_default(output_plugin_prefs, TRUE);
-
-    alignment76 = gtk_alignment_new (0.5, 0.5, 0, 0);
-    gtk_container_add (GTK_CONTAINER (output_plugin_prefs), alignment76);
-
-    hbox7 = gtk_hbox_new (FALSE, 2);
-    gtk_container_add (GTK_CONTAINER (alignment76), hbox7);
-
-    image5 = gtk_image_new_from_stock ("gtk-preferences", GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start (GTK_BOX (hbox7), image5, FALSE, FALSE, 0);
-
-    label80 = gtk_label_new_with_mnemonic (_("Output Plugin Preferences"));
-    gtk_box_pack_start (GTK_BOX (hbox7), label80, FALSE, FALSE, 0);
-
-    output_plugin_info = gtk_button_new ();
-    gtk_container_add (GTK_CONTAINER (output_plugin_button_box), output_plugin_info);
-    gtk_widget_set_sensitive (output_plugin_info, FALSE);
-    gtk_widget_set_can_default(output_plugin_info, TRUE);
-
-    alignment77 = gtk_alignment_new (0.5, 0.5, 0, 0);
-    gtk_container_add (GTK_CONTAINER (output_plugin_info), alignment77);
-
-    hbox8 = gtk_hbox_new (FALSE, 2);
-    gtk_container_add (GTK_CONTAINER (alignment77), hbox8);
-
-    image6 = gtk_image_new_from_stock ("gtk-about", GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start (GTK_BOX (hbox8), image6, FALSE, FALSE, 0);
-
-    label81 = gtk_label_new_with_mnemonic (_("Output Plugin Information"));
-    gtk_box_pack_start (GTK_BOX (hbox8), label81, FALSE, FALSE, 0);
+    gtk_box_pack_end ((GtkBox *) hbox, output_about_button, FALSE, FALSE, 0);
+    gtk_box_pack_end ((GtkBox *) hbox, output_config_button, FALSE, FALSE, 0);
 
     create_widgets(GTK_BOX(audio_page_vbox), audio_page_widgets, G_N_ELEMENTS(audio_page_widgets));
+
+    output_combo_fill ((GtkComboBox *) output_plugin_cbox);
+    output_combo_update ((GtkComboBox *) output_plugin_cbox);
+    g_signal_connect (output_plugin_cbox, "changed", (GCallback)
+     output_combo_changed, NULL);
+    g_signal_connect (output_config_button, "clicked", (GCallback)
+     output_do_config, NULL);
+    g_signal_connect (output_about_button, "clicked", (GCallback)
+     output_do_about, NULL);
 
     g_signal_connect(G_OBJECT(output_plugin_bufsize), "value_changed",
                      G_CALLBACK(on_output_plugin_bufsize_value_changed),
@@ -2122,26 +1763,6 @@ create_audio_category(void)
     g_signal_connect_after(G_OBJECT(output_plugin_bufsize), "realize",
                            G_CALLBACK(on_output_plugin_bufsize_realize),
                            NULL);
-    g_signal_connect_after(G_OBJECT(output_plugin_cbox), "realize",
-                           G_CALLBACK(on_output_plugin_cbox_realize),
-                           NULL);
-
-    /* plugin->output page */
-
-    g_signal_connect(G_OBJECT(output_plugin_cbox), "changed",
-                     G_CALLBACK(output_plugin_enable_prefs),
-                     output_plugin_prefs);
-    g_signal_connect_swapped(G_OBJECT(output_plugin_prefs), "clicked",
-                             G_CALLBACK(output_plugin_open_prefs),
-                             output_plugin_cbox);
-
-    g_signal_connect(G_OBJECT(output_plugin_cbox), "changed",
-                     G_CALLBACK(output_plugin_enable_info),
-                     output_plugin_info);
-    g_signal_connect_swapped(G_OBJECT(output_plugin_info), "clicked",
-                             G_CALLBACK(output_plugin_open_info),
-                             output_plugin_cbox);
-
 }
 
 static void
@@ -2159,390 +1780,30 @@ create_connectivity_category(void)
     create_widgets(GTK_BOX(vbox29), connectivity_page_widgets, G_N_ELEMENTS(connectivity_page_widgets));
 }
 
-static void
-create_plugin_category(void)
+static void create_plugin_category (void)
 {
-    GtkWidget *plugin_page_vbox;
-    GtkWidget *plugin_notebook;
-    GtkWidget *plugin_input_vbox;
-    GtkWidget *alignment43;
-    GtkWidget *input_plugin_list_label;
-    GtkWidget *scrolledwindow3;
-    GtkWidget *input_plugin_view;
-    GtkWidget *input_plugin_button_box;
-    GtkWidget *input_plugin_prefs;
-    GtkWidget *input_plugin_info;
-    GtkWidget *plugin_input_label;
-    GtkWidget *plugin_general_vbox;
-    GtkWidget *alignment45;
-    GtkWidget *label11;
-    GtkWidget *scrolledwindow5;
-    GtkWidget *general_plugin_view;
-    GtkWidget *general_plugin_button_box;
-    GtkWidget *general_plugin_prefs;
-    GtkWidget *general_plugin_info;
-    GtkWidget *plugin_general_label;
-    GtkWidget *vbox21;
-    GtkWidget *alignment46;
-    GtkWidget *label53;
-    GtkWidget *scrolledwindow7;
-    GtkWidget *vis_plugin_view;
-    GtkWidget *hbuttonbox6;
-    GtkWidget *vis_plugin_prefs;
-    GtkWidget *vis_plugin_info;
-    GtkWidget *vis_label;
-    GtkWidget *vbox25;
-    GtkWidget *alignment58;
-    GtkWidget *label64;
-    GtkWidget *scrolledwindow9;
-    GtkWidget *effect_plugin_view;
-    GtkWidget *hbuttonbox9;
-    GtkWidget *effect_plugin_prefs;
-    GtkWidget *effect_plugin_info;
-    GtkWidget *effects_label;
-
-    plugin_page_vbox = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (category_notebook), plugin_page_vbox);
-
-    plugin_notebook = gtk_notebook_new ();
-    gtk_box_pack_start (GTK_BOX (plugin_page_vbox), plugin_notebook, TRUE, TRUE, 0);
-    gtk_notebook_set_show_border (GTK_NOTEBOOK (plugin_notebook), FALSE);
-
-    plugin_input_vbox = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (plugin_notebook), plugin_input_vbox);
-    gtk_container_set_border_width (GTK_CONTAINER (plugin_input_vbox), 12);
-
-    alignment43 = gtk_alignment_new (0.5, 0.5, 1, 1);
-    gtk_box_pack_start (GTK_BOX (plugin_input_vbox), alignment43, FALSE, FALSE, 4);
-    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment43), 0, 6, 0, 0);
-
-    input_plugin_list_label = gtk_label_new_with_mnemonic (_("_Decoder list:"));
-    gtk_container_add (GTK_CONTAINER (alignment43), input_plugin_list_label);
-    gtk_label_set_use_markup (GTK_LABEL (input_plugin_list_label), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (input_plugin_list_label), 0, 0.5);
-
-    scrolledwindow3 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_box_pack_start (GTK_BOX (plugin_input_vbox), scrolledwindow3, TRUE, TRUE, 0);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow3), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow3), GTK_SHADOW_IN);
-
-    input_plugin_view = gtk_tree_view_new ();
-    gtk_container_add (GTK_CONTAINER (scrolledwindow3), input_plugin_view);
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (input_plugin_view), TRUE);
-    gtk_tree_view_set_reorderable (GTK_TREE_VIEW (input_plugin_view), TRUE);
-
-    input_plugin_button_box = gtk_hbutton_box_new ();
-    gtk_box_pack_start (GTK_BOX (plugin_input_vbox), input_plugin_button_box, FALSE, FALSE, 8);
-    gtk_button_box_set_layout (GTK_BUTTON_BOX (input_plugin_button_box), GTK_BUTTONBOX_START);
-    gtk_box_set_spacing (GTK_BOX (input_plugin_button_box), 8);
-
-    input_plugin_prefs = gtk_button_new_from_stock ("gtk-preferences");
-    gtk_container_add (GTK_CONTAINER (input_plugin_button_box), input_plugin_prefs);
-    gtk_widget_set_sensitive (input_plugin_prefs, FALSE);
-    gtk_widget_set_can_default(input_plugin_prefs, TRUE);
-
-    input_plugin_info = gtk_button_new_from_stock ("gtk-dialog-info");
-    gtk_container_add (GTK_CONTAINER (input_plugin_button_box), input_plugin_info);
-    gtk_widget_set_sensitive (input_plugin_info, FALSE);
-    gtk_widget_set_can_default(input_plugin_info, TRUE);
-
-    plugin_input_label = gtk_label_new (_("<span size=\"medium\"><b>Decoders</b></span>"));
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (plugin_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (plugin_notebook), 0), plugin_input_label);
-    gtk_label_set_use_markup (GTK_LABEL (plugin_input_label), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (plugin_input_label), 0, 0);
-
-    plugin_general_vbox = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (plugin_notebook), plugin_general_vbox);
-    gtk_container_set_border_width (GTK_CONTAINER (plugin_general_vbox), 12);
-
-    alignment45 = gtk_alignment_new (0.5, 0.5, 1, 1);
-    gtk_box_pack_start (GTK_BOX (plugin_general_vbox), alignment45, FALSE, FALSE, 4);
-    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment45), 0, 6, 0, 0);
-
-    label11 = gtk_label_new_with_mnemonic (_("_General plugin list:"));
-    gtk_container_add (GTK_CONTAINER (alignment45), label11);
-    gtk_label_set_use_markup (GTK_LABEL (label11), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label11), 0, 0.5);
-
-    scrolledwindow5 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_box_pack_start (GTK_BOX (plugin_general_vbox), scrolledwindow5, TRUE, TRUE, 0);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow5), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow5), GTK_SHADOW_IN);
-
-    general_plugin_view = gtk_tree_view_new ();
-    gtk_container_add (GTK_CONTAINER (scrolledwindow5), general_plugin_view);
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (general_plugin_view), TRUE);
-    gtk_tree_view_set_reorderable (GTK_TREE_VIEW (general_plugin_view), TRUE);
-
-    general_plugin_button_box = gtk_hbutton_box_new ();
-    gtk_box_pack_start (GTK_BOX (plugin_general_vbox), general_plugin_button_box, FALSE, FALSE, 8);
-    gtk_button_box_set_layout (GTK_BUTTON_BOX (general_plugin_button_box), GTK_BUTTONBOX_START);
-    gtk_box_set_spacing (GTK_BOX (general_plugin_button_box), 8);
-
-    general_plugin_prefs = gtk_button_new_from_stock ("gtk-preferences");
-    gtk_container_add (GTK_CONTAINER (general_plugin_button_box), general_plugin_prefs);
-    gtk_widget_set_sensitive (general_plugin_prefs, FALSE);
-    gtk_widget_set_can_default(general_plugin_prefs, TRUE);
-
-    general_plugin_info = gtk_button_new_from_stock ("gtk-dialog-info");
-    gtk_container_add (GTK_CONTAINER (general_plugin_button_box), general_plugin_info);
-    gtk_widget_set_sensitive (general_plugin_info, FALSE);
-    gtk_widget_set_can_default(general_plugin_info, TRUE);
-
-    plugin_general_label = gtk_label_new (_("<span size=\"medium\"><b>General</b></span>"));
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (plugin_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (plugin_notebook), 1), plugin_general_label);
-    gtk_label_set_use_markup (GTK_LABEL (plugin_general_label), TRUE);
-
-    vbox21 = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (plugin_notebook), vbox21);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox21), 12);
-
-    alignment46 = gtk_alignment_new (0.5, 0.5, 1, 1);
-    gtk_box_pack_start (GTK_BOX (vbox21), alignment46, FALSE, FALSE, 4);
-    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment46), 0, 6, 0, 0);
-
-    label53 = gtk_label_new_with_mnemonic (_("_Visualization plugin list:"));
-    gtk_container_add (GTK_CONTAINER (alignment46), label53);
-    gtk_label_set_use_markup (GTK_LABEL (label53), TRUE);
-    gtk_misc_set_alignment (GTK_MISC (label53), 0, 0.5);
-
-    scrolledwindow7 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_box_pack_start (GTK_BOX (vbox21), scrolledwindow7, TRUE, TRUE, 0);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow7), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow7), GTK_SHADOW_IN);
-
-    vis_plugin_view = gtk_tree_view_new ();
-    gtk_container_add (GTK_CONTAINER (scrolledwindow7), vis_plugin_view);
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (vis_plugin_view), TRUE);
-    gtk_tree_view_set_reorderable (GTK_TREE_VIEW (vis_plugin_view), TRUE);
-
-    hbuttonbox6 = gtk_hbutton_box_new ();
-    gtk_box_pack_start (GTK_BOX (vbox21), hbuttonbox6, FALSE, FALSE, 8);
-    gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox6), GTK_BUTTONBOX_START);
-    gtk_box_set_spacing (GTK_BOX (hbuttonbox6), 8);
-
-    vis_plugin_prefs = gtk_button_new_from_stock ("gtk-preferences");
-    gtk_container_add (GTK_CONTAINER (hbuttonbox6), vis_plugin_prefs);
-    gtk_widget_set_sensitive (vis_plugin_prefs, FALSE);
-    gtk_widget_set_can_default(vis_plugin_prefs, TRUE);
-
-    vis_plugin_info = gtk_button_new_from_stock ("gtk-dialog-info");
-    gtk_container_add (GTK_CONTAINER (hbuttonbox6), vis_plugin_info);
-    gtk_widget_set_sensitive (vis_plugin_info, FALSE);
-    gtk_widget_set_can_default(vis_plugin_info, TRUE);
-
-    vis_label = gtk_label_new (_("<b>Visualization</b>"));
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (plugin_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (plugin_notebook), 2), vis_label);
-    gtk_label_set_use_markup (GTK_LABEL (vis_label), TRUE);
-
-    vbox25 = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (plugin_notebook), vbox25);
-    gtk_container_set_border_width (GTK_CONTAINER (vbox25), 12);
-
-    alignment58 = gtk_alignment_new (0.5, 0.5, 1, 1);
-    gtk_box_pack_start (GTK_BOX (vbox25), alignment58, FALSE, FALSE, 4);
-    gtk_alignment_set_padding (GTK_ALIGNMENT (alignment58), 0, 6, 0, 0);
-
-    label64 = gtk_label_new (_("Effect plugins:"));
-    gtk_container_add (GTK_CONTAINER (alignment58), label64);
-    gtk_misc_set_alignment (GTK_MISC (label64), 0, 0.5);
-
-    scrolledwindow9 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_box_pack_start (GTK_BOX (vbox25), scrolledwindow9, TRUE, TRUE, 0);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindow9), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolledwindow9), GTK_SHADOW_IN);
-
-    effect_plugin_view = gtk_tree_view_new ();
-    gtk_container_add (GTK_CONTAINER (scrolledwindow9), effect_plugin_view);
-    gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (effect_plugin_view), TRUE);
-    gtk_tree_view_set_reorderable (GTK_TREE_VIEW (effect_plugin_view), TRUE);
-
-    hbuttonbox9 = gtk_hbutton_box_new ();
-    gtk_box_pack_start (GTK_BOX (vbox25), hbuttonbox9, FALSE, FALSE, 8);
-    gtk_button_box_set_layout (GTK_BUTTON_BOX (hbuttonbox9), GTK_BUTTONBOX_START);
-    gtk_box_set_spacing (GTK_BOX (hbuttonbox9), 8);
-
-    effect_plugin_prefs = gtk_button_new_from_stock ("gtk-preferences");
-    gtk_container_add (GTK_CONTAINER (hbuttonbox9), effect_plugin_prefs);
-    gtk_widget_set_sensitive (effect_plugin_prefs, FALSE);
-    gtk_widget_set_can_default(effect_plugin_prefs, TRUE);
-
-    effect_plugin_info = gtk_button_new_from_stock ("gtk-dialog-info");
-    gtk_container_add (GTK_CONTAINER (hbuttonbox9), effect_plugin_info);
-    gtk_widget_set_sensitive (effect_plugin_info, FALSE);
-    gtk_widget_set_can_default(effect_plugin_info, TRUE);
-
-    effects_label = gtk_label_new (_("<b>Effects</b>"));
-    gtk_notebook_set_tab_label (GTK_NOTEBOOK (plugin_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (plugin_notebook), 3), effects_label);
-    gtk_label_set_use_markup (GTK_LABEL (effects_label), TRUE);
-
-
-
-    gtk_label_set_mnemonic_widget (GTK_LABEL (input_plugin_list_label), category_notebook);
-    gtk_label_set_mnemonic_widget (GTK_LABEL (label11), category_notebook);
-    gtk_label_set_mnemonic_widget (GTK_LABEL (label53), category_notebook);
-    gtk_label_set_mnemonic_widget (GTK_LABEL (label64), category_notebook);
-
-
-
-    g_signal_connect_after(G_OBJECT(input_plugin_view), "realize",
-                           G_CALLBACK(on_input_plugin_view_realize),
-                           NULL);
-    g_signal_connect_after(G_OBJECT(general_plugin_view), "realize",
-                           G_CALLBACK(on_general_plugin_view_realize),
-                           NULL);
-    g_signal_connect_after(G_OBJECT(vis_plugin_view), "realize",
-                           G_CALLBACK(on_vis_plugin_view_realize),
-                           NULL);
-    g_signal_connect_after(G_OBJECT(effect_plugin_view), "realize",
-                           G_CALLBACK(on_effect_plugin_view_realize),
-                           NULL);
-
-
-
-    /* plugin->input page */
-    g_object_set_data(G_OBJECT(input_plugin_view), "plugin_type" , GINT_TO_POINTER(PLUGIN_VIEW_TYPE_INPUT));
-    g_signal_connect(G_OBJECT(input_plugin_view), "row-activated",
-                     G_CALLBACK(plugin_treeview_open_prefs),
-                     NULL);
-    g_signal_connect(G_OBJECT(input_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_prefs),
-                     input_plugin_prefs);
-
-    g_signal_connect_swapped(G_OBJECT(input_plugin_prefs), "clicked",
-                             G_CALLBACK(plugin_treeview_open_prefs),
-                             input_plugin_view);
-
-    g_signal_connect(G_OBJECT(input_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_info),
-                     input_plugin_info);
-    g_signal_connect_swapped(G_OBJECT(input_plugin_info), "clicked",
-                             G_CALLBACK(plugin_treeview_open_info),
-                             input_plugin_view);
-
-
-    /* plugin->general page */
-
-    g_object_set_data(G_OBJECT(general_plugin_view), "plugin_type" , GINT_TO_POINTER(PLUGIN_VIEW_TYPE_GENERAL));
-    g_signal_connect(G_OBJECT(general_plugin_view), "row-activated",
-                     G_CALLBACK(plugin_treeview_open_prefs),
-                     NULL);
-
-    g_signal_connect(G_OBJECT(general_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_prefs),
-                     general_plugin_prefs);
-
-    g_signal_connect_swapped(G_OBJECT(general_plugin_prefs), "clicked",
-                             G_CALLBACK(plugin_treeview_open_prefs),
-                             general_plugin_view);
-
-    g_signal_connect(G_OBJECT(general_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_info),
-                     general_plugin_info);
-    g_signal_connect_swapped(G_OBJECT(general_plugin_info), "clicked",
-                             G_CALLBACK(plugin_treeview_open_info),
-                             general_plugin_view);
-
-
-    /* plugin->vis page */
-
-    g_object_set_data(G_OBJECT(vis_plugin_view), "plugin_type" , GINT_TO_POINTER(PLUGIN_VIEW_TYPE_VIS));
-    g_signal_connect(G_OBJECT(vis_plugin_view), "row-activated",
-                     G_CALLBACK(plugin_treeview_open_prefs),
-                     NULL);
-    g_signal_connect_swapped(G_OBJECT(vis_plugin_prefs), "clicked",
-                             G_CALLBACK(plugin_treeview_open_prefs),
-                             vis_plugin_view);
-    g_signal_connect(G_OBJECT(vis_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_prefs), vis_plugin_prefs);
-
-    g_signal_connect(G_OBJECT(vis_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_info), vis_plugin_info);
-    g_signal_connect_swapped(G_OBJECT(vis_plugin_info), "clicked",
-                             G_CALLBACK(plugin_treeview_open_info),
-                             vis_plugin_view);
-
-
-    /* plugin->effects page */
-
-    g_object_set_data(G_OBJECT(effect_plugin_view), "plugin_type" , GINT_TO_POINTER(PLUGIN_VIEW_TYPE_EFFECT));
-    g_signal_connect(G_OBJECT(effect_plugin_view), "row-activated",
-                     G_CALLBACK(plugin_treeview_open_prefs),
-                     NULL);
-    g_signal_connect_swapped(G_OBJECT(effect_plugin_prefs), "clicked",
-                             G_CALLBACK(plugin_treeview_open_prefs),
-                             effect_plugin_view);
-    g_signal_connect(G_OBJECT(effect_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_prefs), effect_plugin_prefs);
-
-    g_signal_connect(G_OBJECT(effect_plugin_view), "cursor-changed",
-                     G_CALLBACK(plugin_treeview_enable_info), effect_plugin_info);
-    g_signal_connect_swapped(G_OBJECT(effect_plugin_info), "clicked",
-                             G_CALLBACK(plugin_treeview_open_info),
-                             effect_plugin_view);
-
-}
-
-static void
-destroy_plugin_page(GList *list)
-{
-    GList *iter;
-
-    MOWGLI_ITER_FOREACH(iter, list)
-    {
-        Plugin *plugin = PLUGIN(iter->data);
-        if (plugin->settings && plugin->settings->data) {
-            plugin->settings->data = NULL;
-            if (plugin->settings->apply)
-                plugin->settings->apply();
-            if (plugin->settings->cleanup)
-                plugin->settings->cleanup();
-        }
-    }
-}
-
-static void
-destroy_plugin_pages(void)
-{
-    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_INPUT));
-    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_GENERAL));
-    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_VIS));
-    destroy_plugin_page(plugin_get_list(PLUGIN_TYPE_EFFECT));
+    GtkWidget * notebook = gtk_notebook_new ();
+    gtk_container_add ((GtkContainer *) category_notebook, notebook);
+
+    gint types[] = {PLUGIN_TYPE_TRANSPORT, PLUGIN_TYPE_PLAYLIST,
+     PLUGIN_TYPE_INPUT, PLUGIN_TYPE_EFFECT, PLUGIN_TYPE_VIS, PLUGIN_TYPE_GENERAL};
+    const gchar * names[] = {N_("Transport"), N_("Playlist"), N_("Input"),
+     N_("Effect"), N_("Visualization"), N_("General")};
+
+    for (gint i = 0; i < G_N_ELEMENTS (types); i ++)
+        gtk_notebook_append_page ((GtkNotebook *) notebook, plugin_view_new
+         (types[i]), gtk_label_new (_(names[i])));
 }
 
 static gboolean
 prefswin_destroy(GtkWidget *window, GdkEvent *event, gpointer data)
 {
-    destroy_plugin_pages();
     prefswin = NULL;
     category_notebook = NULL;
     gtk_widget_destroy(filepopup_settings);
     filepopup_settings = NULL;
     gtk_widget_destroy(window);
     return TRUE;
-}
-
-static void
-create_plugin_page(GList *list)
-{
-    GList *iter;
-
-    MOWGLI_ITER_FOREACH(iter, list)
-    {
-        Plugin *plugin = PLUGIN(iter->data);
-        if (plugin->settings && plugin->settings->type == PREFERENCES_PAGE) {
-            create_plugin_preferences_page(plugin->settings);
-        }
-    }
-}
-
-static void
-create_plugin_pages(void)
-{
-    create_plugin_page(plugin_get_list(PLUGIN_TYPE_INPUT));
-    create_plugin_page(plugin_get_list(PLUGIN_TYPE_GENERAL));
-    create_plugin_page(plugin_get_list(PLUGIN_TYPE_VIS));
-    create_plugin_page(plugin_get_list(PLUGIN_TYPE_EFFECT));
 }
 
 /* GtkWidget * * create_prefs_window (void) */
@@ -2600,10 +1861,8 @@ void * * create_prefs_window (void)
     create_audio_category();
     create_replay_gain_category();
     create_connectivity_category();
-    create_playback_category();
     create_playlist_category();
     create_plugin_category();
-    create_plugin_pages();
 
     hseparator1 = gtk_hseparator_new ();
     gtk_box_pack_start (GTK_BOX (vbox), hseparator1, FALSE, FALSE, 6);
@@ -2641,7 +1900,7 @@ void * * create_prefs_window (void)
                      NULL);
     g_signal_connect_swapped(G_OBJECT(close), "clicked",
                              G_CALLBACK(prefswin_destroy),
-                             GTK_OBJECT (prefswin));
+                             prefswin);
 
     /* create category view */
     on_category_treeview_realize ((GtkTreeView *) category_treeview,
@@ -2664,42 +1923,6 @@ void
 destroy_prefs_window(void)
 {
     prefswin_destroy(prefswin, NULL, NULL);
-}
-
-void
-create_plugin_preferences_page(PluginPreferences *settings)
-{
-    g_return_if_fail(settings->type == PREFERENCES_PAGE);
-
-    if (settings->data != NULL)
-        return;
-
-    if (settings->init)
-        settings->init();
-
-    GtkWidget *vbox;
-    vbox = gtk_vbox_new(FALSE, 5);
-
-    create_widgets(GTK_BOX(vbox), settings->prefs, settings->n_prefs);
-    gtk_widget_show_all(vbox);
-    prefswin_page_new(vbox, settings->title, settings->imgurl);
-
-    settings->data = (gpointer) vbox;
-}
-
-void
-destroy_plugin_preferences_page(PluginPreferences *settings)
-{
-    if (settings->data) {
-        if (settings->apply)
-            settings->apply();
-
-        prefswin_page_destroy(GTK_WIDGET(settings->data));
-        settings->data = NULL;
-
-        if (settings->cleanup)
-            settings->cleanup();
-    }
 }
 
 void
@@ -2853,7 +2076,7 @@ static void sw_volume_toggled (void)
         vol[1] = cfg.sw_volume_right;
     }
     else
-        input_get_volume (& vol[0], & vol[1]);
+        playback_get_volume (& vol[0], & vol[1]);
 
     hook_call ("volume set", vol);
 }

@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2007  Audacious development team
+ *  Copyright (C) 2005-2011  Audacious development team
  *
  *  Based on BMP:
  *  Copyright (C) 2003-2004  BMP development team
@@ -30,6 +30,7 @@ gint playback_get_time(void);
 void playback_pause(void);
 void playback_stop(void);
 gboolean playback_get_playing(void);
+gboolean playback_get_ready (void);
 gboolean playback_get_paused(void);
 void playback_seek(gint time);
 
@@ -37,7 +38,7 @@ gchar * playback_get_title (void);
 gint playback_get_length (void);
 void playback_get_info (gint * bitrate, gint * samplerate, gint * channels);
 
-void input_get_volume(gint * l, gint * r);
-void input_set_volume(gint l, gint r);
+void playback_get_volume (gint * l, gint * r);
+void playback_set_volume (gint l, gint r);
 
 #endif /* AUDACIOUS_PLAYBACK_H */

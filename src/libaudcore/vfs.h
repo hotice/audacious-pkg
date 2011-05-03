@@ -36,7 +36,9 @@ G_BEGIN_DECLS
 /** @struct VFSFile */
 typedef struct _VFSFile VFSFile;
 /** @struct VFSConstructor */
-typedef struct _VFSConstructor VFSConstructor;
+typedef const struct _VFSConstructor VFSConstructor;
+
+#define VFS_SIG ('V' | ('F' << 8) | ('S' << 16))
 
 /**
  * @struct _VFSFile
@@ -48,6 +50,7 @@ struct _VFSFile {
     gpointer handle;        /**< Opaque data used by the transport plugins */
     VFSConstructor *base;   /**< The base vtable used for VFS functions */
     gint ref;               /**< The amount of references that the VFSFile object has */
+    gint sig;               /**< Used to detect invalid or twice-closed objects */
 };
 
 /**
@@ -57,9 +60,6 @@ struct _VFSFile {
  * nature. VFS base vtables are registered via vfs_register_transport().
  */
 struct _VFSConstructor {
-    /** The URI identifier, e.g. "file" would handle "file://" streams. */
-    gchar * uri_id;
-
     /** A function pointer which points to a fopen implementation. */
     VFSFile * (* vfs_fopen_impl) (const gchar * filename, const gchar * mode);
     /** A function pointer which points to a fclose implementation. */
@@ -118,7 +118,7 @@ gint vfs_fprintf (VFSFile * stream, gchar const * format, ...) __attribute__
 
 gint vfs_fseek (VFSFile * file, gint64 offset, gint whence) WARN_RETURN;
 void vfs_rewind (VFSFile * file);
-glong vfs_ftell (VFSFile * file) WARN_RETURN;
+gint64 vfs_ftell (VFSFile * file) WARN_RETURN;
 gint64 vfs_fsize (VFSFile * file) WARN_RETURN;
 gint vfs_ftruncate (VFSFile * file, gint64 length) WARN_RETURN;
 
@@ -146,7 +146,11 @@ gboolean vfs_is_remote (const gchar * path) WARN_RETURN;
 void vfs_file_get_contents (const gchar * filename, void * * buf, gint64 *
  size);
 
-void vfs_register_transport (VFSConstructor * vtable);
+void vfs_set_lookup_func (VFSConstructor * (* func) (const gchar * scheme));
+void vfs_prepare (const gchar * scheme);
+void vfs_prepare_filename (const gchar * filename);
+
+void vfs_set_verbose (gboolean verbose);
 
 #undef WARN_RETURN
 

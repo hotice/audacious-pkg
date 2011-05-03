@@ -1,5 +1,5 @@
 /*
- * Audtool2
+ * Audtool
  * Copyright (c) 2007 Audacious development team
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,7 +84,7 @@ struct commandhandler handlers[] = {
 	{"playqueue-add", playqueue_add, "adds a song to the playqueue", 1},
 	{"playqueue-remove", playqueue_remove, "removes a song from the playqueue", 1},
 	{"playqueue-is-queued", playqueue_is_queued, "returns OK if a song is queued", 1},
-	{"playqueue-get-queue-position", playqueue_get_queue_position, "returns the playqueue position of a song in the given poition in the playlist", 1},
+	{"playqueue-get-queue-position", playqueue_get_queue_position, "returns the playqueue position of a song in the given position in the playlist", 1},
 	{"playqueue-get-list-position", playqueue_get_list_position, "returns the playlist position of a song in the given position in the playqueue", 1},
 	{"playqueue-length", playqueue_length, "returns the length of the playqueue", 0},
 	{"playqueue-display", playqueue_display, "returns a list of currently-queued songs", 0},
@@ -190,7 +190,7 @@ main(gint argc, gchar **argv)
 
 	if (argc < 2)
 		mowgli_error_context_display_with_error (e, ":\n  * ", "not enough "
-         "parameters, use \'audtool2 help\' for more information.");
+         "parameters, use \'audtool help\' for more information.");
 
 	for (j = 1; j < argc; j++)
 	{
@@ -212,7 +212,7 @@ main(gint argc, gchar **argv)
 
 	if (k == 0)
 		mowgli_error_context_display_with_error (e, ":\n  * ", g_strdup_printf
-         ("Unknown command '%s' encountered, use \'audtool2 help\' for a "
+         ("Unknown command '%s' encountered, use \'audtool help\' for a "
          "command list.", argv[1]));
 
 	audtool_disconnect();

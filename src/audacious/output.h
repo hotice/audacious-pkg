@@ -30,17 +30,17 @@
 
 #include "plugin.h"
 
-extern struct OutputAPI output_api;
-extern OutputPlugin * current_output_plugin;
+extern const struct OutputAPI output_api;
 
-GList *get_output_list(void);
 void output_get_volume(gint * l, gint * r);
 void output_set_volume(gint l, gint r);
 
-void output_init (void);
-void output_cleanup (void);
-void set_current_output_plugin (OutputPlugin * plugin);
 gint get_output_time (void);
+gint get_raw_output_time (void);
 void output_drain (void);
+
+PluginHandle * output_plugin_probe (void);
+PluginHandle * output_plugin_get_current (void);
+gboolean output_plugin_set_current (PluginHandle * plugin);
 
 #endif /* AUDACIOUS_OUTPUT_H */

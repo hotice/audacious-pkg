@@ -580,7 +580,7 @@ static TupleValue * tf_get_fieldref (TupleEvalVar * var, const Tuple * tuple)
 {
   if (var->type == TUPLE_VAR_FIELD && var->fieldref == NULL) {
     if (var->fieldidx < 0)
-      var->fieldref = mowgli_dictionary_retrieve(tuple->dict, var->name);
+      var->fieldref = mowgli_patricia_retrieve(tuple->dict, var->name);
     else
       var->fieldref = tuple->values[var->fieldidx];
   }
@@ -819,7 +819,7 @@ static gboolean tuple_formatter_eval_do (TupleEvalContext * ctx, TupleEvalNode *
 gchar * tuple_formatter_eval (TupleEvalContext * ctx, TupleEvalNode * expr,
  const Tuple * tuple)
 {
-  gchar *res = g_strdup("");
+  gchar *res = NULL;
   gssize resmax = 0, reslen = 0;
   assert(ctx != NULL);
   assert(tuple != NULL);

@@ -1,6 +1,6 @@
 /*
  * folder-add.c
- * Copyright 2009 John Lindgren
+ * Copyright 2009-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -20,31 +20,39 @@
  */
 
 #include <dirent.h>
-#include <glib.h>
-#include <gtk/gtk.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+
+#include <gtk/gtk.h>
 
 #include <libaudcore/audstrings.h>
 
 #include "audconfig.h"
 #include "config.h"
+#include "glib-compat.h"
 #include "i18n.h"
 #include "misc.h"
 #include "playback.h"
 #include "playlist.h"
 
-static GList * add_queue = NULL;
+typedef struct {
+    gchar * filename;
+    PluginHandle * decoder;
+} AddFile;
+
+typedef struct {
+    gint playlist_id, at;
+    GQueue folders; // (gchar *)
+    gboolean play;
+} AddGroup;
+
+static GQueue add_queue = G_QUEUE_INIT; // (AddGroup *)
 static gint add_source = 0;
-static gint add_playlist, add_at;
-static gboolean add_play;
 static GtkWidget * add_window = NULL, * add_progress_path, * add_progress_count;
 
 static void show_progress (const gchar * path, gint count)
 {
-    gchar scratch[128];
-
     if (add_window == NULL)
     {
         GtkWidget * vbox;
@@ -76,6 +84,8 @@ static void show_progress (const gchar * path, gint count)
     }
 
     gtk_label_set_text (GTK_LABEL(add_progress_path), path);
+
+    gchar scratch[128];
     snprintf (scratch, sizeof scratch, dngettext (PACKAGE, "%d file found",
      "%d files found", count), count);
     gtk_label_set_text (GTK_LABEL(add_progress_count), scratch);
@@ -86,34 +96,49 @@ static void show_done (void)
     gtk_widget_destroy (add_window);
 }
 
+static gint sort_cb (const AddFile * a, const AddFile * b)
+{
+    return string_compare_encoded (a->filename, b->filename);
+}
+
 static gboolean add_cb (void * unused)
 {
-    static GList * stack = NULL;
-    static struct index * index;
-    gint count;
+    static GList * stack = NULL; // (gchar *) and (DIR *) alternately
+    static GList * big_list = NULL, * little_list = NULL; // (AddFile *)
 
-    if (stack == NULL)
+    if (! stack)
     {
-        stack = g_list_prepend (stack, add_queue->data);
-        index = index_new ();
+        AddGroup * group = g_queue_peek_head (& add_queue);
+        g_return_val_if_fail (group, FALSE);
+        gchar * folder = g_queue_pop_head (& group->folders);
+        g_return_val_if_fail (folder, FALSE);
+        stack = g_list_prepend (NULL, folder);
     }
 
-    show_progress ((gchar *) stack->data, index_count (index));
+    show_progress (stack->data, g_list_length (big_list) + g_list_length
+     (little_list));
 
-    for (count = 0; count < 30; count ++)
+    for (gint count = 0; count < 30; count ++)
     {
         struct stat info;
-        struct dirent * entry;
 
-        if (stat (stack->data, & info) == 0)
+        /* top of stack is (gchar *) */
+
+        if (! stat (stack->data, & info))
         {
             if (S_ISREG (info.st_mode))
             {
                 gchar * filename = filename_to_uri (stack->data);
+                PluginHandle * decoder = (filename == NULL) ? NULL :
+                 file_find_decoder (filename, TRUE);
 
-                if (filename != NULL && file_find_decoder (filename, TRUE) !=
-                 NULL)
-                    index_append (index, filename);
+                if (decoder)
+                {
+                    AddFile * file = g_slice_new (AddFile);
+                    file->filename = filename;
+                    file->decoder = decoder;
+                    little_list = g_list_prepend (little_list, file);
+                }
                 else
                     g_free (filename);
             }
@@ -121,7 +146,7 @@ static gboolean add_cb (void * unused)
             {
                 DIR * folder = opendir (stack->data);
 
-                if (folder != NULL)
+                if (folder)
                 {
                     stack = g_list_prepend (stack, folder);
                     goto READ;
@@ -133,18 +158,20 @@ static gboolean add_cb (void * unused)
         stack = g_list_delete_link (stack, stack);
 
     READ:
-        if (stack == NULL)
+        if (! stack)
             break;
 
-        entry = readdir (stack->data);
+        /* top of stack is (DIR *) */
 
-        if (entry != NULL)
+        struct dirent * entry = readdir (stack->data);
+
+        if (entry)
         {
             if (entry->d_name[0] == '.')
                 goto READ;
 
-            stack = g_list_prepend (stack, g_strdup_printf ("%s/%s", (gchar *)
-             stack->next->data, entry->d_name));
+            stack = g_list_prepend (stack, g_strdup_printf ("%s"
+             G_DIR_SEPARATOR_S "%s", (gchar *) stack->next->data, entry->d_name));
         }
         else
         {
@@ -156,64 +183,114 @@ static gboolean add_cb (void * unused)
         }
     }
 
-    if (stack == NULL)
+    if (stack)
+        return TRUE; /* not done yet */
+
+    AddGroup * group = g_queue_peek_head (& add_queue);
+    g_return_val_if_fail (group, FALSE);
+
+    little_list = g_list_sort (little_list, (GCompareFunc) sort_cb);
+    big_list = g_list_concat (big_list, little_list);
+    little_list = NULL;
+
+    if (! g_queue_is_empty (& group->folders))
+        return TRUE; /* not done yet */
+
+    gint playlist = playlist_by_unique_id (group->playlist_id);
+
+    if (playlist < 0) /* ouch! playlist deleted */
     {
-        index_sort (index, (gint (*) (const void *, const void *))
-         string_compare_encoded);
-
-        count = playlist_count ();
-
-        if (add_playlist > count - 1)
-            add_playlist = count - 1;
-
-        count = playlist_entry_count (add_playlist);
-
-        if (add_at < 0 || add_at > count)
-            add_at = count;
-
-        playlist_entry_insert_batch (add_playlist, add_at, index, NULL);
-
-        if (add_play && playlist_entry_count (add_playlist) > count)
+        for (GList * node = big_list; node; node = node->next)
         {
-            playlist_set_playing (add_playlist);
-            if (! cfg.shuffle)
-                playlist_set_position (add_playlist, add_at);
-            playback_play (0, FALSE);
-            add_play = FALSE;
+            AddFile * file = node->data;
+            g_free (file->filename);
+            g_slice_free (AddFile, file);
         }
 
-        add_at += playlist_entry_count (add_playlist) - count;
-
-        add_queue = g_list_delete_link (add_queue, add_queue);
-
-        if (add_queue == NULL)
-        {
-            show_done ();
-            add_source = 0;
-            return FALSE;
-        }
+        g_list_free (big_list);
+        big_list = NULL;
+        goto ADDED;
     }
 
-    return TRUE;
+    struct index * filenames = index_new ();
+    struct index * decoders = index_new ();
+
+    for (GList * node = big_list; node; node = node->next)
+    {
+        AddFile * file = node->data;
+        index_append (filenames, file->filename);
+        index_append (decoders, file->decoder);
+        g_slice_free (AddFile, file);
+    }
+
+    g_list_free (big_list);
+    big_list = NULL;
+
+    gint count = playlist_entry_count (playlist);
+    if (group->at < 0 || group->at > count)
+        group->at = count;
+
+    playlist_entry_insert_batch_with_decoders (playlist, group->at,
+     filenames, decoders, NULL);
+
+    if (group->play && playlist_entry_count (playlist) > count)
+    {
+        playlist_set_playing (playlist);
+        if (! cfg.shuffle)
+            playlist_set_position (playlist, group->at);
+        playback_play (0, FALSE);
+    }
+
+ADDED:
+    g_slice_free (AddGroup, group);
+    g_queue_pop_head (& add_queue);
+
+    if (! g_queue_is_empty (& add_queue))
+        return TRUE; /* not done yet */
+
+    show_done ();
+    add_source = 0;
+    return FALSE;
 }
 
 void playlist_insert_folder (gint playlist, gint at, const gchar * folder,
  gboolean play)
 {
+    gint playlist_id = playlist_get_unique_id (playlist);
+    g_return_if_fail (playlist_id >= 0);
+
     gchar * unix_name = uri_to_filename (folder);
-
-    add_playlist = playlist;
-    add_at = at;
-    add_play |= play;
-
-    if (unix_name == NULL)
-        return;
+    g_return_if_fail (unix_name);
 
     if (unix_name[strlen (unix_name) - 1] == '/')
         unix_name[strlen (unix_name) - 1] = 0;
 
-    add_queue = g_list_append (add_queue, unix_name);
+    AddGroup * group = NULL;
 
-    if (add_source == 0)
+    for (GList * node = g_queue_peek_head_link (& add_queue); node; node =
+     node->next)
+    {
+        AddGroup * test = node->data;
+        if (test->playlist_id == playlist_id && test->at == at)
+        {
+            group = test;
+            break;
+        }
+    }
+
+    if (! group)
+    {
+        group = g_slice_new (AddGroup);
+        group->playlist_id = playlist_id;
+        group->at = at;
+        g_queue_init (& group->folders);
+        group->play = FALSE;
+        g_queue_push_tail (& add_queue, group);
+    }
+
+    g_queue_push_tail (& group->folders, unix_name);
+    group->play |= play;
+
+    if (! add_source)
         add_source = g_idle_add (add_cb, NULL);
 }

@@ -82,14 +82,6 @@ static gboolean probe_func (PluginHandle * plugin, ProbeState * state)
         if (vfs_fseek (state->handle, 0, SEEK_SET) < 0)
             return FALSE;
     }
-    else if (decoder->is_our_file != NULL)
-    {
-        if (decoder->is_our_file (state->filename))
-        {
-            state->plugin = plugin;
-            return FALSE;
-        }
-    }
 
     return TRUE;
 }
@@ -176,10 +168,10 @@ static void probe_by_mime (ProbeState * state)
 static void probe_by_content (ProbeState * state)
 {
     AUDDBG ("Probing by content.\n");
-    plugin_for_each (PLUGIN_TYPE_INPUT, (PluginForEachFunc) probe_func, state);
+    plugin_for_enabled (PLUGIN_TYPE_INPUT, (PluginForEachFunc) probe_func, state);
 }
 
-InputPlugin * file_find_decoder (const gchar * filename, gboolean fast)
+PluginHandle * file_find_decoder (const gchar * filename, gboolean fast)
 {
     ProbeState state;
 
@@ -211,69 +203,72 @@ DONE:
     if (state.handle != NULL)
         vfs_fclose (state.handle);
 
-    return (state.plugin != NULL) ? plugin_get_header (state.plugin) : NULL;
+    return state.plugin;
 }
 
-Tuple * file_read_tuple (const gchar * filename, InputPlugin * decoder)
+Tuple * file_read_tuple (const gchar * filename, PluginHandle * decoder)
 {
-    if (decoder->get_song_tuple != NULL)
-        return decoder->get_song_tuple (filename);
+    InputPlugin * ip = plugin_get_header (decoder);
+    g_return_val_if_fail (ip, NULL);
+    g_return_val_if_fail (ip->probe_for_tuple, NULL);
 
-    if (decoder->probe_for_tuple != NULL)
-    {
-        VFSFile * handle = vfs_fopen (filename, "r");
-        Tuple * tuple;
+    gchar * real = filename_split_subtune (filename, NULL);
+    VFSFile * handle = vfs_fopen (real, "r");
+    g_free (real);
 
-        if (handle == NULL)
-            return NULL;
+    Tuple * tuple = ip->probe_for_tuple (filename, handle);
 
-        tuple = decoder->probe_for_tuple (filename, handle);
+    if (handle)
         vfs_fclose (handle);
-        return tuple;
-    }
 
-    return NULL;
+    return tuple;
 }
 
-gboolean file_read_image (const gchar * filename, InputPlugin * decoder,
+gboolean file_read_image (const gchar * filename, PluginHandle * decoder,
  void * * data, gint * size)
 {
-    VFSFile * handle;
-    gboolean success;
-
-    if (decoder->get_song_image == NULL)
+    if (! input_plugin_has_images (decoder))
         return FALSE;
 
-    handle = vfs_fopen (filename, "r");
-    success = decoder->get_song_image (filename, handle, data, size);
+    InputPlugin * ip = plugin_get_header (decoder);
+    g_return_val_if_fail (ip, FALSE);
+    g_return_val_if_fail (ip->get_song_image, FALSE);
 
-    if (handle != NULL)
+    gchar * real = filename_split_subtune (filename, NULL);
+    VFSFile * handle = vfs_fopen (real, "r");
+    g_free (real);
+
+    gboolean success = ip->get_song_image (filename, handle, data, size);
+
+    if (handle)
         vfs_fclose (handle);
 
     return success;
 }
 
-gboolean file_can_write_tuple (const gchar * filename, InputPlugin * decoder)
+gboolean file_can_write_tuple (const gchar * filename, PluginHandle * decoder)
 {
-    return (decoder->update_song_tuple != NULL);
+    return input_plugin_can_write_tuple (decoder);
 }
 
-gboolean file_write_tuple (const gchar * filename, InputPlugin * decoder,
+gboolean file_write_tuple (const gchar * filename, PluginHandle * decoder,
  const Tuple * tuple)
 {
-    VFSFile * handle;
-    gboolean success;
+    InputPlugin * ip = plugin_get_header (decoder);
+    g_return_val_if_fail (ip, FALSE);
+    g_return_val_if_fail (ip->update_song_tuple, FALSE);
 
-    if (decoder->update_song_tuple == NULL)
+    gchar * real = filename_split_subtune (filename, NULL);
+    VFSFile * handle = vfs_fopen (real, "r+");
+    g_free (real);
+
+    if (! handle)
         return FALSE;
 
-    handle = vfs_fopen (filename, "r+");
+    gboolean success = ip->update_song_tuple (tuple, handle);
 
-    if (handle == NULL)
-        return FALSE;
-
-    success = decoder->update_song_tuple (tuple, handle);
-    vfs_fclose (handle);
+    if (handle)
+        vfs_fclose (handle);
 
     if (success)
         playlist_rescan_file (filename);
@@ -281,11 +276,15 @@ gboolean file_write_tuple (const gchar * filename, InputPlugin * decoder,
     return success;
 }
 
-gboolean custom_infowin (const gchar * filename, InputPlugin * decoder)
+gboolean custom_infowin (const gchar * filename, PluginHandle * decoder)
 {
-    if (decoder->file_info_box == NULL)
+    if (! input_plugin_has_infowin (decoder))
         return FALSE;
 
-    decoder->file_info_box (filename);
+    InputPlugin * ip = plugin_get_header (decoder);
+    g_return_val_if_fail (ip, FALSE);
+    g_return_val_if_fail (ip->file_info_box, FALSE);
+
+    ip->file_info_box (filename);
     return TRUE;
 }

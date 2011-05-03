@@ -1,6 +1,6 @@
 /*
  * drct.c
- * Copyright 2009-2010 John Lindgren
+ * Copyright 2009-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -24,11 +24,10 @@
 #include <libaudcore/vfs.h>
 
 #include "audconfig.h"
-#include "compatibility.h"
 #include "config.h"
 #include "drct.h"
+#include "glib-compat.h"
 #include "i18n.h"
-#include "main.h"
 #include "playback.h"
 #include "playlist.h"
 
@@ -36,7 +35,7 @@
 
 void drct_quit (void)
 {
-    aud_quit ();
+    hook_call ("quit", NULL);
 }
 
 /* --- PLAYBACK CONTROL --- */
@@ -69,6 +68,11 @@ void drct_stop (void)
 gboolean drct_get_playing (void)
 {
     return playback_get_playing ();
+}
+
+gboolean drct_get_ready (void)
+{
+    return playback_get_ready ();
 }
 
 gboolean drct_get_paused (void)
@@ -105,14 +109,14 @@ void drct_seek (gint time)
 
 void drct_get_volume (gint * left, gint * right)
 {
-    input_get_volume (left, right);
+    playback_get_volume (left, right);
     * left = CLAMP (* left, 0, 100);
     * right = CLAMP (* right, 0, 100);
 }
 
 void drct_set_volume (gint left, gint right)
 {
-    input_set_volume (CLAMP (left, 0, 100), CLAMP (right, 0, 100));
+    playback_set_volume (CLAMP (left, 0, 100), CLAMP (right, 0, 100));
 }
 
 void drct_get_volume_main (gint * volume)
@@ -244,8 +248,35 @@ gint drct_pl_get_time (gint pos)
     return playlist_entry_get_length (playlist_get_active (), pos, FALSE);
 }
 
-static void add_list (GList * list, gint at, gboolean play)
+static void activate_temp (void)
 {
+    gint playlists = playlist_count ();
+    const gchar * title = _("Temporary Playlist");
+
+    for (gint playlist = 0; playlist < playlists; playlist ++)
+    {
+        if (! strcmp (playlist_get_title (playlist), title))
+        {
+            playlist_set_active (playlist);
+            return;
+        }
+    }
+
+    if (! playlist_entry_count (playlist_get_active ()))
+        playlist_set_title (playlist_get_active (), title);
+    else
+    {
+        playlist_insert (playlists);
+        playlist_set_title (playlists, title);
+        playlist_set_active (playlists);
+    }
+}
+
+static void add_list (GList * list, gint at, gboolean to_temp, gboolean play)
+{
+    if (to_temp)
+        activate_temp ();
+
     gint playlist = playlist_get_active ();
 
     if (play)
@@ -301,61 +332,70 @@ static void add_list (GList * list, gint at, gboolean play)
 void drct_pl_add (const gchar * filename, gint at)
 {
     GList * list = g_list_prepend (NULL, (void *) filename);
-    add_list (list, at, FALSE);
+    add_list (list, at, FALSE, FALSE);
     g_list_free (list);
 }
 
 void drct_pl_add_list (GList * list, gint at)
 {
-    add_list (list, at, FALSE);
+    add_list (list, at, FALSE, FALSE);
 }
 
 void drct_pl_open (const gchar * filename)
 {
     GList * list = g_list_prepend (NULL, (void *) filename);
-    add_list (list, -1, TRUE);
+    add_list (list, -1, cfg.open_to_temporary, TRUE);
     g_list_free (list);
 }
 
 void drct_pl_open_list (GList * list)
 {
-    add_list (list, -1, TRUE);
-}
-
-static void activate_temp (void)
-{
-    gint playlists = playlist_count ();
-    const gchar * title = _("Temporary Playlist");
-
-    for (gint playlist = 0; playlist < playlists; playlist ++)
-    {
-        if (! strcmp (playlist_get_title (playlist), title))
-        {
-            playlist_set_active (playlist);
-            return;
-        }
-    }
-
-    playlist_insert (playlists);
-    playlist_set_title (playlists, title);
-    playlist_set_active (playlists);
+    add_list (list, -1, cfg.open_to_temporary, TRUE);
 }
 
 void drct_pl_open_temp (const gchar * filename)
 {
-    activate_temp ();
-    drct_pl_open (filename);
+    GList * list = g_list_prepend (NULL, (void *) filename);
+    add_list (list, -1, TRUE, TRUE);
+    g_list_free (list);
 }
 
 void drct_pl_open_temp_list (GList * list)
 {
-    activate_temp ();
-    drct_pl_open_list (list);
+    add_list (list, -1, TRUE, TRUE);
 }
 
 void drct_pl_delete (gint entry)
 {
     playlist_entry_delete (playlist_get_active (), entry, 1);
+}
+
+/* Advancing to the next song when the current one is deleted is tricky.  First,
+ * we delete all the selected songs except the current one.  We can then advance
+ * to a new song without worrying about picking one that is also selected.
+ * Finally, we can delete the former current song without stopping playback. */
+
+void drct_pl_delete_selected (void)
+{
+    gint list = playlist_get_active ();
+    gint pos = playlist_get_position (list);
+
+    if (cfg.advance_on_delete && ! cfg.no_playlist_advance
+     && playback_get_playing () && list == playlist_get_playing ()
+     && pos >= 0 && playlist_entry_get_selected (list, pos))
+    {
+        playlist_entry_set_selected (list, pos, FALSE);
+        playlist_delete_selected (list);
+        pos = playlist_get_position (list); /* it may have moved */
+
+        if (playlist_next_song (list, cfg.repeat)
+         && playlist_get_position (list) != pos)
+            playback_play (0, FALSE);
+
+        playlist_entry_delete (list, pos, 1);
+    }
+    else
+        playlist_delete_selected (list);
 }
 
 void drct_pl_clear (void)

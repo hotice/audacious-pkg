@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2008  Audacious development team
+ *  Copyright (C) 2005-2011  Audacious development team
  *
  *  Based on BMP:
  *  Copyright (C) 2003-2004  BMP development team
@@ -39,6 +39,9 @@ gboolean dir_foreach(const gchar * path, DirForeachFunc function,
 gint file_get_mtime (const gchar * filename);
 void make_directory(const gchar * path, mode_t mode);
 
-GList * plugin_get_list (gint type);
+gchar * get_path_to_self (void);
+
+void describe_song (const gchar * filename, const Tuple * tuple,
+ gchar * * title, gchar * * artist, gchar * * album);
 
 #endif /* AUDACIOUS_UTIL_H */

@@ -27,38 +27,25 @@
 #  include "config.h"
 #endif
 
-
-#include <glib.h>
-#include <glib/gprintf.h>
-#include <gtk/gtk.h>
-
-#include <gdk/gdk.h>
-#include <gdk/gdkkeysyms.h>
-
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <sys/types.h>
 
-#if defined(USE_REGEX_ONIGURUMA)
-  #include <onigposix.h>
-#elif defined(USE_REGEX_PCRE)
-  #include <pcreposix.h>
-#else
-  #include <regex.h>
-#endif
+#include <gdk/gdkkeysyms.h>
+#include <gtk/gtk.h>
 
 #include <audacious/audconfig.h>
 #include <audacious/drct.h>
+#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/playlist.h>
 #include <libaudcore/hook.h>
 
-#include "audacious/compatibility.h"
-
 #include "icons-stock.h"
 #include "ui_jumptotrack_cache.h"
+#include "ui_regex.h"
 
 static void watchdog (void * hook_data, void * user_data);
 

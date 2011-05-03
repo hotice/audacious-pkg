@@ -23,7 +23,6 @@
 
 #include "debug.h"
 #include "effect.h"
-#include "output.h"
 #include "playback.h"
 #include "plugin.h"
 #include "plugins.h"
@@ -35,7 +34,8 @@ typedef struct {
     gboolean remove_flag;
 } RunningEffect;
 
-static GList * running_effects = NULL;
+static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+static GList * running_effects = NULL; /* (RunningEffect *) */
 static gint input_channels, input_rate;
 
 typedef struct {
@@ -63,6 +63,8 @@ static gboolean effect_start_cb (PluginHandle * plugin, EffectStartState * state
 
 void effect_start (gint * channels, gint * rate)
 {
+    g_static_mutex_lock (& mutex);
+
     AUDDBG ("Starting effects.\n");
     g_list_foreach (running_effects, (GFunc) g_free, NULL);
     g_list_free (running_effects);
@@ -75,10 +77,11 @@ void effect_start (gint * channels, gint * rate)
     plugin_for_enabled (PLUGIN_TYPE_EFFECT, (PluginForEachFunc) effect_start_cb,
      & state);
     running_effects = g_list_reverse (running_effects);
+
+    g_static_mutex_unlock (& mutex);
 }
 
-typedef struct
-{
+typedef struct {
     gfloat * * data;
     gint * samples;
 } EffectProcessState;
@@ -100,36 +103,56 @@ static void effect_process_cb (RunningEffect * effect, EffectProcessState *
 
 void effect_process (gfloat * * data, gint * samples)
 {
+    g_static_mutex_lock (& mutex);
+
     EffectProcessState state = {data, samples};
     g_list_foreach (running_effects, (GFunc) effect_process_cb, & state);
+
+    g_static_mutex_unlock (& mutex);
 }
 
 void effect_flush (void)
 {
+    g_static_mutex_lock (& mutex);
+
     for (GList * node = running_effects; node != NULL; node = node->next)
         ((RunningEffect *) node->data)->header->flush ();
+
+    g_static_mutex_unlock (& mutex);
 }
 
 void effect_finish (gfloat * * data, gint * samples)
 {
+    g_static_mutex_lock (& mutex);
+
     for (GList * node = running_effects; node != NULL; node = node->next)
         ((RunningEffect *) node->data)->header->finish (data, samples);
+
+    g_static_mutex_unlock (& mutex);
 }
 
 gint effect_decoder_to_output_time (gint time)
 {
+    g_static_mutex_lock (& mutex);
+
     for (GList * node = running_effects; node != NULL; node = node->next)
         time = ((RunningEffect *) node->data)->header->decoder_to_output_time
          (time);
+
+    g_static_mutex_unlock (& mutex);
     return time;
 }
 
 gint effect_output_to_decoder_time (gint time)
 {
+    g_static_mutex_lock (& mutex);
+
     for (GList * node = g_list_last (running_effects); node != NULL; node =
      node->prev)
         time = ((RunningEffect *) node->data)->header->output_to_decoder_time
          (time);
+
+    g_static_mutex_unlock (& mutex);
     return time;
 }
 
@@ -193,26 +216,48 @@ static void effect_remove (PluginHandle * plugin)
     ((RunningEffect *) node->data)->remove_flag = TRUE;
 }
 
-void effect_plugin_enable (PluginHandle * plugin, gboolean enable)
+static void effect_enable (PluginHandle * plugin, EffectPlugin * ep, gboolean
+ enable)
 {
-    plugin_set_enabled (plugin, enable);
+    if (ep->preserves_format)
+    {
+        g_static_mutex_lock (& mutex);
 
+        if (enable)
+            effect_insert (plugin, ep);
+        else
+            effect_remove (plugin);
+
+        g_static_mutex_unlock (& mutex);
+    }
+    else
+    {
+        AUDDBG ("Reset to add/remove %s.\n", plugin_get_name (plugin));
+        gint time = playback_get_time ();
+        gboolean paused = playback_get_paused ();
+        playback_stop ();
+        playback_play (time, paused);
+    }
+}
+
+gboolean effect_plugin_start (PluginHandle * plugin)
+{
     if (playback_get_playing ())
     {
-        EffectPlugin * header = plugin_get_header (plugin);
-        g_return_if_fail (header != NULL);
+        EffectPlugin * ep = plugin_get_header (plugin);
+        g_return_val_if_fail (ep != NULL, FALSE);
+        effect_enable (plugin, ep, TRUE);
+    }
 
-        if (header->preserves_format)
-        {
-            if (enable)
-                effect_insert (plugin, header);
-            else
-                effect_remove (plugin);
-        }
-        else
-        {
-            AUDDBG ("Reset to add/remove %s.\n", plugin_get_name (plugin));
-            set_current_output_plugin (current_output_plugin);
-        }
+    return TRUE;
+}
+
+void effect_plugin_stop (PluginHandle * plugin)
+{
+    if (playback_get_playing ())
+    {
+        EffectPlugin * ep = plugin_get_header (plugin);
+        g_return_if_fail (ep != NULL);
+        effect_enable (plugin, ep, FALSE);
     }
 }
