@@ -1,3 +1,11 @@
+audacious (2.5.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches/bp-audtag-debugging-output.patch: Removed, merged
+    upstream.
+
+ -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Tue, 03 May 2011 10:39:22 +0530
+
 audacious (2.4.4-1) unstable; urgency=low
 
   * New upstream release.
