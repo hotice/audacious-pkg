@@ -59,7 +59,8 @@ static void increase_buffer (ProbeBuffer * p, gint64 size)
     }
 
     if (p->filled < size)
-        p->filled += vfs_fread (p->buffer + p->at, 1, size - p->filled, p->file);
+        p->filled += vfs_fread (p->buffer + p->filled, 1, size - p->filled,
+         p->file);
 }
 
 static gint64 probe_buffer_fread (void * buffer, gint64 size, gint64 count,
@@ -156,7 +157,6 @@ static gchar * probe_buffer_get_metadata (VFSFile * file, const gchar * field)
 
 static VFSConstructor probe_buffer_table =
 {
-	.uri_id = NULL,
 	.vfs_fopen_impl = NULL,
 	.vfs_fclose_impl = probe_buffer_fclose,
 	.vfs_fread_impl = probe_buffer_fread,
@@ -193,6 +193,7 @@ VFSFile * probe_buffer_new (const gchar * filename)
     file2->handle = p;
     file2->uri = g_strdup (filename);
     file2->ref = 1;
+    file2->sig = VFS_SIG;
 
     return file2;
 }

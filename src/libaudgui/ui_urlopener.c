@@ -31,6 +31,7 @@
 #include <gtk/gtk.h>
 
 #include <audacious/audconfig.h>
+#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/drct.h>
 #include <audacious/misc.h>
@@ -63,7 +64,7 @@ GtkWidget * urlopener_add_url_dialog_new (GCallback func, gboolean open)
     vbox = gtk_vbox_new(FALSE, 10);
     gtk_container_add(GTK_CONTAINER(win), vbox);
 
-    combo = gtk_combo_box_entry_new_text();
+    combo = gtk_combo_box_text_new_with_entry ();
     gtk_box_pack_start(GTK_BOX(vbox), combo, FALSE, FALSE, 0);
 
     entry = gtk_bin_get_child(GTK_BIN(combo));
@@ -71,8 +72,8 @@ GtkWidget * urlopener_add_url_dialog_new (GCallback func, gboolean open)
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 
     for (url = aud_cfg->url_history; url; url = g_list_next(url))
-        gtk_combo_box_append_text(GTK_COMBO_BOX(combo),
-                                  (const gchar *) url->data);
+        gtk_combo_box_text_append_text ((GtkComboBoxText *) combo,
+         (const gchar *) url->data);
 
     g_signal_connect(entry, "activate",
                      G_CALLBACK(urlopener_add_url_callback),

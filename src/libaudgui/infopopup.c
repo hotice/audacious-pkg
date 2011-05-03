@@ -25,8 +25,8 @@
 #include <string.h>
 
 #include <audacious/audconfig.h>
-#include <audacious/compatibility.h>
 #include <audacious/drct.h>
+#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
 #include <audacious/playlist.h>
@@ -35,7 +35,16 @@
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
 
-#define DEFAULT_ARTWORK DATA_DIR "/images/audio.png"
+static const gchar * get_default_artwork (void)
+{
+    static gchar * path = NULL;
+    if (! path)
+        path = g_strdup_printf ("%s/images/audio.png",
+         aud_get_path (AUD_PATH_DATA_DIR));
+    return path;
+}
+
+#define DEFAULT_ARTWORK (get_default_artwork ())
 
 static GtkWidget * infopopup = NULL;
 
@@ -246,8 +255,6 @@ static void infopopup_create (void)
 
     /* track progress */
     infopopup_progress = gtk_progress_bar_new ();
-    gtk_progress_bar_set_orientation ((GtkProgressBar *) infopopup_progress,
-     GTK_PROGRESS_LEFT_TO_RIGHT);
     gtk_progress_bar_set_text ((GtkProgressBar *) infopopup_progress, "");
     gtk_table_attach ((GtkTable *) infopopup_data_table, infopopup_progress, 0,
      2, 7, 8, GTK_FILL, 0, 0, 0);

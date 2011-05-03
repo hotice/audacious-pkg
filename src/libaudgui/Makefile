@@ -9,7 +9,7 @@ SRCS = confirm.c \
        infopopup.c \
        infowin.c \
        init.c \
-       library-store.c \
+       list.c \
        ui_gtk.c \
        ui_fileopener.c \
        ui_urlopener.c \
@@ -23,14 +23,15 @@ SRCS = confirm.c \
        util.c
 
 INCLUDES = libaudgui.h \
-           libaudgui-gtk.h
+           libaudgui-gtk.h \
+           list.h
 
 include ../../buildsys.mk
 include ../../extra.mk
 
 includesubdir = libaudgui
 
-CPPFLAGS += -DHAVE_CONFIG_H ${LIB_CPPFLAGS} -I.. -I../.. ${GLIB_CFLASG} ${GTK_CFLAGS} ${DBUS_CFLAGS} ${LIBMCS_CFLAGS} ${AUDACIOUS_DEFINES} ${REGEX_CFLAGS}
+CPPFLAGS += -DHAVE_CONFIG_H -I.. -I../.. ${GLIB_CFLASG} ${GTK_CFLAGS} ${DBUS_CFLAGS} ${LIBMCS_CFLAGS} ${AUDACIOUS_DEFINES} ${REGEX_CFLAGS}
 CFLAGS += -std=gnu99 ${LIB_CFLAGS}
 LDFLAGS += $(AUDLDFLAGS)
 LIBS += -lm ${GLIB_LIBS} ${MOWGLI_LIBS} ${GTK_LIBS} ${REGEX_LIBS} -L../libaudcore -laudcore

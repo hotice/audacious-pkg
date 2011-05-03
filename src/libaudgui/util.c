@@ -24,8 +24,12 @@
 #include <gtk/gtk.h>
 
 #include <audacious/debug.h>
+#include <audacious/gtk-compat.h>
+#include <audacious/playlist.h>
 #include <audacious/plugin.h>
 #include <audacious/misc.h>
+#include <libaudcore/audstrings.h>
+#include <libaudcore/hook.h>
 
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
@@ -74,19 +78,34 @@ void audgui_connect_check_box (GtkWidget * box, gboolean * setting)
 void audgui_simple_message (GtkWidget * * widget, GtkMessageType type,
  const gchar * title, const gchar * text)
 {
-    if (* widget == NULL)
-    {
-        * widget = gtk_message_dialog_new (NULL, 0, type, GTK_BUTTONS_OK, "%s",
-         text);
-        gtk_window_set_title ((GtkWindow *) * widget, title);
+    AUDDBG ("%s\n", text);
 
-        g_signal_connect (* widget, "response", (GCallback) gtk_widget_destroy,
-         NULL);
-        audgui_destroy_on_escape (* widget);
-        g_signal_connect (* widget, "destroy", (GCallback) gtk_widget_destroyed,
-         widget);
+    if (* widget != NULL)
+    {
+#if GTK_CHECK_VERSION (2, 10, 0)
+        const gchar * old = NULL;
+        g_object_get ((GObject *) * widget, "text", & old, NULL);
+        g_return_if_fail (old);
+
+        if (! strcmp (old, text))
+            goto CREATED;
+
+        gchar both[strlen (old) + strlen (text) + 2];
+        snprintf (both, sizeof both, "%s\n%s", old, text);
+        g_object_set ((GObject *) * widget, "text", both, NULL);
+#endif
+        goto CREATED;
     }
 
+    * widget = gtk_message_dialog_new (NULL, 0, type, GTK_BUTTONS_OK, "%s", text);
+    gtk_window_set_title ((GtkWindow *) * widget, title);
+
+    g_signal_connect (* widget, "response", (GCallback) gtk_widget_destroy, NULL);
+    audgui_destroy_on_escape (* widget);
+    g_signal_connect (* widget, "destroy", (GCallback) gtk_widget_destroyed,
+     widget);
+
+CREATED:
     gtk_window_present ((GtkWindow *) * widget);
 }
 
@@ -105,16 +124,20 @@ GdkPixbuf * audgui_pixbuf_from_data (void * data, gint size)
     return pixbuf;
 }
 
-GdkPixbuf * audgui_pixbuf_for_file (const gchar * name)
+GdkPixbuf * audgui_pixbuf_for_entry (gint list, gint entry)
 {
-    /* MMS is slow.  Skip it. */
-    if (! strncmp (name, "mms://", 6))
-        return NULL;
+    const gchar * name = aud_playlist_entry_get_filename (list, entry);
+    g_return_val_if_fail (name, NULL);
 
-    InputPlugin * decoder = aud_file_find_decoder (name, FALSE);
+    /* Don't get album art for network files -- too slow. */
+    if (! strncmp (name, "http://", 7) || ! strncmp (name, "https://", 8) ||
+     ! strncmp (name, "mms://", 6))
+        goto FALLBACK;
 
+    AUDDBG ("Trying to load pixbuf for %s.\n", name);
+    PluginHandle * decoder = aud_playlist_entry_get_decoder (list, entry, FALSE);
     if (! decoder)
-        return NULL;
+        goto FALLBACK;
 
     void * data;
     gint size;
@@ -123,17 +146,67 @@ GdkPixbuf * audgui_pixbuf_for_file (const gchar * name)
     {
         GdkPixbuf * p = audgui_pixbuf_from_data (data, size);
         g_free (data);
-        return p;
+        if (p)
+            return p;
     }
 
     gchar * assoc = aud_get_associated_image_file (name);
 
-    if (! assoc)
-        return NULL;
+    if (assoc)
+    {
+        GdkPixbuf * p = gdk_pixbuf_new_from_file (assoc, NULL);
+        g_free (assoc);
+        if (p)
+            return p;
+    }
 
-    GdkPixbuf * p = gdk_pixbuf_new_from_file (assoc, NULL);
-    g_free (assoc);
-    return p;
+FALLBACK:;
+    AUDDBG ("Using fallback pixbuf.\n");
+    static GdkPixbuf * fallback = NULL;
+    if (! fallback)
+    {
+        gchar * path = g_strdup_printf ("%s/images/album.png",
+         aud_get_path (AUD_PATH_DATA_DIR));
+        fallback = gdk_pixbuf_new_from_file (path, NULL);
+        g_free (path);
+    }
+    if (fallback)
+        g_object_ref ((GObject *) fallback);
+    return fallback;
+}
+
+
+static void clear_cached_pixbuf (void * list, GdkPixbuf * * pixbuf)
+{
+    if (GPOINTER_TO_INT (list) != aud_playlist_get_playing () || ! * pixbuf)
+        return;
+
+    AUDDBG ("Clearing cached pixbuf.\n");
+    g_object_unref ((GObject *) * pixbuf);
+    * pixbuf = NULL;
+}
+
+GdkPixbuf * audgui_pixbuf_for_current (void)
+{
+    static GdkPixbuf * pixbuf = NULL;
+    static gboolean hooked = FALSE;
+
+    if (! hooked)
+    {
+        hook_associate ("playlist position", (HookFunction) clear_cached_pixbuf,
+         & pixbuf);
+        hooked = TRUE;
+    }
+
+    if (! pixbuf)
+    {
+        gint list = aud_playlist_get_playing ();
+        pixbuf = audgui_pixbuf_for_entry (list, aud_playlist_get_position (list));
+    }
+
+    if (pixbuf)
+        g_object_ref ((GObject *) pixbuf);
+    return pixbuf;
 }
 
 void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, gint size)

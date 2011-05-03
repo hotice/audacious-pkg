@@ -22,6 +22,7 @@
 #include <audacious/audconfig.h>
 #include <audacious/i18n.h>
 #include <audacious/drct.h>
+#include <audacious/gtk-compat.h>
 
 #include "config.h"
 #include "libaudgui.h"
@@ -143,6 +144,9 @@ run_filebrowser_gtk2style(gboolean play_button, gboolean show)
     action_button = gtk_button_new_from_stock(action_stock);
     gtk_container_add(GTK_CONTAINER(bbox), close_button);
     gtk_container_add(GTK_CONTAINER(bbox), action_button);
+
+    gtk_widget_set_can_default (action_button, TRUE);
+    gtk_widget_grab_default (action_button);
 
     /* this storage object holds several other objects which are used in the
      * callback functions

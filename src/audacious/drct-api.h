@@ -1,6 +1,6 @@
 /*
  * drct-api.h
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -75,6 +75,7 @@ AUD_FUNC1 (void, drct_pl_open_temp, const gchar *, filename)
 AUD_FUNC1 (void, drct_pl_open_temp_list, GList *, list)
 
 AUD_FUNC1 (void, drct_pl_delete, gint, entry)
+AUD_FUNC0 (void, drct_pl_delete_selected)
 AUD_FUNC0 (void, drct_pl_clear)
 
 /* --- PLAYLIST QUEUE CONTROL --- */
@@ -86,3 +87,6 @@ AUD_FUNC1 (gint, drct_pq_get_queue_position, gint, entry)
 AUD_FUNC1 (void, drct_pq_add, gint, entry)
 AUD_FUNC1 (void, drct_pq_remove, gint, entry)
 AUD_FUNC0 (void, drct_pq_clear)
+
+/* New in 2.5-alpha2 */
+AUD_FUNC0 (gboolean, drct_get_ready)

@@ -123,9 +123,8 @@ gboolean id3v1_read_tag (Tuple * tuple, VFSFile * f)
         {
             tuple_associate_string(tuple, FIELD_GENRE, NULL, ext_genre);
             genre_set = TRUE;
+            g_free(ext_genre);
         }
-
-        g_free(ext_genre);
     }
 
     tuple_associate_string(tuple, FIELD_TITLE, NULL, title);
@@ -159,6 +158,7 @@ ERR:
 
 static gboolean id3v1_write_tag (const Tuple * tuple, VFSFile * handle)
 {
+    fprintf (stderr, "Writing ID3v1 tags is not implemented yet, sorry.\n");
     return FALSE;
 }
 

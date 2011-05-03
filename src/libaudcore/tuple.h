@@ -80,7 +80,7 @@ enum {
     FIELD_GAIN_GAIN_UNIT,
     FIELD_GAIN_PEAK_UNIT,
 
-    FIELD_COMPOSER,	/**< Composer of song, if different than artist. */
+    FIELD_COMPOSER,     /**< Composer of song, if different than artist. */
 
     /* Special field, must always be last */
     FIELD_LAST
@@ -99,7 +99,10 @@ typedef struct {
 
 extern const TupleBasicType tuple_fields[FIELD_LAST];
 
+#define TUPLE_NAME_MAX 20
+
 typedef struct {
+    gchar name[TUPLE_NAME_MAX]; /* for standard fields, the empty string */
     TupleValueType type;
     union {
         gchar *string;
@@ -113,7 +116,7 @@ typedef struct {
  */
 typedef struct _Tuple {
     mowgli_object_t parent;
-    mowgli_dictionary_t *dict;      /**< Mowgli dictionary for holding other than basic values. */
+    mowgli_patricia_t *dict;        /**< Mowgli dictionary for holding other than basic values. */
     TupleValue *values[FIELD_LAST]; /**< Basic #Tuple values, entry is NULL if not set. */
     gint nsubtunes;                 /**< Number of subtunes, if any. Values greater than 0
                                          mean that there are subtunes and #subtunes array
@@ -139,6 +142,15 @@ const gchar * tuple_get_string (const Tuple * tuple, gint nfield, const gchar *
  field);
 gint tuple_get_int (const Tuple * tuple, gint nfield, const gchar * field);
 #define tuple_free(x) mowgli_object_unref(x);
+
+/* Fills in format-related fields (specifically FIELD_CODEC, FIELD_QUALITY, and
+ * FIELD_BITRATE.  Plugins should use this function instead of setting these
+ * fields individually so that the style is consistent across file formats.
+ * <format> should be a brief description such as "Microsoft WAV", "MPEG-1 layer
+ * 3", "Audio CD", and so on.  <samplerate> is in Hertz.  <bitrate> is in 1000
+ * bits per second. */
+void tuple_set_format (Tuple * tuple, const gchar * format, gint channels, gint
+ samplerate, gint bitrate);
 
 G_END_DECLS
 

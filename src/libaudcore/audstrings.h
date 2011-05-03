@@ -31,8 +31,6 @@
 
 G_BEGIN_DECLS
 
-gchar *escape_shell_chars(const gchar * string);
-
 gchar *str_append(gchar * str, const gchar * add_str);
 gchar *str_replace(gchar * str, gchar * new_str);
 void str_replace_in(gchar ** str, gchar * new_str);
@@ -42,18 +40,16 @@ gboolean str_has_suffix_nocase(const gchar * str, const gchar * suffix);
 gboolean str_has_suffixes_nocase(const gchar * str, gchar * const *suffixes);
 
 gchar *str_assert_utf8(const gchar *str);
-extern gchar *(*str_to_utf8)(const gchar * str);
-gchar *str_to_utf8_fallback(const gchar * str);
-extern gchar * (* chardet_to_utf8) (const gchar * string, gssize length, gsize *
- bytes_read, gsize * bytes_written, GError * * error);
+
+void str_set_utf8_impl (gchar * (* stu_impl) (const gchar *),
+ gchar * (* stuf_impl) (const gchar *, gssize, gsize *, gsize *, GError * *));
+gchar * str_to_utf8 (const gchar * str);
+gchar * str_to_utf8_full (const gchar * str, gssize len, gsize * bytes_read,
+ gsize * bytes_written, GError * * err);
 
 const gchar *str_skip_chars(const gchar * str, const gchar * chars);
 
 gchar *convert_dos_path(gchar * text);
-
-extern gchar *(*chardet_to_utf8)(const gchar *str, gssize len,
-                       gsize *arg_bytes_read, gsize *arg_bytes_write,
-                       GError **arg_error);
 
 gchar *filename_get_subtune(const gchar * filename, gint * track);
 gchar *filename_split_subtune(const gchar * filename, gint * track);
@@ -67,6 +63,9 @@ gchar * uri_to_utf8 (const gchar * uri);
 void uri_check_utf8 (gchar * * uri, gboolean warn);
 gchar * filename_to_uri (const gchar * filename);
 gchar * uri_to_filename (const gchar * uri);
+gchar * uri_to_display (const gchar * uri);
+
+gchar * uri_get_extension (const gchar * uri);
 
 void string_cut_extension(gchar *string);
 gint string_compare (const gchar * a, const gchar * b);
@@ -74,6 +73,10 @@ gint string_compare_encoded (const gchar * a, const gchar * b);
 
 const void * memfind (const void * mem, gint size, const void * token, gint
  length);
+
+gchar *str_replace_fragment(gchar *s, gint size, const gchar *old_str, const gchar *new_str);
+
+void string_canonize_case(gchar *string);
 
 G_END_DECLS
 

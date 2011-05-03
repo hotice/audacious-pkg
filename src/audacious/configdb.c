@@ -46,7 +46,15 @@ cfg_db_open()
     }
 
     if (! config_handle)
+    {
         config_handle = mcs_new (RCFILE_DEFAULT_SECTION_NAME);
+
+        if (! config_handle)
+        {
+            fprintf (stderr, "MCS failure.  Configuration will not be saved.\n");
+            return NULL;
+        }
+    }
 
     config_refcount ++;
     return config_handle;
@@ -58,7 +66,7 @@ cfg_db_open()
  */
 void cfg_db_close (mcs_handle_t * handle)
 {
-    g_return_if_fail (handle == config_handle);
+    g_return_if_fail (handle && handle == config_handle);
     g_return_if_fail (config_refcount > 0);
     config_refcount --;
 }
@@ -88,6 +96,8 @@ cfg_db_get_string(mcs_handle_t * db,
                   const gchar * key,
                   gchar ** value)
 {
+    g_return_val_if_fail (db && db == config_handle, FALSE);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -117,6 +127,8 @@ gboolean
 cfg_db_get_int(mcs_handle_t * db,
                const gchar * section, const gchar * key, gint * value)
 {
+    g_return_val_if_fail (db && db == config_handle, FALSE);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -138,6 +150,8 @@ cfg_db_get_bool(mcs_handle_t * db,
                     const gchar * key,
                     gboolean * value)
 {
+    g_return_val_if_fail (db && db == config_handle, FALSE);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -160,6 +174,8 @@ cfg_db_get_float(mcs_handle_t * db,
                      const gchar * key,
                      gfloat * value)
 {
+    g_return_val_if_fail (db && db == config_handle, FALSE);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -182,6 +198,8 @@ cfg_db_get_double(mcs_handle_t * db,
                       const gchar * key,
                       gdouble * value)
 {
+    g_return_val_if_fail (db && db == config_handle, FALSE);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -203,6 +221,8 @@ cfg_db_set_string(mcs_handle_t * db,
                       const gchar * key,
                       const gchar * value)
 {
+    g_return_if_fail (db && db == config_handle);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -227,6 +247,8 @@ cfg_db_set_int(mcs_handle_t * db,
                    const gchar * key,
                    gint value)
 {
+    g_return_if_fail (db && db == config_handle);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -248,6 +270,8 @@ cfg_db_set_bool(mcs_handle_t * db,
                     const gchar * key,
                     gboolean value)
 {
+    g_return_if_fail (db && db == config_handle);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -269,6 +293,8 @@ cfg_db_set_float(mcs_handle_t * db,
                      const gchar * key,
                      gfloat value)
 {
+    g_return_if_fail (db && db == config_handle);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -290,6 +316,8 @@ cfg_db_set_double(mcs_handle_t * db,
                       const gchar * key,
                       gdouble value)
 {
+    g_return_if_fail (db && db == config_handle);
+
     if (!section)
         section = RCFILE_DEFAULT_SECTION_NAME;
 
@@ -308,7 +336,7 @@ cfg_db_unset_key(mcs_handle_t * db,
                      const gchar * section,
                      const gchar * key)
 {
-    g_return_if_fail(db != NULL);
+    g_return_if_fail (db && db == config_handle);
     g_return_if_fail(key != NULL);
 
     if (!section)

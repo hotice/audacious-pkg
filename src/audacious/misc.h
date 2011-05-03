@@ -38,16 +38,25 @@ enum {
  AUDACIOUS_MENU_PLAYLIST_MISC,
  TOTAL_PLUGIN_MENUS};
 
+enum {
+ AUD_PATH_BIN_DIR,
+ AUD_PATH_DATA_DIR,
+ AUD_PATH_PLUGIN_DIR,
+ AUD_PATH_LOCALE_DIR,
+ AUD_PATH_DESKTOP_FILE,
+ AUD_PATH_ICON_FILE,
+ AUD_PATH_USER_DIR,
+ AUD_PATH_USER_PLUGIN_DIR,
+ AUD_PATH_PLAYLISTS_DIR,
+ AUD_PATH_PLAYLIST_FILE,
+ AUD_PATH_GTKRC_FILE,
+ AUD_PATH_COUNT
+};
+
 typedef struct {
     gchar * name;
     gfloat preamp, bands[10];
 } EqualizerPreset;
-
-typedef struct {
-	const gchar * name, * ext;
-	void (* plc_read) (const gchar * filename, gint at);
-	void (* plc_write) (const gchar * filename, gint at);
-} PlaylistContainer;
 
 typedef gint16 VisFreqData[2][256];
 typedef gint16 VisPCMData[2][512];

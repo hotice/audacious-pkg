@@ -1,8 +1,6 @@
 include ../../extra.mk
 
-SUBDIRS = ${INTL_OBJECTIVE}
-
-PROG = audacious2${PROG_SUFFIX}
+PROG = audacious${PROG_SUFFIX}
 SRCS = audconfig.c								\
        chardet.c								\
        configdb.c								\
@@ -13,19 +11,23 @@ SRCS = audconfig.c								\
        equalizer_preset.c						\
        fft.c									\
        folder-add.c \
-       general.c								\
+       general.c \
        interface.c								\
        main.c									\
+       mpris-signals.c \
        output.c									\
        playback.c								\
-       playlist_container.c						\
+       playlist-files.c \
        playlist-new.c \
        playlist-utils.c \
        pluginenum.c								\
        plugin-registry.c \
+       plugin-init.c \
+       plugin-view.c \
        probe.c \
        probe-buffer.c \
        signals.c								\
+       smclient.c \
        ui_plugin_menu.c \
        ui_preferences.c							\
        util.c									\
@@ -50,6 +52,8 @@ INCLUDES = api.h \
            debug.h \
            drct.h \
            drct-api.h \
+           glib-compat.h \
+           gtk-compat.h \
            i18n.h				\
            interface.h			\
            misc.h \
@@ -63,6 +67,7 @@ INCLUDES = api.h \
            types.h
 
 DATA = images/about-logo.png				\
+       images/album.png \
        images/appearance.png				\
        images/audacious_eq.xpm				\
        images/audacious_player.xpm			\
@@ -73,7 +78,6 @@ DATA = images/about-logo.png				\
        images/menu_playlist.png				\
        images/menu_plugin.png				\
        images/menu_queue_toggle.png			\
-       images/playback.png					\
        images/playlist.png					\
        images/plugins.png					\
        images/replay_gain.png
@@ -106,13 +110,13 @@ CPPFLAGS += -std=gnu99 \
 		${ARCH_DEFINES}			\
 		${DBUS_CFLAGS}			\
 		${REGEX_CFLAGS}			\
+		${PTHREAD_CFLAGS}		\
 		${LIBMCS_CFLAGS}		\
 		${SIMD_CFLAGS}			\
 		-D_AUDACIOUS_CORE		\
 		${EGGSM_CFLAGS}			\
 		${LIBGUESS_CFLAGS}		\
-		-I.. -I../..			\
-		-I./intl
+		-I.. -I../..
 
 LIBS += ${LDADD}						\
         -lm \
@@ -128,6 +132,7 @@ LIBS += ${LDADD}						\
 		${MOWGLI_LIBS}					\
 		${LIBMCS_LIBS}					\
 		${REGEX_LIBS}					\
+		${PTHREAD_LIBS}					\
 		${LIBGUESS_LIBS}
 
 LDFLAGS += ${PROG_IMPLIB_LDFLAGS} ${AUDLDFLAGS}
@@ -150,9 +155,6 @@ dbus-client-bindings.h: ${DBUS_BINDINGS_SOURCES}
 	${DBUS_BINDING_TOOL} --mode=glib-client --prefix=audacious_rc objects.xml > $@
 
 install-extra:
-	if test -h "${DESTDIR}${bindir}/audacious" ; then ${RM} "${DESTDIR}${bindir}/audacious" ; fi
-	${LN_S} audacious2 "${DESTDIR}${bindir}/audacious"
-
 	if test x"${PROG_IMPLIB_NEEDED}" = x"yes"; then \
 		for i in ${PROG}; do \
 			i="lib$$i.a"; \
@@ -166,8 +168,6 @@ install-extra:
 	fi
 
 uninstall-extra:
-	if test -h "${DESTDIR}${bindir}/audacious" ; then ${RM} "${DESTDIR}${bindir}/audacious" ; fi
-
 	if test x"${PROG_IMPLIB_NEEDED}" = x"yes"; then \
 		for i in ${PROG}; do \
 			i="lib$$i.a"; \

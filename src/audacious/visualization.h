@@ -22,7 +22,16 @@
 #ifndef AUDACIOUS_VISUALIZATION_H
 #define AUDACIOUS_VISUALIZATION_H
 
+#include <glib.h>
+
+#include "plugins.h"
+
 void vis_init (void);
 void vis_cleanup (void);
+
+gboolean vis_plugin_start (PluginHandle * plugin);
+void vis_plugin_stop (PluginHandle * plugin);
+
+PluginHandle * vis_plugin_by_widget (/* GtkWidget * */ void * widget);
 
 #endif
