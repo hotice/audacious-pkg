@@ -1,348 +1,224 @@
 libaudcore.so.1 libaudcore1 #MINVER#
- aud_log@Base 2.3
- aud_log_add_thread_context@Base 2.3
- aud_log_close@Base 2.3
- aud_log_delete_thread_context@Base 2.3
- aud_log_init@Base 2.3
- aud_log_line@Base 2.3
- aud_logv@Base 2.3
- aud_md5_append@Base 2.3
- aud_md5_finish@Base 2.3
- aud_md5_init@Base 2.3
- audio_amplify@Base 2.3
- audio_from_int@Base 2.3
- audio_to_int@Base 2.3
- buffered_file_const@Base 2.3
- buffered_file_vfs_fclose_impl@Base 2.3
- buffered_file_vfs_feof_impl@Base 2.3
- buffered_file_vfs_fopen_impl@Base 2.3
- buffered_file_vfs_fread_impl@Base 2.3
- buffered_file_vfs_fseek_impl@Base 2.3
- buffered_file_vfs_fsize_impl@Base 2.3
- buffered_file_vfs_ftell_impl@Base 2.3
- buffered_file_vfs_fwrite_impl@Base 2.3
- buffered_file_vfs_getc_impl@Base 2.3
- buffered_file_vfs_metadata_impl@Base 2.3
- buffered_file_vfs_rewind_impl@Base 2.3
- buffered_file_vfs_truncate_impl@Base 2.3
- buffered_file_vfs_ungetc_impl@Base 2.3
- chardet_to_utf8@Base 2.3
- convert_dos_path@Base 2.3
- convert_table@Base 2.3
- escape_shell_chars@Base 2.3
- event_queue@Base 2.4~beta1
- event_queue_timed@Base 2.4~beta1
- event_queue_with_data_free@Base 2.4~beta1
- filename_get_subtune@Base 2.3
- filename_split_subtune@Base 2.3
- filename_to_uri@Base 2.4.3
-#MISSING: 2.4.3# filename_to_utf8@Base 2.3
- hook_associate@Base 2.4~beta1
- hook_call@Base 2.4~beta1
- hook_dissociate@Base 2.4~beta1
- hook_dissociate_full@Base 2.4~beta1
- hook_init@Base 2.4~beta1
- hook_register@Base 2.4~beta1
- index_append@Base 2.3
- index_copy_append@Base 2.4~alpha1
- index_copy_insert@Base 2.4~alpha1
- index_copy_set@Base 2.4~alpha1
- index_count@Base 2.3
- index_delete@Base 2.3
- index_free@Base 2.3
- index_get@Base 2.3
- index_insert@Base 2.3
- index_merge_append@Base 2.3
- index_merge_insert@Base 2.3
- index_move@Base 2.4~alpha1
- index_new@Base 2.3
- index_set@Base 2.3
- index_sort@Base 2.3
- index_sort_with_data@Base 2.4~alpha1
- log_level_names@Base 2.3
- memfind@Base 2.4~alpha1
- str_append@Base 2.3
- str_assert_utf8@Base 2.3
- str_has_prefix_nocase@Base 2.3
- str_has_suffix_nocase@Base 2.3
- str_has_suffixes_nocase@Base 2.3
- str_replace@Base 2.3
- str_replace_in@Base 2.3
- str_skip_chars@Base 2.3
- str_to_utf8@Base 2.3
- str_to_utf8_fallback@Base 2.3
- string_compare@Base 2.3
- string_compare_encoded@Base 2.4.2
- string_cut_extension@Base 2.3
- string_decode_percent@Base 2.3
- string_encode_percent@Base 2.4~alpha1
- string_replace_char@Base 2.4~alpha1
- stringpool_get@Base 2.3
- stringpool_unref@Base 2.3
- tuple_associate_int@Base 2.3
- tuple_associate_string@Base 2.3
- tuple_associate_string_rel@Base 2.3
- tuple_copy@Base 2.3
- tuple_disassociate@Base 2.3
- tuple_error@Base 2.3
- tuple_evalctx_add_function@Base 2.3
- tuple_evalctx_add_var@Base 2.3
- tuple_evalctx_free@Base 2.3
- tuple_evalctx_new@Base 2.3
- tuple_evalctx_reset@Base 2.3
- tuple_evalnode_free@Base 2.3
- tuple_fields@Base 2.3
- tuple_formatter_compile@Base 2.3
- tuple_formatter_eval@Base 2.3
- tuple_formatter_make_title_string@Base 2.3
- tuple_formatter_print@Base 2.3
- tuple_formatter_process_construct@Base 2.3
- tuple_formatter_process_expr@Base 2.3
- tuple_formatter_process_function@Base 2.3
- tuple_formatter_process_string@Base 2.3
- tuple_formatter_register_expression@Base 2.3
- tuple_formatter_register_function@Base 2.3
- tuple_get_int@Base 2.3
- tuple_get_string@Base 2.3
- tuple_get_value_type@Base 2.3
- tuple_new@Base 2.3
- tuple_new_from_filename@Base 2.3
- tuple_set_filename@Base 2.3
- uri_check_utf8@Base 2.4.3
- uri_is_utf8@Base 2.4.3
-#MISSING: 2.4.3# uri_to_display_basename@Base 2.3
-#MISSING: 2.4.3# uri_to_display_dirname@Base 2.3
- uri_to_filename@Base 2.4.3
- uri_to_utf8@Base 2.4.3
- vfs_async_file_get_contents@Base 2.4~beta1
- vfs_async_file_get_contents_trampoline@Base 2.4~beta1
- vfs_async_file_get_contents_worker@Base 2.4~beta1
- vfs_buffer_new@Base 2.3
- vfs_buffer_new_from_string@Base 2.3
- vfs_buffered_file_new_from_uri@Base 2.3
- vfs_buffered_file_release_live_fd@Base 2.3
- vfs_dup@Base 2.3
- vfs_fclose@Base 2.3
- vfs_feof@Base 2.3
- vfs_fget_be16@Base 2.3
- vfs_fget_be32@Base 2.3
- vfs_fget_be64@Base 2.3
- vfs_fget_le16@Base 2.3
- vfs_fget_le32@Base 2.3
- vfs_fget_le64@Base 2.3
- vfs_fgets@Base 2.3
- vfs_file_get_contents@Base 2.3
- vfs_file_test@Base 2.3
- vfs_fopen@Base 2.3
- vfs_fprintf@Base 2.3
- vfs_fput_be16@Base 2.3
- vfs_fput_be32@Base 2.3
- vfs_fput_be64@Base 2.3
- vfs_fput_le16@Base 2.3
- vfs_fput_le32@Base 2.3
- vfs_fput_le64@Base 2.3
- vfs_fputc@Base 2.3
- vfs_fputs@Base 2.3
- vfs_fread@Base 2.3
- vfs_fseek@Base 2.3
- vfs_fsize@Base 2.3
- vfs_ftell@Base 2.3
- vfs_ftruncate@Base 2.4~alpha1
- vfs_fwrite@Base 2.3
- vfs_get_metadata@Base 2.3
- vfs_getc@Base 2.3
- vfs_is_remote@Base 2.3
- vfs_is_streaming@Base 2.3
- vfs_is_writeable@Base 2.3
- vfs_register_transport@Base 2.3
- vfs_rewind@Base 2.3
- vfs_transports@Base 2.3
-#MISSING: 2.4~alpha1# vfs_truncate@Base 2.3
- vfs_ungetc@Base 2.3
- vfs_vfprintf@Base 2.3
+ audio_amplify@Base 3.2
+ audio_from_int@Base 3.2
+ audio_to_int@Base 3.2
+ convert_table@Base 3.2
+ double_array_to_string@Base 3.2
+ double_to_string@Base 3.2
+ event_queue_cancel@Base 3.2
+ event_queue_full@Base 3.2
+ filename_to_uri@Base 3.2
+ hook_associate@Base 3.2
+ hook_call@Base 3.2
+ hook_dissociate_full@Base 3.2
+ index_allocate@Base 3.2
+ index_append@Base 3.2
+ index_copy_append@Base 3.2
+ index_copy_insert@Base 3.2
+ index_copy_set@Base 3.2
+ index_count@Base 3.2
+ index_delete@Base 3.2
+ index_free@Base 3.2
+ index_get@Base 3.2
+ index_insert@Base 3.2
+ index_merge_append@Base 3.2
+ index_merge_insert@Base 3.2
+ index_move@Base 3.2
+ index_new@Base 3.2
+ index_set@Base 3.2
+ index_sort@Base 3.2
+ index_sort_with_data@Base 3.2
+ int_to_string@Base 3.2
+ str_decode_percent@Base 3.2
+ str_encode_percent@Base 3.2
+ str_get@Base 3.2
+ str_has_prefix_nocase@Base 3.2
+ str_has_suffix_nocase@Base 3.2
+ str_nget@Base 3.2
+ str_printf@Base 3.2
+ str_ref@Base 3.2
+ str_replace_fragment@Base 3.2
+ str_set_utf8_impl@Base 3.2
+ str_to_utf8@Base 3.2
+ str_to_utf8_full@Base 3.2
+ str_unref@Base 3.2
+ string_compare@Base 3.2
+ string_compare_encoded@Base 3.2
+ string_replace_char@Base 3.2
+ string_to_double@Base 3.2
+ string_to_double_array@Base 3.2
+ string_to_int@Base 3.2
+ strpool_abort@Base 3.2
+ strpool_shutdown@Base 3.2
+ tuple_copy@Base 3.2
+ tuple_evalctx_free@Base 3.2
+ tuple_evalctx_new@Base 3.2
+ tuple_evalctx_reset@Base 3.2
+ tuple_evalnode_free@Base 3.2
+ tuple_field_by_name@Base 3.2
+ tuple_field_get_name@Base 3.2
+ tuple_field_get_type@Base 3.2
+ tuple_format_title@Base 3.2
+ tuple_formatter_compile@Base 3.2
+ tuple_formatter_eval@Base 3.2
+ tuple_formatter_process_string@Base 3.2
+ tuple_get_int@Base 3.2
+ tuple_get_n_subtunes@Base 3.2
+ tuple_get_nth_subtune@Base 3.2
+ tuple_get_str@Base 3.2
+ tuple_get_value_type@Base 3.2
+ tuple_new@Base 3.2
+ tuple_new_from_filename@Base 3.2
+ tuple_ref@Base 3.2
+ tuple_set_filename@Base 3.2
+ tuple_set_format@Base 3.2
+ tuple_set_int@Base 3.2
+ tuple_set_str@Base 3.2
+ tuple_set_subtunes@Base 3.2
+ tuple_unref@Base 3.2
+ tuple_unset@Base 3.2
+ uri_parse@Base 3.2
+ uri_to_display@Base 3.2
+ uri_to_filename@Base 3.2
+ vfs_async_file_get_contents@Base 3.2
+ vfs_async_file_get_contents_trampoline@Base 3.2
+ vfs_async_file_get_contents_worker@Base 3.2
+ vfs_fclose@Base 3.2
+ vfs_feof@Base 3.2
+ vfs_fget_be16@Base 3.2
+ vfs_fget_be32@Base 3.2
+ vfs_fget_be64@Base 3.2
+ vfs_fget_le16@Base 3.2
+ vfs_fget_le32@Base 3.2
+ vfs_fget_le64@Base 3.2
+ vfs_fgets@Base 3.2
+ vfs_file_get_contents@Base 3.2
+ vfs_file_test@Base 3.2
+ vfs_fopen@Base 3.2
+ vfs_fprintf@Base 3.2
+ vfs_fput_be16@Base 3.2
+ vfs_fput_be32@Base 3.2
+ vfs_fput_be64@Base 3.2
+ vfs_fput_le16@Base 3.2
+ vfs_fput_le32@Base 3.2
+ vfs_fput_le64@Base 3.2
+ vfs_fputc@Base 3.2
+ vfs_fputs@Base 3.2
+ vfs_fread@Base 3.2
+ vfs_fseek@Base 3.2
+ vfs_fsize@Base 3.2
+ vfs_ftell@Base 3.2
+ vfs_ftruncate@Base 3.2
+ vfs_fwrite@Base 3.2
+ vfs_get_filename@Base 3.2
+ vfs_get_handle@Base 3.2
+ vfs_get_metadata@Base 3.2
+ vfs_getc@Base 3.2
+ vfs_is_remote@Base 3.2
+ vfs_is_streaming@Base 3.2
+ vfs_is_writeable@Base 3.2
+ vfs_new@Base 3.2
+ vfs_rewind@Base 3.2
+ vfs_set_lookup_func@Base 3.2
+ vfs_set_verbose@Base 3.2
+ vfs_ungetc@Base 3.2
+ vfs_vfprintf@Base 3.2
 libaudgui.so.1 libaudcore1 #MINVER#
- _aud_api_table@Base 2.4~beta1
- audgui_confirm_playlist_delete@Base 2.4~alpha1
- audgui_connect_check_box@Base 2.4~alpha1
- audgui_create_effects_menu@Base 2.3
- audgui_create_iface_menu@Base 2.4~beta1
- audgui_destroy_on_escape@Base 2.4~alpha1
- audgui_get_library_store@Base 2.4~alpha1
- audgui_hide_about_window@Base 2.3
- audgui_hide_equalizer_window@Base 2.4~alpha2
- audgui_hide_filebrowser@Base 2.3
- audgui_hide_on_delete@Base 2.4~alpha1
- audgui_hide_on_escape@Base 2.4~alpha1
- audgui_infopopup_hide@Base 2.4~alpha1
- audgui_infopopup_show@Base 2.4~alpha1
- audgui_infopopup_show_current@Base 2.4~alpha1
- audgui_infowin_show@Base 2.4~alpha1
- audgui_infowin_show_current@Base 2.4~alpha1
- audgui_init@Base 2.4~alpha1
- audgui_jump_to_track@Base 2.3
- audgui_jump_to_track_hide@Base 2.3
- audgui_pixbuf_for_file@Base 2.4.0
- audgui_pixbuf_from_data@Base 2.4~alpha1
- audgui_pixbuf_scale_within@Base 2.4~alpha1
- audgui_playlist_manager_destroy@Base 2.4~alpha1
- audgui_playlist_manager_ui_show@Base 2.4~alpha1
- audgui_register_stock_icons@Base 2.3
- audgui_run_filebrowser@Base 2.3
- audgui_set_default_icon@Base 2.3
- audgui_show_about_window@Base 2.3
- audgui_show_add_url_window@Base 2.3
- audgui_show_credits_window@Base 2.3
- audgui_show_equalizer_window@Base 2.4~alpha2
- audgui_simple_message@Base 2.4~alpha1
- audgui_urilist_create_from_selected@Base 2.4~alpha2
- audgui_urilist_insert@Base 2.4~alpha2
- audgui_urilist_open@Base 2.4~alpha2
- create_infowin@Base 2.4~alpha1
- genre_fill@Base 2.4~alpha2
- library_store_row_drop_possible@Base 2.4~alpha1
- ui_jump_to_track_cache_free@Base 2.3
- ui_jump_to_track_cache_new@Base 2.3
- ui_jump_to_track_cache_search@Base 2.3
- urlopener_add_url_dialog_new@Base 2.3
+ _aud_api_table@Base 3.2
+ audgui_cleanup@Base 3.2
+ audgui_confirm_playlist_delete@Base 3.2
+ audgui_connect_check_box@Base 3.2
+ audgui_create_effects_menu@Base 3.2
+ audgui_create_iface_menu@Base 3.2
+ audgui_create_vis_menu@Base 3.2
+ audgui_destroy_on_escape@Base 3.2
+ audgui_export_playlist@Base 3.2
+ audgui_hide_equalizer_window@Base 3.2
+ audgui_hide_filebrowser@Base 3.2
+ audgui_hide_on_delete@Base 3.2
+ audgui_hide_on_escape@Base 3.2
+ audgui_import_playlist@Base 3.2
+ audgui_infopopup_hide@Base 3.2
+ audgui_infopopup_show@Base 3.2
+ audgui_infopopup_show_current@Base 3.2
+ audgui_infowin_show@Base 3.2
+ audgui_infowin_show_current@Base 3.2
+ audgui_init@Base 3.2
+ audgui_jump_to_time@Base 3.2
+ audgui_jump_to_track@Base 3.2
+ audgui_jump_to_track_hide@Base 3.2
+ audgui_list_add_column@Base 3.2
+ audgui_list_delete_rows@Base 3.2
+ audgui_list_get_focus@Base 3.2
+ audgui_list_get_highlight@Base 3.2
+ audgui_list_get_user@Base 3.2
+ audgui_list_insert_rows@Base 3.2
+ audgui_list_new@Base 3.2
+ audgui_list_row_at_point@Base 3.2
+ audgui_list_row_count@Base 3.2
+ audgui_list_set_focus@Base 3.2
+ audgui_list_set_highlight@Base 3.2
+ audgui_list_update_rows@Base 3.2
+ audgui_list_update_selection@Base 3.2
+ audgui_pixbuf_for_current@Base 3.2
+ audgui_pixbuf_for_entry@Base 3.2
+ audgui_pixbuf_from_data@Base 3.2
+ audgui_pixbuf_scale_within@Base 3.2
+ audgui_pixbuf_uncache@Base 3.2
+ audgui_playlist_manager@Base 3.2
+ audgui_playlist_manager_cleanup@Base 3.2
+ audgui_queue_manager_cleanup@Base 3.2
+ audgui_queue_manager_show@Base 3.2
+ audgui_register_stock_icons@Base 3.2
+ audgui_run_filebrowser@Base 3.2
+ audgui_set_default_icon@Base 3.2
+ audgui_show_about_window@Base 3.2
+ audgui_show_add_url_window@Base 3.2
+ audgui_show_equalizer_window@Base 3.2
+ audgui_show_playlist_rename@Base 3.2
+ audgui_simple_message@Base 3.2
+ audgui_urilist_create_from_selected@Base 3.2
+ audgui_urilist_insert@Base 3.2
+ audgui_urilist_open@Base 3.2
+ create_infowin@Base 3.2
+ genre_fill@Base 3.2
+ ui_jump_to_track_cache_free@Base 3.2
+ ui_jump_to_track_cache_new@Base 3.2
+ ui_jump_to_track_cache_search@Base 3.2
+ urlopener_add_url_dialog_new@Base 3.2
 libaudtag.so.1 libaudcore1 #MINVER#
-#MISSING: 2.4~alpha1# aac@Base 2.3
-#MISSING: 2.4~alpha1# aac_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1# aac_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1# aac_write_tuple_to_file@Base 2.3
-#MISSING: 2.4~alpha1# add_frameFromTupleInt@Base 2.3
-#MISSING: 2.4~alpha1# add_frameFromTupleStr@Base 2.3
-#MISSING: 2.4~alpha1# add_newFrameFromTupleInt@Base 2.3
-#MISSING: 2.4~alpha1# add_newFrameFromTupleStr@Base 2.3
-#MISSING: 2.4~alpha1# add_newISO8859_1FrameFromString@Base 2.3
-#MISSING: 2.4~alpha1# add_tagItemFromTuple@Base 2.3
- ape@Base 2.3
-#MISSING: 2.4~alpha1# ape_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1# ape_items@Base 2.3
-#MISSING: 2.4~alpha1# ape_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1# ape_write_tuple_to_file@Base 2.3
-#MISSING: 2.4~alpha1# assocIntInfo@Base 2.3
-#MISSING: 2.4~alpha1# assocStrInfo@Base 2.3
-#MISSING: 2.4~alpha1# atom_types@Base 2.3
-#MISSING: 2.4~alpha1# computeNewHeader@Base 2.3
- convert_numericgenre_to_text@Base 2.4~alpha1
- convert_text@Base 2.4~alpha2
-#MISSING: 2.4.4# copyAudioData@Base 2.3
-#MISSING: 2.4.4# copyAudioToFile@Base 2.3
- cut_beginning_tag@Base 2.4~alpha1
-#MISSING: 2.4~alpha1# dataAtoms@Base 2.3
-#MISSING: 2.4~alpha1# findAtom@Base 2.3
- find_tag_module@Base 2.3
-#MISSING: 2.4~alpha1# frameIDs@Base 2.3
-#MISSING: 2.4~alpha1# frames@Base 2.3
- fread_utf16@Base 2.3
-#MISSING: 2.4~alpha1# free_content_descr@Base 2.3
-#MISSING: 2.4~alpha1# free_content_descr_obj@Base 2.3
-#MISSING: 2.4~alpha1# free_ext_content_descr_obj@Base 2.3
-#MISSING: 2.4~alpha1# getAtomID@Base 2.3
-#MISSING: 2.4~alpha1# getFrameID@Base 2.3
-#MISSING: 2.4~alpha1# getTagItemID@Base 2.3
- get_complete_filepath@Base 2.3
-#MISSING: 2.4~alpha1# get_guid_type@Base 2.3
- get_year@Base 2.3
-#MISSING: 2.4~alpha1# getilstAtom@Base 2.3
-#MISSING: 2.4~alpha1# guid_convert_from_string@Base 2.3
-#MISSING: 2.4~alpha1# guid_convert_to_string@Base 2.3
-#MISSING: 2.4~alpha1# guid_equal@Base 2.3
-#MISSING: 2.4~alpha1# guid_read_from_file@Base 2.3
-#MISSING: 2.4~alpha1# guid_write_to_file@Base 2.3
-#MISSING: 2.4~alpha1# headerPosition@Base 2.3
-#MISSING: 2.4~alpha1# id3@Base 2.3
-#MISSING: 2.4~alpha1# id3_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1# id3_frames@Base 2.3
-#MISSING: 2.4~alpha1# id3_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1# id3_write_tuple_to_file@Base 2.3
- id3v1@Base 2.4~alpha1
- id3v1_can_handle_file@Base 2.4~alpha1
- id3v1_read_tag@Base 2.4~alpha1
- id3v22@Base 2.4~alpha2
- id3v22_read_tag@Base 2.4~alpha2
- id3v24@Base 2.4~alpha1
-#MISSING: 2.4~alpha1# ilstAtom@Base 2.3
-#MISSING: 2.4~alpha1# ilstAtoms@Base 2.3
-#MISSING: 2.4~alpha1# ilstFileOffset@Base 2.3
- init_tag_modules@Base 2.3
-#MISSING: 2.4~alpha1# isExperimental@Base 2.3
-#MISSING: 2.4~alpha1# isExtendedHeader@Base 2.3
-#MISSING: 2.4~alpha1# isUnsynchronisation@Base 2.3
-#MISSING: 2.4~alpha1# isValidFrame@Base 2.3
-#MISSING: 2.4~alpha1# makeAtomWithData@Base 2.3
- makeTuple@Base 2.3
-#MISSING: 2.4~alpha1# make_temp_file@Base 2.3
-#MISSING: 2.4~alpha1# newilstSize@Base 2.3
- number_of_modules@Base 2.3
-#MISSING: 2.4~alpha1# printAtom@Base 2.3
- print_tuple@Base 2.3
-#MISSING: 2.4~alpha1# readAPEHeader@Base 2.3
-#MISSING: 2.4~alpha1# readAPETagItem@Base 2.3
-#MISSING: 2.4~alpha1# readAllFrames@Base 2.3
-#MISSING: 2.4~alpha1# readAtom@Base 2.3
-#MISSING: 2.4~alpha1# readExtendedHeader@Base 2.3
-#MISSING: 2.4~alpha1# readFrameBody@Base 2.3
-#MISSING: 2.4~alpha1# readGenericFrame@Base 2.3
-#MISSING: 2.4~alpha1# readHeader@Base 2.3
-#MISSING: 2.4~alpha1# readID3v2FrameHeader@Base 2.3
-#MISSING: 2.4~alpha1# readStrDataAtom@Base 2.3
-#MISSING: 2.4~alpha1# readTextFrame@Base 2.3
-#MISSING: 2.4~alpha1# readUTF_8@Base 2.3
- read_BEuint16@Base 2.3
- read_BEuint32@Base 2.3
- read_BEuint64@Base 2.3
- read_LEuint16@Base 2.3
- read_LEuint32@Base 2.3
- read_LEuint64@Base 2.3
-#MISSING: 2.4~alpha1# read_NULLterminatedString@Base 2.3
- read_char_data@Base 2.3
-#MISSING: 2.4~alpha1# read_iso8859_1@Base 2.3
-#MISSING: 2.4~alpha1# read_syncsafe_int32@Base 2.3
- read_uint8@Base 2.3
-#MISSING: 2.4~alpha1# read_unicode@Base 2.3
-#MISSING: 2.4~alpha1# seek@Base 2.3
-#MISSING: 2.4~alpha1# skip@Base 2.3
-#MISSING: 2.4~alpha1# skipFrame@Base 2.3
- syncsafe32@Base 2.4~alpha1
-#MISSING: 2.4~alpha1# tagContainsHeader@Base 2.3
-#MISSING: 2.4~alpha1# tagItems@Base 2.3
-#MISSING: 2.4~alpha1# tagKeys@Base 2.3
- tag_image_read@Base 2.4~alpha1
- tag_init@Base 2.3
- tag_modules@Base 2.3
- tag_set_verbose@Base 2.4.2
- tag_tuple_read@Base 2.3
- tag_tuple_write@Base 2.4~alpha1
- tag_tuple_write_to_file@Base 2.3
- tag_verbose@Base 2.4.2
- unix_time@Base 2.3
- unsyncsafe32@Base 2.4~alpha1
- utf8@Base 2.3
-#MISSING: 2.4~alpha1# wma@Base 2.3
-#MISSING: 2.4~alpha1# wma_can_handle_file@Base 2.3
-#MISSING: 2.4~alpha1# wma_guid_map@Base 2.3
-#MISSING: 2.4~alpha1# wma_populate_tuple_from_file@Base 2.3
-#MISSING: 2.4~alpha1# wma_write_tuple_to_file@Base 2.3
-#MISSING: 2.4~alpha1# writeAllFramesToFile@Base 2.3
-#MISSING: 2.4~alpha1# writeAtom@Base 2.3
-#MISSING: 2.4~alpha1# writeAtomListToFile@Base 2.3
-#MISSING: 2.4~alpha1# writeGenericFrame@Base 2.3
-#MISSING: 2.4~alpha1# writeID3FrameHeaderToFile@Base 2.3
-#MISSING: 2.4~alpha1# writeID3HeaderToFile@Base 2.3
-#MISSING: 2.4~alpha1# writePaddingToFile@Base 2.3
-#MISSING: 2.4~alpha1# writeStrDataAtom@Base 2.3
-#MISSING: 2.4~alpha1# write_ASCII@Base 2.3
- write_BEuint32@Base 2.3
- write_LEuint16@Base 2.3
- write_LEuint32@Base 2.3
- write_LEuint64@Base 2.3
-#MISSING: 2.4~alpha1# write_allTagsToFile@Base 2.3
-#MISSING: 2.4~alpha1# write_apeHeaderToFile@Base 2.3
- write_char_data@Base 2.3
-#MISSING: 2.4~alpha1# write_int32@Base 2.3
-#MISSING: 2.4~alpha1# write_syncsafe_int32@Base 2.3
-#MISSING: 2.4~alpha1# write_tagItemToFile@Base 2.3
- write_uint8@Base 2.3
- write_utf16@Base 2.3
-#MISSING: 2.4~alpha1# write_utf8@Base 2.3
+ ape@Base 3.2
+ convert_numericgenre_to_text@Base 3.2
+ convert_text@Base 3.2
+ cut_beginning_tag@Base 3.2
+ find_tag_module@Base 3.2
+ get_year@Base 3.2
+ id3v1@Base 3.2
+ id3v1_can_handle_file@Base 3.2
+ id3v1_read_tag@Base 3.2
+ id3v22@Base 3.2
+ id3v22_read_tag@Base 3.2
+ id3v24@Base 3.2
+ read_BEuint16@Base 3.2
+ read_BEuint32@Base 3.2
+ read_BEuint64@Base 3.2
+ read_LEuint16@Base 3.2
+ read_LEuint32@Base 3.2
+ read_LEuint64@Base 3.2
+ read_char_data@Base 3.2
+ read_uint8@Base 3.2
+ syncsafe32@Base 3.2
+ tag_image_read@Base 3.2
+ tag_set_verbose@Base 3.2
+ tag_tuple_read@Base 3.2
+ tag_tuple_write@Base 3.2
+ tag_tuple_write_to_file@Base 3.2
+ tag_verbose@Base 3.2
+ unix_time@Base 3.2
+ unsyncsafe32@Base 3.2
+ write_BEuint32@Base 3.2
+ write_LEuint16@Base 3.2
+ write_LEuint32@Base 3.2
+ write_LEuint64@Base 3.2
+ write_char_data@Base 3.2
+ write_uint8@Base 3.2

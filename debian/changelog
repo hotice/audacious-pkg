@@ -1,10 +1,15 @@
-audacious (2.5.0-1) UNRELEASED; urgency=low
+audacious (3.2-1) UNRELEASED; urgency=low
 
-  * New upstream release.
-  * debian/patches/bp-audtag-debugging-output.patch: Removed, merged
-    upstream.
+  * New upstream release. (Closes: #639374)
+  * debian/control:
+    + Removed all references to libmowgli
+    + Added libuchardet-dev and libguess-dev as build-dep
+    + Raised the Standards-Version to 3.9.2
+  * debian/libaudclient2.symbols: symbols file updated
+  * debian/libaudcore1.symbols: symbols file updated
+  * debian/menu: command changed to "/usr/bin/audacious"
 
- -- Bilal Akhtar <bilalakhtar@ubuntu.com>  Tue, 03 May 2011 10:39:22 +0530
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed, 25 Jan 2012 21:30:42 +0100
 
 audacious (2.4.4-1) unstable; urgency=low
 

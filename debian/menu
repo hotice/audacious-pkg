@@ -4,4 +4,4 @@
                      longtitle="Audacious Media Player" \
                      icon32x32="/usr/share/pixmaps/audacious-32.xpm" \
                      icon16x16="/usr/share/pixmaps/audacious-16.xpm" \
-                     command="/usr/bin/audacious2"
+                     command="/usr/bin/audacious"
