@@ -1,6 +1,6 @@
 /*
  * misc.h
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -22,21 +22,11 @@
 #ifndef AUDACIOUS_MISC_H
 #define AUDACIOUS_MISC_H
 
-#include <glib.h>
 #include <audacious/api.h>
 #include <audacious/types.h>
-#include <libaudcore/vfs.h>
+#include <libaudcore/index.h>
 #include <libaudcore/tuple.h>
-
-enum {
- AUDACIOUS_MENU_MAIN,
- AUDACIOUS_MENU_PLAYLIST,
- AUDACIOUS_MENU_PLAYLIST_RCLICK,
- AUDACIOUS_MENU_PLAYLIST_ADD,
- AUDACIOUS_MENU_PLAYLIST_REMOVE,
- AUDACIOUS_MENU_PLAYLIST_SELECT,
- AUDACIOUS_MENU_PLAYLIST_MISC,
- TOTAL_PLUGIN_MENUS};
+#include <libaudcore/vfs.h>
 
 enum {
  AUD_PATH_BIN_DIR,
@@ -48,26 +38,36 @@ enum {
  AUD_PATH_USER_DIR,
  AUD_PATH_USER_PLUGIN_DIR,
  AUD_PATH_PLAYLISTS_DIR,
- AUD_PATH_PLAYLIST_FILE,
  AUD_PATH_GTKRC_FILE,
  AUD_PATH_COUNT
 };
 
 typedef struct {
-    gchar * name;
-    gfloat preamp, bands[10];
+    char * name;
+    float preamp, bands[10];
 } EqualizerPreset;
 
-typedef gint16 VisFreqData[2][256];
-typedef gint16 VisPCMData[2][512];
+enum {
+ AUD_MENU_MAIN,
+ AUD_MENU_PLAYLIST,
+ AUD_MENU_PLAYLIST_RCLICK,
+ AUD_MENU_PLAYLIST_ADD,
+ AUD_MENU_PLAYLIST_REMOVE,
+ AUD_MENU_PLAYLIST_SELECT,
+ AUD_MENU_PLAYLIST_MISC,
+ AUD_MENU_COUNT};
 
-typedef struct {
-    gint time, nch;
-    gint length; /* obsolete, always 512 */
-    VisPCMData data;
-} VisNode;
+typedef void (* MenuFunc) (void);
 
-typedef void (* VisHookFunc) (const VisNode * node, void * user);
+enum {
+ AUD_VIS_TYPE_CLEAR,        /* like VisPlugin::clear() */
+ AUD_VIS_TYPE_MONO_PCM,     /* like VisPlugin::render_mono_pcm() */
+ AUD_VIS_TYPE_MULTI_PCM,    /* like VisPlugin::render_multi_pcm() */
+ AUD_VIS_TYPE_FREQ,         /* like VisPlugin::render_freq() */
+ AUD_VIS_TYPES};
+
+/* generic type; does not correspond to actual function types */
+typedef void (* VisFunc) (void);
 
 #define AUD_API_NAME MiscAPI
 #define AUD_API_SYMBOL misc_api

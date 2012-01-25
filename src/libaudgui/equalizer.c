@@ -1,22 +1,20 @@
 /*
- * libaudgui/equalizer.c
- * Copyright 2010 John Lindgren
+ * equalizer.c
+ * Copyright 2010-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 /*
@@ -27,38 +25,23 @@
 
 #include <math.h>
 
-#include <audacious/audconfig.h>
 #include <audacious/i18n.h>
+#include <audacious/misc.h>
+#include <audacious/types.h>
 #include <libaudcore/hook.h>
 
 #include "config.h"
 #include "libaudgui-gtk.h"
 
-typedef struct
-{
-    GtkWidget * slider;
-    gfloat * setting;
-}
-SliderPair;
-
 static void on_off_cb (GtkToggleButton * on_off, void * unused)
 {
-    gboolean active = gtk_toggle_button_get_active (on_off);
-
-    if (aud_cfg->equalizer_active != active)
-    {
-        aud_cfg->equalizer_active = active;
-        hook_call ("equalizer changed", NULL);
-    }
+    aud_set_bool (NULL, "equalizer_active", gtk_toggle_button_get_active (on_off));
 }
 
 static void on_off_update (void * unused, GtkWidget * on_off)
 {
-    gboolean active = gtk_toggle_button_get_active ((GtkToggleButton *) on_off);
-
-    if (active != aud_cfg->equalizer_active)
-        gtk_toggle_button_set_active ((GtkToggleButton *) on_off,
-         aud_cfg->equalizer_active);
+    gtk_toggle_button_set_active ((GtkToggleButton *) on_off, aud_get_bool
+     (NULL, "equalizer_active"));
 }
 
 static GtkWidget * create_on_off (void)
@@ -67,50 +50,44 @@ static GtkWidget * create_on_off (void)
 
     on_off = gtk_check_button_new_with_mnemonic (_("_Enable"));
     g_signal_connect ((GObject *) on_off, "toggled", (GCallback) on_off_cb, NULL);
-    hook_associate ("equalizer changed", (HookFunction) on_off_update, on_off);
+    hook_associate ("set equalizer_active", (HookFunction) on_off_update, on_off);
 
     on_off_update (NULL, on_off);
     return on_off;
 }
 
-static void slider_cb (GtkRange * slider, gfloat * setting)
+static void slider_moved (GtkRange * slider, void * unused)
 {
-    gint old = roundf (* setting);
-    gint new = round (-gtk_range_get_value (slider));
+    int band = GPOINTER_TO_INT (g_object_get_data ((GObject *) slider, "band"));
+    double value = round (-gtk_range_get_value (slider));
 
-    if (old != new)
-    {
-        * setting = new;
-        hook_call ("equalizer changed", NULL);
-    }
+    if (band == -1)
+        aud_set_double (NULL, "equalizer_preamp", value);
+    else
+        aud_eq_set_band (band, value);
 }
 
-static void slider_update (void * unused, SliderPair * pair)
+static void slider_update (void * unused, GtkRange * slider)
 {
-    gint old = round (-gtk_range_get_value ((GtkRange *) pair->slider));
-    gint new = roundf (* pair->setting);
+    int band = GPOINTER_TO_INT (g_object_get_data ((GObject *) slider, "band"));
+    double value;
 
-    if (old != new)
-        gtk_range_set_value ((GtkRange *) pair->slider, -new);
+    if (band == -1)
+        value = round (aud_get_double (NULL, "equalizer_preamp"));
+    else
+        value = round (aud_eq_get_band (band));
+
+    g_signal_handlers_block_by_func (slider, (void *) slider_moved, NULL);
+    gtk_range_set_value (slider, -value);
+    g_signal_handlers_unblock_by_func (slider, (void *) slider_moved, NULL);
 }
 
-static void set_slider_update (GtkWidget * slider, gfloat * setting)
+static char * format_value (GtkScale * slider, double value, void * unused)
 {
-    SliderPair * pair = g_slice_new (SliderPair);
-
-    pair->slider = slider;
-    pair->setting = setting;
-
-    hook_associate ("equalizer changed", (HookFunction) slider_update, pair);
-    slider_update (NULL, pair);
+    return g_strdup_printf ("%d", (int) -value);
 }
 
-static gchar * format_value (GtkScale * slider, gdouble value, void * unused)
-{
-    return g_strdup_printf ("%d", (gint) -value);
-}
-
-static GtkWidget * create_slider (const gchar * name, gfloat * setting)
+static GtkWidget * create_slider (const char * name, int band)
 {
     GtkWidget * vbox, * slider, * label;
 
@@ -120,16 +97,22 @@ static GtkWidget * create_slider (const gchar * name, gfloat * setting)
     gtk_label_set_angle ((GtkLabel *) label, 90);
     gtk_box_pack_start ((GtkBox *) vbox, label, TRUE, FALSE, 0);
 
-    slider = gtk_vscale_new_with_range (-EQUALIZER_MAX_GAIN, EQUALIZER_MAX_GAIN,
-     1);
+    slider = gtk_vscale_new_with_range (-EQUALIZER_MAX_GAIN, EQUALIZER_MAX_GAIN, 1);
     gtk_scale_set_draw_value ((GtkScale *) slider, TRUE);
     gtk_scale_set_value_pos ((GtkScale *) slider, GTK_POS_BOTTOM);
     gtk_widget_set_size_request (slider, -1, 120);
-    g_signal_connect ((GObject *) slider, "format-value", (GCallback)
-     format_value, NULL);
-    g_signal_connect ((GObject *) slider, "value-changed", (GCallback)
-     slider_cb, setting);
-    set_slider_update (slider, setting);
+
+    g_object_set_data ((GObject *) slider, "band", GINT_TO_POINTER (band));
+    g_signal_connect ((GObject *) slider, "format-value", (GCallback) format_value, NULL);
+    g_signal_connect ((GObject *) slider, "value-changed", (GCallback) slider_moved, NULL);
+
+    slider_update (NULL, (GtkRange *) slider);
+
+    if (band == -1)
+        hook_associate ("set equalizer_preamp", (HookFunction) slider_update, slider);
+    else
+        hook_associate ("set equalizer_bands", (HookFunction) slider_update, slider);
+
     gtk_box_pack_start ((GtkBox *) vbox, slider, FALSE, FALSE, 0);
 
     return vbox;
@@ -137,11 +120,11 @@ static GtkWidget * create_slider (const gchar * name, gfloat * setting)
 
 static GtkWidget * create_window (void)
 {
-    const gchar * const names[AUD_EQUALIZER_NBANDS] = {N_("31 Hz"), N_("63 Hz"),
+    const char * const names[AUD_EQUALIZER_NBANDS] = {N_("31 Hz"), N_("63 Hz"),
      N_("125 Hz"), N_("250 Hz"), N_("500 Hz"), N_("1 kHz"), N_("2 kHz"),
      N_("4 kHz"), N_("8 kHz"), N_("16 kHz")};
     GtkWidget * window, * vbox, * hbox;
-    gint i;
+    int i;
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title ((GtkWindow *) window, _("Equalizer"));
@@ -160,14 +143,11 @@ static GtkWidget * create_window (void)
     hbox = gtk_hbox_new (FALSE, 6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox, FALSE, FALSE, 0);
 
-    gtk_box_pack_start ((GtkBox *) hbox, create_slider (_("Preamp"),
-     & aud_cfg->equalizer_preamp), FALSE, FALSE, 0);
-
+    gtk_box_pack_start ((GtkBox *) hbox, create_slider (_("Preamp"), -1), FALSE, FALSE, 0);
     gtk_box_pack_start ((GtkBox *) hbox, gtk_vseparator_new (), FALSE, FALSE, 0);
 
     for (i = 0; i < AUD_EQUALIZER_NBANDS; i ++)
-        gtk_box_pack_start ((GtkBox *) hbox, create_slider (_(names[i]),
-         & aud_cfg->equalizer_bands[i]), FALSE, FALSE, 0);
+        gtk_box_pack_start ((GtkBox *) hbox, create_slider (_(names[i]), i), FALSE, FALSE, 0);
 
     gtk_widget_show_all (vbox);
     return window;
@@ -185,6 +165,13 @@ void audgui_show_equalizer_window (void)
 
 void audgui_hide_equalizer_window (void)
 {
-    if (equalizer_window != NULL)
-        gtk_widget_hide (equalizer_window);
+    if (! equalizer_window)
+        return;
+
+    hook_dissociate ("set equalizer_active", (HookFunction) on_off_update);
+    hook_dissociate ("set equalizer_bands", (HookFunction) slider_update);
+    hook_dissociate ("set equalizer_preamp", (HookFunction) slider_update);
+
+    gtk_widget_destroy (equalizer_window);
+    equalizer_window = NULL;
 }

@@ -19,31 +19,27 @@
  */
 
 #include <glib.h>
+#include <stdio.h>
+
 #include <libaudcore/tuple.h>
 #include <libaudcore/vfs.h>
 
 #include "audtag.h"
 #include "util.h"
 #include "tag_module.h"
-#include "wma/module.h"
 #include "id3/id3v1.h"
 #include "id3/id3v22.h"
 #include "id3/id3v24.h"
 #include "ape/ape.h"
-/* #include "aac/aac.h" */
 
-void init_tag_modules(void)
-{
-    mowgli_node_add((void *)&id3v24, &id3v24.node, &tag_modules);
-    mowgli_node_add((void *)&id3v22, &id3v22.node, &tag_modules);
-    mowgli_node_add((void *)&ape, &ape.node, &tag_modules);
-    mowgli_node_add((void *)&id3v1, &id3v1.node, &tag_modules);
-}
+static tag_module_t * const modules[] = {& id3v24, & id3v22, & ape, & id3v1};
+#define N_MODULES (sizeof modules / sizeof modules[0])
 
-tag_module_t * find_tag_module (VFSFile * fd, gint new_type)
+tag_module_t * find_tag_module (VFSFile * fd, int new_type)
 {
-    mowgli_node_t *mod, *tmod;
-    MOWGLI_LIST_FOREACH_SAFE(mod, tmod, tag_modules.head)
+    int i;
+
+    for (i = 0; i < N_MODULES; i ++)
     {
         if (vfs_fseek(fd, 0, SEEK_SET))
         {
@@ -51,21 +47,20 @@ tag_module_t * find_tag_module (VFSFile * fd, gint new_type)
             return NULL;
         }
 
-        if (((tag_module_t *) mod->data)->can_handle_file (fd))
+        if (modules[i]->can_handle_file (fd))
         {
-            TAGDBG ("Module %s accepted file.\n", ((tag_module_t *)
-             mod->data)->name);
-            return mod->data;
+            TAGDBG ("Module %s accepted file.\n", modules[i]->name);
+            return modules[i];
         }
     }
 
     /* No existing tag; see if we can create a new one. */
     if (new_type != TAG_TYPE_NONE)
     {
-        MOWGLI_LIST_FOREACH_SAFE (mod, tmod, tag_modules.head)
+        for (i = 0; i < N_MODULES; i ++)
         {
-            if (((tag_module_t *) (mod->data))->type == new_type)
-                return mod->data;
+            if (modules[i]->type == new_type)
+                return modules[i];
         }
     }
 

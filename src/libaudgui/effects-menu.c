@@ -1,22 +1,20 @@
 /*
  * effects-menu.c
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include "config.h"
@@ -27,9 +25,9 @@
 
 #include "libaudgui-gtk.h"
 
-static gboolean watch_cb (PluginHandle * plugin, GtkCheckMenuItem * item)
+static bool_t watch_cb (PluginHandle * plugin, GtkCheckMenuItem * item)
 {
-    gboolean enabled = aud_plugin_get_enabled (plugin);
+    bool_t enabled = aud_plugin_get_enabled (plugin);
     gtk_check_menu_item_set_active (item, enabled);
 
     GtkWidget * settings = g_object_get_data ((GObject *) item, "settings");
@@ -54,12 +52,12 @@ static void settings_cb (GtkMenuItem * settings, PluginHandle * plugin)
     if (! aud_plugin_get_enabled (plugin))
         return;
 
-    EffectPlugin * header = aud_plugin_get_header (plugin);
+    Plugin * header = aud_plugin_get_header (plugin);
     g_return_if_fail (header != NULL);
     header->configure ();
 }
 
-static gboolean add_item_cb (PluginHandle * plugin, GtkWidget * menu)
+static bool_t add_item_cb (PluginHandle * plugin, GtkWidget * menu)
 {
     GtkWidget * item = gtk_check_menu_item_new_with_label (aud_plugin_get_name
      (plugin));
@@ -89,5 +87,12 @@ GtkWidget * audgui_create_effects_menu (void)
     GtkWidget * menu = gtk_menu_new ();
     aud_plugin_for_each (PLUGIN_TYPE_EFFECT, (PluginForEachFunc) add_item_cb,
      menu);
+    return menu;
+}
+
+GtkWidget * audgui_create_vis_menu (void)
+{
+    GtkWidget * menu = gtk_menu_new ();
+    aud_plugin_for_each (PLUGIN_TYPE_VIS, (PluginForEachFunc) add_item_cb, menu);
     return menu;
 }

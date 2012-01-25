@@ -29,10 +29,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include <mowgli.h>
 #include <locale.h>
 #include "libaudclient/audctrl.h"
 #include "audtool.h"
@@ -58,10 +58,12 @@ struct commandhandler handlers[] = {
 
 	{"<sep>", NULL, "Playlist manipulation", 0},
 	{"playlist-advance", playlist_advance, "go to the next song in the playlist", 0},
+	{"playlist-auto-advance-status", playlist_auto_advance_status, "returns the status of playlist auto-advance", 0},
+	{"playlist-auto-advance-toggle", playlist_auto_advance_toggle, "toggles playlist auto-advance", 0},
 	{"playlist-reverse", playlist_reverse, "go to the previous song in the playlist", 0},
-	{"playlist-addurl", playlist_add_url_string, "adds a url to the playlist", 1},
-    {"playlist-insurl", playlist_ins_url_string, "inserts a url at specified position in the playlist", 2},
-	{"playlist-addurl-to-new-playlist", playlist_enqueue_to_temp, "adds a url to the newly created playlist", 1},
+	{"playlist-addurl", playlist_add_url_string, "adds a URL to the playlist", 1},
+    {"playlist-insurl", playlist_ins_url_string, "inserts a URL at specified position in the playlist", 2},
+	{"playlist-addurl-to-new-playlist", playlist_enqueue_to_temp, "adds a URL to the newly created playlist", 1},
 	{"playlist-delete", playlist_delete, "deletes a song from the playlist", 1},
 	{"playlist-length", playlist_length, "returns the total length of the playlist", 0},
 	{"playlist-song", playlist_song, "returns the title of a song in the playlist", 1},
@@ -77,6 +79,8 @@ struct commandhandler handlers[] = {
 	{"playlist-repeat-toggle", playlist_repeat_toggle, "toggles playlist repeat", 0},
 	{"playlist-shuffle-status", playlist_shuffle_status, "returns the status of playlist shuffle", 0},
 	{"playlist-shuffle-toggle", playlist_shuffle_toggle, "toggles playlist shuffle", 0},
+	{"playlist-stop-after-status", playlist_stop_after_status, "queries if stopping after current song", 0},
+	{"playlist-stop-after-toggle", playlist_stop_after_toggle, "toggles if stopping after current song", 0},
 	{"playlist-tuple-data", playlist_tuple_field_data, "returns the value of a tuple field for a song in the playlist", 2},
 	{"current-playlist-name", playlist_title, "returns the playlist title of the active playlist", 0},
 
@@ -121,18 +125,14 @@ struct commandhandler handlers[] = {
 
 	{"<sep>", NULL, "Miscellaneous", 0},
 	{"mainwin-show", mainwin_show, "shows/hides the main window", 1},
-	{"playlist-show", playlist_show, "shows/hides the playlist window", 1},
-	{"equalizer-show", equalizer_show, "shows/hides the equalizer window", 1},
-
 	{"filebrowser-show", show_filebrowser, "shows/hides the filebrowser", 1},
 	{"jumptofile-show", show_jtf_window, "shows/hides the jump to file window", 1},
 	{"preferences-show", show_preferences_window, "shows/hides the preferences window", 1},
 	{"about-show", show_about_window, "shows/hides the about window", 1},
 
-	{"activate", activate, "activates and raises audacious", 0},
 	{"always-on-top", toggle_aot, "on/off always on top", 1},
-    {"version", get_version, "shows audaciuos version", 0},
-	{"shutdown", shutdown_audacious_server, "shuts down audacious", 0},
+    {"version", get_version, "shows Audacious version", 0},
+	{"shutdown", shutdown_audacious_server, "shuts down Audacious", 0},
 
 
 	{"<sep>", NULL, "Help system", 0},
@@ -143,7 +143,6 @@ struct commandhandler handlers[] = {
 	{NULL, NULL, NULL, 0}
 };
 
-mowgli_error_context_t *e = NULL;
 DBusGProxy *dbus_proxy = NULL;
 static DBusGConnection *connection = NULL;
 
@@ -152,13 +151,13 @@ audtool_connect(void)
 {
 	GError *error = NULL;
 
-	mowgli_error_context_push(e, "While attempting to connect to the D-Bus session bus");
 	connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
 
 	if (connection == NULL)
-		mowgli_error_context_display_with_error(e, ":\n  * ", g_strdup_printf("D-Bus Error: %s", error->message));
-
-	mowgli_error_context_pop(e);
+	{
+		fprintf (stderr, "D-Bus Error: %s\n", error->message);
+		exit (EXIT_FAILURE);
+	}
 
 	dbus_proxy = dbus_g_proxy_new_for_name(connection, AUDACIOUS_DBUS_SERVICE,
                                            AUDACIOUS_DBUS_PATH,
@@ -179,18 +178,14 @@ main(gint argc, gchar **argv)
 
 	setlocale(LC_CTYPE, "");
 	g_type_init();
-	mowgli_init();
-
-	e = mowgli_error_context_create();
-	mowgli_error_context_push(e, "In program %s", argv[0]);
 
 	audtool_connect();
 
-	mowgli_error_context_push(e, "While processing the commandline");
-
 	if (argc < 2)
-		mowgli_error_context_display_with_error (e, ":\n  * ", "not enough "
-         "parameters, use \'audtool help\' for more information.");
+	{
+		fprintf (stderr, "Not enough parameters.  Try \"audtool help\".\n");
+		exit (EXIT_FAILURE);
+	}
 
 	for (j = 1; j < argc; j++)
 	{
@@ -211,9 +206,10 @@ main(gint argc, gchar **argv)
 	}
 
 	if (k == 0)
-		mowgli_error_context_display_with_error (e, ":\n  * ", g_strdup_printf
-         ("Unknown command '%s' encountered, use \'audtool help\' for a "
-         "command list.", argv[1]));
+	{
+		fprintf (stderr, "Unknown command \"%s\".  Try \"audtool help\".\n", argv[1]);
+		exit (EXIT_FAILURE);
+	}
 
 	audtool_disconnect();
 

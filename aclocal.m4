@@ -1,7 +1,8 @@
-# generated automatically by aclocal 1.11.1 -*- Autoconf -*-
+# generated automatically by aclocal 1.11.2 -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008, 2009  Free Software Foundation, Inc.
+# 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation,
+# Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -1834,7 +1835,8 @@ AC_DEFUN([AM_NLS],
 # ----------------------------------
 AC_DEFUN([PKG_PROG_PKG_CONFIG],
 [m4_pattern_forbid([^_?PKG_[A-Z_]+$])
-m4_pattern_allow([^PKG_CONFIG(_PATH)?$])
+m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
+m4_pattern_allow([^PKG_CONFIG_(DISABLE_UNINSTALLED|TOP_BUILD_DIR|DEBUG_SPEW)$])
 AC_ARG_VAR([PKG_CONFIG], [path to pkg-config utility])
 AC_ARG_VAR([PKG_CONFIG_PATH], [directories to add to pkg-config's search path])
 AC_ARG_VAR([PKG_CONFIG_LIBDIR], [path overriding pkg-config's built-in search path])
@@ -1880,7 +1882,8 @@ m4_define([_PKG_CONFIG],
     pkg_cv_[]$1="$$1"
  elif test -n "$PKG_CONFIG"; then
     PKG_CHECK_EXISTS([$3],
-                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`],
+                     [pkg_cv_[]$1=`$PKG_CONFIG --[]$2 "$3" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes ],
 		     [pkg_failed=yes])
  else
     pkg_failed=untried
@@ -1928,9 +1931,9 @@ if test $pkg_failed = yes; then
    	AC_MSG_RESULT([no])
         _PKG_SHORT_ERRORS_SUPPORTED
         if test $_pkg_short_errors_supported = yes; then
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors "$2" 2>&1`
+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "$2" 2>&1`
         else 
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors "$2" 2>&1`
+	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "$2" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
@@ -1954,7 +1957,7 @@ path to pkg-config.
 
 _PKG_TEXT
 
-To get pkg-config, see <http://pkg-config.freedesktop.org/>.])dnl
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.])[]dnl
         ])
 else
 	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
@@ -2565,14 +2568,14 @@ AC_CONFIG_COMMANDS_PRE(
 Usually this means the macro was only invoked conditionally.]])
 fi])])
 
-# Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009
-# Free Software Foundation, Inc.
+# Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009,
+# 2010, 2011 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 10
+# serial 12
 
 # There are a few dirty hacks below to avoid letting `AC_PROG_CC' be
 # written in clear, in which case automake, when reading aclocal.m4,
@@ -2612,6 +2615,7 @@ AC_CACHE_CHECK([dependency style of $depcc],
   # instance it was reported that on HP-UX the gcc test will end up
   # making a dummy file named `D' -- because `-MD' means `put the output
   # in D'.
+  rm -rf conftest.dir
   mkdir conftest.dir
   # Copy depcomp to subdir because otherwise we won't find it if we're
   # using a relative directory.
@@ -2676,7 +2680,7 @@ AC_CACHE_CHECK([dependency style of $depcc],
 	break
       fi
       ;;
-    msvisualcpp | msvcmsys)
+    msvc7 | msvc7msys | msvisualcpp | msvcmsys)
       # This compiler won't grok `-c -o', but also, the minuso test has
       # not run yet.  These depmodes are late enough in the game, and
       # so weak that their functioning should not be impacted.
@@ -2741,10 +2745,13 @@ AC_DEFUN([AM_DEP_TRACK],
 if test "x$enable_dependency_tracking" != xno; then
   am_depcomp="$ac_aux_dir/depcomp"
   AMDEPBACKSLASH='\'
+  am__nodep='_no'
 fi
 AM_CONDITIONAL([AMDEP], [test "x$enable_dependency_tracking" != xno])
 AC_SUBST([AMDEPBACKSLASH])dnl
 _AM_SUBST_NOTMAKE([AMDEPBACKSLASH])dnl
+AC_SUBST([am__nodep])dnl
+_AM_SUBST_NOTMAKE([am__nodep])dnl
 ])
 
 # Generate code to set up dependency tracking.              -*- Autoconf -*-
@@ -2900,11 +2907,14 @@ AC_MSG_RESULT([$_am_result])
 rm -f confinc confmf
 ])
 
-# Copyright (C) 2003, 2004, 2005, 2006  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004, 2005, 2006, 2011 Free Software Foundation,
+# Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
+
+# serial 1
 
 # AM_PROG_MKDIR_P
 # ---------------
@@ -2928,13 +2938,14 @@ esac
 
 # Helper functions for option handling.                     -*- Autoconf -*-
 
-# Copyright (C) 2001, 2002, 2003, 2005, 2008  Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2003, 2005, 2008, 2010 Free Software
+# Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 4
+# serial 5
 
 # _AM_MANGLE_OPTION(NAME)
 # -----------------------
@@ -2942,13 +2953,13 @@ AC_DEFUN([_AM_MANGLE_OPTION],
 [[_AM_OPTION_]m4_bpatsubst($1, [[^a-zA-Z0-9_]], [_])])
 
 # _AM_SET_OPTION(NAME)
-# ------------------------------
+# --------------------
 # Set option NAME.  Presently that only means defining a flag for this option.
 AC_DEFUN([_AM_SET_OPTION],
 [m4_define(_AM_MANGLE_OPTION([$1]), 1)])
 
 # _AM_SET_OPTIONS(OPTIONS)
-# ----------------------------------
+# ------------------------
 # OPTIONS is a space-separated list of Automake options.
 AC_DEFUN([_AM_SET_OPTIONS],
 [m4_foreach_w([_AM_Option], [$1], [_AM_SET_OPTION(_AM_Option)])])
@@ -2959,13 +2970,13 @@ AC_DEFUN([_AM_SET_OPTIONS],
 AC_DEFUN([_AM_IF_OPTION],
 [m4_ifset(_AM_MANGLE_OPTION([$1]), [$2], [$3])])
 
-# Copyright (C) 2006, 2008  Free Software Foundation, Inc.
+# Copyright (C) 2006, 2008, 2010 Free Software Foundation, Inc.
 #
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 2
+# serial 3
 
 # _AM_SUBST_NOTMAKE(VARIABLE)
 # ---------------------------
@@ -2974,7 +2985,7 @@ AC_DEFUN([_AM_IF_OPTION],
 AC_DEFUN([_AM_SUBST_NOTMAKE])
 
 # AM_SUBST_NOTMAKE(VARIABLE)
-# ---------------------------
+# --------------------------
 # Public sister of _AM_SUBST_NOTMAKE.
 AC_DEFUN([AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE($@)])
 

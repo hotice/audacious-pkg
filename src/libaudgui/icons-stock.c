@@ -1,34 +1,32 @@
-/*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2008  Audacious development team.
+/*
+ * icons-stock.c
+ * Copyright 2007-2010 Michael Färber and John Lindgren
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; under version 3 of the License.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses>.
  *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * The Audacious team does not consider modular code linking to
+ * Audacious or using our public API to be a derived work.
  */
 
-
-#include "icons-stock.h"
-
-#include <gdk/gdk.h>
 #include <gtk/gtk.h>
-
 #include <audacious/misc.h>
 
-static void load_stock_icon (gchar * id, gchar * filename,
+#include "libaudgui.h"
+
+static void load_stock_icon (char * id, char * filename,
  GtkIconFactory * iconfactory)
 {
-    gchar * path = g_strdup_printf ("%s/images/%s",
+    char * path = g_strdup_printf ("%s/images/%s",
      aud_get_path (AUD_PATH_DATA_DIR), filename);
 
     GdkPixbuf * pixbuf = gdk_pixbuf_new_from_file (path, NULL);
@@ -61,4 +59,3 @@ audgui_register_stock_icons(void)
     gtk_icon_factory_add_default( iconfactory );
     g_object_unref( iconfactory );
 }
-

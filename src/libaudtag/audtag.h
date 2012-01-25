@@ -23,13 +23,8 @@
 #ifndef AUDTAG_H
 #define AUDTAG_H
 
-G_BEGIN_DECLS
-
-#include <glib.h>
-#include <mowgli.h>
-#include "libaudcore/tuple.h"
-#include "libaudcore/vfs.h"
-#include "config.h"
+#include <libaudcore/tuple.h>
+#include <libaudcore/vfs.h>
 
 enum
 {
@@ -37,18 +32,16 @@ enum
     TAG_TYPE_APE,
 };
 
-void tag_init (void);
-void tag_set_verbose (gboolean verbose);
+void tag_set_verbose (bool_t verbose);
 
-gboolean tag_tuple_read (Tuple * tuple, VFSFile *fd);
-gboolean tag_image_read (VFSFile * handle, void * * data, gint * size);
+bool_t tag_tuple_read (Tuple * tuple, VFSFile *fd);
+bool_t tag_image_read (VFSFile * handle, void * * data, int64_t * size);
 
 /* new_type specifies the type of tag (see the TAG_TYPE_* enum) that should be
  * written if the file does not have any existing tag. */
-gboolean tag_tuple_write (const Tuple * tuple, VFSFile * handle, gint new_type);
+bool_t tag_tuple_write (const Tuple * tuple, VFSFile * handle, int new_type);
 
 /* deprecated, use tag_tuple_write */
-gboolean tag_tuple_write_to_file (Tuple * tuple, VFSFile * handle);
+bool_t tag_tuple_write_to_file (Tuple * tuple, VFSFile * handle);
 
-G_END_DECLS
 #endif /* AUDTAG_H */

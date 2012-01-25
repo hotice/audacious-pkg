@@ -1,83 +1,59 @@
-/*  Audacious
- *  Copyright (C) 2005-2007  Audacious development team.
+/*
+ * audstrings.h
+ * Copyright 2009-2011 John Lindgren
+ * Copyright 2010 William Pitcock
  *
- *  BMP - Cross-platform multimedia player
- *  Copyright (C) 2003-2004  BMP development team.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  Based on XMMS:
- *  Copyright (C) 1998-2003  XMMS development team.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
- *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
-#ifndef AUDACIOUS_STRINGS_H
-#define AUDACIOUS_STRINGS_H
+#ifndef LIBAUDCORE_STRINGS_H
+#define LIBAUDCORE_STRINGS_H
 
-#include <stdlib.h>
-#include <glib.h>
+#include <libaudcore/core.h>
 
-G_BEGIN_DECLS
+bool_t str_has_prefix_nocase(const char * str, const char * prefix);
+bool_t str_has_suffix_nocase(const char * str, const char * suffix);
 
-gchar *str_append(gchar * str, const gchar * add_str);
-gchar *str_replace(gchar * str, gchar * new_str);
-void str_replace_in(gchar ** str, gchar * new_str);
+void str_set_utf8_impl (char * (* stu_impl) (const char *),
+ char * (* stuf_impl) (const char *, int, int *, int *));
+char * str_to_utf8 (const char * str);
+char * str_to_utf8_full (const char * str, int len, int * bytes_read, int * bytes_written);
 
-gboolean str_has_prefix_nocase(const gchar * str, const gchar * prefix);
-gboolean str_has_suffix_nocase(const gchar * str, const gchar * suffix);
-gboolean str_has_suffixes_nocase(const gchar * str, gchar * const *suffixes);
+void string_replace_char (char * string, char old_str, char new_str);
 
-gchar *str_assert_utf8(const gchar *str);
+void str_decode_percent (const char * str, int len, char * out);
+void str_encode_percent (const char * str, int len, char * out);
 
-void str_set_utf8_impl (gchar * (* stu_impl) (const gchar *),
- gchar * (* stuf_impl) (const gchar *, gssize, gsize *, gsize *, GError * *));
-gchar * str_to_utf8 (const gchar * str);
-gchar * str_to_utf8_full (const gchar * str, gssize len, gsize * bytes_read,
- gsize * bytes_written, GError * * err);
+char * filename_to_uri (const char * filename);
+char * uri_to_filename (const char * uri);
+char * uri_to_display (const char * uri);
 
-const gchar *str_skip_chars(const gchar * str, const gchar * chars);
+void uri_parse (const char * uri, const char * * base_p, const char * * ext_p,
+ const char * * sub_p, int * isub_p);
 
-gchar *convert_dos_path(gchar * text);
+int string_compare (const char * a, const char * b);
+int string_compare_encoded (const char * a, const char * b);
 
-gchar *filename_get_subtune(const gchar * filename, gint * track);
-gchar *filename_split_subtune(const gchar * filename, gint * track);
+char *str_replace_fragment(char *s, int size, const char *old_str, const char *new_str);
 
-void string_replace_char (gchar * string, gchar old_str, gchar new_str);
-void string_decode_percent (gchar * string);
-gchar * string_encode_percent (const gchar * string, gboolean is_filename);
+bool_t string_to_int (const char * string, int * addr);
+bool_t string_to_double (const char * string, double * addr);
+char * int_to_string (int val);
+char * double_to_string (double val);
 
-gboolean uri_is_utf8 (const gchar * uri, gboolean warn);
-gchar * uri_to_utf8 (const gchar * uri);
-void uri_check_utf8 (gchar * * uri, gboolean warn);
-gchar * filename_to_uri (const gchar * filename);
-gchar * uri_to_filename (const gchar * uri);
-gchar * uri_to_display (const gchar * uri);
+bool_t string_to_double_array (const char * string, double * array, int count);
+char * double_array_to_string (const double * array, int count);
 
-gchar * uri_get_extension (const gchar * uri);
-
-void string_cut_extension(gchar *string);
-gint string_compare (const gchar * a, const gchar * b);
-gint string_compare_encoded (const gchar * a, const gchar * b);
-
-const void * memfind (const void * mem, gint size, const void * token, gint
- length);
-
-gchar *str_replace_fragment(gchar *s, gint size, const gchar *old_str, const gchar *new_str);
-
-void string_canonize_case(gchar *string);
-
-G_END_DECLS
-
-#endif /* AUDACIOUS_STRINGS_H */
+#endif /* LIBAUDCORE_STRINGS_H */

@@ -1,22 +1,20 @@
 /*
- * libaudgui/urilist.c
+ * urilist.c
  * Copyright 2010 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <string.h>
@@ -29,18 +27,11 @@
 
 #include "libaudgui.h"
 
-typedef void (* ForEachFunc) (gchar *, void *);
+typedef void (* ForEachFunc) (char *, void *);
 
-typedef struct
+static char * check_uri (char * name)
 {
-    gint playlist, at;
-    struct index * index;
-}
-AddState;
-
-static gchar * check_uri (gchar * name)
-{
-    gchar * new;
+    char * new;
 
     if (strstr (name, "://") || ! (new = filename_to_uri (name)))
         return name;
@@ -49,9 +40,9 @@ static gchar * check_uri (gchar * name)
     return new;
 }
 
-static void urilist_for_each (const gchar * list, ForEachFunc func, void * user)
+static void urilist_for_each (const char * list, ForEachFunc func, void * user)
 {
-    const gchar * end, * next;
+    const char * end, * next;
 
     while (list[0])
     {
@@ -67,56 +58,33 @@ static void urilist_for_each (const gchar * list, ForEachFunc func, void * user)
     }
 }
 
-static void add_to_glist (gchar * name, GList * * listp)
+static void add_to_index (char * name, Index * index)
 {
-    * listp = g_list_prepend (* listp, name);
+    index_append (index, str_get (name));
+    g_free (name);
 }
 
-void audgui_urilist_open (const gchar * list)
+void audgui_urilist_open (const char * list)
 {
-    GList * glist = NULL;
-
-    urilist_for_each (list, (ForEachFunc) add_to_glist, & glist);
-    glist = g_list_reverse (glist);
-
-    aud_drct_pl_open_list (glist);
-
-    g_list_foreach (glist, (GFunc) g_free, NULL);
-    g_list_free (glist);
+    Index * filenames = index_new ();
+    urilist_for_each (list, (ForEachFunc) add_to_index, filenames);
+    aud_drct_pl_open_list (filenames);
 }
 
-static void add_full (gchar * name, AddState * state)
+void audgui_urilist_insert (int playlist, int at, const char * list)
 {
-    if (vfs_file_test (name, G_FILE_TEST_IS_DIR))
-    {
-        aud_playlist_insert_folder (state->playlist, state->at, name, FALSE);
-        g_free (name);
-    }
-    else if (aud_filename_is_playlist (name))
-    {
-        gint entries = aud_playlist_entry_count (state->playlist);
-        aud_playlist_insert_playlist (state->playlist, state->at, name);
-        state->at += aud_playlist_entry_count (state->playlist) - entries;
-    }
-    else
-        index_append (state->index, name);
+    Index * filenames = index_new ();
+    urilist_for_each (list, (ForEachFunc) add_to_index, filenames);
+    aud_playlist_entry_insert_batch (playlist, at, filenames, NULL, FALSE);
 }
 
-void audgui_urilist_insert (gint playlist, gint at, const gchar * list)
+char * audgui_urilist_create_from_selected (int playlist)
 {
-    AddState state = {playlist, at, index_new ()};
-
-    urilist_for_each (list, (ForEachFunc) add_full, & state);
-    aud_playlist_entry_insert_batch (playlist, state.at, state.index, NULL);
-}
-
-gchar * audgui_urilist_create_from_selected (gint playlist)
-{
-    gint entries = aud_playlist_entry_count (playlist);
-    gint space = 0;
-    gint count, length;
-    const gchar * name;
-    gchar * buffer, * set;
+    int entries = aud_playlist_entry_count (playlist);
+    int space = 0;
+    int count, length;
+    char * name;
+    char * buffer, * set;
 
     for (count = 0; count < entries; count ++)
     {
@@ -126,6 +94,7 @@ gchar * audgui_urilist_create_from_selected (gint playlist)
         name = aud_playlist_entry_get_filename (playlist, count);
         g_return_val_if_fail (name != NULL, NULL);
         space += strlen (name) + 1;
+        str_unref (name);
     }
 
     if (! space)
@@ -147,6 +116,7 @@ gchar * audgui_urilist_create_from_selected (gint playlist)
         set += length;
         * set ++ = '\n';
         space -= length + 1;
+        str_unref (name);
     }
 
     * -- set = 0; /* last newline replaced with null */

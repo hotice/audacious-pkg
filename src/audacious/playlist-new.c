@@ -19,29 +19,43 @@
  * using our public API to be a derived work.
  */
 
-#include <assert.h>
+#include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <glib.h>
 
 #include <libaudcore/audstrings.h>
 #include <libaudcore/hook.h>
-#include <libaudcore/stringpool.h>
-#include <libaudcore/tuple_formatter.h>
+#include <libaudcore/tuple.h>
 
-#include "audconfig.h"
 #include "config.h"
 #include "i18n.h"
 #include "misc.h"
 #include "playback.h"
 #include "playlist.h"
-#include "playlist-utils.h"
 #include "plugins.h"
 #include "util.h"
 
-#define SCAN_THREADS 4
+enum {RESUME_STOP, RESUME_PLAY, RESUME_PAUSE};
+
+#define SCAN_THREADS 2
 #define STATE_FILE "playlist-state"
+
+#define ENTER pthread_mutex_lock (& mutex)
+#define LEAVE pthread_mutex_unlock (& mutex)
+
+#define LEAVE_RET_VOID do { \
+    pthread_mutex_unlock (& mutex); \
+    return; \
+} while (0)
+
+#define LEAVE_RET(ret) do { \
+    pthread_mutex_unlock (& mutex); \
+    return ret; \
+} while (0)
 
 #define DECLARE_PLAYLIST \
     Playlist * playlist
@@ -51,141 +65,147 @@
     Entry * entry
 
 #define LOOKUP_PLAYLIST do { \
-    playlist = lookup_playlist (playlist_num); \
-    g_return_if_fail (playlist != NULL); \
+    if (! (playlist = lookup_playlist (playlist_num))) \
+        LEAVE_RET_VOID; \
 } while (0)
 
 #define LOOKUP_PLAYLIST_RET(ret) do { \
-    playlist = lookup_playlist (playlist_num); \
-    g_return_val_if_fail (playlist != NULL, ret); \
+    if (! (playlist = lookup_playlist (playlist_num))) \
+        LEAVE_RET(ret); \
 } while (0)
 
 #define LOOKUP_PLAYLIST_ENTRY do { \
-    playlist = lookup_playlist (playlist_num); \
-    g_return_if_fail (playlist != NULL); \
-    entry = lookup_entry (playlist, entry_num); \
-    g_return_if_fail (entry != NULL); \
+    LOOKUP_PLAYLIST; \
+    if (! (entry = lookup_entry (playlist, entry_num))) \
+        LEAVE_RET_VOID; \
 } while (0)
 
 #define LOOKUP_PLAYLIST_ENTRY_RET(ret) do { \
-    playlist = lookup_playlist (playlist_num); \
-    g_return_val_if_fail (playlist != NULL, ret); \
-    entry = lookup_entry (playlist, entry_num); \
-    g_return_val_if_fail (entry != NULL, ret); \
+    LOOKUP_PLAYLIST_RET(ret); \
+    if (! (entry = lookup_entry (playlist, entry_num))) \
+        LEAVE_RET(ret); \
 } while (0)
 
 #define SELECTION_HAS_CHANGED(p, a, c) \
  queue_update (PLAYLIST_UPDATE_SELECTION, p, a, c)
 
-#define METADATA_WILL_CHANGE scan_stop ()
+#define METADATA_HAS_CHANGED(p, a, c) \
+ queue_update (PLAYLIST_UPDATE_METADATA, p, a, c)
 
-#define METADATA_HAS_CHANGED(p, a, c) do { \
-    scan_reset (); \
-    queue_update (PLAYLIST_UPDATE_METADATA, p, a, c); \
-} while (0)
-
-#define PLAYLIST_WILL_CHANGE scan_stop ()
-
-#define PLAYLIST_HAS_CHANGED(p, a, c) do { \
-    scan_reset (); \
-    queue_update (PLAYLIST_UPDATE_STRUCTURE, p, a, c); \
-} while (0)
+#define PLAYLIST_HAS_CHANGED(p, a, c) \
+ queue_update (PLAYLIST_UPDATE_STRUCTURE, p, a, c)
 
 typedef struct {
-    gint number;
-    gchar *filename;
+    int level, before, after;
+} Update;
+
+typedef struct {
+    int number;
+    char * filename;
     PluginHandle * decoder;
-    Tuple *tuple;
-    gchar * formatted, * title, * artist, * album;
-    gint length;
-    gboolean failed;
-    gboolean selected;
-    gint shuffle_num;
-    gboolean queued;
-    gboolean segmented;
-    gint start;
-    gint end;
+    Tuple * tuple;
+    char * formatted, * title, * artist, * album;
+    int length;
+    bool_t failed;
+    bool_t selected;
+    int shuffle_num;
+    bool_t queued;
+    bool_t segmented;
+    int start, end;
 } Entry;
 
 typedef struct {
-    gint number;
-    gint unique_id;
-    gchar *filename;
-    gchar *title;
-    struct index *entries;
+    int number, unique_id;
+    char * filename, * title;
+    bool_t modified;
+    Index * entries;
     Entry * position;
-    gint selected_count;
-    gint last_shuffle_num;
-    GList *queued;
-    gint64 total_length;
-    gint64 selected_length;
+    int selected_count;
+    int last_shuffle_num;
+    GList * queued;
+    int64_t total_length, selected_length;
+    bool_t scanning, scan_ending;
+    Update next_update, last_update;
 } Playlist;
 
-static gint next_unique_id = 1000;
+static const char * const default_title = N_("New Playlist");
+static const char * const temp_title = N_("Now Playing");
 
-static struct index * playlists = NULL;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+/* The unique ID table contains pointers to Playlist for ID's in use and NULL
+ * for "dead" (previously used and therefore unavailable) ID's. */
+static GHashTable * unique_id_table = NULL;
+static int next_unique_id = 1000;
+
+static Index * playlists = NULL;
 static Playlist * active_playlist = NULL;
 static Playlist * playing_playlist = NULL;
 
-static gint update_source, update_level;
-static Playlist * update_playlist;
-static gint unchanged_before, unchanged_after;
+static int update_source = 0, update_level;
+static int resume_state, resume_time;
 
-static gint scan_source;
-static GMutex * scan_mutex;
-static GCond * scan_conds[SCAN_THREADS];
-static const gchar * scan_filenames[SCAN_THREADS];
-static PluginHandle * scan_decoders[SCAN_THREADS];
-static Tuple * scan_tuples[SCAN_THREADS];
-static gboolean scan_quit;
-static GThread * scan_threads[SCAN_THREADS];
-static gint scan_positions[SCAN_THREADS];
+typedef struct {
+    Playlist * playlist;
+    Entry * entry;
+} ScanItem;
+
+static pthread_t scan_threads[SCAN_THREADS];
+static bool_t scan_quit;
+static int scan_playlist, scan_row;
+static GQueue scan_queue = G_QUEUE_INIT;
+static ScanItem * scan_items[SCAN_THREADS];
 
 static void * scanner (void * unused);
+static void scan_trigger (void);
 
-static gchar *title_from_tuple(Tuple * tuple)
+static char * title_format;
+
+static char * title_from_tuple (Tuple * tuple)
 {
-    const gchar *format = tuple_get_string(tuple, FIELD_FORMATTER, NULL);
+    if (! title_format)
+        title_format = get_string (NULL, "generic_title_format");
 
-    if (format == NULL)
-        format = get_gentitle_format();
-
-    return tuple_formatter_make_title_string(tuple, format);
+    return tuple_format_title (tuple, title_format);
 }
 
 static void entry_set_tuple_real (Entry * entry, Tuple * tuple)
 {
     /* Hack: We cannot refresh segmented entries (since their info is read from
      * the cue sheet when it is first loaded), so leave them alone. -jlindgren */
-    if (entry->segmented && ! tuple)
+    if (entry->segmented && entry->tuple)
+    {
+        if (tuple)
+            tuple_unref (tuple);
         return;
+    }
 
-    if (entry->tuple != NULL)
-        tuple_free (entry->tuple);
+    if (entry->tuple)
+        tuple_unref (entry->tuple);
     entry->tuple = tuple;
 
-    g_free (entry->formatted);
-    stringpool_unref (entry->title);
-    stringpool_unref (entry->artist);
-    stringpool_unref (entry->album);
+    str_unref (entry->formatted);
+    str_unref (entry->title);
+    str_unref (entry->artist);
+    str_unref (entry->album);
 
-    if (tuple == NULL)
+    describe_song (entry->filename, tuple, & entry->title, & entry->artist, & entry->album);
+
+    if (! tuple)
     {
         entry->formatted = NULL;
-        entry->title = NULL;
-        entry->artist = NULL;
-        entry->album = NULL;
         entry->length = 0;
         entry->segmented = FALSE;
-        entry->start = entry->end = -1;
+        entry->start = 0;
+        entry->end = -1;
     }
     else
     {
         entry->formatted = title_from_tuple (tuple);
-        describe_song (entry->filename, tuple, & entry->title, & entry->artist,
-         & entry->album);
         entry->length = tuple_get_int (tuple, FIELD_LENGTH, NULL);
-        entry->length = MAX (entry->length, 0);
+        if (entry->length < 0)
+            entry->length = 0;
 
         if (tuple_get_value_type (tuple, FIELD_SEGMENT_START, NULL) == TUPLE_INT)
         {
@@ -205,20 +225,18 @@ static void entry_set_tuple_real (Entry * entry, Tuple * tuple)
 
 static void entry_set_tuple (Playlist * playlist, Entry * entry, Tuple * tuple)
 {
-    if (entry->tuple != NULL)
+    if (entry->tuple)
     {
         playlist->total_length -= entry->length;
-
         if (entry->selected)
             playlist->selected_length -= entry->length;
     }
 
     entry_set_tuple_real (entry, tuple);
 
-    if (tuple != NULL)
+    if (tuple)
     {
         playlist->total_length += entry->length;
-
         if (entry->selected)
             playlist->selected_length += entry->length;
     }
@@ -230,10 +248,35 @@ static void entry_set_failed (Playlist * playlist, Entry * entry)
     entry->failed = TRUE;
 }
 
-static Entry * entry_new (gchar * filename, PluginHandle * decoder, Tuple *
- tuple)
+static void entry_cancel_scan (Entry * entry)
 {
-    Entry * entry = g_malloc (sizeof (Entry));
+    GList * next;
+    for (GList * node = scan_queue.head; node; node = next)
+    {
+        ScanItem * item = node->data;
+        next = node->next;
+
+        if (item->entry == entry)
+        {
+            g_queue_delete_link (& scan_queue, node);
+            g_slice_free (ScanItem, item);
+        }
+    }
+
+    for (int i = 0; i < SCAN_THREADS; i ++)
+    {
+        if (scan_items[i] && scan_items[i]->entry == entry)
+        {
+            g_slice_free (ScanItem, scan_items[i]);
+            scan_items[i] = NULL;
+        }
+    }
+}
+
+static Entry * entry_new (char * filename, Tuple * tuple,
+ PluginHandle * decoder)
+{
+    Entry * entry = g_slice_new (Entry);
 
     entry->filename = filename;
     entry->decoder = decoder;
@@ -248,7 +291,8 @@ static Entry * entry_new (gchar * filename, PluginHandle * decoder, Tuple *
     entry->shuffle_num = 0;
     entry->queued = FALSE;
     entry->segmented = FALSE;
-    entry->start = entry->end = -1;
+    entry->start = 0;
+    entry->end = -1;
 
     entry_set_tuple_real (entry, tuple);
     return entry;
@@ -256,36 +300,41 @@ static Entry * entry_new (gchar * filename, PluginHandle * decoder, Tuple *
 
 static void entry_free (Entry * entry)
 {
-    g_free(entry->filename);
+    entry_cancel_scan (entry);
 
-    if (entry->tuple != NULL)
-        tuple_free(entry->tuple);
+    str_unref (entry->filename);
+    if (entry->tuple)
+        tuple_unref (entry->tuple);
 
-    g_free (entry->formatted);
-    stringpool_unref (entry->title);
-    stringpool_unref (entry->artist);
-    stringpool_unref (entry->album);
-    g_free (entry);
+    str_unref (entry->formatted);
+    str_unref (entry->title);
+    str_unref (entry->artist);
+    str_unref (entry->album);
+    g_slice_free (Entry, entry);
 }
 
-static void entry_check_has_decoder (Playlist * playlist, Entry * entry)
+static int new_unique_id (int preferred)
 {
-    if (entry->decoder != NULL || entry->failed)
-        return;
+    if (preferred >= 0 && ! g_hash_table_lookup_extended (unique_id_table,
+     GINT_TO_POINTER (preferred), NULL, NULL))
+        return preferred;
 
-    entry->decoder = file_find_decoder (entry->filename, FALSE);
-    if (! entry->decoder)
-        entry_set_failed (playlist, entry);
+    while (g_hash_table_lookup_extended (unique_id_table,
+     GINT_TO_POINTER (next_unique_id), NULL, NULL))
+        next_unique_id ++;
+
+    return next_unique_id ++;
 }
 
-static Playlist * playlist_new (void)
+static Playlist * playlist_new (int id)
 {
-    Playlist * playlist = g_malloc (sizeof (Playlist));
+    Playlist * playlist = g_slice_new (Playlist);
 
     playlist->number = -1;
-    playlist->unique_id = next_unique_id ++;
+    playlist->unique_id = new_unique_id (id);
     playlist->filename = NULL;
-    playlist->title = g_strdup(_("Untitled Playlist"));
+    playlist->title = str_get (_(default_title));
+    playlist->modified = TRUE;
     playlist->entries = index_new();
     playlist->position = NULL;
     playlist->selected_count = 0;
@@ -293,435 +342,459 @@ static Playlist * playlist_new (void)
     playlist->queued = NULL;
     playlist->total_length = 0;
     playlist->selected_length = 0;
+    playlist->scanning = FALSE;
+    playlist->scan_ending = FALSE;
 
+    memset (& playlist->last_update, 0, sizeof (Update));
+    memset (& playlist->next_update, 0, sizeof (Update));
+
+    g_hash_table_insert (unique_id_table, GINT_TO_POINTER (playlist->unique_id), playlist);
     return playlist;
 }
 
 static void playlist_free (Playlist * playlist)
 {
-    gint count;
+    g_hash_table_insert (unique_id_table, GINT_TO_POINTER (playlist->unique_id), NULL);
 
-    g_free(playlist->filename);
-    g_free(playlist->title);
+    str_unref (playlist->filename);
+    str_unref (playlist->title);
 
-    for (count = 0; count < index_count(playlist->entries); count++)
-        entry_free(index_get(playlist->entries, count));
+    for (int count = 0; count < index_count (playlist->entries); count ++)
+        entry_free (index_get (playlist->entries, count));
 
-    index_free(playlist->entries);
-    g_list_free(playlist->queued);
-    g_free(playlist);
+    index_free (playlist->entries);
+    g_list_free (playlist->queued);
+    g_slice_free (Playlist, playlist);
 }
 
-static void number_playlists(gint at, gint length)
+static void number_playlists (int at, int length)
 {
-    gint count;
-
-    for (count = 0; count < length; count++)
+    for (int count = 0; count < length; count ++)
     {
         Playlist * playlist = index_get (playlists, at + count);
         playlist->number = at + count;
     }
 }
 
-static Playlist * lookup_playlist (gint playlist_num)
+static Playlist * lookup_playlist (int playlist_num)
 {
-    /* Not initted or already shut down */
-    if (! playlists)
-        return NULL;
-
-    if (playlist_num < 0 || playlist_num >= index_count(playlists))
-        return NULL;
-
-    return index_get(playlists, playlist_num);
+    return (playlists && playlist_num >= 0 && playlist_num < index_count
+     (playlists)) ? index_get (playlists, playlist_num) : NULL;
 }
 
-static void number_entries (Playlist * playlist, gint at, gint length)
+static void number_entries (Playlist * playlist, int at, int length)
 {
-    gint count;
-
-    for (count = 0; count < length; count++)
+    for (int count = 0; count < length; count ++)
     {
         Entry * entry = index_get (playlist->entries, at + count);
         entry->number = at + count;
     }
 }
 
-static Entry * lookup_entry (Playlist * playlist, gint entry_num)
+static Entry * lookup_entry (Playlist * playlist, int entry_num)
 {
-    if (entry_num < 0 || entry_num >= index_count(playlist->entries))
-        return NULL;
-
-    return index_get(playlist->entries, entry_num);
+    return (entry_num >= 0 && entry_num < index_count (playlist->entries)) ?
+     index_get (playlist->entries, entry_num) : NULL;
 }
 
-static gboolean update (void * unused)
+static bool_t update (void * unused)
 {
-    hook_call ("playlist update", GINT_TO_POINTER (update_level));
-    update_source = 0;
+    ENTER;
+
+    for (int i = 0; i < index_count (playlists); i ++)
+    {
+        Playlist * p = index_get (playlists, i);
+        memcpy (& p->last_update, & p->next_update, sizeof (Update));
+        memset (& p->next_update, 0, sizeof (Update));
+    }
+
+    int level = update_level;
+    update_level = 0;
+
+    if (update_source)
+    {
+        g_source_remove (update_source);
+        update_source = 0;
+    }
+
+    LEAVE;
+
+    hook_call ("playlist update", GINT_TO_POINTER (level));
     return FALSE;
 }
 
-static void queue_update (gint level, Playlist * list, gint at, gint count)
+static void queue_update (int level, int list, int at, int count)
 {
-    if (! update_source)
+    Playlist * p = lookup_playlist (list);
+
+    if (p)
     {
-        update_source = g_idle_add_full (G_PRIORITY_HIGH_IDLE, update, NULL,
-         NULL);
-        update_level = 0;
-        update_playlist = list;
-        unchanged_before = list ? index_count (list->entries) : 0;
-        unchanged_after = list ? index_count (list->entries) : 0;
+        if (level >= PLAYLIST_UPDATE_METADATA)
+        {
+            p->modified = TRUE;
+
+            if (! get_bool (NULL, "metadata_on_play"))
+            {
+                p->scanning = TRUE;
+                p->scan_ending = FALSE;
+                scan_trigger ();
+            }
+        }
+
+        if (p->next_update.level)
+        {
+            p->next_update.level = MAX (p->next_update.level, level);
+            p->next_update.before = MIN (p->next_update.before, at);
+            p->next_update.after = MIN (p->next_update.after,
+             index_count (p->entries) - at - count);
+        }
+        else
+        {
+            p->next_update.level = level;
+            p->next_update.before = at;
+            p->next_update.after = index_count (p->entries) - at - count;
+        }
     }
 
     update_level = MAX (update_level, level);
 
-    if (list && list == update_playlist)
-    {
-        unchanged_before = MIN (unchanged_before, at);
-        unchanged_after = MIN (unchanged_after, index_count (list->entries) - at
-         - count);
-    }
-    else
-    {
-        update_playlist = NULL;
-        unchanged_before = 0;
-        unchanged_after = 0;
-    }
+    if (! update_source)
+        update_source = g_idle_add_full (G_PRIORITY_HIGH, update, NULL, NULL);
 }
 
-gboolean playlist_update_pending (void)
+bool_t playlist_update_pending (void)
 {
-    return update_source ? TRUE : FALSE;
+    ENTER;
+    bool_t pending = update_level ? TRUE : FALSE;
+    LEAVE_RET (pending);
 }
 
-gboolean playlist_update_range (gint * playlist, gint * at, gint * count)
+int playlist_updated_range (int playlist_num, int * at, int * count)
 {
-    g_return_val_if_fail (update_source, FALSE);
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST_RET (0);
 
-    if (! update_playlist)
-        return FALSE;
+    Update * u = & playlist->last_update;
 
-    * playlist = update_playlist->number;
-    * at = unchanged_before;
-    * count = index_count (update_playlist->entries) - unchanged_before -
-     unchanged_after;
-    return TRUE;
+    int level = u->level;
+    * at = u->before;
+    * count = index_count (playlist->entries) - u->before - u->after;
+
+    LEAVE_RET (level);
 }
 
-/* scan_mutex must be locked! */
-void scan_receive (void)
+bool_t playlist_scan_in_progress (int playlist_num)
 {
-    for (gint i = 0; i < SCAN_THREADS; i ++)
-    {
-        if (! scan_filenames[i] || scan_decoders[i])
-            continue; /* thread not in use or still working */
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST_RET (FALSE);
 
-        Entry * entry = index_get (active_playlist->entries, scan_positions[i]);
+    bool_t scanning = playlist->scanning || playlist->scan_ending;
 
-        if (scan_tuples[i])
-            entry_set_tuple (active_playlist, entry, scan_tuples[i]);
-        else
-            entry_set_failed (active_playlist, entry);
-
-        scan_filenames[i] = NULL;
-        scan_tuples[i] = NULL;
-
-        queue_update (PLAYLIST_UPDATE_METADATA, active_playlist,
-         scan_positions[i], 1);
-    }
+    LEAVE_RET (scanning);
 }
 
-static gboolean scan_next (void * unused)
+static bool_t entry_scan_is_queued (Entry * entry)
 {
-    gint entries = index_count (active_playlist->entries);
-    gint search = 0;
-
-    g_mutex_lock (scan_mutex);
-
-    if (scan_source)
+    for (GList * node = scan_queue.head; node; node = node->next)
     {
-        g_source_remove (scan_source);
-        scan_source = 0;
+        ScanItem * item = node->data;
+        if (item->entry == entry)
+            return TRUE;
     }
 
-    scan_receive ();
-
-    for (gint i = 0; i < SCAN_THREADS; i ++)
-        search = MAX (search, scan_positions[i] + 1);
-
-    for (gint i = 0; i < SCAN_THREADS; i ++)
+    for (int i = 0; i < SCAN_THREADS; i ++)
     {
-        if (scan_filenames[i])
-            continue; /* thread already in use */
-
-        for (; search < entries; search ++)
-        {
-            Entry * entry = index_get (active_playlist->entries, search);
-
-            if (entry->tuple)
-                continue;
-
-            entry_check_has_decoder (active_playlist, entry);
-            if (entry->failed)
-                continue;
-
-            vfs_prepare_filename (entry->filename);
-
-            scan_positions[i] = search;
-            scan_filenames[i] = entry->filename;
-            scan_decoders[i] = entry->decoder;
-            g_cond_signal (scan_conds[i]);
-
-            search ++;
-            break;
-        }
+        if (scan_items[i] && scan_items[i]->entry == entry)
+            return TRUE;
     }
 
-    g_mutex_unlock (scan_mutex);
     return FALSE;
 }
 
-static void scan_continue (void)
+static void entry_queue_scan (Playlist * playlist, Entry * entry)
 {
-    if (! scan_source)
-        scan_source = g_idle_add_full (G_PRIORITY_LOW, scan_next, NULL, NULL);
+    if (entry_scan_is_queued (entry))
+        return;
+
+    ScanItem * item = g_slice_new (ScanItem);
+    item->playlist = playlist;
+    item->entry = entry;
+    g_queue_push_tail (& scan_queue, item);
+
+    pthread_cond_broadcast (& cond);
 }
 
-static void scan_reset (void)
+static void check_scan_complete (Playlist * p)
 {
-    for (gint i = 0; i < SCAN_THREADS; i ++)
+    if (! p->scan_ending)
+        return;
+
+    for (GList * node = scan_queue.head; node; node = node->next)
     {
-        assert (! scan_filenames[i]); /* scan in progress == very, very bad */
-        scan_positions[i] = -1;
+        ScanItem * item = node->data;
+        if (item->playlist == p)
+            return;
     }
 
-    scan_continue ();
+    for (int i = 0; i < SCAN_THREADS; i ++)
+    {
+        if (scan_items[i] && scan_items[i]->playlist == p)
+            return;
+    }
+
+    p->scan_ending = FALSE;
+
+    event_queue_cancel ("playlist scan complete", NULL);
+    event_queue ("playlist scan complete", NULL);
 }
 
-static void scan_stop (void)
+static ScanItem * entry_find_to_scan (void)
 {
-    g_mutex_lock (scan_mutex);
+    ScanItem * item = g_queue_pop_head (& scan_queue);
+    if (item)
+        return item;
 
-    if (scan_source != 0)
+    while (scan_playlist < index_count (playlists))
     {
-        g_source_remove (scan_source);
-        scan_source = 0;
+        Playlist * playlist = index_get (playlists, scan_playlist);
+
+        if (playlist->scanning)
+        {
+            while (scan_row < index_count (playlist->entries))
+            {
+                Entry * entry = index_get (playlist->entries, scan_row);
+
+                if (! entry->tuple && ! entry_scan_is_queued (entry))
+                {
+                    item = g_slice_new (ScanItem);
+                    item->playlist = playlist;
+                    item->entry = entry;
+                    return item;
+                }
+
+                scan_row ++;
+            }
+
+            playlist->scanning = FALSE;
+            playlist->scan_ending = TRUE;
+            check_scan_complete (playlist);
+        }
+
+        scan_playlist ++;
+        scan_row = 0;
     }
 
-    for (gint i = 0; i < SCAN_THREADS; i ++)
-    {
-        if (! scan_filenames[i])
-            continue;
-
-        while (scan_decoders[i])
-            g_cond_wait (scan_conds[i], scan_mutex);
-    }
-
-    scan_receive ();
-    g_mutex_unlock (scan_mutex);
+    return NULL;
 }
 
 static void * scanner (void * data)
 {
-    gint i = GPOINTER_TO_INT (data);
+    ENTER;
 
-    g_mutex_lock (scan_mutex);
-    g_cond_signal (scan_conds[i]);
+    int i = GPOINTER_TO_INT (data);
 
+    while (! scan_quit)
+    {
+        if (! scan_items[i])
+            scan_items[i] = entry_find_to_scan ();
+
+        if (! scan_items[i])
+        {
+            pthread_cond_wait (& cond, & mutex);
+            continue;
+        }
+
+        Playlist * playlist = scan_items[i]->playlist;
+        Entry * entry = scan_items[i]->entry;
+        char * filename = str_ref (entry->filename);
+        PluginHandle * decoder = entry->decoder;
+        bool_t need_tuple = entry->tuple ? FALSE : TRUE;
+
+        LEAVE;
+
+        if (! decoder)
+            decoder = file_find_decoder (filename, FALSE);
+
+        Tuple * tuple = (need_tuple && decoder) ? file_read_tuple (filename, decoder) : NULL;
+
+        ENTER;
+
+        str_unref (filename);
+
+        if (! scan_items[i]) /* scan canceled */
+        {
+            if (tuple)
+                tuple_unref (tuple);
+            continue;
+        }
+
+        entry->decoder = decoder;
+
+        if (tuple)
+        {
+            entry_set_tuple (playlist, entry, tuple);
+            queue_update (PLAYLIST_UPDATE_METADATA, playlist->number, entry->number, 1);
+        }
+        else if (need_tuple || ! decoder)
+        {
+            entry_set_failed (playlist, entry);
+            queue_update (PLAYLIST_UPDATE_METADATA, playlist->number, entry->number, 1);
+        }
+
+        g_slice_free (ScanItem, scan_items[i]);
+        scan_items[i] = NULL;
+
+        pthread_cond_broadcast (& cond);
+        check_scan_complete (playlist);
+    }
+
+    LEAVE_RET (NULL);
+}
+
+static void scan_trigger (void)
+{
+    scan_playlist = 0;
+    scan_row = 0;
+    pthread_cond_broadcast (& cond);
+}
+
+/* mutex may be unlocked during the call */
+static Entry * get_entry (int playlist_num, int entry_num,
+ bool_t need_decoder, bool_t need_tuple)
+{
     while (1)
     {
-        g_cond_wait (scan_conds[i], scan_mutex);
+        Playlist * playlist = lookup_playlist (playlist_num);
+        Entry * entry = playlist ? lookup_entry (playlist, entry_num) : NULL;
 
-        if (scan_quit)
-            break;
+        if (! entry || entry->failed)
+            return entry;
 
-        if (! scan_filenames[i])
+        if ((need_decoder && ! entry->decoder) || (need_tuple && ! entry->tuple))
+        {
+            entry_queue_scan (playlist, entry);
+            pthread_cond_wait (& cond, & mutex);
             continue;
+        }
 
-        scan_tuples[i] = file_read_tuple (scan_filenames[i], scan_decoders[i]);
-        scan_decoders[i] = NULL;
-        g_cond_signal (scan_conds[i]);
-        scan_continue ();
+        return entry;
     }
-
-    g_mutex_unlock (scan_mutex);
-    return NULL;
 }
 
-/* As soon as we know the caller is looking for metadata, we start the threaded
- * scanner.  Though it may be faster in the short run simply to scan the entry
- * we are concerned with in the main thread, this is better in the long run
- * because the scanner can work on the following entries while the caller is
- * processing this one. */
-static gboolean scan_threaded (Playlist * playlist, Entry * entry)
+/* mutex may be unlocked during the call */
+static Entry * get_playback_entry (bool_t need_decoder, bool_t need_tuple)
 {
-    gint i;
-
-    if (playlist != active_playlist)
-        return FALSE;
-
-    scan_next (NULL);
-
-    if (entry->tuple)
-        return TRUE;
-
-    for (i = 0; i < SCAN_THREADS; i ++)
+    while (1)
     {
-        if (entry->number == scan_positions[i])
-            goto FOUND;
+        Entry * entry = playing_playlist ? playing_playlist->position : NULL;
+
+        if (! entry || entry->failed)
+            return entry;
+
+        if ((need_decoder && ! entry->decoder) || (need_tuple && ! entry->tuple))
+        {
+            entry_queue_scan (playing_playlist, entry);
+            pthread_cond_wait (& cond, & mutex);
+            continue;
+        }
+
+        return entry;
     }
-
-    return FALSE;
-
-FOUND:
-    g_mutex_lock (scan_mutex);
-    scan_receive ();
-
-    while (scan_filenames[i])
-    {
-        g_cond_wait (scan_conds[i], scan_mutex);
-        scan_receive ();
-    }
-
-    g_mutex_unlock (scan_mutex);
-    return TRUE;
-}
-
-static void check_scanned (Playlist * playlist, Entry * entry)
-{
-    if (entry->tuple)
-        return;
-    if (scan_threaded (playlist, entry))
-        return;
-
-    entry_check_has_decoder (playlist, entry);
-    if (entry->failed)
-        return;
-
-    entry_set_tuple (playlist, entry, file_read_tuple (entry->filename,
-     entry->decoder));
-    if (! entry->tuple)
-        entry_set_failed (playlist, entry);
-
-    queue_update (PLAYLIST_UPDATE_METADATA, playlist, entry->number, 1);
-}
-
-static void check_selected_scanned (Playlist * playlist)
-{
-    gint entries = index_count (playlist->entries);
-    for (gint count = 0; count < entries; count++)
-    {
-        Entry * entry = index_get (playlist->entries, count);
-        if (entry->selected)
-            check_scanned (playlist, entry);
-    }
-}
-
-static void check_all_scanned (Playlist * playlist)
-{
-    gint entries = index_count (playlist->entries);
-    for (gint count = 0; count < entries; count++)
-        check_scanned (playlist, index_get (playlist->entries, count));
 }
 
 void playlist_init (void)
 {
     srand (time (NULL));
 
+    ENTER;
+
+    unique_id_table = g_hash_table_new (g_direct_hash, g_direct_equal);
     playlists = index_new ();
-    Playlist * playlist = playlist_new ();
-    index_append (playlists, playlist);
-    playlist->number = 0;
-    active_playlist = playlist;
-    playing_playlist = NULL;
 
-    update_source = 0;
+    update_level = 0;
 
-    scan_mutex = g_mutex_new ();
-    memset (scan_filenames, 0, sizeof scan_filenames);
-    memset (scan_decoders, 0, sizeof scan_decoders);
-    memset (scan_tuples, 0, sizeof scan_tuples);
-    scan_source = 0;
     scan_quit = FALSE;
+    scan_playlist = scan_row = 0;
 
-    g_mutex_lock (scan_mutex);
+    for (int i = 0; i < SCAN_THREADS; i ++)
+        pthread_create (& scan_threads[i], NULL, scanner, GINT_TO_POINTER (i));
 
-    for (gint i = 0; i < SCAN_THREADS; i ++)
-    {
-        scan_conds[i] = g_cond_new ();
-        scan_threads[i] = g_thread_create (scanner, GINT_TO_POINTER (i), TRUE,
-         NULL);
-        g_cond_wait (scan_conds[i], scan_mutex);
-    }
-
-    g_mutex_unlock (scan_mutex);
-
-    scan_reset ();
+    LEAVE;
 }
 
-void playlist_end(void)
+void playlist_end (void)
 {
-    gint count;
+    ENTER;
 
-    scan_stop ();
     scan_quit = TRUE;
+    pthread_cond_broadcast (& cond);
 
-    for (gint i = 0; i < SCAN_THREADS; i ++)
+    LEAVE;
+
+    for (int i = 0; i < SCAN_THREADS; i ++)
+        pthread_join (scan_threads[i], NULL);
+
+    ENTER;
+
+    if (update_source)
     {
-        g_mutex_lock (scan_mutex);
-        g_cond_signal (scan_conds[i]);
-        g_mutex_unlock (scan_mutex);
-        g_thread_join (scan_threads[i]);
-        g_cond_free (scan_conds[i]);
+        g_source_remove (update_source);
+        update_source = 0;
     }
 
-    g_mutex_free (scan_mutex);
+    active_playlist = playing_playlist = NULL;
 
-    if (update_source != 0)
-        g_source_remove(update_source);
+    for (int i = 0; i < index_count (playlists); i ++)
+        playlist_free (index_get (playlists, i));
 
-    for (count = 0; count < index_count(playlists); count++)
-        playlist_free(index_get(playlists, count));
-
-    index_free(playlists);
+    index_free (playlists);
     playlists = NULL;
-    active_playlist = NULL;
-    playing_playlist = NULL;
+
+    g_hash_table_destroy (unique_id_table);
+    unique_id_table = NULL;
+
+    g_free (title_format);
+    title_format = NULL;
+
+    LEAVE;
 }
 
-gint playlist_count(void)
+int playlist_count (void)
 {
-    return index_count(playlists);
+    ENTER;
+    int count = index_count (playlists);
+    LEAVE_RET (count);
 }
 
-void playlist_insert(gint at)
+void playlist_insert_with_id (int at, int id)
 {
-    PLAYLIST_WILL_CHANGE;
+    ENTER;
 
-    if (at < 0 || at > index_count(playlists))
-        at = index_count(playlists);
+    if (at < 0 || at > index_count (playlists))
+        at = index_count (playlists);
 
-    if (at == index_count(playlists))
-        index_append(playlists, playlist_new());
-    else
-        index_insert(playlists, at, playlist_new());
+    index_insert (playlists, at, playlist_new (id));
+    number_playlists (at, index_count (playlists) - at);
 
-    number_playlists(at, index_count(playlists) - at);
-
-    PLAYLIST_HAS_CHANGED (NULL, 0, 0);
+    PLAYLIST_HAS_CHANGED (-1, 0, 0);
+    LEAVE;
 }
 
-void playlist_reorder (gint from, gint to, gint count)
+void playlist_insert (int at)
 {
-    struct index * displaced;
+    playlist_insert_with_id (at, -1);
+}
 
-    g_return_if_fail (from >= 0 && from + count <= index_count (playlists));
-    g_return_if_fail (to >= 0 && to + count <= index_count (playlists));
-    g_return_if_fail (count >= 0);
+void playlist_reorder (int from, int to, int count)
+{
+    ENTER;
+    if (from < 0 || from + count > index_count (playlists) || to < 0 || to +
+     count > index_count (playlists) || count < 0)
+        LEAVE_RET_VOID;
 
-    PLAYLIST_WILL_CHANGE;
-
-    displaced = index_new ();
+    Index * displaced = index_new ();
 
     if (to < from)
         index_copy_append (playlists, to, displaced, from - to);
@@ -743,140 +816,221 @@ void playlist_reorder (gint from, gint to, gint count)
 
     index_free (displaced);
 
-    PLAYLIST_HAS_CHANGED (NULL, 0, 0);
+    PLAYLIST_HAS_CHANGED (-1, 0, 0);
+    LEAVE;
 }
 
-void playlist_delete (gint playlist_num)
+void playlist_delete (int playlist_num)
 {
-    DECLARE_PLAYLIST;
+    if (playback_get_playing () && playlist_num == playlist_get_playing ())
+        playback_stop ();
 
+    ENTER;
+    DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    if (playlist == playing_playlist)
-    {
-        if (playback_get_playing ())
-            playback_stop ();
+    index_delete (playlists, playlist_num, 1);
+    playlist_free (playlist);
 
-        playing_playlist = NULL;
-    }
+    if (! index_count (playlists))
+        index_insert (playlists, 0, playlist_new (-1));
 
-    PLAYLIST_WILL_CHANGE;
-
-    playlist_free(playlist);
-    index_delete(playlists, playlist_num, 1);
-    number_playlists(playlist_num, index_count(playlists) - playlist_num);
-
-    if (index_count(playlists) == 0)
-        playlist_insert(0);
+    number_playlists (playlist_num, index_count (playlists) - playlist_num);
 
     if (playlist == active_playlist)
         active_playlist = index_get (playlists, MIN (playlist_num, index_count
          (playlists) - 1));
+    if (playlist == playing_playlist)
+        playing_playlist = NULL;
 
-    PLAYLIST_HAS_CHANGED (NULL, 0, 0);
+    PLAYLIST_HAS_CHANGED (-1, 0, 0);
+    LEAVE;
 }
 
-gint playlist_get_unique_id (gint playlist_num)
+int playlist_get_unique_id (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST_RET (-1);
-    return playlist->unique_id;
+
+    int unique_id = playlist->unique_id;
+
+    LEAVE_RET (unique_id);
 }
 
-gint playlist_by_unique_id (gint id)
+int playlist_by_unique_id (int id)
 {
-    g_return_val_if_fail (playlists, -1);
-    gint n = index_count (playlists);
+    ENTER;
 
-    for (gint i = 0; i < n; i ++)
+    Playlist * p = g_hash_table_lookup (unique_id_table, GINT_TO_POINTER (id));
+    int num = p ? p->number : -1;
+
+    LEAVE_RET (num);
+}
+
+void playlist_set_filename (int playlist_num, const char * filename)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST;
+
+    str_unref (playlist->filename);
+    playlist->filename = str_get (filename);
+    playlist->modified = TRUE;
+
+    METADATA_HAS_CHANGED (-1, 0, 0);
+    LEAVE;
+}
+
+char * playlist_get_filename (int playlist_num)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST_RET (NULL);
+
+    char * filename = str_ref (playlist->filename);
+
+    LEAVE_RET (filename);
+}
+
+void playlist_set_title (int playlist_num, const char * title)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST;
+
+    str_unref (playlist->title);
+    playlist->title = str_get (title);
+    playlist->modified = TRUE;
+
+    METADATA_HAS_CHANGED (-1, 0, 0);
+    LEAVE;
+}
+
+char * playlist_get_title (int playlist_num)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST_RET (NULL);
+
+    char * title = str_ref (playlist->title);
+
+    LEAVE_RET (title);
+}
+
+void playlist_set_modified (int playlist_num, bool_t modified)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST;
+
+    playlist->modified = modified;
+
+    LEAVE;
+}
+
+bool_t playlist_get_modified (int playlist_num)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST_RET (FALSE);
+
+    bool_t modified = playlist->modified;
+
+    LEAVE_RET (modified);
+}
+
+void playlist_set_active (int playlist_num)
+{
+    ENTER;
+    DECLARE_PLAYLIST;
+    LOOKUP_PLAYLIST;
+
+    bool_t changed = FALSE;
+
+    if (playlist != active_playlist)
     {
-        Playlist * p = index_get (playlists, i);
-        if (p->unique_id == id)
-            return p->number;
+        changed = TRUE;
+        active_playlist = playlist;
     }
 
-    return -1;
+    LEAVE;
+
+    if (changed)
+        hook_call ("playlist activate", NULL);
 }
 
-void playlist_set_filename(gint playlist_num, const gchar * filename)
+int playlist_get_active (void)
 {
+    ENTER;
+    int list = active_playlist ? active_playlist->number : -1;
+    LEAVE_RET (list);
+}
+
+void playlist_set_playing (int playlist_num)
+{
+    if (playback_get_playing ())
+        playback_stop ();
+
+    ENTER;
     DECLARE_PLAYLIST;
 
-    LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
-
-    g_free(playlist->filename);
-    playlist->filename = g_strdup(filename);
-
-    PLAYLIST_HAS_CHANGED (NULL, 0, 0);
-}
-
-const gchar *playlist_get_filename(gint playlist_num)
-{
-    DECLARE_PLAYLIST;
-
-    LOOKUP_PLAYLIST_RET (NULL);
-
-    return playlist->filename;
-}
-
-void playlist_set_title(gint playlist_num, const gchar * title)
-{
-    DECLARE_PLAYLIST;
-
-    LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
-
-    g_free(playlist->title);
-    playlist->title = g_strdup(title);
-
-    PLAYLIST_HAS_CHANGED (NULL, 0, 0);
-}
-
-const gchar *playlist_get_title(gint playlist_num)
-{
-    DECLARE_PLAYLIST;
-
-    LOOKUP_PLAYLIST_RET (NULL);
-
-    return playlist->title;
-}
-
-void playlist_set_active(gint playlist_num)
-{
-    DECLARE_PLAYLIST;
-
-    LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
-
-    active_playlist = playlist;
-
-    PLAYLIST_HAS_CHANGED (NULL, 0, 0);
-}
-
-gint playlist_get_active(void)
-{
-    return (active_playlist == NULL) ? -1 : active_playlist->number;
-}
-
-void playlist_set_playing(gint playlist_num)
-{
-    DECLARE_PLAYLIST;
-
-    if (playlist_num == -1)
+    if (playlist_num < 0)
         playlist = NULL;
     else
         LOOKUP_PLAYLIST;
 
-    if (playing_playlist != NULL && playback_get_playing ())
-        playback_stop();
-
     playing_playlist = playlist;
+
+    LEAVE;
+
+    hook_call ("playlist set playing", NULL);
 }
 
-gint playlist_get_playing(void)
+int playlist_get_playing (void)
 {
-    return (playing_playlist == NULL) ? -1 : playing_playlist->number;
+    ENTER;
+    int list = playing_playlist ? playing_playlist->number: -1;
+    LEAVE_RET (list);
+}
+
+int playlist_get_blank (void)
+{
+    int list = playlist_get_active ();
+    char * title = playlist_get_title (list);
+
+    if (strcmp (title, _(default_title)) || playlist_entry_count (list) > 0)
+    {
+        list = playlist_count ();
+        playlist_insert (list);
+    }
+
+    str_unref (title);
+    return list;
+}
+
+int playlist_get_temporary (void)
+{
+    int list, count = playlist_count ();
+    bool_t found = FALSE;
+
+    for (list = 0; list < count; list ++)
+    {
+        char * title = playlist_get_title (list);
+        found = ! strcmp (title, _(temp_title));
+        str_unref (title);
+
+        if (found)
+            break;
+    }
+
+    if (! found)
+    {
+        list = playlist_get_blank ();
+        playlist_set_title (list, _(temp_title));
+    }
+
+    return list;
 }
 
 /* If we are already at the song or it is already at the top of the shuffle
@@ -888,7 +1042,7 @@ static void set_position (Playlist * playlist, Entry * entry)
 
     playlist->position = entry;
 
-    if (entry == NULL)
+    if (! entry)
         return;
 
     if (! entry->shuffle_num || entry->shuffle_num != playlist->last_shuffle_num)
@@ -898,86 +1052,41 @@ static void set_position (Playlist * playlist, Entry * entry)
     }
 }
 
-gint playlist_entry_count(gint playlist_num)
+int playlist_entry_count (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST_RET (0);
 
-    return index_count(playlist->entries);
+    int count = index_count (playlist->entries);
+
+    LEAVE_RET (count);
 }
 
-static void make_entries (gchar * filename, PluginHandle * decoder, Tuple *
- tuple, struct index * list)
+void playlist_entry_insert_batch_raw (int playlist_num, int at,
+ Index * filenames, Index * tuples, Index * decoders)
 {
-    uri_check_utf8 (& filename, TRUE);
-
-    if (! tuple && ! decoder)
-        decoder = file_find_decoder (filename, TRUE);
-
-    if (! tuple && decoder && input_plugin_has_subtunes (decoder) && ! strchr
-     (filename, '?'))
-        tuple = file_read_tuple (filename, decoder);
-
-    if (tuple != NULL && tuple->nsubtunes > 0)
-    {
-        gint subtune;
-
-        for (subtune = 0; subtune < tuple->nsubtunes; subtune++)
-        {
-            gchar *name = g_strdup_printf("%s?%d", filename, (tuple->subtunes == NULL) ? 1 + subtune : tuple->subtunes[subtune]);
-            make_entries(name, decoder, NULL, list);
-        }
-
-        g_free(filename);
-        tuple_free(tuple);
-    }
-    else
-        index_append(list, entry_new(filename, decoder, tuple));
-}
-
-void playlist_entry_insert(gint playlist_num, gint at, gchar * filename, Tuple * tuple)
-{
-    struct index *filenames = index_new();
-    struct index *tuples = index_new();
-
-    index_append(filenames, filename);
-    index_append(tuples, tuple);
-
-    playlist_entry_insert_batch_with_decoders (playlist_num, at, filenames,
-     NULL, tuples);
-}
-
-void playlist_entry_insert_batch (gint playlist_num, gint at,
- struct index * filenames, struct index * tuples)
-{
-    playlist_entry_insert_batch_with_decoders (playlist_num, at, filenames,
-     NULL, tuples);
-}
-
-void playlist_entry_insert_batch_with_decoders (gint playlist_num, gint at,
- struct index * filenames, struct index * decoders, struct index * tuples)
-{
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
 
-    gint entries = index_count (playlist->entries);
+    int entries = index_count (playlist->entries);
 
     if (at < 0 || at > entries)
         at = entries;
 
-    gint number = index_count (filenames);
-    struct index * add = index_new ();
+    int number = index_count (filenames);
 
-    /* Preallocate space to avoid reallocs.  (The actual number of entries may
-     * turn out to be greater due to subtunes.) */
+    Index * add = index_new ();
     index_allocate (add, number);
 
-    for (gint count = 0; count < number; count ++)
-        make_entries (index_get (filenames, count), decoders ? index_get
-         (decoders, count) : NULL, tuples ? index_get (tuples, count) : NULL,
-         add);
+    for (int i = 0; i < number; i ++)
+    {
+        char * filename = index_get (filenames, i);
+        Tuple * tuple = tuples ? index_get (tuples, i) : NULL;
+        PluginHandle * decoder = decoders ? index_get (decoders, i) : NULL;
+        index_append (add, entry_new (filename, tuple, decoder));
+    }
 
     index_free (filenames);
     if (decoders)
@@ -989,184 +1098,137 @@ void playlist_entry_insert_batch_with_decoders (gint playlist_num, gint at,
     index_merge_insert (playlist->entries, at, add);
     index_free (add);
 
-    number_entries(playlist, at, entries + number - at);
+    number_entries (playlist, at, entries + number - at);
 
-    for (gint count = 0; count < number; count ++)
+    for (int count = 0; count < number; count ++)
     {
         Entry * entry = index_get (playlist->entries, at + count);
         playlist->total_length += entry->length;
     }
 
-    PLAYLIST_HAS_CHANGED (playlist, at, number);
+    PLAYLIST_HAS_CHANGED (playlist->number, at, number);
+    LEAVE;
 }
 
-void playlist_entry_delete(gint playlist_num, gint at, gint number)
+void playlist_entry_delete (int playlist_num, int at, int number)
 {
+    if (playback_get_playing () && playlist_num == playlist_get_playing () &&
+     playlist_get_position (playlist_num) >= at && playlist_get_position
+     (playlist_num) < at + number)
+        playback_stop ();
+
+    ENTER;
     DECLARE_PLAYLIST;
-    gboolean stop = FALSE;
-    gint entries, count;
-
     LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
 
-    entries = index_count (playlist->entries);
+    int entries = index_count (playlist->entries);
 
     if (at < 0 || at > entries)
         at = entries;
     if (number < 0 || number > entries - at)
         number = entries - at;
 
-    for (count = 0; count < number; count++)
+    if (playlist->position && playlist->position->number >= at &&
+     playlist->position->number < at + number)
+        set_position (playlist, NULL);
+
+    for (int count = 0; count < number; count ++)
     {
         Entry * entry = index_get (playlist->entries, at + count);
 
-        if (entry == playlist->position)
-        {
-            stop = (playlist == playing_playlist);
-            set_position (playlist, NULL);
-        }
+        if (entry->queued)
+            playlist->queued = g_list_remove (playlist->queued, entry);
 
         if (entry->selected)
         {
-            playlist->selected_count--;
+            playlist->selected_count --;
             playlist->selected_length -= entry->length;
         }
 
-        if (entry->queued)
-            playlist->queued = g_list_remove(playlist->queued, entry);
-
         playlist->total_length -= entry->length;
-
-        entry_free(entry);
+        entry_free (entry);
     }
 
     index_delete (playlist->entries, at, number);
     number_entries (playlist, at, entries - at - number);
 
-    if (stop && playback_get_playing ())
+    PLAYLIST_HAS_CHANGED (playlist->number, at, 0);
+    LEAVE;
+}
+
+char * playlist_entry_get_filename (int playlist_num, int entry_num)
+{
+    ENTER;
+    DECLARE_PLAYLIST_ENTRY;
+    LOOKUP_PLAYLIST_ENTRY_RET (NULL);
+
+    char * filename = str_ref (entry->filename);
+
+    LEAVE_RET (filename);
+}
+
+PluginHandle * playlist_entry_get_decoder (int playlist_num, int entry_num, bool_t fast)
+{
+    ENTER;
+
+    Entry * entry = get_entry (playlist_num, entry_num, ! fast, FALSE);
+    PluginHandle * decoder = entry ? entry->decoder : NULL;
+
+    LEAVE_RET (decoder);
+}
+
+Tuple * playlist_entry_get_tuple (int playlist_num, int entry_num, bool_t fast)
+{
+    ENTER;
+
+    Entry * entry = get_entry (playlist_num, entry_num, FALSE, ! fast);
+    Tuple * tuple = entry ? entry->tuple : NULL;
+
+    if (tuple)
+        tuple_ref (tuple);
+
+    LEAVE_RET (tuple);
+}
+
+char * playlist_entry_get_title (int playlist_num, int entry_num, bool_t fast)
+{
+    ENTER;
+
+    Entry * entry = get_entry (playlist_num, entry_num, FALSE, ! fast);
+    char * title = entry ? str_ref (entry->formatted ? entry->formatted : entry->filename) : NULL;
+
+    LEAVE_RET (title);
+}
+
+void playlist_entry_describe (int playlist_num, int entry_num,
+ char * * title, char * * artist, char * * album, bool_t fast)
+{
+    ENTER;
+
+    Entry * entry = get_entry (playlist_num, entry_num, FALSE, ! fast);
+    * title = (entry && entry->title) ? str_ref (entry->title) : NULL;
+    * artist = (entry && entry->artist) ? str_ref (entry->artist) : NULL;
+    * album = (entry && entry->album) ? str_ref (entry->album) : NULL;
+
+    LEAVE;
+}
+
+int playlist_entry_get_length (int playlist_num, int entry_num, bool_t fast)
+{
+    ENTER;
+
+    Entry * entry = get_entry (playlist_num, entry_num, FALSE, ! fast);
+    int length = entry ? entry->length : 0;
+
+    LEAVE_RET (length);
+}
+
+void playlist_set_position (int playlist_num, int entry_num)
+{
+    if (playback_get_playing () && playlist_num == playlist_get_playing ())
         playback_stop ();
 
-    PLAYLIST_HAS_CHANGED (playlist, at, 0);
-}
-
-const gchar *playlist_entry_get_filename(gint playlist_num, gint entry_num)
-{
-    DECLARE_PLAYLIST_ENTRY;
-
-    LOOKUP_PLAYLIST_ENTRY_RET (NULL);
-
-    return entry->filename;
-}
-
-PluginHandle * playlist_entry_get_decoder (gint playlist_num, gint entry_num,
- gboolean fast)
-{
-    DECLARE_PLAYLIST_ENTRY;
-    LOOKUP_PLAYLIST_ENTRY_RET (NULL);
-
-    if (! fast)
-        entry_check_has_decoder (playlist, entry);
-
-    return entry->decoder;
-}
-
-void playlist_entry_set_tuple (gint playlist_num, gint entry_num, Tuple * tuple)
-{
-    DECLARE_PLAYLIST_ENTRY;
-
-    LOOKUP_PLAYLIST_ENTRY;
-    METADATA_WILL_CHANGE;
-
-    entry_set_tuple (playlist, entry, tuple);
-
-    METADATA_HAS_CHANGED (playlist, entry_num, 1);
-}
-
-const Tuple * playlist_entry_get_tuple (gint playlist_num, gint entry_num,
- gboolean fast)
-{
-    DECLARE_PLAYLIST_ENTRY;
-    LOOKUP_PLAYLIST_ENTRY_RET (NULL);
-
-    if (! fast)
-        check_scanned (playlist, entry);
-
-    return entry->tuple;
-}
-
-const gchar * playlist_entry_get_title (gint playlist_num, gint entry_num,
- gboolean fast)
-{
-    DECLARE_PLAYLIST_ENTRY;
-    LOOKUP_PLAYLIST_ENTRY_RET (NULL);
-
-    if (! fast)
-        check_scanned (playlist, entry);
-
-    return (entry->formatted == NULL) ? entry->filename : entry->formatted;
-}
-
-void playlist_entry_describe (gint playlist_num, gint entry_num,
- const gchar * * title, const gchar * * artist, const gchar * * album,
- gboolean fast)
-{
-    * title = * artist = * album = NULL;
-    DECLARE_PLAYLIST_ENTRY;
-    LOOKUP_PLAYLIST_ENTRY;
-
-    if (! fast)
-        check_scanned (playlist, entry);
-
-    if (entry->title)
-    {
-        * title = entry->title;
-        * artist = entry->artist;
-        * album = entry->album;
-    }
-    else
-        * title = entry->filename;
-}
-
-gint playlist_entry_get_length (gint playlist_num, gint entry_num, gboolean fast)
-{
-    DECLARE_PLAYLIST_ENTRY;
-    LOOKUP_PLAYLIST_ENTRY_RET (0);
-
-    if (! fast)
-        check_scanned (playlist, entry);
-
-    return entry->length;
-}
-
-gboolean playlist_entry_is_segmented(gint playlist_num, gint entry_num)
-{
-    DECLARE_PLAYLIST_ENTRY;
-
-    LOOKUP_PLAYLIST_ENTRY_RET (FALSE);
-
-    return entry->segmented;
-}
-
-gint playlist_entry_get_start_time (gint playlist_num, gint entry_num)
-{
-    DECLARE_PLAYLIST_ENTRY;
-
-    LOOKUP_PLAYLIST_ENTRY_RET (-1);
-
-    return entry->start;
-}
-
-gint playlist_entry_get_end_time (gint playlist_num, gint entry_num)
-{
-    DECLARE_PLAYLIST_ENTRY;
-
-    LOOKUP_PLAYLIST_ENTRY_RET (-1);
-
-    return entry->end;
-}
-
-void playlist_set_position (gint playlist_num, gint entry_num)
-{
+    ENTER;
     DECLARE_PLAYLIST_ENTRY;
 
     if (entry_num == -1)
@@ -1177,31 +1239,32 @@ void playlist_set_position (gint playlist_num, gint entry_num)
     else
         LOOKUP_PLAYLIST_ENTRY;
 
-    if (playlist == playing_playlist && playback_get_playing ())
-        playback_stop ();
-
     set_position (playlist, entry);
+    LEAVE;
 
     hook_call ("playlist position", GINT_TO_POINTER (playlist_num));
 }
 
-gint playlist_get_position(gint playlist_num)
+int playlist_get_position (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST_RET (-1);
 
-    return (playlist->position == NULL) ? -1 : playlist->position->number;
+    int position = playlist->position ? playlist->position->number : -1;
+
+    LEAVE_RET (position);
 }
 
-void playlist_entry_set_selected(gint playlist_num, gint entry_num, gboolean selected)
+void playlist_entry_set_selected (int playlist_num, int entry_num,
+ bool_t selected)
 {
+    ENTER;
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY;
 
     if (entry->selected == selected)
-        return;
+        LEAVE_RET_VOID;
 
     entry->selected = selected;
 
@@ -1216,36 +1279,42 @@ void playlist_entry_set_selected(gint playlist_num, gint entry_num, gboolean sel
         playlist->selected_length -= entry->length;
     }
 
-    SELECTION_HAS_CHANGED (playlist, entry_num, 1);
+    SELECTION_HAS_CHANGED (playlist->number, entry_num, 1);
+    LEAVE;
 }
 
-gboolean playlist_entry_get_selected(gint playlist_num, gint entry_num)
+bool_t playlist_entry_get_selected (int playlist_num, int entry_num)
 {
+    ENTER;
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY_RET (FALSE);
 
-    return entry->selected;
+    bool_t selected = entry->selected;
+
+    LEAVE_RET (selected);
 }
 
-gint playlist_selected_count(gint playlist_num)
+int playlist_selected_count (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST_RET (0);
 
-    return playlist->selected_count;
+    int selected_count = playlist->selected_count;
+
+    LEAVE_RET (selected_count);
 }
 
-void playlist_select_all (gint playlist_num, gboolean selected)
+void playlist_select_all (int playlist_num, bool_t selected)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    gint entries = index_count (playlist->entries);
-    gint first = entries, last = 0;
+    int entries = index_count (playlist->entries);
+    int first = entries, last = 0;
 
-    for (gint count = 0; count < entries; count ++)
+    for (int count = 0; count < entries; count ++)
     {
         Entry * entry = index_get (playlist->entries, count);
 
@@ -1269,21 +1338,22 @@ void playlist_select_all (gint playlist_num, gboolean selected)
     }
 
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist, first, last + 1 - first);
+        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+
+    LEAVE;
 }
 
-gint playlist_shift (gint playlist_num, gint entry_num, gint distance)
+int playlist_shift (int playlist_num, int entry_num, int distance)
 {
+    ENTER;
     DECLARE_PLAYLIST_ENTRY;
     LOOKUP_PLAYLIST_ENTRY_RET (0);
 
     if (! entry->selected || ! distance)
-        return 0;
+        LEAVE_RET (0);
 
-    PLAYLIST_WILL_CHANGE;
-
-    gint entries = index_count (playlist->entries);
-    gint shift = 0, center, top, bottom;
+    int entries = index_count (playlist->entries);
+    int shift = 0, center, top, bottom;
 
     if (distance < 0)
     {
@@ -1306,37 +1376,37 @@ gint playlist_shift (gint playlist_num, gint entry_num, gint distance)
 
     top = bottom = center;
 
-    for (gint i = 0; i < top; i ++)
+    for (int i = 0; i < top; i ++)
     {
         entry = index_get (playlist->entries, i);
         if (entry->selected)
             top = i;
     }
 
-    for (gint i = entries; i > bottom; i --)
+    for (int i = entries; i > bottom; i --)
     {
         entry = index_get (playlist->entries, i - 1);
         if (entry->selected)
             bottom = i;
     }
 
-    struct index * temp = index_new ();
+    Index * temp = index_new ();
 
-    for (gint i = top; i < center; i ++)
+    for (int i = top; i < center; i ++)
     {
         entry = index_get (playlist->entries, i);
         if (! entry->selected)
             index_append (temp, entry);
     }
 
-    for (gint i = top; i < bottom; i ++)
+    for (int i = top; i < bottom; i ++)
     {
         entry = index_get (playlist->entries, i);
         if (entry->selected)
             index_append (temp, entry);
     }
 
-    for (gint i = center; i < bottom; i ++)
+    for (int i = center; i < bottom; i ++)
     {
         entry = index_get (playlist->entries, i);
         if (! entry->selected)
@@ -1346,95 +1416,107 @@ gint playlist_shift (gint playlist_num, gint entry_num, gint distance)
     index_copy_set (temp, 0, playlist->entries, top, bottom - top);
 
     number_entries (playlist, top, bottom - top);
-    PLAYLIST_HAS_CHANGED (playlist, top, bottom - top);
+    PLAYLIST_HAS_CHANGED (playlist->number, top, bottom - top);
 
-    return shift;
+    LEAVE_RET (shift);
 }
 
-void playlist_delete_selected(gint playlist_num)
+void playlist_delete_selected (int playlist_num)
 {
+    if (playback_get_playing () && playlist_num == playlist_get_playing () &&
+     playlist_get_position (playlist_num) >= 0 && playlist_entry_get_selected
+     (playlist_num, playlist_get_position (playlist_num)))
+        playback_stop ();
+
+    ENTER;
     DECLARE_PLAYLIST;
-    gboolean stop = FALSE;
-    gint entries, count;
-    struct index *others;
-
     LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
 
-    entries = index_count (playlist->entries);
-    others = index_new();
+    if (! playlist->selected_count)
+        LEAVE_RET_VOID;
 
-    for (count = 0; count < entries; count++)
+    int entries = index_count (playlist->entries);
+
+    Index * others = index_new ();
+    index_allocate (others, entries - playlist->selected_count);
+
+    if (playlist->position && playlist->position->selected)
+        set_position (playlist, NULL);
+
+    int before = 0, after = 0;
+    bool_t found = FALSE;
+
+    for (int count = 0; count < entries; count++)
     {
         Entry * entry = index_get (playlist->entries, count);
 
         if (entry->selected)
         {
-            if (entry == playlist->position)
-            {
-                stop = (playlist == playing_playlist);
-                set_position (playlist, NULL);
-            }
-
             if (entry->queued)
-                playlist->queued = g_list_remove(playlist->queued, entry);
+                playlist->queued = g_list_remove (playlist->queued, entry);
 
             playlist->total_length -= entry->length;
+            entry_free (entry);
 
-            entry_free(entry);
+            found = TRUE;
+            after = 0;
         }
         else
-            index_append(others, entry);
+        {
+            index_append (others, entry);
+
+            if (found)
+                after ++;
+            else
+                before ++;
+        }
     }
 
-    index_free(playlist->entries);
+    index_free (playlist->entries);
     playlist->entries = others;
 
-    number_entries(playlist, 0, index_count(playlist->entries));
     playlist->selected_count = 0;
     playlist->selected_length = 0;
 
-    if (stop && playback_get_playing ())
-        playback_stop ();
-
-    PLAYLIST_HAS_CHANGED (playlist, 0, index_count (playlist->entries));
+    number_entries (playlist, before, index_count (playlist->entries) - before);
+    PLAYLIST_HAS_CHANGED (playlist->number, before, index_count
+     (playlist->entries) - after - before);
+    LEAVE;
 }
 
-void playlist_reverse(gint playlist_num)
+void playlist_reverse (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
-    gint entries, count;
-    struct index *reversed;
-
     LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
 
-    entries = index_count(playlist->entries);
-    reversed = index_new();
-    count = entries;
+    int entries = index_count (playlist->entries);
 
-    while (count--)
-        index_append(reversed, index_get(playlist->entries, count));
+    Index * reversed = index_new ();
+    index_allocate (reversed, entries);
 
-    index_free(playlist->entries);
+    for (int count = entries; count --; )
+        index_append (reversed, index_get (playlist->entries, count));
+
+    index_free (playlist->entries);
     playlist->entries = reversed;
 
-    number_entries(playlist, 0, entries);
-
-    PLAYLIST_HAS_CHANGED (playlist, 0, entries);
+    number_entries (playlist, 0, entries);
+    PLAYLIST_HAS_CHANGED (playlist->number, 0, entries);
+    LEAVE;
 }
 
-void playlist_randomize (gint playlist_num)
+void playlist_randomize (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
-    PLAYLIST_WILL_CHANGE;
 
-    gint entries = index_count (playlist->entries);
+    int entries = index_count (playlist->entries);
 
-    for (gint i = 0; i < entries; i ++)
+    for (int i = 0; i < entries; i ++)
     {
-        gint j = i + rand () % (entries - i);
+        int j = i + rand () % (entries - i);
 
         struct entry * entry = index_get (playlist->entries, j);
         index_set (playlist->entries, j, index_get (playlist->entries, i));
@@ -1442,15 +1524,17 @@ void playlist_randomize (gint playlist_num)
     }
 
     number_entries (playlist, 0, entries);
-    PLAYLIST_HAS_CHANGED (playlist, 0, entries);
+    PLAYLIST_HAS_CHANGED (playlist->number, 0, entries);
+    LEAVE;
 }
 
-static gint filename_compare (const void * _a, const void * _b, void * _compare)
+static int filename_compare (const void * _a, const void * _b, void * compare)
 {
     const Entry * a = _a, * b = _b;
-    gint (* compare) (const gchar * a, const gchar * b) = _compare;
 
-    gint diff = compare (a->filename, b->filename);
+    int diff = ((int (*) (const char * a, const char * b)) compare)
+     (a->filename, b->filename);
+
     if (diff)
         return diff;
 
@@ -1458,17 +1542,18 @@ static gint filename_compare (const void * _a, const void * _b, void * _compare)
     return a->number - b->number;
 }
 
-static gint tuple_compare (const void * _a, const void * _b, void * _compare)
+static int tuple_compare (const void * _a, const void * _b, void * compare)
 {
     const Entry * a = _a, * b = _b;
-    gint (* compare) (const Tuple * a, const Tuple * b) = _compare;
 
-    if (a->tuple == NULL)
-        return (b->tuple == NULL) ? 0 : -1;
-    if (b->tuple == NULL)
+    if (! a->tuple)
+        return b->tuple ? -1 : 0;
+    if (! b->tuple)
         return 1;
 
-    gint diff = compare (a->tuple, b->tuple);
+    int diff = ((int (*) (const Tuple * a, const Tuple * b)) compare)
+     (a->tuple, b->tuple);
+
     if (diff)
         return diff;
 
@@ -1476,13 +1561,14 @@ static gint tuple_compare (const void * _a, const void * _b, void * _compare)
     return a->number - b->number;
 }
 
-static gint title_compare (const void * _a, const void * _b, void * _compare)
+static int title_compare (const void * _a, const void * _b, void * compare)
 {
     const Entry * a = _a, * b = _b;
-    gint (* compare) (const gchar * a, const gchar * b) = _compare;
 
-    gint diff = compare (a->formatted ? a->formatted : a->filename, b->formatted
-     ? b->formatted : b->filename);
+    int diff = ((int (*) (const char * a, const char * b)) compare)
+     (a->formatted ? a->formatted : a->filename,
+      b->formatted ? b->formatted : b->filename);
+
     if (diff)
         return diff;
 
@@ -1490,182 +1576,227 @@ static gint title_compare (const void * _a, const void * _b, void * _compare)
     return a->number - b->number;
 }
 
-static void sort (Playlist * playlist, gint (* compare) (const void * a,
+static void sort (Playlist * playlist, int (* compare) (const void * a,
  const void * b, void * inner), void * inner)
 {
-    PLAYLIST_WILL_CHANGE;
-
     index_sort_with_data (playlist->entries, compare, inner);
     number_entries (playlist, 0, index_count (playlist->entries));
 
-    PLAYLIST_HAS_CHANGED (playlist, 0, index_count (playlist->entries));
+    PLAYLIST_HAS_CHANGED (playlist->number, 0, index_count (playlist->entries));
 }
 
-static void sort_selected (Playlist * playlist, gint (* compare) (const void *
+static void sort_selected (Playlist * playlist, int (* compare) (const void *
  a, const void * b, void * inner), void * inner)
 {
-    gint entries, count, count2;
-    struct index *selected;
+    int entries = index_count (playlist->entries);
 
-    PLAYLIST_WILL_CHANGE;
+    Index * selected = index_new ();
+    index_allocate (selected, playlist->selected_count);
 
-    entries = index_count(playlist->entries);
-    selected = index_new();
-
-    for (count = 0; count < entries; count++)
+    for (int count = 0; count < entries; count++)
     {
         Entry * entry = index_get (playlist->entries, count);
         if (entry->selected)
-            index_append(selected, entry);
+            index_append (selected, entry);
     }
 
     index_sort_with_data (selected, compare, inner);
 
-    count2 = 0;
-
-    for (count = 0; count < entries; count++)
+    int count2 = 0;
+    for (int count = 0; count < entries; count++)
     {
         Entry * entry = index_get (playlist->entries, count);
         if (entry->selected)
-            index_set(playlist->entries, count, index_get(selected, count2++));
+            index_set (playlist->entries, count, index_get (selected, count2 ++));
     }
 
-    index_free(selected);
-    number_entries(playlist, 0, entries);
+    index_free (selected);
 
-    PLAYLIST_HAS_CHANGED (playlist, 0, entries);
+    number_entries (playlist, 0, entries);
+    PLAYLIST_HAS_CHANGED (playlist->number, 0, entries);
 }
 
-void playlist_sort_by_filename (gint playlist_num, gint (* compare)
- (const gchar * a, const gchar * b))
+static bool_t entries_are_scanned (Playlist * playlist, bool_t selected)
 {
-    DECLARE_PLAYLIST;
+    int entries = index_count (playlist->entries);
+    for (int count = 0; count < entries; count ++)
+    {
+        Entry * entry = index_get (playlist->entries, count);
+        if (selected && ! entry->selected)
+            continue;
 
+        if (! entry->tuple)
+        {
+            interface_show_error (_("The playlist cannot be sorted because "
+             "metadata scanning is still in progress (or has been disabled)."));
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+void playlist_sort_by_filename (int playlist_num, int (* compare)
+ (const char * a, const char * b))
+{
+    ENTER;
+    DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    sort (playlist, filename_compare, compare);
+    sort (playlist, filename_compare, (void *) compare);
+
+    LEAVE;
 }
 
-void playlist_sort_by_tuple (gint playlist_num, gint (* compare)
+void playlist_sort_by_tuple (int playlist_num, int (* compare)
  (const Tuple * a, const Tuple * b))
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
-    check_all_scanned (playlist);
-    sort (playlist, tuple_compare, compare);
+
+    if (entries_are_scanned (playlist, FALSE))
+        sort (playlist, tuple_compare, (void *) compare);
+
+    LEAVE;
 }
 
-void playlist_sort_by_title (gint playlist_num, gint (* compare) (const gchar *
- a, const gchar * b))
+void playlist_sort_by_title (int playlist_num, int (* compare) (const char *
+ a, const char * b))
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
-    check_all_scanned (playlist);
-    sort (playlist, title_compare, compare);
+
+    if (entries_are_scanned (playlist, FALSE))
+        sort (playlist, title_compare, (void *) compare);
+
+    LEAVE;
 }
 
-void playlist_sort_selected_by_filename (gint playlist_num, gint (* compare)
- (const gchar * a, const gchar * b))
+void playlist_sort_selected_by_filename (int playlist_num, int (* compare)
+ (const char * a, const char * b))
 {
+    ENTER;
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST;
 
-    sort_selected (playlist, filename_compare, compare);
+    sort_selected (playlist, filename_compare, (void *) compare);
+
+    LEAVE;
 }
 
-void playlist_sort_selected_by_tuple (gint playlist_num, gint (* compare)
+void playlist_sort_selected_by_tuple (int playlist_num, int (* compare)
  (const Tuple * a, const Tuple * b))
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
-    check_selected_scanned (playlist);
-    sort_selected (playlist, tuple_compare, compare);
+
+    if (entries_are_scanned (playlist, TRUE))
+        sort_selected (playlist, tuple_compare, (void *) compare);
+
+    LEAVE;
 }
 
-void playlist_sort_selected_by_title (gint playlist_num, gint (* compare)
- (const gchar * a, const gchar * b))
+void playlist_sort_selected_by_title (int playlist_num, int (* compare)
+ (const char * a, const char * b))
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
-    check_selected_scanned (playlist);
-    sort (playlist, title_compare, compare);
+
+    if (entries_are_scanned (playlist, TRUE))
+        sort (playlist, title_compare, (void *) compare);
+
+    LEAVE;
 }
 
 void playlist_reformat_titles (void)
 {
-    gint playlist_num;
+    ENTER;
 
-    METADATA_WILL_CHANGE;
+    g_free (title_format);
+    title_format = NULL;
 
-    for (playlist_num = 0; playlist_num < index_count(playlists); playlist_num++)
+    for (int playlist_num = 0; playlist_num < index_count (playlists);
+     playlist_num ++)
     {
         Playlist * playlist = index_get (playlists, playlist_num);
-        gint entries = index_count(playlist->entries);
-        gint count;
+        int entries = index_count (playlist->entries);
 
-        for (count = 0; count < entries; count++)
+        for (int count = 0; count < entries; count++)
         {
             Entry * entry = index_get (playlist->entries, count);
-            g_free(entry->formatted);
-            entry->formatted = (entry->tuple == NULL) ? NULL : title_from_tuple(entry->tuple);
+            str_unref (entry->formatted);
+            entry->formatted = entry->tuple ? title_from_tuple (entry->tuple) : NULL;
         }
+
+        METADATA_HAS_CHANGED (playlist_num, 0, entries);
     }
 
-    METADATA_HAS_CHANGED (NULL, 0, 0);
+    LEAVE;
 }
 
-void playlist_rescan_real (gint playlist_num, gboolean onlyselected)
+void playlist_trigger_scan (void)
 {
+    ENTER;
+
+    for (int i = 0; i < index_count (playlists); i ++)
+    {
+        Playlist * p = index_get (playlists, i);
+        p->scanning = TRUE;
+    }
+
+    scan_trigger ();
+
+    LEAVE;
+}
+
+static void playlist_rescan_real (int playlist_num, bool_t selected)
+{
+    ENTER;
     DECLARE_PLAYLIST;
-    gint entries, count;
-
     LOOKUP_PLAYLIST;
-    METADATA_WILL_CHANGE;
 
-    entries = index_count(playlist->entries);
+    int entries = index_count (playlist->entries);
 
-    for (count = 0; count < entries; count++)
+    for (int count = 0; count < entries; count ++)
     {
         Entry * entry = index_get (playlist->entries, count);
-        if (! onlyselected || entry->selected)
+        if (! selected || entry->selected)
         {
             entry_set_tuple (playlist, entry, NULL);
             entry->failed = FALSE;
         }
     }
 
-    METADATA_HAS_CHANGED (playlist, 0, entries);
+    METADATA_HAS_CHANGED (playlist->number, 0, entries);
+    LEAVE;
 }
 
-void playlist_rescan (gint playlist_num)
+void playlist_rescan (int playlist_num)
 {
     playlist_rescan_real (playlist_num, FALSE);
 }
 
-void playlist_rescan_selected (gint playlist_num)
+void playlist_rescan_selected (int playlist_num)
 {
     playlist_rescan_real (playlist_num, TRUE);
 }
 
-void playlist_rescan_file (const gchar * filename)
+void playlist_rescan_file (const char * filename)
 {
-    gint num_playlists = index_count (playlists);
-    gint playlist_num;
+    ENTER;
 
-    METADATA_WILL_CHANGE;
+    int num_playlists = index_count (playlists);
 
-    gchar * copy = NULL;
-    if (! uri_is_utf8 (filename, TRUE))
-        filename = copy = uri_to_utf8 (filename);
-
-    for (playlist_num = 0; playlist_num < num_playlists; playlist_num ++)
+    for (int playlist_num = 0; playlist_num < num_playlists; playlist_num ++)
     {
         Playlist * playlist = index_get (playlists, playlist_num);
-        gint num_entries = index_count (playlist->entries);
-        gint entry_num;
+        int num_entries = index_count (playlist->entries);
 
-        for (entry_num = 0; entry_num < num_entries; entry_num ++)
+        for (int entry_num = 0; entry_num < num_entries; entry_num ++)
         {
             Entry * entry = index_get (playlist->entries, entry_num);
 
@@ -1673,84 +1804,88 @@ void playlist_rescan_file (const gchar * filename)
             {
                 entry_set_tuple (playlist, entry, NULL);
                 entry->failed = FALSE;
+
+                METADATA_HAS_CHANGED (playlist_num, entry_num, 1);
             }
         }
     }
 
-    g_free (copy);
-
-    METADATA_HAS_CHANGED (NULL, 0, 0);
+    LEAVE;
 }
 
-gint64 playlist_get_total_length (gint playlist_num, gboolean fast)
+int64_t playlist_get_total_length (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST_RET (0);
 
-    if (! fast)
-        check_all_scanned (playlist);
+    int64_t length = playlist->total_length;
 
-    return playlist->total_length;
+    LEAVE_RET (length);
 }
 
-gint64 playlist_get_selected_length (gint playlist_num, gboolean fast)
+int64_t playlist_get_selected_length (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST_RET (0);
 
-    if (! fast)
-        check_selected_scanned (playlist);
+    int64_t length = playlist->selected_length;
 
-    return playlist->selected_length;
+    LEAVE_RET (length);
 }
 
-gint playlist_queue_count(gint playlist_num)
+int playlist_queue_count (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
-
     LOOKUP_PLAYLIST_RET (0);
 
-    return g_list_length (playlist->queued);
+    int count = g_list_length (playlist->queued);
+
+    LEAVE_RET (count);
 }
 
-void playlist_queue_insert(gint playlist_num, gint at, gint entry_num)
+void playlist_queue_insert (int playlist_num, int at, int entry_num)
 {
+    ENTER;
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY;
 
     if (entry->queued)
-        return;
+        LEAVE_RET_VOID;
 
     if (at < 0)
-        playlist->queued = g_list_append(playlist->queued, entry);
+        playlist->queued = g_list_append (playlist->queued, entry);
     else
-        playlist->queued = g_list_insert(playlist->queued, entry, at);
+        playlist->queued = g_list_insert (playlist->queued, entry, at);
 
     entry->queued = TRUE;
 
-    SELECTION_HAS_CHANGED (playlist, entry_num, 1);
+    SELECTION_HAS_CHANGED (playlist->number, entry_num, 1);
+    LEAVE;
 }
 
-void playlist_queue_insert_selected (gint playlist_num, gint at)
+void playlist_queue_insert_selected (int playlist_num, int at)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    gint entries = index_count(playlist->entries);
-    gint first = entries, last = 0;
+    int entries = index_count(playlist->entries);
+    int first = entries, last = 0;
 
-    for (gint count = 0; count < entries; count++)
+    for (int count = 0; count < entries; count++)
     {
         Entry * entry = index_get (playlist->entries, count);
 
-        if (!entry->selected || entry->queued)
+        if (! entry->selected || entry->queued)
             continue;
 
         if (at < 0)
-            playlist->queued = g_list_append(playlist->queued, entry);
+            playlist->queued = g_list_append (playlist->queued, entry);
         else
-            playlist->queued = g_list_insert(playlist->queued, entry, at++);
+            playlist->queued = g_list_insert (playlist->queued, entry, at++);
 
         entry->queued = TRUE;
         first = MIN (first, entry->number);
@@ -1758,95 +1893,98 @@ void playlist_queue_insert_selected (gint playlist_num, gint at)
     }
 
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist, first, last + 1 - first);
+        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+
+    LEAVE;
 }
 
-gint playlist_queue_get_entry(gint playlist_num, gint at)
+int playlist_queue_get_entry (int playlist_num, int at)
 {
+    ENTER;
     DECLARE_PLAYLIST;
-    GList *node;
-
     LOOKUP_PLAYLIST_RET (-1);
-    node = g_list_nth(playlist->queued, at);
 
-    if (node == NULL)
-        return -1;
+    GList * node = g_list_nth (playlist->queued, at);
+    int entry_num = node ? ((Entry *) node->data)->number : -1;
 
-    return ((Entry *) node->data)->number;
+    LEAVE_RET (entry_num);
 }
 
-gint playlist_queue_find_entry(gint playlist_num, gint entry_num)
+int playlist_queue_find_entry (int playlist_num, int entry_num)
 {
+    ENTER;
     DECLARE_PLAYLIST_ENTRY;
-
     LOOKUP_PLAYLIST_ENTRY_RET (-1);
 
-    if (! entry->queued)
-        return -1;
+    int pos = entry->queued ? g_list_index (playlist->queued, entry) : -1;
 
-    return g_list_index(playlist->queued, entry);
+    LEAVE_RET (pos);
 }
 
-void playlist_queue_delete(gint playlist_num, gint at, gint number)
+void playlist_queue_delete (int playlist_num, int at, int number)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    gint entries = index_count (playlist->entries);
-    gint first = entries, last = 0;
+    int entries = index_count (playlist->entries);
+    int first = entries, last = 0;
 
     if (at == 0)
     {
-        while (playlist->queued != NULL && number--)
+        while (playlist->queued && number --)
         {
             Entry * entry = playlist->queued->data;
-
-            playlist->queued = g_list_delete_link(playlist->queued, playlist->queued);
-
             entry->queued = FALSE;
             first = MIN (first, entry->number);
             last = entry->number;
+
+            playlist->queued = g_list_delete_link (playlist->queued,
+             playlist->queued);
         }
     }
     else
     {
-        GList *anchor = g_list_nth(playlist->queued, at - 1);
-
-        if (anchor == NULL)
+        GList * anchor = g_list_nth (playlist->queued, at - 1);
+        if (! anchor)
             goto DONE;
 
-        while (anchor->next != NULL && number--)
+        while (anchor->next && number --)
         {
             Entry * entry = anchor->next->data;
-
-            playlist->queued = g_list_delete_link(playlist->queued, anchor->next);
-
             entry->queued = FALSE;
             first = MIN (first, entry->number);
             last = entry->number;
+
+            playlist->queued = g_list_delete_link (playlist->queued,
+             anchor->next);
         }
     }
 
 DONE:
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist, first, last + 1 - first);
+        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+
+    LEAVE;
 }
 
-void playlist_queue_delete_selected (gint playlist_num)
+void playlist_queue_delete_selected (int playlist_num)
 {
+    ENTER;
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    gint entries = index_count (playlist->entries);
-    gint first = entries, last = 0;
+    int entries = index_count (playlist->entries);
+    int first = entries, last = 0;
 
-    for (GList * node = playlist->queued; node != NULL; )
+    for (GList * node = playlist->queued; node; )
     {
         GList * next = node->next;
         Entry * entry = node->data;
 
         if (entry->selected)
         {
+            entry->queued = FALSE;
             playlist->queued = g_list_delete_link (playlist->queued, node);
             first = MIN (first, entry->number);
             last = entry->number;
@@ -1856,61 +1994,65 @@ void playlist_queue_delete_selected (gint playlist_num)
     }
 
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist, first, last + 1 - first);
+        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+
+    LEAVE;
 }
 
-static gboolean shuffle_prev (Playlist * playlist)
+static bool_t shuffle_prev (Playlist * playlist)
 {
-    gint entries = index_count (playlist->entries), count;
+    int entries = index_count (playlist->entries);
     Entry * found = NULL;
 
-    for (count = 0; count < entries; count ++)
+    for (int count = 0; count < entries; count ++)
     {
         Entry * entry = index_get (playlist->entries, count);
 
-        if (entry->shuffle_num && (playlist->position == NULL ||
-         entry->shuffle_num < playlist->position->shuffle_num) && (found == NULL
+        if (entry->shuffle_num && (! playlist->position ||
+         entry->shuffle_num < playlist->position->shuffle_num) && (! found
          || entry->shuffle_num > found->shuffle_num))
             found = entry;
     }
 
-    if (found == NULL)
+    if (! found)
         return FALSE;
 
     playlist->position = found;
     return TRUE;
 }
 
-gboolean playlist_prev_song(gint playlist_num)
+bool_t playlist_prev_song (int playlist_num)
 {
-    DECLARE_PLAYLIST;
+    if (playback_get_playing () && playlist_num == playlist_get_playing ())
+        playback_stop ();
 
+    ENTER;
+    DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST_RET (FALSE);
 
-    if (cfg.shuffle)
+    if (get_bool (NULL, "shuffle"))
     {
         if (! shuffle_prev (playlist))
-            return FALSE;
+            LEAVE_RET (FALSE);
     }
     else
     {
-        if (playlist->position == NULL || playlist->position->number == 0)
-            return FALSE;
+        if (! playlist->position || playlist->position->number == 0)
+            LEAVE_RET (FALSE);
 
         set_position (playlist, index_get (playlist->entries,
          playlist->position->number - 1));
     }
 
-    if (playlist == playing_playlist && playback_get_playing ())
-        playback_stop();
+    LEAVE;
 
     hook_call ("playlist position", GINT_TO_POINTER (playlist_num));
     return TRUE;
 }
 
-static gboolean shuffle_next (Playlist * playlist)
+static bool_t shuffle_next (Playlist * playlist)
 {
-    gint entries = index_count (playlist->entries), choice = 0, count;
+    int entries = index_count (playlist->entries), choice = 0, count;
     Entry * found = NULL;
 
     for (count = 0; count < entries; count ++)
@@ -1919,13 +2061,13 @@ static gboolean shuffle_next (Playlist * playlist)
 
         if (! entry->shuffle_num)
             choice ++;
-        else if (playlist->position != NULL && entry->shuffle_num >
-         playlist->position->shuffle_num && (found == NULL || entry->shuffle_num
+        else if (playlist->position && entry->shuffle_num >
+         playlist->position->shuffle_num && (! found || entry->shuffle_num
          < found->shuffle_num))
             found = entry;
     }
 
-    if (found != NULL)
+    if (found)
     {
         playlist->position = found;
         return TRUE;
@@ -1955,57 +2097,58 @@ static gboolean shuffle_next (Playlist * playlist)
 
 static void shuffle_reset (Playlist * playlist)
 {
-    gint entries = index_count (playlist->entries), count;
+    int entries = index_count (playlist->entries);
 
     playlist->last_shuffle_num = 0;
 
-    for (count = 0; count < entries; count ++)
+    for (int count = 0; count < entries; count ++)
     {
         Entry * entry = index_get (playlist->entries, count);
         entry->shuffle_num = 0;
     }
 }
 
-gboolean playlist_next_song(gint playlist_num, gboolean repeat)
+bool_t playlist_next_song (int playlist_num, bool_t repeat)
 {
+    if (playback_get_playing () && playlist_num == playlist_get_playing ())
+        playback_stop ();
+
+    ENTER;
     DECLARE_PLAYLIST;
-    gint entries;
-
     LOOKUP_PLAYLIST_RET (FALSE);
-    entries = index_count(playlist->entries);
 
-    if (entries == 0)
-        return FALSE;
+    int entries = index_count(playlist->entries);
 
-    /* If we have a song in queue, jump to it, _then_ remove it from queue */
-    if (playlist->queued != NULL)
+    if (! entries)
+        LEAVE_RET (FALSE);
+
+    if (playlist->queued)
     {
         set_position (playlist, playlist->queued->data);
-
-        playlist->queued = g_list_remove(playlist->queued, playlist->position);
+        playlist->queued = g_list_remove (playlist->queued, playlist->position);
         playlist->position->queued = FALSE;
     }
-    else if (cfg.shuffle)
+    else if (get_bool (NULL, "shuffle"))
     {
         if (! shuffle_next (playlist))
         {
             if (! repeat)
-                return FALSE;
+                LEAVE_RET (FALSE);
 
             shuffle_reset (playlist);
 
             if (! shuffle_next (playlist))
-                return FALSE;
+                LEAVE_RET (FALSE);
         }
     }
     else
     {
-        if (playlist->position == NULL)
+        if (! playlist->position)
             set_position (playlist, index_get (playlist->entries, 0));
         else if (playlist->position->number == entries - 1)
         {
-            if (!repeat)
-                return FALSE;
+            if (! repeat)
+                LEAVE_RET (FALSE);
 
             set_position (playlist, index_get (playlist->entries, 0));
         }
@@ -2014,105 +2157,199 @@ gboolean playlist_next_song(gint playlist_num, gboolean repeat)
              playlist->position->number + 1));
     }
 
-    if (playlist == playing_playlist && playback_get_playing ())
-        playback_stop();
+    LEAVE;
 
     hook_call ("playlist position", GINT_TO_POINTER (playlist_num));
     return TRUE;
 }
 
+int playback_entry_get_position (void)
+{
+    ENTER;
+
+    Entry * entry = get_playback_entry (FALSE, FALSE);
+    int entry_num = entry ? entry->number : -1;
+
+    LEAVE_RET (entry_num);
+}
+
+PluginHandle * playback_entry_get_decoder (void)
+{
+    ENTER;
+
+    Entry * entry = get_playback_entry (TRUE, FALSE);
+    PluginHandle * decoder = entry ? entry->decoder : NULL;
+
+    LEAVE_RET (decoder);
+}
+
+Tuple * playback_entry_get_tuple (void)
+{
+    ENTER;
+
+    Entry * entry = get_playback_entry (FALSE, TRUE);
+    Tuple * tuple = entry ? entry->tuple : NULL;
+
+    if (tuple)
+        tuple_ref (tuple);
+
+    LEAVE_RET (tuple);
+}
+
+char * playback_entry_get_title (void)
+{
+    ENTER;
+
+    Entry * entry = get_playback_entry (FALSE, TRUE);
+    char * title = entry ? str_ref (entry->formatted ? entry->formatted :
+     entry->filename) : NULL;
+
+    LEAVE_RET (title);
+}
+
+int playback_entry_get_length (void)
+{
+    ENTER;
+
+    Entry * entry = get_playback_entry (FALSE, TRUE);
+    int length = entry->length;
+
+    LEAVE_RET (length);
+}
+
+void playback_entry_set_tuple (Tuple * tuple)
+{
+    ENTER;
+    if (! playing_playlist || ! playing_playlist->position)
+        LEAVE_RET_VOID;
+
+    Entry * entry = playing_playlist->position;
+    entry_cancel_scan (entry);
+    entry_set_tuple (playing_playlist, entry, tuple);
+
+    METADATA_HAS_CHANGED (playing_playlist->number, entry->number, 1);
+    LEAVE;
+}
+
+int playback_entry_get_start_time (void)
+{
+    ENTER;
+    if (! playing_playlist || ! playing_playlist->position)
+        LEAVE_RET (0);
+
+    int start = playing_playlist->position->start;
+    LEAVE_RET (start);
+}
+
+int playback_entry_get_end_time (void)
+{
+    ENTER;
+    if (! playing_playlist || ! playing_playlist->position)
+        LEAVE_RET (-1);
+
+    int end = playing_playlist->position->end;
+    LEAVE_RET (end);
+}
+
 void playlist_save_state (void)
 {
-    gchar scratch[512];
-    FILE * handle;
-    gint playlist_num;
+    ENTER;
 
-    snprintf (scratch, sizeof scratch, "%s/" STATE_FILE,
-     get_path (AUD_PATH_USER_DIR));
-    handle = fopen (scratch, "w");
+    char * path = g_strdup_printf ("%s/" STATE_FILE, get_path (AUD_PATH_USER_DIR));
+    FILE * handle = fopen (path, "w");
+    g_free (path);
+    if (! handle)
+        LEAVE_RET_VOID;
 
-    if (handle == NULL)
-        return;
+    resume_state = playback_get_playing () ? (playback_get_paused () ?
+     RESUME_PAUSE : RESUME_PLAY) : RESUME_STOP;
+    resume_time = playback_get_playing () ? playback_get_time () : 0;
 
-    fprintf (handle, "active %d\n", playlist_get_active ());
-    fprintf (handle, "playing %d\n", playlist_get_playing ());
+    fprintf (handle, "resume-state %d\n", resume_state);
+    fprintf (handle, "resume-time %d\n", resume_time);
 
-    for (playlist_num = 0; playlist_num < index_count (playlists);
+    fprintf (handle, "active %d\n", active_playlist ? active_playlist->number : -1);
+    fprintf (handle, "playing %d\n", playing_playlist ? playing_playlist->number : -1);
+
+    for (int playlist_num = 0; playlist_num < index_count (playlists);
      playlist_num ++)
     {
         Playlist * playlist = index_get (playlists, playlist_num);
-        gint entries = index_count (playlist->entries), count;
 
         fprintf (handle, "playlist %d\n", playlist_num);
-        fprintf (handle, "position %d\n", playlist_get_position (playlist_num));
-        fprintf (handle, "last-shuffled %d\n", playlist->last_shuffle_num);
 
-        for (count = 0; count < entries; count ++)
-        {
-            Entry * entry = index_get (playlist->entries, count);
-            fprintf (handle, "S %d\n", entry->shuffle_num);
-        }
+        if (playlist->filename)
+            fprintf (handle, "filename %s\n", playlist->filename);
+
+        fprintf (handle, "position %d\n", playlist->position ?
+         playlist->position->number : -1);
     }
 
     fclose (handle);
+    LEAVE;
 }
 
-static gchar parse_key[32];
-static gchar * parse_value;
+static char parse_key[512];
+static char * parse_value;
 
 static void parse_next (FILE * handle)
 {
-    gchar * found;
-
     parse_value = NULL;
 
-    if (fgets (parse_key, sizeof parse_key, handle) == NULL)
+    if (! fgets (parse_key, sizeof parse_key, handle))
         return;
 
-    found = strchr (parse_key, ' ');
-
-    if (found == NULL)
+    char * space = strchr (parse_key, ' ');
+    if (! space)
         return;
 
-    * found = 0;
-    parse_value = found + 1;
+    * space = 0;
+    parse_value = space + 1;
 
-    found = strchr (parse_value, '\n');
-
-    if (found != NULL)
-        * found = 0;
+    char * newline = strchr (parse_value, '\n');
+    if (newline)
+        * newline = 0;
 }
 
-static gboolean parse_integer (const gchar * key, gint * value)
+static bool_t parse_integer (const char * key, int * value)
 {
-    return (parse_value != NULL && ! strcmp (parse_key, key) && sscanf
-     (parse_value, "%d", value) == 1);
+    return (parse_value && ! strcmp (parse_key, key) && sscanf (parse_value,
+     "%d", value) == 1);
+}
+
+static char * parse_string (const char * key)
+{
+    return (parse_value && ! strcmp (parse_key, key)) ? str_get (parse_value) : NULL;
 }
 
 void playlist_load_state (void)
 {
-    gchar scratch[512];
-    FILE * handle;
-    gint playlist_num;
+    ENTER;
+    int playlist_num;
 
-    snprintf (scratch, sizeof scratch, "%s/" STATE_FILE,
-     get_path (AUD_PATH_USER_DIR));
-    handle = fopen (scratch, "r");
-
-    if (handle == NULL)
-        return;
+    char * path = g_strdup_printf ("%s/" STATE_FILE, get_path (AUD_PATH_USER_DIR));
+    FILE * handle = fopen (path, "r");
+    g_free (path);
+    if (! handle)
+        LEAVE_RET_VOID;
 
     parse_next (handle);
 
+    if (parse_integer ("resume-state", & resume_state))
+        parse_next (handle);
+    if (parse_integer ("resume-time", & resume_time))
+        parse_next (handle);
+
     if (parse_integer ("active", & playlist_num))
     {
-        playlist_set_active (playlist_num);
+        if (! (active_playlist = lookup_playlist (playlist_num)))
+            active_playlist = index_get (playlists, 0);
         parse_next (handle);
     }
 
     if (parse_integer ("playing", & playlist_num))
     {
-        playlist_set_playing (playlist_num);
+        playing_playlist = lookup_playlist (playlist_num);
         parse_next (handle);
     }
 
@@ -2120,32 +2357,49 @@ void playlist_load_state (void)
      playlist_num < index_count (playlists))
     {
         Playlist * playlist = index_get (playlists, playlist_num);
-        gint entries = index_count (playlist->entries), position, count;
+        int entries = index_count (playlist->entries), position;
+        char * s;
 
         parse_next (handle);
+
+        if ((s = parse_string ("filename")))
+        {
+            str_unref (playlist->filename);
+            playlist->filename = s;
+            parse_next (handle);
+        }
 
         if (parse_integer ("position", & position))
             parse_next (handle);
 
         if (position >= 0 && position < entries)
-            playlist->position = index_get (playlist->entries, position);
-
-        gint obsolete = 0;
-        if (parse_integer ("shuffled", & obsolete)) /* compatibility with 2.3 */
-            parse_next (handle);
-
-        if (parse_integer ("last-shuffled", & playlist->last_shuffle_num))
-            parse_next (handle);
-        else /* compatibility with 2.3 beta */
-            playlist->last_shuffle_num = obsolete;
-
-        for (count = 0; count < entries; count ++)
-        {
-            Entry * entry = index_get (playlist->entries, count);
-            if (parse_integer ("S", & entry->shuffle_num))
-                parse_next (handle);
-        }
+            set_position (playlist, index_get (playlist->entries, position));
     }
 
     fclose (handle);
+
+    /* clear updates queued during init sequence */
+
+    for (int i = 0; i < index_count (playlists); i ++)
+    {
+        Playlist * p = index_get (playlists, i);
+        memset (& p->last_update, 0, sizeof (Update));
+        memset (& p->next_update, 0, sizeof (Update));
+    }
+
+    update_level = 0;
+
+    if (update_source)
+    {
+        g_source_remove (update_source);
+        update_source = 0;
+    }
+
+    LEAVE;
+}
+
+void playlist_resume (void)
+{
+    if (resume_state == RESUME_PLAY || resume_state == RESUME_PAUSE)
+        playback_play (resume_time, resume_state == RESUME_PAUSE);
 }

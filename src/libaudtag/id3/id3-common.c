@@ -1,6 +1,6 @@
 /*
  * id3-common.c
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -19,6 +19,7 @@
  * using our public API to be a derived work.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include <glib.h>
@@ -28,10 +29,24 @@
 #include "../util.h"
 #include "id3-common.h"
 
-gchar * convert_text (const gchar * text, gint length, gint encoding, gboolean
- nulled, gint * _converted, const gchar * * after)
+static void * memchr16 (const void * mem, int16_t chr, int len)
 {
-    gchar * buffer = NULL;
+    while (len >= 2)
+    {
+        if (* (int16_t *) mem == chr)
+            return (void *) mem;
+
+        mem = (char *) mem + 2;
+        len -= 2;
+    }
+
+    return NULL;
+}
+
+char * convert_text (const char * text, int length, int encoding, bool_t
+ nulled, int * _converted, const char * * after)
+{
+    char * buffer = NULL;
     gsize converted = 0;
 
     TAGDBG ("length = %d, encoding = %d, nulled = %d\n", length, encoding,
@@ -39,8 +54,7 @@ gchar * convert_text (const gchar * text, gint length, gint encoding, gboolean
 
     if (nulled)
     {
-        const guchar null16[] = {0, 0};
-        const gchar * null;
+        const char * null;
 
         switch (encoding)
         {
@@ -58,7 +72,7 @@ gchar * convert_text (const gchar * text, gint length, gint encoding, gboolean
             break;
           case 1:
           case 2:
-            if ((null = memfind (text, length, null16, 2)) == NULL)
+            if ((null = memchr16 (text, 0, length)) == NULL)
                 return NULL;
 
             length = null - text;
@@ -74,11 +88,13 @@ gchar * convert_text (const gchar * text, gint length, gint encoding, gboolean
     switch (encoding)
     {
       case 0:
-      case 3:
-        buffer = str_to_utf8_full (text, length, NULL, & converted, NULL);
+      case 3:;
+        int converted_int = 0;
+        buffer = str_to_utf8_full (text, length, NULL, & converted_int);
+        converted = converted_int;
         break;
       case 1:
-        if (text[0] == (gchar) 0xff)
+        if (text[0] == (char) 0xff)
             buffer = g_convert (text + 2, length - 2, "UTF-8", "UTF-16LE", NULL,
              & converted, NULL);
         else
@@ -92,7 +108,7 @@ gchar * convert_text (const gchar * text, gint length, gint encoding, gboolean
         break;
     }
 
-    TAGDBG ("length converted: %d\n", (gint) converted);
+    TAGDBG ("length converted: %d\n", (int) converted);
     TAGDBG ("string: %s\n", buffer);
 
     if (_converted != NULL)

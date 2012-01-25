@@ -21,17 +21,16 @@
 #include <gdk/gdk.h>
 #include <libaudcore/hook.h>
 
-#include "audconfig.h"
 #include "config.h"
+#include "main.h"
 
 #ifdef USE_EGGSM
-
 #include "eggsmclient.h"
 
 static void
 signal_session_quit_cb(EggSMClient *client, gpointer user_data)
 {
-    const gchar * argv[2];
+    const char * argv[2];
 
     g_print("Session quit requested. Saving state and shutting down.\n");
 
@@ -45,7 +44,7 @@ signal_session_quit_cb(EggSMClient *client, gpointer user_data)
 static void
 signal_session_save_cb(EggSMClient *client, GKeyFile *state_file, gpointer user_data)
 {
-    const gchar * argv[2];
+    const char * argv[2];
 
     g_print("Session save requested. Saving state.\n");
 
@@ -53,7 +52,7 @@ signal_session_save_cb(EggSMClient *client, GKeyFile *state_file, gpointer user_
     argv[1] = g_strdup_printf ("--display=%s", gdk_display_get_name (gdk_display_get_default()));
     egg_sm_client_set_restart_command (client, 2, argv);
 
-    aud_config_save();
+    do_autosave ();
 }
 #endif
 

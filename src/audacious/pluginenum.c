@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2009  Audacious development team
+ *  Copyright (C) 2005-2011  Audacious development team
  *
  *  Based on BMP:
  *  Copyright (C) 2003-2004  BMP development team
@@ -24,9 +24,9 @@
  */
 
 #include <assert.h>
-
 #include <glib.h>
 #include <gmodule.h>
+#include <pthread.h>
 
 #include <libaudcore/audstrings.h>
 #include <libaudgui/init.h>
@@ -37,38 +37,38 @@
 # define SHARED_SUFFIX G_MODULE_SUFFIX
 #endif
 
-#include "audconfig.h"
 #include "debug.h"
 #include "plugin.h"
 #include "ui_preferences.h"
 #include "util.h"
 
 #define AUD_API_DECLARE
-#include "configdb.h"
 #include "drct.h"
 #include "misc.h"
 #include "playlist.h"
 #include "plugins.h"
 #undef AUD_API_DECLARE
 
-static const gchar * plugin_dir_list[] = {PLUGINSUBS, NULL};
+static const char * plugin_dir_list[] = {PLUGINSUBS, NULL};
 
-static AudAPITable api_table = {
- .configdb_api = & configdb_api,
+char verbose = 0;
+
+AudAPITable api_table = {
  .drct_api = & drct_api,
  .misc_api = & misc_api,
  .playlist_api = & playlist_api,
  .plugins_api = & plugins_api,
- .cfg = & cfg};
+ .verbose = & verbose};
 
 typedef struct {
-    PluginHeader * header;
+    Plugin * header;
     GModule * module;
 } LoadedModule;
 
 static GList * loaded_modules = NULL;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-static void plugin2_process (PluginHeader * header, GModule * module, const gchar * filename)
+static void plugin2_process (Plugin * header, GModule * module, const char * filename)
 {
     if (header->magic != _AUD_PLUGIN_MAGIC)
     {
@@ -84,151 +84,60 @@ static void plugin2_process (PluginHeader * header, GModule * module, const gcha
         return;
     }
 
+    switch (header->type)
+    {
+    case PLUGIN_TYPE_TRANSPORT:
+    case PLUGIN_TYPE_PLAYLIST:
+    case PLUGIN_TYPE_INPUT:
+    case PLUGIN_TYPE_EFFECT:
+        if (PLUGIN_HAS_FUNC (header, init) && ! header->init ())
+        {
+            fprintf (stderr, " *** ERROR: %s failed to initialize.\n", filename);
+            g_module_close (module);
+            return;
+        }
+        break;
+    }
+
+    pthread_mutex_lock (& mutex);
     LoadedModule * loaded = g_slice_new (LoadedModule);
     loaded->header = header;
     loaded->module = module;
     loaded_modules = g_list_prepend (loaded_modules, loaded);
+    pthread_mutex_unlock (& mutex);
 
-    if (header->init != NULL)
-    {
-        plugin_register (PLUGIN_TYPE_LOWLEVEL, filename, 0, NULL);
-        header->init ();
-    }
-
-    if (header->tp_list)
-    {
-        TransportPlugin * tp;
-        for (gint i = 0; (tp = header->tp_list[i]); i ++)
-        {
-            plugin_register (PLUGIN_TYPE_TRANSPORT, filename, i, tp);
-            if (tp->init != NULL)
-                tp->init (); /* FIXME: Pay attention to the return value. */
-        }
-    }
-
-    if (header->pp_list)
-    {
-        PlaylistPlugin * pp;
-        for (gint i = 0; (pp = header->pp_list[i]); i ++)
-        {
-            plugin_register (PLUGIN_TYPE_PLAYLIST, filename, i, pp);
-            if (pp->init != NULL)
-                pp->init (); /* FIXME: Pay attention to the return value. */
-        }
-    }
-
-    if (header->ip_list != NULL)
-    {
-        InputPlugin * ip;
-        for (gint i = 0; (ip = header->ip_list[i]) != NULL; i ++)
-        {
-            plugin_register (PLUGIN_TYPE_INPUT, filename, i, ip);
-            if (ip->init != NULL)
-                ip->init (); /* FIXME: Pay attention to the return value. */
-        }
-    }
-
-    if (header->ep_list != NULL)
-    {
-        EffectPlugin * ep;
-        for (gint i = 0; (ep = header->ep_list[i]) != NULL; i ++)
-        {
-            plugin_register (PLUGIN_TYPE_EFFECT, filename, i, ep);
-            if (ep->init != NULL)
-                ep->init (); /* FIXME: Pay attention to the return value. */
-        }
-    }
-
-    if (header->op_list != NULL)
-    {
-        OutputPlugin * op;
-        for (gint i = 0; (op = header->op_list[i]) != NULL; i ++)
-            plugin_register (PLUGIN_TYPE_OUTPUT, filename, i, op);
-    }
-
-    if (header->vp_list != NULL)
-    {
-        VisPlugin * vp;
-        for (gint i = 0; (vp = header->vp_list[i]) != NULL; i ++)
-            plugin_register (PLUGIN_TYPE_VIS, filename, i, vp);
-    }
-
-    if (header->gp_list != NULL)
-    {
-        GeneralPlugin * gp;
-        for (gint i = 0; (gp = header->gp_list[i]) != NULL; i ++)
-            plugin_register (PLUGIN_TYPE_GENERAL, filename, i, gp);
-    }
-
-    if (header->iface != NULL)
-        plugin_register (PLUGIN_TYPE_IFACE, filename, 0, header->iface);
+    plugin_register_loaded (filename, header);
 }
 
 static void plugin2_unload (LoadedModule * loaded)
 {
-    PluginHeader * header = loaded->header;
+    Plugin * header = loaded->header;
 
-    if (header->ip_list != NULL)
+    switch (header->type)
     {
-        InputPlugin * ip;
-        for (gint i = 0; (ip = header->ip_list[i]) != NULL; i ++)
-        {
-            if (ip->settings != NULL)
-                plugin_preferences_cleanup (ip->settings);
-            if (ip->cleanup != NULL)
-                ip->cleanup ();
-        }
+    case PLUGIN_TYPE_TRANSPORT:
+    case PLUGIN_TYPE_PLAYLIST:
+    case PLUGIN_TYPE_INPUT:
+    case PLUGIN_TYPE_EFFECT:
+        if (PLUGIN_HAS_FUNC (header, settings))
+            plugin_preferences_cleanup (header->settings);
+        if (PLUGIN_HAS_FUNC (header, cleanup))
+            header->cleanup ();
+        break;
     }
 
-    if (header->ep_list != NULL)
-    {
-        EffectPlugin * ep;
-        for (gint i = 0; (ep = header->ep_list[i]) != NULL; i ++)
-        {
-            if (ep->settings != NULL)
-                plugin_preferences_cleanup (ep->settings);
-            if (ep->cleanup != NULL)
-                ep->cleanup ();
-        }
-    }
-
-    if (header->pp_list != NULL)
-    {
-        PlaylistPlugin * pp;
-        for (gint i = 0; (pp = header->pp_list[i]) != NULL; i ++)
-        {
-            if (pp->settings != NULL)
-                plugin_preferences_cleanup (pp->settings);
-            if (pp->cleanup != NULL)
-                pp->cleanup ();
-        }
-    }
-
-    if (header->tp_list != NULL)
-    {
-        TransportPlugin * tp;
-        for (gint i = 0; (tp = header->tp_list[i]) != NULL; i ++)
-        {
-            if (tp->settings != NULL)
-                plugin_preferences_cleanup (tp->settings);
-            if (tp->cleanup != NULL)
-                tp->cleanup ();
-        }
-    }
-
-    if (header->fini != NULL)
-        header->fini ();
-
+    pthread_mutex_lock (& mutex);
     g_module_close (loaded->module);
     g_slice_free (LoadedModule, loaded);
+    pthread_mutex_unlock (& mutex);
 }
 
 /******************************************************************/
 
-void module_load (const gchar * filename)
+void plugin_load (const char * filename)
 {
     GModule *module;
-    PluginHeader * (* func) (AudAPITable * table);
+    Plugin * (* func) (AudAPITable * table);
 
     AUDDBG ("Loading plugin: %s.\n", filename);
 
@@ -241,7 +150,7 @@ void module_load (const gchar * filename)
     /* v2 plugin loading */
     if (g_module_symbol (module, "get_plugin_info", (void *) & func))
     {
-        PluginHeader * header = func (& api_table);
+        Plugin * header = func (& api_table);
         g_return_if_fail (header != NULL);
         plugin2_process(header, module, filename);
         return;
@@ -251,7 +160,7 @@ void module_load (const gchar * filename)
     g_module_close(module);
 }
 
-static gboolean scan_plugin_func(const gchar * path, const gchar * basename, gpointer data)
+static bool_t scan_plugin_func(const char * path, const char * basename, gpointer data)
 {
     if (!str_has_suffix_nocase(basename, SHARED_SUFFIX))
         return FALSE;
@@ -259,22 +168,22 @@ static gboolean scan_plugin_func(const gchar * path, const gchar * basename, gpo
     if (!g_file_test(path, G_FILE_TEST_IS_REGULAR))
         return FALSE;
 
-    module_register (path);
+    plugin_register (path);
 
     return FALSE;
 }
 
-static void scan_plugins(const gchar * path)
+static void scan_plugins(const char * path)
 {
-    dir_foreach(path, scan_plugin_func, NULL, NULL);
+    dir_foreach (path, scan_plugin_func, NULL);
 }
 
 void plugin_system_init(void)
 {
     assert (g_module_supported ());
 
-    gchar *dir;
-    gint dirsel = 0;
+    char *dir;
+    int dirsel = 0;
 
     audgui_init (& api_table);
 
@@ -317,4 +226,6 @@ void plugin_system_cleanup(void)
 
     g_list_free (loaded_modules);
     loaded_modules = NULL;
+
+    audgui_cleanup ();
 }

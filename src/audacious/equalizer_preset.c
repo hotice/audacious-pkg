@@ -1,5 +1,5 @@
 /*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2008  Audacious team
+ *  Copyright (C) 2005-2011  Audacious team
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
  */
 
 #include <glib.h>
+#include <string.h>
 
 #include "config.h"
 #include "debug.h"
@@ -25,21 +26,19 @@
 #include "interface.h"
 #include "misc.h"
 
-static EqualizerPreset * equalizer_preset_new (const gchar * name)
+static EqualizerPreset * equalizer_preset_new (const char * name)
 {
     EqualizerPreset *preset = g_new0(EqualizerPreset, 1);
     preset->name = g_strdup(name);
     return preset;
 }
 
-GList *
-equalizer_read_presets(const gchar *basename)
+Index * equalizer_read_presets (const char * basename)
 {
-    gchar *filename, *name;
+    char *filename, *name;
     GKeyFile *rcfile;
     GError *error = NULL;
-    GList *list = NULL;
-    gint i, p = 0;
+    int i, p = 0;
     EqualizerPreset *preset;
 
     filename = g_build_filename (get_path (AUD_PATH_USER_DIR), basename, NULL);
@@ -61,9 +60,11 @@ equalizer_read_presets(const gchar *basename)
 
     g_free(filename);
 
+    Index * list = index_new ();
+
     for (;;)
     {
-        gchar section[32];
+        char section[32];
 
         error = NULL;
         g_snprintf(section, sizeof(section), "Preset%d", p++);
@@ -78,7 +79,7 @@ equalizer_read_presets(const gchar *basename)
 
             for (i = 0; i < AUD_EQUALIZER_NBANDS; i++)
             {
-                gchar band[16];
+                char band[16];
                 g_snprintf(band, sizeof(band), "Band%d", i);
 
                 error = NULL;
@@ -86,37 +87,33 @@ equalizer_read_presets(const gchar *basename)
                 preset->bands[i] = g_key_file_get_double(rcfile, name, band, &error);
             }
 
-            list = g_list_prepend(list, preset);
+            index_append (list, preset);
         }
         else
             break;
     }
 
-    list = g_list_reverse(list);
     g_key_file_free(rcfile);
 
     return list;
 }
 
-gboolean equalizer_write_preset_file (GList * list, const gchar * basename)
+bool_t equalizer_write_preset_file (Index * list, const char * basename)
 {
-    gchar *filename, *tmp;
-    gint i, p;
-    EqualizerPreset *preset;
+    char *filename;
+    int i;
     GKeyFile *rcfile;
-    GList *node;
-    gchar *data;
+    char *data;
     gsize len;
     GError *error = NULL;
 
     rcfile = g_key_file_new();
-    p = 0;
 
-    for (node = list; node; node = g_list_next(node))
+    for (int p = 0; p < index_count (list); p ++)
     {
-        preset = node->data;
+        EqualizerPreset * preset = index_get (list, p);
 
-        tmp = g_strdup_printf("Preset%d", p++);
+        char * tmp = g_strdup_printf ("Preset%d", p);
         g_key_file_set_string(rcfile, "Presets", tmp, preset->name);
         g_free(tmp);
 
@@ -134,7 +131,7 @@ gboolean equalizer_write_preset_file (GList * list, const gchar * basename)
     filename = g_build_filename (get_path (AUD_PATH_USER_DIR), basename, NULL);
 
     data = g_key_file_to_data(rcfile, &len, &error);
-    gboolean success = g_file_set_contents (filename, data, len, & error);
+    bool_t success = g_file_set_contents (filename, data, len, & error);
     g_free(data);
 
     g_key_file_free(rcfile);
@@ -142,16 +139,14 @@ gboolean equalizer_write_preset_file (GList * list, const gchar * basename)
     return success;
 }
 
-GList *
-import_winamp_eqf(VFSFile * file)
+Index * import_winamp_eqf (VFSFile * file)
 {
-    gchar header[31];
-    gchar bands[11];
-    gint i = 0;
+    char header[31];
+    char bands[11];
+    int i = 0;
     EqualizerPreset *preset = NULL;
-    GList *list = NULL;
-    gchar *markup;
-    gchar preset_name[0xb4];
+    char *markup;
+    char preset_name[0xb4];
 
     if (vfs_fread (header, 1, sizeof header, file) != sizeof header || strncmp
      (header, "Winamp EQ library file v1.1", 27))
@@ -160,6 +155,8 @@ import_winamp_eqf(VFSFile * file)
     AUDDBG("The EQF header is OK\n");
 
     if (vfs_fseek(file, 0x1f, SEEK_SET) == -1) goto error;
+
+    Index * list = index_new ();
 
     while (vfs_fread(preset_name, 1, 0xb4, file) == 0xb4) {
         AUDDBG("The preset name is '%s'\n", preset_name);
@@ -174,28 +171,25 @@ import_winamp_eqf(VFSFile * file)
         for (i = 0; i < 10; i++)
             preset->bands[i] = EQUALIZER_MAX_GAIN - ((bands[i] * EQUALIZER_MAX_GAIN * 2) / 64.0);
 
-        list = g_list_prepend(list, preset);
+        index_append (list, preset);
     }
-
-    list = g_list_reverse(list);
-    if (list == NULL) goto error;
 
     return list;
 
 error:
     markup = g_strdup_printf (_("Error importing Winamp EQF file '%s'"),
-     file->uri);
-    interface_show_error_message(markup);
+     vfs_get_filename (file));
+    interface_show_error(markup);
 
     g_free(markup);
     return NULL;
 }
 
-gboolean save_preset_file (EqualizerPreset * preset, const gchar * filename)
+bool_t save_preset_file (EqualizerPreset * preset, const char * filename)
 {
     GKeyFile *rcfile;
-    gint i;
-    gchar *data;
+    int i;
+    char *data;
     gsize len;
     GError *error = NULL;
 
@@ -203,7 +197,7 @@ gboolean save_preset_file (EqualizerPreset * preset, const gchar * filename)
     g_key_file_set_double(rcfile, "Equalizer preset", "Preamp", preset->preamp);
 
     for (i = 0; i < 10; i++) {
-        gchar tmp[7];
+        char tmp[7];
         g_snprintf(tmp, sizeof(tmp), "Band%d", i);
         g_key_file_set_double(rcfile, "Equalizer preset", tmp,
                               preset->bands[i]);
@@ -211,7 +205,7 @@ gboolean save_preset_file (EqualizerPreset * preset, const gchar * filename)
 
     data = g_key_file_to_data(rcfile, &len, &error);
 
-    gboolean success = FALSE;
+    bool_t success = FALSE;
 
     VFSFile * file = vfs_fopen (filename, "w");
     if (file == NULL)
@@ -226,9 +220,9 @@ DONE:
     return success;
 }
 
-static EqualizerPreset * equalizer_read_aud_preset (const gchar * filename)
+static EqualizerPreset * equalizer_read_aud_preset (const char * filename)
 {
-    gint i;
+    int i;
     EqualizerPreset *preset;
     GKeyFile *rcfile;
     GError *error = NULL;
@@ -240,13 +234,15 @@ static EqualizerPreset * equalizer_read_aud_preset (const gchar * filename)
     if (!g_key_file_load_from_file(rcfile, filename, G_KEY_FILE_NONE, &error))
     {
         g_key_file_free(rcfile);
+        g_free(preset->name);
+        g_free(preset);
         return NULL;
     }
 
     preset->preamp = g_key_file_get_double(rcfile, "Equalizer preset", "Preamp", &error);
     for (i = 0; i < 10; i++)
     {
-        gchar tmp[7];
+        char tmp[7];
         g_snprintf(tmp, sizeof(tmp), "Band%d", i);
 
         preset->bands[i] = g_key_file_get_double(rcfile, "Equalizer preset", tmp, &error);
@@ -257,7 +253,7 @@ static EqualizerPreset * equalizer_read_aud_preset (const gchar * filename)
 }
 
 EqualizerPreset *
-load_preset_file(const gchar *filename)
+load_preset_file(const char *filename)
 {
     if (filename) {
         EqualizerPreset *preset = equalizer_read_aud_preset(filename);

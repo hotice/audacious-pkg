@@ -1,31 +1,28 @@
 /*
  * libaudgui/infowin.c
- * Copyright 2006 William Pitcock, Tony Vroon, George Averill, Giacomo Lozito,
- *  Derek Pomery and Yoshiki Yazawa.
- * Copyright 2008 Eugene Zagidullin
- * Copyright 2010 John Lindgren
+ * Copyright 2006-2011 William Pitcock, Tomasz Moń, Eugene Zagidullin, and
+ *                     John Lindgren
  *
- * This file is part of Audacious.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; under version 3 of the License.
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses>.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * The Audacious team does not consider modular code linking to
+ * Audacious or using our public API to be a derived work.
  */
 
 #include <gtk/gtk.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
-#include <audacious/audconfig.h>
 #include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
@@ -38,6 +35,7 @@
 #include "libaudgui-gtk.h"
 
 #define AUDGUI_STATUS_TIMEOUT 3000
+#define IMAGE_SIZE 150
 
 static GtkWidget * infowin = NULL;
 
@@ -65,15 +63,15 @@ enum
     RAWDATA_N_COLS
 };
 
-static gchar * current_file = NULL;
+static char * current_file = NULL;
 static PluginHandle * current_decoder = NULL;
-static gboolean can_write = FALSE, something_changed = FALSE;
+static bool_t can_write = FALSE, something_changed = FALSE;
 
 /* This is by no means intended to be a complete list.  If it is not short, it
  * is useless: scrolling through ten pages of dropdown list is more work than
  * typing out the genre. */
 
-static const gchar * genre_table[] = {
+static const char * genre_table[] = {
  N_("Acid Jazz"),
  N_("Acid Rock"),
  N_("Ambient"),
@@ -115,18 +113,20 @@ static const gchar * genre_table[] = {
  N_("Trip-hop")};
 
 static void set_entry_str_from_field (GtkWidget * widget, const Tuple * tuple,
- gint fieldn, gboolean editable)
+ int fieldn, bool_t editable)
 {
-    const gchar * text = tuple_get_string (tuple, fieldn, NULL);
+    char * text = tuple_get_str (tuple, fieldn, NULL);
 
     gtk_entry_set_text ((GtkEntry *) widget, text != NULL ? text : "");
     gtk_editable_set_editable ((GtkEditable *) widget, editable);
+
+    str_unref (text);
 }
 
 static void set_entry_int_from_field (GtkWidget * widget, const Tuple * tuple,
- gint fieldn, gboolean editable)
+ int fieldn, bool_t editable)
 {
-    gchar scratch[32];
+    char scratch[32];
 
     if (tuple_get_value_type (tuple, fieldn, NULL) == TUPLE_INT)
         snprintf (scratch, sizeof scratch, "%d", tuple_get_int (tuple, fieldn,
@@ -138,37 +138,39 @@ static void set_entry_int_from_field (GtkWidget * widget, const Tuple * tuple,
     gtk_editable_set_editable ((GtkEditable *) widget, editable);
 }
 
-static void set_field_str_from_entry (Tuple * tuple, gint fieldn, GtkWidget *
+static void set_field_str_from_entry (Tuple * tuple, int fieldn, GtkWidget *
  widget)
 {
-    const gchar * text = gtk_entry_get_text ((GtkEntry *) widget);
+    const char * text = gtk_entry_get_text ((GtkEntry *) widget);
 
     if (text[0])
-        tuple_associate_string (tuple, fieldn, NULL, text);
+        tuple_set_str (tuple, fieldn, NULL, text);
     else
-        tuple_disassociate (tuple, fieldn, NULL);
+        tuple_unset (tuple, fieldn, NULL);
 }
 
-static void set_field_int_from_entry (Tuple * tuple, gint fieldn, GtkWidget *
+static void set_field_int_from_entry (Tuple * tuple, int fieldn, GtkWidget *
  widget)
 {
-    const gchar * text = gtk_entry_get_text ((GtkEntry *) widget);
+    const char * text = gtk_entry_get_text ((GtkEntry *) widget);
 
     if (text[0])
-        tuple_associate_int (tuple, fieldn, NULL, atoi (text));
+        tuple_set_int (tuple, fieldn, NULL, atoi (text));
     else
-        tuple_disassociate (tuple, fieldn, NULL);
+        tuple_unset (tuple, fieldn, NULL);
 }
 
-static void infowin_label_set_text (GtkWidget * widget, const gchar * text)
+/* call str_unref() on <text> */
+static void infowin_label_set_text (GtkWidget * widget, char * text)
 {
-    gchar * tmp;
+    char * tmp;
 
-    if (text != NULL)
+    if (text)
     {
         tmp = g_strdup_printf("<span size=\"small\">%s</span>", text);
         gtk_label_set_text ((GtkLabel *) widget, tmp);
         g_free (tmp);
+        str_unref (text);
     }
     else
         gtk_label_set_text ((GtkLabel *) widget,
@@ -177,12 +179,12 @@ static void infowin_label_set_text (GtkWidget * widget, const gchar * text)
     gtk_label_set_use_markup ((GtkLabel *) widget, TRUE);
 }
 
-static void infowin_entry_set_image (GtkWidget * widget, gint list, gint entry)
+static void infowin_entry_set_image (GtkWidget * widget, int list, int entry)
 {
     GdkPixbuf * p = audgui_pixbuf_for_entry (list, entry);
     g_return_if_fail (p);
 
-    audgui_pixbuf_scale_within (& p, aud_cfg->filepopup_pixelsize);
+    audgui_pixbuf_scale_within (& p, IMAGE_SIZE);
     gtk_image_set_from_pixbuf ((GtkImage *) widget, p);
     g_object_unref ((GObject *) p);
 }
@@ -225,7 +227,7 @@ static void entry_changed (GtkEditable * editable, void * unused)
     }
 }
 
-static gboolean ministatus_timeout_proc (void * data)
+static bool_t ministatus_timeout_proc (void * data)
 {
     GtkLabel * status = data;
 
@@ -235,9 +237,9 @@ static gboolean ministatus_timeout_proc (void * data)
     return FALSE;
 }
 
-static void ministatus_display_message (const gchar * text)
+static void ministatus_display_message (const char * text)
 {
-    gchar * tmp = g_strdup_printf ("<span size=\"small\">%s</span>", text);
+    char * tmp = g_strdup_printf ("<span size=\"small\">%s</span>", text);
 
     gtk_label_set_text ((GtkLabel *) label_mini_status, tmp);
     gtk_label_set_use_markup ((GtkLabel *) label_mini_status, TRUE);
@@ -269,14 +271,14 @@ static void infowin_update_tuple (void * unused)
     else
         ministatus_display_message (_("Metadata updating failed"));
 
-    mowgli_object_unref (tuple);
+    tuple_unref (tuple);
 }
 
-gboolean genre_fill (GtkWidget * combo)
+bool_t genre_fill (GtkWidget * combo)
 {
     GList * list = NULL;
     GList * node;
-    gint i;
+    int i;
 
     for (i = 0; i < G_N_ELEMENTS (genre_table); i ++)
         list = g_list_prepend (list, _(genre_table[i]));
@@ -508,10 +510,10 @@ void create_infowin (void)
     gtk_widget_grab_focus (entry_title);
 }
 
-static void infowin_show (gint list, gint entry, const gchar * filename,
- const Tuple * tuple, PluginHandle * decoder, gboolean updating_enabled)
+static void infowin_show (int list, int entry, const char * filename,
+ const Tuple * tuple, PluginHandle * decoder, bool_t updating_enabled)
 {
-    gchar * tmp;
+    char * tmp;
 
     if (infowin == NULL)
         create_infowin ();
@@ -539,18 +541,12 @@ static void infowin_show (gint list, gint entry, const gchar * filename,
     set_entry_int_from_field (entry_track, tuple, FIELD_TRACK_NUMBER,
      updating_enabled);
 
-    infowin_label_set_text (label_format_name, tuple_get_string (tuple,
-     FIELD_CODEC, NULL));
-    infowin_label_set_text (label_quality, tuple_get_string (tuple,
-     FIELD_QUALITY, NULL));
+    infowin_label_set_text (label_format_name, tuple_get_str (tuple, FIELD_CODEC, NULL));
+    infowin_label_set_text (label_quality, tuple_get_str (tuple, FIELD_QUALITY, NULL));
 
     if (tuple_get_value_type (tuple, FIELD_BITRATE, NULL) == TUPLE_INT)
-    {
-        tmp = g_strdup_printf (_("%d kb/s"), tuple_get_int (tuple,
-         FIELD_BITRATE, NULL));
-        infowin_label_set_text (label_bitrate, tmp);
-        g_free (tmp);
-    }
+        infowin_label_set_text (label_bitrate, str_printf (_("%d kb/s"),
+         tuple_get_int (tuple, FIELD_BITRATE, NULL)));
     else
         infowin_label_set_text (label_bitrate, NULL);
 
@@ -559,38 +555,42 @@ static void infowin_show (gint list, gint entry, const gchar * filename,
     gtk_window_present ((GtkWindow *) infowin);
 }
 
-void audgui_infowin_show (gint playlist, gint entry)
+void audgui_infowin_show (int playlist, int entry)
 {
-    const gchar * filename = aud_playlist_entry_get_filename (playlist, entry);
+    char * filename = aud_playlist_entry_get_filename (playlist, entry);
     g_return_if_fail (filename != NULL);
 
     PluginHandle * decoder = aud_playlist_entry_get_decoder (playlist, entry,
      FALSE);
     if (decoder == NULL)
-        return;
+        goto FREE;
 
     if (aud_custom_infowin (filename, decoder))
-        return;
+        goto FREE;
 
-    const Tuple * tuple = aud_playlist_entry_get_tuple (playlist, entry, FALSE);
+    Tuple * tuple = aud_playlist_entry_get_tuple (playlist, entry, FALSE);
 
     if (tuple == NULL)
     {
-        gchar * message = g_strdup_printf (_("No info available for %s.\n"),
+        char * message = g_strdup_printf (_("No info available for %s.\n"),
          filename);
-        hook_call ("interface show error", message);
+        aud_interface_show_error (message);
         g_free (message);
-        return;
+        goto FREE;
     }
 
     infowin_show (playlist, entry, filename, tuple, decoder,
      aud_file_can_write_tuple (filename, decoder));
+    tuple_unref (tuple);
+
+FREE:
+    str_unref (filename);
 }
 
 void audgui_infowin_show_current (void)
 {
-    gint playlist = aud_playlist_get_playing ();
-    gint position;
+    int playlist = aud_playlist_get_playing ();
+    int position;
 
     if (playlist == -1)
         playlist = aud_playlist_get_active ();
