@@ -17,26 +17,28 @@
  *  Audacious or using our public API to be a derived work.
  */
 
+#include <glib.h>
 #include <string.h>
 #include <libaudcore/audstrings.h>
 
-#include "audconfig.h"
 #include "config.h"
-#include "i18n.h"
 #include "debug.h"
+#include "i18n.h"
+#include "main.h"
+#include "misc.h"
 
 #ifdef USE_CHARDET
 #  include <libguess.h>
 #endif
 
-static gchar * cd_chardet_to_utf8 (const gchar * str, gssize len,
- gsize * arg_bytes_read, gsize * arg_bytes_write, GError ** error);
+static char * cd_chardet_to_utf8 (const char * str, int len,
+ int * arg_bytes_read, int * arg_bytes_written);
 
-static gchar * str_to_utf8_fallback (const gchar * str)
+static char * str_to_utf8_fallback (const char * str)
 {
-    gchar * out = g_strconcat (str, _("  (invalid UTF-8)"), NULL);
+    char * out = g_strconcat (str, _("  (invalid UTF-8)"), NULL);
 
-    for (gchar * c = out; * c; c ++)
+    for (char * c = out; * c; c ++)
     {
         if (* c & 0x80)
             * c = '?';
@@ -45,9 +47,9 @@ static gchar * str_to_utf8_fallback (const gchar * str)
     return out;
 }
 
-static gchar * cd_str_to_utf8 (const gchar * str)
+static char * cd_str_to_utf8 (const char * str)
 {
-    gchar *out_str;
+    char *out_str;
 
     if (str == NULL)
         return NULL;
@@ -84,25 +86,19 @@ static gchar * cd_str_to_utf8 (const gchar * str)
 #endif
 
     /* chardet encoding detector */
-    if ((out_str = cd_chardet_to_utf8(str, strlen(str), NULL, NULL, NULL)) != NULL)
+    if ((out_str = cd_chardet_to_utf8 (str, strlen (str), NULL, NULL)))
         return out_str;
 
     /* all else fails, we mask off character codes >= 128, replace with '?' */
     return str_to_utf8_fallback(str);
 }
 
-static gchar * cd_chardet_to_utf8 (const gchar * str, gssize len,
- gsize * arg_bytes_read, gsize * arg_bytes_write, GError ** error)
+static char * cd_chardet_to_utf8 (const char * str, int len,
+ int * arg_bytes_read, int * arg_bytes_write)
 {
-    if (error)
-        * error = NULL;
-
-#ifdef USE_CHARDET
-    gchar *det = NULL, *encoding = NULL;
-#endif
-    gchar *ret = NULL;
-    gsize *bytes_read, *bytes_write;
-    gsize my_bytes_read, my_bytes_write;
+    char *ret = NULL;
+    int * bytes_read, * bytes_write;
+    int my_bytes_read, my_bytes_write;
 
     bytes_read = arg_bytes_read != NULL ? arg_bytes_read : &my_bytes_read;
     bytes_write = arg_bytes_write != NULL ? arg_bytes_write : &my_bytes_write;
@@ -129,33 +125,40 @@ static gchar * cd_chardet_to_utf8 (const gchar * str, gssize len,
 
         return ret;
     }
-#ifdef USE_CHARDET
-    if (cfg.chardet_detector)
-        det = cfg.chardet_detector;
 
-    if (det)
+#ifdef USE_CHARDET
+    char * det = get_string (NULL, "chardet_detector");
+
+    if (det[0])
     {
         AUDDBG("guess encoding (%s) %s\n", det, str);
-        encoding = (gchar *) libguess_determine_encoding(str, len, det);
+        const char * encoding = libguess_determine_encoding (str, len, det);
         AUDDBG("encoding = %s\n", encoding);
-        if (encoding == NULL)
-            goto fallback;
-
-        ret = g_convert (str, len, "UTF-8", encoding, bytes_read, bytes_write,
-         (error && * error) ? NULL : error);
+        if (encoding)
+        {
+            gsize read_gsize = 0, written_gsize = 0;
+            ret = g_convert (str, len, "UTF-8", encoding, & read_gsize, & written_gsize, NULL);
+            * bytes_read = read_gsize;
+            * bytes_write = written_gsize;
+        }
     }
 
-fallback:
+    g_free (det);
 #endif
 
     /* If detection failed or was not enabled, try fallbacks (if there are any) */
-    if (ret == NULL && cfg.chardet_fallback_s != NULL)
+    if (! ret)
     {
-        gchar **enc;
-        for (enc = cfg.chardet_fallback_s; *enc != NULL; enc++)
+        char * fallbacks = get_string (NULL, "chardet_fallback");
+        char * * split = g_strsplit_set (fallbacks, " ,:;|/", -1);
+
+        for (char * * enc = split; * enc; enc ++)
         {
-            ret = g_convert (str, len, "UTF-8", * enc, bytes_read, bytes_write,
-             (error && * error) ? NULL : error);
+            gsize read_gsize = 0, written_gsize = 0;
+            ret = g_convert (str, len, "UTF-8", * enc, & read_gsize, & written_gsize, NULL);
+            * bytes_read = read_gsize;
+            * bytes_write = written_gsize;
+
             if (len == *bytes_read)
                 break;
             else {
@@ -163,17 +166,28 @@ fallback:
                 ret = NULL;
             }
         }
+
+        g_strfreev (split);
+        g_free (fallbacks);
     }
 
     /* First fallback: locale (duh!) */
     if (ret == NULL)
-        ret = g_locale_to_utf8 (str, len, bytes_read, bytes_write,
-         (error && * error) ? NULL : error);
+    {
+        gsize read_gsize = 0, written_gsize = 0;
+        ret = g_locale_to_utf8 (str, len, & read_gsize, & written_gsize, NULL);
+        * bytes_read = read_gsize;
+        * bytes_write = written_gsize;
+    }
 
     /* The final fallback is ISO-8859-1, if no other is specified or conversions fail */
     if (ret == NULL)
-        ret = g_convert (str, len, "UTF-8", "ISO-8859-1", bytes_read,
-         bytes_write, (error && * error) ? NULL : error);
+    {
+        gsize read_gsize = 0, written_gsize = 0;
+        ret = g_convert (str, len, "UTF-8", "ISO-8859-1", & read_gsize, & written_gsize, NULL);
+        * bytes_read = read_gsize;
+        * bytes_write = written_gsize;
+    }
 
     if (ret != NULL)
     {
@@ -192,5 +206,8 @@ fallback:
 
 void chardet_init (void)
 {
+#ifdef USE_CHARDET
+    libguess_determine_encoding(NULL, -1, "");
+#endif
     str_set_utf8_impl (cd_str_to_utf8, cd_chardet_to_utf8);
 }

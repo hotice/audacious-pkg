@@ -2,60 +2,63 @@
  * list.h
  * Copyright 2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #ifndef AUDGUI_LIST_H
 #define AUDGUI_LIST_H
 
 #include <gtk/gtk.h>
+#include <libaudcore/core.h>
 
 typedef struct {
-    void (* get_value) (void * user, gint row, gint column, GValue * value);
+    void (* get_value) (void * user, int row, int column, GValue * value);
 
     /* selection (optional) */
-    gboolean (* get_selected) (void * user, gint row);
-    void (* set_selected) (void * user, gint row, gboolean selected);
-    void (* select_all) (void * user, gboolean selected);
+    bool_t (* get_selected) (void * user, int row);
+    void (* set_selected) (void * user, int row, bool_t selected);
+    void (* select_all) (void * user, bool_t selected);
 
-    void (* activate_row) (void * user, gint row); /* optional */
+    void (* activate_row) (void * user, int row); /* optional */
     void (* right_click) (void * user, GdkEventButton * event); /* optional */
-    void (* shift_rows) (void * user, gint row, gint before); /* optional */
+    void (* shift_rows) (void * user, int row, int before); /* optional */
 
     /* cross-widget drag and drop (optional) */
-    const gchar * data_type;
-    void (* get_data) (void * user, void * * data, gint * length); /* data will
+    const char * data_type;
+    void (* get_data) (void * user, void * * data, int * length); /* data will
      be freed */
-    void (* receive_data) (void * user, gint row, const void * data, gint length);
+    void (* receive_data) (void * user, int row, const void * data, int length);
 } AudguiListCallbacks;
 
 GtkWidget * audgui_list_new (const AudguiListCallbacks * cbs, void * user,
- gint rows);
+ int rows);
 void * audgui_list_get_user (GtkWidget * list);
-void audgui_list_add_column (GtkWidget * list, const gchar * title,
- gint column, GType type, gboolean expand);
+void audgui_list_add_column (GtkWidget * list, const char * title,
+ int column, GType type, int width);
 
-gint audgui_list_row_count (GtkWidget * list);
-void audgui_list_insert_rows (GtkWidget * list, gint at, gint rows);
-void audgui_list_update_rows (GtkWidget * list, gint at, gint rows);
-void audgui_list_delete_rows (GtkWidget * list, gint at, gint rows);
-void audgui_list_update_selection (GtkWidget * list, gint at, gint rows);
-void audgui_list_set_highlight (GtkWidget * list, gint row);
-void audgui_list_set_focus (GtkWidget * list, gint row);
-gint audgui_list_row_at_point (GtkWidget * list, gint x, gint y);
+int audgui_list_row_count (GtkWidget * list);
+void audgui_list_insert_rows (GtkWidget * list, int at, int rows);
+void audgui_list_update_rows (GtkWidget * list, int at, int rows);
+void audgui_list_delete_rows (GtkWidget * list, int at, int rows);
+void audgui_list_update_selection (GtkWidget * list, int at, int rows);
+
+int audgui_list_get_highlight (GtkWidget * list);
+void audgui_list_set_highlight (GtkWidget * list, int row);
+int audgui_list_get_focus (GtkWidget * list);
+void audgui_list_set_focus (GtkWidget * list, int row);
+
+int audgui_list_row_at_point (GtkWidget * list, int x, int y);
 
 #endif

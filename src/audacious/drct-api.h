@@ -25,68 +25,49 @@
 
 /* --- PROGRAM CONTROL --- */
 
-AUD_FUNC0 (void, drct_quit)
+AUD_VFUNC0 (drct_quit)
 
 /* --- PLAYBACK CONTROL --- */
 
-AUD_FUNC0 (void, drct_play)
-AUD_FUNC0 (void, drct_pause)
-AUD_FUNC0 (void, drct_stop)
-AUD_FUNC0 (gboolean, drct_get_playing)
-AUD_FUNC0 (gboolean, drct_get_paused)
-AUD_FUNC0 (gchar *, drct_get_title)
-AUD_FUNC3 (void, drct_get_info, gint *, bitrate, gint *, samplerate, gint *,
- channels)
-AUD_FUNC0 (gint, drct_get_time)
-AUD_FUNC0 (gint, drct_get_length)
-AUD_FUNC1 (void, drct_seek, gint, time)
+/* The strings returned by drct_get_filename() and drct_get_title() are pooled
+ * and must be freed with str_unref(). */
+
+AUD_VFUNC0 (drct_play)
+AUD_VFUNC0 (drct_pause)
+AUD_VFUNC0 (drct_stop)
+AUD_FUNC0 (bool_t, drct_get_playing)
+AUD_FUNC0 (bool_t, drct_get_ready)
+AUD_FUNC0 (bool_t, drct_get_paused)
+AUD_FUNC0 (char *, drct_get_filename)
+AUD_FUNC0 (char *, drct_get_title)
+AUD_VFUNC3 (drct_get_info, int *, bitrate, int *, samplerate, int *, channels)
+AUD_FUNC0 (int, drct_get_time)
+AUD_FUNC0 (int, drct_get_length)
+AUD_VFUNC1 (drct_seek, int, time)
 
 /* --- VOLUME CONTROL --- */
 
-AUD_FUNC2 (void, drct_get_volume, gint *, left, gint *, right)
-AUD_FUNC2 (void, drct_set_volume, gint, left, gint, right)
-AUD_FUNC1 (void, drct_get_volume_main, gint *, volume)
-AUD_FUNC1 (void, drct_set_volume_main, gint, volume)
-AUD_FUNC1 (void, drct_get_volume_balance, gint *, balance)
-AUD_FUNC1 (void, drct_set_volume_balance, gint, balance)
+AUD_VFUNC2 (drct_get_volume, int *, left, int *, right)
+AUD_VFUNC2 (drct_set_volume, int, left, int, right)
+AUD_VFUNC1 (drct_get_volume_main, int *, volume)
+AUD_VFUNC1 (drct_set_volume_main, int, volume)
+AUD_VFUNC1 (drct_get_volume_balance, int *, balance)
+AUD_VFUNC1 (drct_set_volume_balance, int, balance)
 
 /* --- PLAYLIST CONTROL --- */
 
-AUD_FUNC0 (gint, drct_pl_get_length)
-AUD_FUNC0 (void, drct_pl_next)
-AUD_FUNC0 (void, drct_pl_prev)
-AUD_FUNC0 (gint, drct_pl_get_pos)
-AUD_FUNC1 (void, drct_pl_set_pos, gint, pos)
+/* The indexes passed to drct_pl_add_list(), drct_pl_open_list(), and
+ * drct_pl_open_temp_list() contain pooled strings to which the caller gives up
+ * one reference.  The indexes themselves are freed by these functions. */
 
-AUD_FUNC0 (gboolean, drct_pl_repeat_is_enabled)
-AUD_FUNC0 (void, drct_pl_repeat_toggle)
-AUD_FUNC0 (gboolean, drct_pl_shuffle_is_enabled)
-AUD_FUNC0 (void, drct_pl_shuffle_toggle)
+AUD_VFUNC0 (drct_pl_next)
+AUD_VFUNC0 (drct_pl_prev)
 
-AUD_FUNC1 (gchar *, drct_pl_get_file, gint, entry)
-AUD_FUNC1 (gchar *, drct_pl_get_title, gint, entry)
-AUD_FUNC1 (gint, drct_pl_get_time, gint, entry)
+AUD_VFUNC2 (drct_pl_add, const char *, filename, int, at)
+AUD_VFUNC2 (drct_pl_add_list, Index *, filenames, int, at)
+AUD_VFUNC1 (drct_pl_open, const char *, filename)
+AUD_VFUNC1 (drct_pl_open_list, Index *, filenames)
+AUD_VFUNC1 (drct_pl_open_temp, const char *, filename)
+AUD_VFUNC1 (drct_pl_open_temp_list, Index *, filenames)
 
-AUD_FUNC2 (void, drct_pl_add, const gchar *, filename, gint, at)
-AUD_FUNC2 (void, drct_pl_add_list, GList *, list, gint, at)
-AUD_FUNC1 (void, drct_pl_open, const gchar *, filename)
-AUD_FUNC1 (void, drct_pl_open_list, GList *, list)
-AUD_FUNC1 (void, drct_pl_open_temp, const gchar *, filename)
-AUD_FUNC1 (void, drct_pl_open_temp_list, GList *, list)
-
-AUD_FUNC1 (void, drct_pl_delete, gint, entry)
-AUD_FUNC0 (void, drct_pl_delete_selected)
-AUD_FUNC0 (void, drct_pl_clear)
-
-/* --- PLAYLIST QUEUE CONTROL --- */
-
-AUD_FUNC0 (gint, drct_pq_get_length)
-AUD_FUNC1 (gint, drct_pq_get_entry, gint, queue_position)
-AUD_FUNC1 (gboolean, drct_pq_is_queued, gint, entry)
-AUD_FUNC1 (gint, drct_pq_get_queue_position, gint, entry)
-AUD_FUNC1 (void, drct_pq_add, gint, entry)
-AUD_FUNC1 (void, drct_pq_remove, gint, entry)
-AUD_FUNC0 (void, drct_pq_clear)
-
-/* New in 2.5-alpha2 */
-AUD_FUNC0 (gboolean, drct_get_ready)
+AUD_VFUNC1 (drct_pl_delete_selected, int, playlist)

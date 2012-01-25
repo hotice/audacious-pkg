@@ -1,50 +1,47 @@
 /*
  * libaudgui-gtk.h
- * Copyright 2010 Audacious Development Team
+ * Copyright 2010-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #ifndef LIBAUDGUI_GTK_H
 #define LIBAUDGUI_GTK_H
 
+#include <stdint.h>
 #include <gtk/gtk.h>
+#include <libaudcore/core.h>
 
 /* effects-menu.c */
 GtkWidget * audgui_create_effects_menu (void);
+GtkWidget * audgui_create_vis_menu (void);
 
 /* iface-menu.c */
 GtkWidget * audgui_create_iface_menu (void);
-
-void audgui_playlist_manager_update(void);
-void audgui_playlist_manager_ui_show(GtkWidget *mainwin);
-void audgui_playlist_manager_destroy(void);
 
 /* util.c */
 void audgui_hide_on_delete (GtkWidget * widget);
 void audgui_hide_on_escape (GtkWidget * widget);
 void audgui_destroy_on_escape (GtkWidget * widget);
 void audgui_simple_message (GtkWidget * * widget, GtkMessageType type,
- const gchar * title, const gchar * text);
-void audgui_connect_check_box (GtkWidget * box, gboolean * setting);
+ const char * title, const char * text);
+void audgui_connect_check_box (GtkWidget * box, bool_t * setting);
 
-GdkPixbuf * audgui_pixbuf_from_data (void * data, gint size);
-GdkPixbuf * audgui_pixbuf_for_entry (gint playlist, gint entry);
+GdkPixbuf * audgui_pixbuf_from_data (const void * data, int64_t size);
+GdkPixbuf * audgui_pixbuf_for_entry (int playlist, int entry);
 GdkPixbuf * audgui_pixbuf_for_current (void);
-void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, gint size);
+void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, int size);
 
 #endif

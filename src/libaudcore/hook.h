@@ -1,44 +1,50 @@
-/*  Audacious
- *  Copyright (c) 2006-2007 William Pitcock
+/*
+ * hook.h
+ * Copyright 2011 John Lindgren
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
-#ifndef AUDACIOUS_HOOK_H
-#define AUDACIOUS_HOOK_H
+#ifndef LIBAUDCORE_HOOK_H
+#define LIBAUDCORE_HOOK_H
 
-#include <glib.h>
+typedef void (* HookFunction) (void * data, void * user);
 
-typedef void (*HookFunction)(gpointer hook_data, gpointer user_data);
+/* Adds <func> to the list of functions to be called when the hook <name> is
+ * triggered. */
+void hook_associate (const char * name, HookFunction func, void * user);
 
-typedef struct {
-    HookFunction func;
-    gpointer user_data;
-} HookItem;
+/* Removes all instances matching <func> and <user> from the list of functions
+ * to be called when the hook <name> is triggered.  If <user> is NULL, all
+ * instances matching <func> are removed. */
+void hook_dissociate_full (const char * name, HookFunction func, void * user);
 
-typedef struct {
-    const gchar *name;
-    GSList *items;
-} Hook;
+#define hook_dissociate(n, f) hook_dissociate_full (n, f, NULL)
 
-void hook_init (void);
-void hook_register(const gchar *name);
-gint hook_associate(const gchar *name, HookFunction func, gpointer user_data);
-gint hook_dissociate(const gchar *name, HookFunction func);
-gint hook_dissociate_full(const gchar *name, HookFunction func, gpointer user_data);
-void hook_call(const gchar *name, gpointer hook_data);
+/* Triggers the hook <name>. */
+void hook_call (const char * name, void * data);
 
-#endif /* AUDACIOUS_HOOK_H */
+/* Schedules a call of the hook <name> from the program's main loop, to be
+ * executed in <time> milliseconds.  If <destroy> is not NULL, it will be called
+ * on <data> after the hook is called. */
+void event_queue_full (int time, const char * name, void * data, void (* destroy) (void *));
+
+#define event_queue(n, d) event_queue_full (0, n, d, NULL)
+
+/* Cancels pending hook calls matching <name> and <data>.  If <data> is NULL,
+ * all hook calls matching <name> are canceled. */
+void event_queue_cancel (const char * name, void * data);
+
+#endif /* LIBAUDCORE_HOOK_H */

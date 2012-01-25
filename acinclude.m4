@@ -1,16 +1,3 @@
-
-dnl ** ADD_PKG_REQUIRES([requirement])
-dnl ** Adds a dependency to package's pkg-config file.
-AC_DEFUN([ADD_PC_REQUIRES], [
-   if test "x$PC_REQUIRES" = "x"; then
-       PC_REQUIRES="$1"
-   else
-       PC_REQUIRES="$PC_REQUIRES, $1"
-   fi
-   AC_SUBST([PC_REQUIRES])
-])
-
-
 dnl ** AUD_CHECK_MODULE([define name], [module], [version required],
 dnl **     [informational name], [additional error message])
 dnl **
@@ -21,7 +8,6 @@ dnl **
 dnl ** AUD_CHECK_MODULE([GLIB], [gtk+-2.0], [>= 2.8.0], [Gtk+2], [See http://www.gtk.org/])
 AC_DEFUN([AUD_CHECK_MODULE], [
     PKG_CHECK_MODULES([$1], [$2 $3], [
-        ADD_PC_REQUIRES([$2 $3])
     ],[
         PKG_CHECK_EXISTS([$2], [
             cv_pkg_version=`$PKG_CONFIG --modversion "$2" 2>/dev/null`
@@ -142,6 +128,23 @@ define([aud_get_plugin_dirs_defined],[1])dnl
 ])dnl
 
 
+dnl Add $1 to CFLAGS and CXXFLAGS if supported
+dnl ------------------------------------------
+
+AC_DEFUN([AUD_CHECK_CFLAGS],[
+    AC_MSG_CHECKING([whether the C/C++ compiler supports $1])
+    OLDCFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $1 -Werror"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[return 0;])],[
+        AC_MSG_RESULT(yes)
+        CFLAGS="$OLDCFLAGS $1"
+        CXXFLAGS="$CXXFLAGS $1"
+    ],[
+        AC_MSG_RESULT(no)
+        CFLAGS="$OLDCFLAGS"
+    ])
+])
+
 
 dnl **
 dnl ** Common checks
@@ -150,20 +153,34 @@ AC_DEFUN([AUD_COMMON_PROGS], [
 
 dnl Check for C and C++ compilers
 dnl =============================
-AUD_CHECK_GNU_MAKE
-AC_PROG_CC
-AC_PROG_CXX
-AM_PROG_AS
-AC_ISC_POSIX
-AC_C_BIGENDIAN
+AC_REQUIRE([AC_PROG_CC])
+AC_REQUIRE([AC_PROG_CXX])
+AC_REQUIRE([AM_PROG_AS])
+AC_REQUIRE([AC_C_BIGENDIAN])
+AC_REQUIRE([AC_SYS_LARGEFILE])
 
 if test "x$GCC" = "xyes"; then
-    CFLAGS="$CFLAGS -Wall -pipe"
-    CXXFLAGS="$CXXFLAGS -pipe -Wall"
+    CFLAGS="$CFLAGS -std=gnu99 -Wall -pipe"
+    CXXFLAGS="$CXXFLAGS -Wall -pipe"
+    AUD_CHECK_CFLAGS(-Wtype-limits)
 fi
+
+dnl Enable "-Wl,-z,defs" only on Linux
+dnl ==============================
+AC_MSG_CHECKING([for Linux])
+case "$target" in
+    *linux*)
+        AC_MSG_RESULT([yes])
+        LDFLAGS="$LDFLAGS -Wl,-z,defs"
+        ;;
+    *)
+        AC_MSG_RESULT([no])
+        ;;
+esac
 
 dnl Checks for various programs
 dnl ===========================
+AUD_CHECK_GNU_MAKE
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PATH_PROG([RM], [rm])
@@ -172,85 +189,14 @@ AC_PATH_PROG([CP], [cp])
 AC_PATH_PROG([AR], [ar])
 AC_PATH_PROG([TR], [tr])
 AC_PATH_PROG([RANLIB], [ranlib])
+AC_PATH_PROG([WINDRES], [windres])
 
 dnl Check for Gtk+/GLib and pals
 dnl ============================
-AUD_CHECK_MODULE([GLIB], [glib-2.0], [>= 2.12.0], [Glib2])
-AUD_CHECK_MODULE([GTHREAD], [gthread-2.0], [>= 2.12.0], [gthread-2.0])
-
-if test $use_gtk3 = yes ; then
-    AUD_CHECK_MODULE([GTK], [gtk+-3.0], [>= 3.0.0], [Gtk+3])
-else
-    AUD_CHECK_MODULE([GTK], [gtk+-2.0], [>= 2.8.0], [Gtk+2])
-fi
-
-AUD_CHECK_MODULE([PANGO], [pango], [>= 1.8.0], [Pango])
-AUD_CHECK_MODULE([CAIRO], [cairo], [>= 1.2.4], [Cairo])
-
-
-dnl Check for libmowgli
-dnl ===================
-AUD_CHECK_MODULE([MOWGLI], [libmowgli], [>= 0.9], [libmowgli],
-    [http://www.atheme.org/projects/mowgli.shtml])
-
-
-dnl Check for libmcs
-dnl ================
-AUD_CHECK_MODULE([LIBMCS], [libmcs], [>= 0.7], [libmcs],
-    [http://www.atheme.org/projects/mcs.shtml])
-
-
-dnl SSE2 support
-dnl ============
-AUD_ARG_ENABLE([sse2], [yes], [SSE2 support],
-[
-    AC_MSG_CHECKING([SSE2 support])
-    aud_my_save_CFLAGS="$CFLAGS"
-    CFLAGS="-msse2"
-    AC_TRY_RUN([
-#include <emmintrin.h>
-int main()
-{
-  _mm_setzero_pd();
-  asm volatile("xorpd %xmm0,%xmm0\n\t");
-  return 0;
-}
-    ],[
-        AC_MSG_RESULT([yes])
-        AC_DEFINE([HAVE_SSE2], 1, [Define to 1 if your system has SSE2 support])
-        SIMD_CFLAGS="-msse2"
-    ],[
-        AC_MSG_RESULT([no])
-        enable_sse2="no"
-    ])
-    AC_SUBST([SIMD_CFLAGS])
-    CFLAGS="$aud_my_save_CFLAGS"
-])
-
-dnl AltiVec support
-dnl ===============
-AUD_ARG_ENABLE([altivec], [yes], [AltiVec support],
-[
-    AC_CHECK_HEADERS([altivec.h],
-    [
-        AC_DEFINE([HAVE_ALTIVEC], 1, [Define to 1 if your system has AltiVec.])
-        AC_DEFINE([HAVE_ALTIVEC_H], 1, [Define to 1 if your system has an altivec.h file.])
-        AC_DEFINE([ARCH_POWERPC], 1, [Define to 1 if your system is a PowerPC.])
-        case $target in
-             *-apple-*)
-             SIMD_CFLAGS="-mpim-altivec"
-             ;;
-             *)
-             SIMD_CFLAGS="-maltivec"
-             ;;
-        esac
-        AC_SUBST([SIMD_CFLAGS])
-    ],[
-        enable_altivec="no"
-    ])
-])
-
-AC_CHECK_FUNC([getrlimit])
+AUD_CHECK_MODULE([GLIB], [glib-2.0], [>= 2.16], [Glib2])
+AUD_CHECK_MODULE([GTHREAD], [gthread-2.0], [>= 2.16], [GThread])
+AUD_CHECK_MODULE([PANGO], [pango], [>= 1.20], [Pango])
+AUD_CHECK_MODULE([CAIRO], [cairo], [>= 1.6], [Cairo])
 
 ])
 

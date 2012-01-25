@@ -1,6 +1,6 @@
 /*
  * playlist-utils.c
- * Copyright 2009-2010 John Lindgren
+ * Copyright 2009-2011 John Lindgren
  *
  * This file is part of Audacious.
  *
@@ -19,90 +19,83 @@
  * using our public API to be a derived work.
  */
 
+#include <dirent.h>
 #include <glib.h>
 #include <regex.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <libaudcore/audstrings.h>
+#include <libaudcore/hook.h>
 
-#include "audconfig.h"
 #include "misc.h"
 #include "playlist.h"
-#include "playlist-utils.h"
 
-static const gchar * aud_titlestring_presets[] =
+static const char * get_basename (const char * filename)
 {
-    "${title}",
-    "${?artist:${artist} - }${title}",
-    "${?artist:${artist} - }${?album:${album} - }${title}",
-    "${?artist:${artist} - }${?album:${album} - }"
-     "${?track-number:${track-number}. }${title}",
-    "${?artist:${artist} }${?album:[ ${album} ] }${?artist:- }"
-     "${?track-number:${track-number}. }${title}",
-    "${?album:${album} - }${title}",
-};
-
-const gint n_titlestring_presets = G_N_ELEMENTS (aud_titlestring_presets);
-
-static const gchar * get_basename (const gchar * filename)
-{
-    const gchar * slash = strrchr (filename, '/');
+    const char * slash = strrchr (filename, '/');
 
     return (slash == NULL) ? filename : slash + 1;
 }
 
-static gint filename_compare_basename (const gchar * a, const gchar * b)
+static int filename_compare_basename (const char * a, const char * b)
 {
     return string_compare_encoded (get_basename (a), get_basename (b));
 }
 
-static gint tuple_compare_string (const Tuple * a, const Tuple * b, gint field)
+static int tuple_compare_string (const Tuple * a, const Tuple * b, int field)
 {
-    const gchar * string_a = tuple_get_string (a, field, NULL);
-    const gchar * string_b = tuple_get_string (b, field, NULL);
+    char * string_a = tuple_get_str (a, field, NULL);
+    char * string_b = tuple_get_str (b, field, NULL);
+    int ret;
 
     if (string_a == NULL)
-        return (string_b == NULL) ? 0 : -1;
-    if (string_b == NULL)
-        return 1;
+        ret = (string_b == NULL) ? 0 : -1;
+    else if (string_b == NULL)
+        ret = 1;
+    else
+        ret = string_compare (string_a, string_b);
 
-    return string_compare (string_a, string_b);
+    str_unref (string_a);
+    str_unref (string_b);
+    return ret;
 }
 
-static gint tuple_compare_int (const Tuple * a, const Tuple * b, gint field)
+static int tuple_compare_int (const Tuple * a, const Tuple * b, int field)
 {
     if (tuple_get_value_type (a, field, NULL) != TUPLE_INT)
         return (tuple_get_value_type (b, field, NULL) != TUPLE_INT) ? 0 : -1;
     if (tuple_get_value_type (b, field, NULL) != TUPLE_INT)
         return 1;
 
-    gint int_a = tuple_get_int (a, field, NULL);
-    gint int_b = tuple_get_int (b, field, NULL);
+    int int_a = tuple_get_int (a, field, NULL);
+    int int_b = tuple_get_int (b, field, NULL);
 
     return (int_a < int_b) ? -1 : (int_a > int_b);
 }
 
-static gint tuple_compare_title (const Tuple * a, const Tuple * b)
+static int tuple_compare_title (const Tuple * a, const Tuple * b)
 {
     return tuple_compare_string (a, b, FIELD_TITLE);
 }
 
-static gint tuple_compare_album (const Tuple * a, const Tuple * b)
+static int tuple_compare_album (const Tuple * a, const Tuple * b)
 {
     return tuple_compare_string (a, b, FIELD_ALBUM);
 }
 
-static gint tuple_compare_artist (const Tuple * a, const Tuple * b)
+static int tuple_compare_artist (const Tuple * a, const Tuple * b)
 {
     return tuple_compare_string (a, b, FIELD_ARTIST);
 }
 
-static gint tuple_compare_date (const Tuple * a, const Tuple * b)
+static int tuple_compare_date (const Tuple * a, const Tuple * b)
 {
     return tuple_compare_int (a, b, FIELD_YEAR);
 }
 
-static gint tuple_compare_track (const Tuple * a, const Tuple * b)
+static int tuple_compare_track (const Tuple * a, const Tuple * b)
 {
     return tuple_compare_int (a, b, FIELD_TRACK_NUMBER);
 }
@@ -137,16 +130,7 @@ static const PlaylistStringCompareFunc title_comparisons[] = {
  [PLAYLIST_SORT_TRACK] = NULL,
  [PLAYLIST_SORT_FORMATTED_TITLE] = string_compare};
 
-const gchar * get_gentitle_format (void)
-{
-    if (cfg.titlestring_preset >= 0 && cfg.titlestring_preset <
-     n_titlestring_presets)
-        return aud_titlestring_presets[cfg.titlestring_preset];
-
-    return cfg.gentitle_format;
-}
-
-void playlist_sort_by_scheme (gint playlist, gint scheme)
+void playlist_sort_by_scheme (int playlist, int scheme)
 {
     if (filename_comparisons[scheme] != NULL)
         playlist_sort_by_filename (playlist, filename_comparisons[scheme]);
@@ -156,7 +140,7 @@ void playlist_sort_by_scheme (gint playlist, gint scheme)
         playlist_sort_by_title (playlist, title_comparisons[scheme]);
 }
 
-void playlist_sort_selected_by_scheme (gint playlist, gint scheme)
+void playlist_sort_selected_by_scheme (int playlist, int scheme)
 {
     if (filename_comparisons[scheme] != NULL)
         playlist_sort_selected_by_filename (playlist,
@@ -168,10 +152,10 @@ void playlist_sort_selected_by_scheme (gint playlist, gint scheme)
 }
 
 /* Fix me:  This considers empty fields as duplicates. */
-void playlist_remove_duplicates_by_scheme (gint playlist, gint scheme)
+void playlist_remove_duplicates_by_scheme (int playlist, int scheme)
 {
-    gint entries = playlist_entry_count (playlist);
-    gint count;
+    int entries = playlist_entry_count (playlist);
+    int count;
 
     if (entries < 1)
         return;
@@ -180,176 +164,328 @@ void playlist_remove_duplicates_by_scheme (gint playlist, gint scheme)
 
     if (filename_comparisons[scheme] != NULL)
     {
-        gint (* compare) (const gchar * a, const gchar * b) =
+        int (* compare) (const char * a, const char * b) =
          filename_comparisons[scheme];
-        const gchar * last, * current;
 
         playlist_sort_by_filename (playlist, compare);
-        last = playlist_entry_get_filename (playlist, 0);
+        char * last = playlist_entry_get_filename (playlist, 0);
 
         for (count = 1; count < entries; count ++)
         {
-            current = playlist_entry_get_filename (playlist, count);
+            char * current = playlist_entry_get_filename (playlist, count);
 
             if (compare (last, current) == 0)
                 playlist_entry_set_selected (playlist, count, TRUE);
 
+            str_unref (last);
             last = current;
         }
+
+        str_unref (last);
     }
     else if (tuple_comparisons[scheme] != NULL)
     {
-        gint (* compare) (const Tuple * a, const Tuple * b) =
+        int (* compare) (const Tuple * a, const Tuple * b) =
          tuple_comparisons[scheme];
-        const Tuple * last, * current;
 
         playlist_sort_by_tuple (playlist, compare);
-        last = playlist_entry_get_tuple (playlist, 0, FALSE);
+        Tuple * last = playlist_entry_get_tuple (playlist, 0, FALSE);
 
         for (count = 1; count < entries; count ++)
         {
-            current = playlist_entry_get_tuple (playlist, count, FALSE);
+            Tuple * current = playlist_entry_get_tuple (playlist, count, FALSE);
 
             if (last != NULL && current != NULL && compare (last, current) == 0)
                 playlist_entry_set_selected (playlist, count, TRUE);
 
+            if (last)
+                tuple_unref (last);
             last = current;
         }
+
+        if (last)
+            tuple_unref (last);
     }
 
     playlist_delete_selected (playlist);
 }
 
-void playlist_remove_failed (gint playlist)
+void playlist_remove_failed (int playlist)
 {
-    gint entries = playlist_entry_count (playlist);
-    gint count;
+    int entries = playlist_entry_count (playlist);
+    int count;
 
-    playlist_rescan (playlist);
     playlist_select_all (playlist, FALSE);
 
     for (count = 0; count < entries; count ++)
     {
-        if (! playlist_entry_get_decoder (playlist, count, FALSE))
+        char * filename = playlist_entry_get_filename (playlist, count);
+
+        /* vfs_file_test() only works for file:// URIs currently */
+        if (! strncmp (filename, "file://", 7) && ! vfs_file_test (filename,
+         G_FILE_TEST_EXISTS))
             playlist_entry_set_selected (playlist, count, TRUE);
+
+        str_unref (filename);
     }
 
     playlist_delete_selected (playlist);
 }
 
-void playlist_select_by_patterns (gint playlist, const Tuple * patterns)
+void playlist_select_by_patterns (int playlist, const Tuple * patterns)
 {
-    const gint fields[] = {FIELD_TITLE, FIELD_ALBUM, FIELD_ARTIST,
+    const int fields[] = {FIELD_TITLE, FIELD_ALBUM, FIELD_ARTIST,
      FIELD_FILE_NAME};
 
-    gint entries = playlist_entry_count (playlist);
-    gint field, entry;
+    int entries = playlist_entry_count (playlist);
+    int field, entry;
 
     playlist_select_all (playlist, TRUE);
 
     for (field = 0; field < G_N_ELEMENTS (fields); field ++)
     {
-        const gchar * pattern = tuple_get_string ((Tuple *) patterns,
-         fields[field], NULL);
+        char * pattern = tuple_get_str (patterns, fields[field], NULL);
         regex_t regex;
 
-        if (pattern == NULL || pattern[0] == 0)
+        if (! pattern || ! pattern[0] || regcomp (& regex, pattern, REG_ICASE))
+        {
+            str_unref (pattern);
             continue;
-
-        if (regcomp (& regex, pattern, REG_ICASE) != 0)
-            continue;
+        }
 
         for (entry = 0; entry < entries; entry ++)
         {
-            const Tuple * tuple;
-            const gchar * string;
-
             if (! playlist_entry_get_selected (playlist, entry))
                 continue;
 
-            tuple = playlist_entry_get_tuple (playlist, entry, FALSE);
+            Tuple * tuple = playlist_entry_get_tuple (playlist, entry, FALSE);
+            char * string = tuple ? tuple_get_str (tuple, fields[field], NULL) : NULL;
 
-            if (tuple == NULL)
-                goto NO_MATCH;
+            if (! string || regexec (& regex, string, 0, NULL, 0))
+                playlist_entry_set_selected (playlist, entry, FALSE);
 
-            string = tuple_get_string ((Tuple *) tuple, fields[field], NULL);
-
-            if (string == NULL)
-                goto NO_MATCH;
-
-            if (regexec (& regex, string, 0, NULL, 0) == 0)
-                continue;
-
-        NO_MATCH:
-            playlist_entry_set_selected (playlist, entry, FALSE);
+            str_unref (string);
+            if (tuple)
+                tuple_unref (tuple);
         }
 
         regfree (& regex);
+        str_unref (pattern);
     }
 }
 
-/* The algorithm is a bit quirky for historical reasons. -jlindgren */
-static gchar * make_playlist_path (gint playlist)
+static char * make_playlist_path (int playlist)
 {
     if (! playlist)
-        return g_strdup (get_path (AUD_PATH_PLAYLIST_FILE));
+        return g_strdup_printf ("%s/playlist.xspf", get_path (AUD_PATH_USER_DIR));
 
     return g_strdup_printf ("%s/playlist_%02d.xspf",
      get_path (AUD_PATH_PLAYLISTS_DIR), 1 + playlist);
 }
 
-void load_playlists (void)
+static void load_playlists_real (void)
 {
-    gboolean done = FALSE;
-    gint count;
+    /* old (v3.1 and earlier) naming scheme */
 
-    for (count = 0; ! done; count ++)
+    int count;
+    for (count = 0; ; count ++)
     {
-        gchar * path = make_playlist_path (count);
+        char * path = make_playlist_path (count);
 
-        if (g_file_test (path, G_FILE_TEST_EXISTS))
+        if (! g_file_test (path, G_FILE_TEST_EXISTS))
         {
-            gchar * uri = filename_to_uri (path);
-
-            if (count)
-                playlist_insert (count);
-
-            playlist_insert_playlist (count, 0, uri);
-            g_free (uri);
+            g_free (path);
+            break;
         }
-        else
-            done = TRUE;
+
+        char * uri = filename_to_uri (path);
+
+        playlist_insert (count);
+        playlist_insert_playlist_raw (count, 0, uri);
+        playlist_set_modified (count, TRUE);
 
         g_free (path);
+        g_free (uri);
     }
 
-    playlist_load_state ();
+    /* unique ID-based naming scheme */
+
+    char * order_path = g_strdup_printf ("%s/order", get_path (AUD_PATH_PLAYLISTS_DIR));
+    char * order_string;
+    g_file_get_contents (order_path, & order_string, NULL, NULL);
+    g_free (order_path);
+
+    if (! order_string)
+        goto DONE;
+
+    char * * order = g_strsplit (order_string, " ", -1);
+    g_free (order_string);
+
+    for (int i = 0; order[i]; i ++)
+    {
+        char * path = g_strdup_printf ("%s/%s.audpl", get_path (AUD_PATH_PLAYLISTS_DIR), order[i]);
+
+        if (! g_file_test (path, G_FILE_TEST_EXISTS))
+        {
+            g_free (path);
+            path = g_strdup_printf ("%s/%s.xspf", get_path (AUD_PATH_PLAYLISTS_DIR), order[i]);
+        }
+
+        char * uri = filename_to_uri (path);
+
+        playlist_insert_with_id (count + i, atoi (order[i]));
+        playlist_insert_playlist_raw (count + i, 0, uri);
+        playlist_set_modified (count + i, FALSE);
+
+        if (g_str_has_suffix (path, ".xspf"))
+            playlist_set_modified (count + i, TRUE);
+
+        g_free (path);
+        g_free (uri);
+    }
+
+    g_strfreev (order);
+
+DONE:
+    if (! playlist_count ())
+        playlist_insert (0);
+
+    playlist_set_active (0);
 }
 
-void save_playlists (void)
+static void save_playlists_real (void)
 {
-    gint playlists = playlist_count ();
-    gboolean done = FALSE;
-    gint count;
+    int lists = playlist_count ();
+    const char * folder = get_path (AUD_PATH_PLAYLISTS_DIR);
 
-    for (count = 0; ! done; count ++)
+    /* save playlists */
+
+    char * * order = g_malloc (sizeof (char *) * (lists + 1));
+    GHashTable * saved = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+    for (int i = 0; i < lists; i ++)
     {
-        gchar * path = make_playlist_path (count);
+        int id = playlist_get_unique_id (i);
+        order[i] = g_strdup_printf ("%d", id);
 
-        if (count < playlists)
+        if (playlist_get_modified (i))
         {
-            gchar * uri = filename_to_uri (path);
+            char * path = g_strdup_printf ("%s/%d.audpl", folder, id);
+            char * uri = filename_to_uri (path);
 
-            playlist_save (count, uri);
+            playlist_save (i, uri);
+            playlist_set_modified (i, FALSE);
+
+            g_free (path);
             g_free (uri);
         }
-        else if (g_file_test (path, G_FILE_TEST_EXISTS))
-            remove (path);
-        else
-            done = TRUE;
 
-        g_free (path);
+        g_hash_table_insert (saved, g_strdup_printf ("%d.audpl", id), NULL);
     }
 
-    playlist_save_state ();
+    order[lists] = NULL;
+    char * order_string = g_strjoinv (" ", order);
+    g_strfreev (order);
+
+    GError * error = NULL;
+    char * order_path = g_strdup_printf ("%s/order", get_path (AUD_PATH_PLAYLISTS_DIR));
+
+    char * old_order_string;
+    g_file_get_contents (order_path, & old_order_string, NULL, NULL);
+
+    if (! old_order_string || strcmp (old_order_string, order_string))
+    {
+        if (! g_file_set_contents (order_path, order_string, -1, & error))
+        {
+            fprintf (stderr, "Cannot write to %s: %s\n", order_path, error->message);
+            g_error_free (error);
+        }
+    }
+
+    g_free (order_string);
+    g_free (order_path);
+    g_free (old_order_string);
+
+    /* clean up deleted playlists and files from old naming scheme */
+
+    char * path = make_playlist_path (0);
+    remove (path);
+    g_free (path);
+
+    DIR * dir = opendir (folder);
+    if (! dir)
+        goto DONE;
+
+    struct dirent * entry;
+    while ((entry = readdir (dir)))
+    {
+        if (! g_str_has_suffix (entry->d_name, ".audpl")
+         && ! g_str_has_suffix (entry->d_name, ".xspf"))
+            continue;
+
+        if (! g_hash_table_lookup_extended (saved, entry->d_name, NULL, NULL))
+        {
+            char * path = g_strdup_printf ("%s/%s", folder, entry->d_name);
+            remove (path);
+            g_free (path);
+        }
+    }
+
+    closedir (dir);
+
+DONE:
+    g_hash_table_destroy (saved);
+}
+
+static bool_t hooks_added, state_changed;
+
+static void update_cb (void * data, void * user)
+{
+    if (GPOINTER_TO_INT (data) < PLAYLIST_UPDATE_METADATA)
+        return;
+
+    state_changed = TRUE;
+}
+
+static void state_cb (void * data, void * user)
+{
+    state_changed = TRUE;
+}
+
+void load_playlists (void)
+{
+    load_playlists_real ();
+    playlist_load_state ();
+
+    state_changed = FALSE;
+
+    if (! hooks_added)
+    {
+        hook_associate ("playlist update", update_cb, NULL);
+        hook_associate ("playlist activate", state_cb, NULL);
+        hook_associate ("playlist position", state_cb, NULL);
+
+        hooks_added = TRUE;
+    }
+}
+
+void save_playlists (bool_t exiting)
+{
+    save_playlists_real ();
+
+    /* on exit, save resume time if resume feature is enabled */
+    if (state_changed || (exiting && get_bool (NULL, "resume_playback_on_startup")))
+    {
+        playlist_save_state ();
+        state_changed = FALSE;
+    }
+
+    if (exiting && hooks_added)
+    {
+        hook_dissociate ("playlist update", update_cb);
+        hook_dissociate ("playlist activate", state_cb);
+        hook_dissociate ("playlist position", state_cb);
+
+        hooks_added = FALSE;
+    }
 }

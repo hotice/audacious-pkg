@@ -23,7 +23,8 @@
  *  Audacious or using our public API to be a derived work.
  */
 
-#include <limits.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef _WIN32
@@ -41,108 +42,66 @@
 
 #include <errno.h>
 
-#ifdef HAVE_FTS_H
-#  include <sys/types.h>
-#  include <sys/stat.h>
-#  include <fts.h>
-#endif
-
 #include <libaudcore/audstrings.h>
-#include <libaudcore/stringpool.h>
 
-#include "audconfig.h"
 #include "debug.h"
 #include "i18n.h"
 #include "misc.h"
 #include "plugins.h"
 #include "util.h"
 
-gboolean
-dir_foreach(const gchar * path, DirForeachFunc function,
-            gpointer user_data, GError ** error)
+bool_t dir_foreach (const char * path, DirForeachFunc func, void * user)
 {
-    GError *error_out = NULL;
-    GDir *dir;
-    const gchar *entry;
-    gchar *entry_fullpath;
-
-    if (!(dir = g_dir_open(path, 0, &error_out))) {
-        g_propagate_error(error, error_out);
+    DIR * dir = opendir (path);
+    if (! dir)
         return FALSE;
-    }
 
-    while ((entry = g_dir_read_name(dir))) {
-        entry_fullpath = g_build_filename(path, entry, NULL);
+    struct dirent * entry;
+    while ((entry = readdir (dir)))
+    {
+        if (entry->d_name[0] == '.')
+            continue;
 
-        if ((*function) (entry_fullpath, entry, user_data)) {
-            g_free(entry_fullpath);
+        char * full = g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s", path, entry->d_name);
+        bool_t stop = func (full, entry->d_name, user);
+        g_free (full);
+
+        if (stop)
             break;
-        }
-
-        g_free(entry_fullpath);
     }
 
-    g_dir_close(dir);
-
+    closedir (dir);
     return TRUE;
 }
 
-/**
- * util_get_localdir:
- *
- * Returns a string with the full path of Audacious local datadir (where config files are placed).
- * It's useful in order to put in the right place custom config files for audacious plugins.
- *
- * Return value: a string with full path of Audacious local datadir (should be freed after use)
- **/
-gchar*
-util_get_localdir(void)
+char * construct_uri (const char * string, const char * playlist_name)
 {
-  gchar *datadir;
-  gchar *tmp;
+    /* URI */
+    if (strstr (string, "://"))
+        return strdup (string);
 
-  if ( (tmp = getenv("XDG_CONFIG_HOME")) == NULL )
-    datadir = g_build_filename( g_get_home_dir() , ".config" , "audacious" ,  NULL );
-  else
-    datadir = g_build_filename( tmp , "audacious" , NULL );
+    /* absolute filename (assumed UTF-8) */
+#ifdef _WIN32
+    if (string[0] && string[1] == ':' && string[2] == '\\')
+#else
+    if (string[0] == '/')
+#endif
+        return filename_to_uri (string);
 
-  return datadir;
-}
+    /* relative filename (assumed UTF-8) */
+    const char * slash = strrchr (playlist_name, '/');
+    if (! slash)
+        return NULL;
 
-
-gchar * construct_uri (const gchar * string, const gchar * playlist_name)
-{
-    gchar *filename = g_strdup(string);
-    gchar *uri = NULL;
-
-    /* try to translate dos path */
-    convert_dos_path(filename); /* in place replacement */
-
-    // make full path uri here
-    // case 1: filename is raw full path or uri
-    if (filename[0] == '/' || strstr(filename, "://")) {
-        uri = g_filename_to_uri(filename, NULL, NULL);
-        if(!uri)
-            uri = g_strdup(filename);
-    }
-    // case 2: filename is not raw full path nor uri
-    // make full path by replacing last part of playlist path with filename.
-    else
-    {
-        const gchar * fslash = strrchr (filename, '/');
-        const gchar * pslash = strrchr (playlist_name, '/');
-
-        if (pslash)
-            uri = g_strdup_printf ("%.*s/%s", (gint) (pslash - playlist_name),
-             playlist_name, fslash ? fslash + 1 : filename);
-    }
-
-    g_free (filename);
-    return uri;
+    int pathlen = slash + 1 - playlist_name;
+    char buf[pathlen + 3 * strlen (string) + 1];
+    memcpy (buf, playlist_name, pathlen);
+    str_encode_percent (string, -1, buf + pathlen);
+    return strdup (buf);
 }
 
 /* local files -- not URI's */
-gint file_get_mtime (const gchar * filename)
+int file_get_mtime (const char * filename)
 {
     struct stat info;
 
@@ -153,7 +112,7 @@ gint file_get_mtime (const gchar * filename)
 }
 
 void
-make_directory(const gchar * path, mode_t mode)
+make_directory(const char * path, mode_t mode)
 {
     if (g_mkdir_with_parents(path, mode) == 0)
         return;
@@ -162,79 +121,117 @@ make_directory(const gchar * path, mode_t mode)
                g_strerror(errno));
 }
 
-gchar * get_path_to_self (void)
+char * write_temp_file (void * data, int64_t len)
 {
-    gchar buf[PATH_MAX];
-    gint len;
+    char * name = g_strdup_printf ("%s/audacious-temp-XXXXXX", g_get_tmp_dir ());
+
+    int handle = g_mkstemp (name);
+    if (handle < 0)
+    {
+        fprintf (stderr, "Error creating temporary file: %s\n", strerror (errno));
+        g_free (name);
+        return NULL;
+    }
+
+    while (len)
+    {
+        int64_t written = write (handle, data, len);
+        if (written < 0)
+        {
+            fprintf (stderr, "Error writing %s: %s\n", name, strerror (errno));
+            close (handle);
+            g_free (name);
+            return NULL;
+        }
+
+        data += written;
+        len -= written;
+    }
+
+    if (close (handle) < 0)
+    {
+        fprintf (stderr, "Error closing %s: %s\n", name, strerror (errno));
+        g_free (name);
+        return NULL;
+    }
+
+    return name;
+}
+
+char * get_path_to_self (void)
+{
+#if defined _WIN32 || defined HAVE_PROC_SELF_EXE
+    int size = 256;
+    char * buf = g_malloc (size);
+
+    while (1)
+    {
+        int len;
 
 #ifdef _WIN32
-    if (! (len = GetModuleFileName (NULL, buf, sizeof buf)) || len == sizeof buf)
-    {
-        fprintf (stderr, "GetModuleFileName failed.\n");
-        return NULL;
-    }
+        if (! (len = GetModuleFileName (NULL, buf, size)))
+        {
+            fprintf (stderr, "GetModuleFileName failed.\n");
+            g_free (buf);
+            return NULL;
+        }
 #else
-    if ((len = readlink ("/proc/self/exe", buf, sizeof buf)) < 0)
-    {
-        fprintf (stderr, "Cannot access /proc/self/exe: %s.\n", strerror (errno));
-        return NULL;
-    }
+        if ((len = readlink ("/proc/self/exe", buf, size)) < 0)
+        {
+            fprintf (stderr, "Cannot access /proc/self/exe: %s.\n", strerror (errno));
+            g_free (buf);
+            return NULL;
+        }
 #endif
 
-    return g_strndup (buf, len);
-}
+        if (len < size)
+        {
+            buf[len] = 0;
+            return buf;
+        }
 
-#define URL_HISTORY_MAX_SIZE 30
-
-void
-util_add_url_history_entry(const gchar * url)
-{
-    if (g_list_find_custom(cfg.url_history, url, (GCompareFunc) strcasecmp))
-        return;
-
-    cfg.url_history = g_list_prepend(cfg.url_history, g_strdup(url));
-
-    while (g_list_length(cfg.url_history) > URL_HISTORY_MAX_SIZE) {
-        GList *node = g_list_last(cfg.url_history);
-        g_free(node->data);
-        cfg.url_history = g_list_delete_link(cfg.url_history, node);
+        size += size;
+        buf = g_realloc (buf, size);
     }
+#else
+    return NULL;
+#endif
 }
 
-/* Strips various common top-level folders from a file name (not URI).  The
- * string passed will not be modified, but the string returned will share the
- * same memory.  Examples:
- *     "/home/john/folder/file.mp3"    -> "folder/file.mp3"
- *     "/folder/file.mp3"              -> "folder/file.mp3"
- *     "C:\Users\John\folder\file.mp3" -> "folder\file.mp3"
- *     "E:\folder\file.mp3"            -> "folder\file.mp3" */
+/* Strips various common top-level folders from a URI.  The string passed will
+ * not be modified, but the string returned will share the same memory.
+ * Examples:
+ *     "file:///home/john/folder/file.mp3" -> "folder/file.mp3"
+ *     "file:///folder/file.mp3"           -> "folder/file.mp3" */
 
-static gchar * skip_top_folders (gchar * name)
+static char * skip_top_folders (char * name)
 {
-    const gchar * home = getenv ("HOME");
-    if (! home)
-        goto NO_HOME;
+    static char * home;
+    static int len;
 
-    gint len = strlen (home);
-    if (len > 0 && home[len - 1] == G_DIR_SEPARATOR)
-        len --;
+    if (! home)
+    {
+        home = filename_to_uri (g_get_home_dir ());
+        len = strlen (home);
+
+        if (len > 0 && home[len - 1] == '/')
+            len --;
+    }
 
 #ifdef _WIN32
-    if (! strncasecmp (name, home, len) && name[len] == '\\')
+    if (! g_ascii_strncasecmp (name, home, len) && name[len] == '/')
 #else
     if (! strncmp (name, home, len) && name[len] == '/')
 #endif
         return name + len + 1;
 
-NO_HOME:
-#ifdef _WIN32
-    return (name[0] && name[1] == ':' && name[2] == '\\') ? name + 3 : name;
-#else
-    return (name[0] == '/') ? name + 1 : name;
-#endif
+    if (! strncmp (name, "file:///", 8))
+        return name + 8;
+
+    return name;
 }
 
-/* Divides a file name (not URI) into the base name, the lowest folder, and the
+/* Divides a URI into the base name, the lowest folder, and the
  * second lowest folder.  The string passed will be modified, and the strings
  * returned will use the same memory.  May return NULL for <first> and <second>.
  * Examples:
@@ -242,14 +239,14 @@ NO_HOME:
  *     "d/e.mp3"       -> "e", "d",  NULL
  *     "e.mp3"         -> "e", NULL, NULL */
 
-static void split_filename (gchar * name, gchar * * base, gchar * * first,
- gchar * * second)
+static void split_filename (char * name, char * * base, char * * first,
+ char * * second)
 {
     * first = * second = NULL;
 
-    gchar * c;
+    char * c;
 
-    if ((c = strrchr (name, G_DIR_SEPARATOR)))
+    if ((c = strrchr (name, '/')))
     {
         * base = c + 1;
         * c = 0;
@@ -260,7 +257,7 @@ static void split_filename (gchar * name, gchar * * base, gchar * * first,
         goto DONE;
     }
 
-    if ((c = strrchr (name, G_DIR_SEPARATOR)))
+    if ((c = strrchr (name, '/')))
     {
         * first = c + 1;
         * c = 0;
@@ -271,7 +268,7 @@ static void split_filename (gchar * name, gchar * * base, gchar * * first,
         goto DONE;
     }
 
-    if ((c = strrchr (name, G_DIR_SEPARATOR)))
+    if ((c = strrchr (name, '/')))
         * second = c + 1;
     else
         * second = name;
@@ -287,7 +284,7 @@ DONE:
  *     "http://some.domain.org/folder/file.mp3" -> "some.domain.org"
  *     "http://some.stream.fm:8000"             -> "some.stream.fm" */
 
-static gchar * stream_name (gchar * name)
+static char * stream_name (char * name)
 {
     if (! strncmp (name, "http://", 7))
         name += 7;
@@ -298,7 +295,7 @@ static gchar * stream_name (gchar * name)
     else
         return NULL;
 
-    gchar * c;
+    char * c;
 
     if ((c = strchr (name, '/')))
         * c = 0;
@@ -310,47 +307,66 @@ static gchar * stream_name (gchar * name)
     return name;
 }
 
-/* Derives best guesses of title, artist, and album from a file name (URI) and
- * tuple.  The returned strings are stringpooled or NULL. */
+static char * get_nonblank_field (const Tuple * tuple, int field)
+{
+    char * str = tuple ? tuple_get_str (tuple, field, NULL) : NULL;
 
-void describe_song (const gchar * name, const Tuple * tuple, gchar * * _title,
- gchar * * _artist, gchar * * _album)
+    if (str && ! str[0])
+    {
+        str_unref (str);
+        str = NULL;
+    }
+
+    return str;
+}
+
+static char * str_get_decoded (char * str)
+{
+    if (! str)
+        return NULL;
+
+    str_decode_percent (str, -1, str);
+    return str_get (str);
+}
+
+/* Derives best guesses of title, artist, and album from a file name (URI) and
+ * tuple (which may be NULL).  The returned strings are stringpooled or NULL. */
+
+void describe_song (const char * name, const Tuple * tuple, char * * _title,
+ char * * _artist, char * * _album)
 {
     /* Common folder names to skip */
-    static const gchar * const skip[] = {"music"};
+    static const char * const skip[] = {"music"};
 
-    const gchar * title = tuple_get_string (tuple, FIELD_TITLE, NULL);
-    const gchar * artist = tuple_get_string (tuple, FIELD_ARTIST, NULL);
-    const gchar * album = tuple_get_string (tuple, FIELD_ALBUM, NULL);
-
-    if (title && ! title[0])
-        title = NULL;
-    if (artist && ! artist[0])
-        artist = NULL;
-    if (album && ! album[0])
-        album = NULL;
-
-    gchar * copy = NULL;
+    char * title = get_nonblank_field (tuple, FIELD_TITLE);
+    char * artist = get_nonblank_field (tuple, FIELD_ARTIST);
+    char * album = get_nonblank_field (tuple, FIELD_ALBUM);
 
     if (title && artist && album)
-        goto DONE;
-
-    copy = uri_to_display (name);
-
-    if (! strncmp (name, "file://", 7))
     {
-        gchar * base, * first, * second;
-        split_filename (skip_top_folders (copy), & base, & first,
-         & second);
+DONE:
+        * _title = title;
+        * _artist = artist;
+        * _album = album;
+        return;
+    }
+
+    char buf[strlen (name) + 1];
+    memcpy (buf, name, sizeof buf);
+
+    if (! strncmp (buf, "file:///", 8))
+    {
+        char * base, * first, * second;
+        split_filename (skip_top_folders (buf), & base, & first, & second);
 
         if (! title)
-            title = base;
+            title = str_get_decoded (base);
 
-        for (gint i = 0; i < G_N_ELEMENTS (skip); i ++)
+        for (int i = 0; i < G_N_ELEMENTS (skip); i ++)
         {
-            if (first && ! strcasecmp (first, skip[i]))
+            if (first && ! g_ascii_strcasecmp (first, skip[i]))
                 first = NULL;
-            if (second && ! strcasecmp (second, skip[i]))
+            if (second && ! g_ascii_strcasecmp (second, skip[i]))
                 second = NULL;
         }
 
@@ -358,29 +374,29 @@ void describe_song (const gchar * name, const Tuple * tuple, gchar * * _title,
         {
             if (second && ! artist && ! album)
             {
-                artist = second;
-                album = first;
+                artist = str_get_decoded (second);
+                album = str_get_decoded (first);
             }
             else if (! artist)
-                artist = first;
+                artist = str_get_decoded (first);
             else if (! album)
-                album = first;
+                album = str_get_decoded (first);
         }
     }
     else
     {
         if (! title)
-            title = stream_name (copy);
+        {
+            title = str_get_decoded (stream_name (buf));
+
+            if (! title)
+                title = str_get_decoded (buf);
+        }
         else if (! artist)
-            artist = stream_name (copy);
+            artist = str_get_decoded (stream_name (buf));
         else if (! album)
-            album = stream_name (copy);
+            album = str_get_decoded (stream_name (buf));
     }
 
-DONE:
-    * _title = title ? stringpool_get ((gchar *) title, FALSE) : NULL;
-    * _artist = artist ? stringpool_get ((gchar *) artist, FALSE) : NULL;
-    * _album = album ? stringpool_get ((gchar *) album, FALSE) : NULL;
-
-    g_free (copy);
+    goto DONE;
 }

@@ -23,32 +23,20 @@
 #ifndef TAG_MODULE_H
 #define TAG_MODULE_H
 
-G_BEGIN_DECLS
-
-#include <glib.h>
-#include <mowgli.h>
 #include "libaudcore/tuple.h"
 #include "libaudcore/vfs.h"
 
-mowgli_list_t tag_modules;
-int number_of_modules;
 typedef Tuple* pTuple;
 
 typedef struct _module {
-    gchar *name;
-    gint type; /* set to TAG_TYPE_NONE if the module cannot create new tags */
-    gboolean(*can_handle_file) (VFSFile *fd);
-    gboolean (* read_tag) (Tuple * tuple, VFSFile * handle);
-    gboolean (* read_image) (VFSFile * handle, void * * data, gint * size);
-    gboolean (* write_tag) (const Tuple * tuple, VFSFile * handle);
-
-    mowgli_node_t node;
+    char *name;
+    int type; /* set to TAG_TYPE_NONE if the module cannot create new tags */
+    bool_t(*can_handle_file) (VFSFile *fd);
+    bool_t (* read_tag) (Tuple * tuple, VFSFile * handle);
+    bool_t (* read_image) (VFSFile * handle, void * * data, int64_t * size);
+    bool_t (* write_tag) (const Tuple * tuple, VFSFile * handle);
 } tag_module_t;
 
-/* this function must be modified when including new modules */
-void init_tag_modules(void);
+tag_module_t * find_tag_module (VFSFile * handle, int new_type);
 
-tag_module_t * find_tag_module (VFSFile * handle, gint new_type);
-
-G_END_DECLS
 #endif /* TAG_MODULE_H */

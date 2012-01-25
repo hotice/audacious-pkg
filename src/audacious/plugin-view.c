@@ -60,7 +60,7 @@ static Plugin * get_selected_header (GtkTreeView * tree)
     return plugin_get_header (p);
 }
 
-static void do_enable (GtkCellRendererToggle * cell, const gchar * path_str,
+static void do_enable (GtkCellRendererToggle * cell, const char * path_str,
  GtkTreeModel * model)
 {
     GtkTreePath * path = gtk_tree_path_new_from_string (path_str);
@@ -69,7 +69,7 @@ static void do_enable (GtkCellRendererToggle * cell, const gchar * path_str,
     gtk_tree_path_free (path);
 
     Node * n = NULL;
-    gboolean enabled;
+    bool_t enabled;
     gtk_tree_model_get (model, & iter, PVIEW_COL_NODE, & n,
      PVIEW_COL_ENABLED, & enabled, -1);
     g_return_if_fail (n != NULL);
@@ -77,7 +77,7 @@ static void do_enable (GtkCellRendererToggle * cell, const gchar * path_str,
     plugin_enable (n->p, ! enabled);
 }
 
-static gboolean list_watcher (PluginHandle * p, Node * n)
+static bool_t list_watcher (PluginHandle * p, Node * n)
 {
     GtkTreeIter iter;
     gtk_tree_model_get_iter (n->model, & iter, n->path);
@@ -86,7 +86,7 @@ static gboolean list_watcher (PluginHandle * p, Node * n)
     return TRUE;
 }
 
-static gboolean fill_cb (PluginHandle * p, GtkTreeModel * model)
+static bool_t fill_cb (PluginHandle * p, GtkTreeModel * model)
 {
     Node * n = g_slice_new (Node);
 
@@ -122,7 +122,7 @@ static void list_fill (GtkTreeView * tree, void * type)
     gtk_tree_view_column_set_attributes (col, rend, "active", PVIEW_COL_ENABLED,
      NULL);
 
-    for (gint i = PVIEW_COL_NAME; i <= PVIEW_COL_PATH; i ++)
+    for (int i = PVIEW_COL_NAME; i <= PVIEW_COL_PATH; i ++)
     {
         col = gtk_tree_view_column_new ();
         gtk_tree_view_column_set_sizing (col, GTK_TREE_VIEW_COLUMN_GROW_ONLY);
@@ -162,14 +162,14 @@ static void list_destroy (GtkTreeView * tree)
     g_object_unref ((GObject *) model);
 }
 
-static gboolean config_watcher (PluginHandle * p, GtkWidget * config)
+static bool_t config_watcher (PluginHandle * p, GtkWidget * config)
 {
     gtk_widget_set_sensitive (config, plugin_has_configure (p) &&
      plugin_get_enabled (p));
     return TRUE;
 }
 
-static gboolean about_watcher (PluginHandle * p, GtkWidget * about)
+static bool_t about_watcher (PluginHandle * p, GtkWidget * about)
 {
     gtk_widget_set_sensitive (about, plugin_has_about (p) && plugin_get_enabled
      (p));
@@ -178,7 +178,8 @@ static gboolean about_watcher (PluginHandle * p, GtkWidget * about)
 
 static void button_update (GtkTreeView * tree, GtkWidget * b)
 {
-    PluginForEachFunc watcher = g_object_get_data ((GObject *) b, "watcher");
+    PluginForEachFunc watcher = (PluginForEachFunc) g_object_get_data
+     ((GObject *) b, "watcher");
     g_return_if_fail (watcher != NULL);
 
     PluginHandle * p = g_object_steal_data ((GObject *) b, "plugin");
@@ -218,7 +219,8 @@ static void do_about (GtkTreeView * tree)
 
 static void button_destroy (GtkWidget * b)
 {
-    PluginForEachFunc watcher = g_object_get_data ((GObject *) b, "watcher");
+    PluginForEachFunc watcher = (PluginForEachFunc) g_object_get_data
+     ((GObject *) b, "watcher");
     g_return_if_fail (watcher != NULL);
 
     PluginHandle * p = g_object_steal_data ((GObject *) b, "plugin");
@@ -226,7 +228,7 @@ static void button_destroy (GtkWidget * b)
         plugin_remove_watch (p, watcher, b);
 }
 
-GtkWidget * plugin_view_new (gint type)
+GtkWidget * plugin_view_new (int type)
 {
     GtkWidget * vbox = gtk_vbox_new (FALSE, 6);
     gtk_container_set_border_width ((GtkContainer *) vbox, 6);
@@ -251,7 +253,7 @@ GtkWidget * plugin_view_new (gint type)
     GtkWidget * config = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
     gtk_box_pack_start ((GtkBox *) hbox, config, FALSE, FALSE, 0);
     gtk_widget_set_sensitive (config, FALSE);
-    g_object_set_data ((GObject *) config, "watcher", config_watcher);
+    g_object_set_data ((GObject *) config, "watcher", (void *) config_watcher);
     g_signal_connect (tree, "cursor-changed", (GCallback) button_update, config);
     g_signal_connect_swapped (config, "clicked", (GCallback)
      do_config, tree);
@@ -260,7 +262,7 @@ GtkWidget * plugin_view_new (gint type)
     GtkWidget * about = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
     gtk_box_pack_start ((GtkBox *) hbox, about, FALSE, FALSE, 0);
     gtk_widget_set_sensitive (about, FALSE);
-    g_object_set_data ((GObject *) about, "watcher", about_watcher);
+    g_object_set_data ((GObject *) about, "watcher", (void *) about_watcher);
     g_signal_connect (tree, "cursor-changed", (GCallback) button_update, about);
     g_signal_connect_swapped (about, "clicked", (GCallback) do_about, tree);
     g_signal_connect (about, "destroy", (GCallback) button_destroy, NULL);

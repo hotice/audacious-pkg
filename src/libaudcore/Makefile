@@ -7,38 +7,29 @@ SRCS = audio.c \
        eventqueue.c \
        hook.c \
        index.c \
-       stringpool.c \
+       strpool.c \
        tuple.c \
        tuple_compiler.c \
        tuple_formatter.c \
        vfs.c \
        vfs_async.c \
-       vfs_buffer.c \
-       vfs_buffered_file.c \
-       vfs_common.c \
-       md5.c
+       vfs_common.c
 
 INCLUDES = audio.h \
            audstrings.h \
-           eventqueue.h \
+           core.h \
            hook.h \
            index.h \
-           stringpool.h \
            tuple.h \
-           tuple_compiler.h \
-           tuple_formatter.h \
            vfs.h \
-           vfs_async.h \
-           vfs_buffer.h \
-           vfs_buffered_file.h \
-           md5.h
+           vfs_async.h
 
 include ../../buildsys.mk
 include ../../extra.mk
 
 includesubdir = libaudcore
 
-CPPFLAGS += -DHAVE_CONFIG_H ${CFLAGS} -I.. -I../..
-CFLAGS += ${LIB_CFLAGS} ${GLIB_CFLAGS} ${MOWGLI_CFLAGS}
+CPPFLAGS += -DHAVE_CONFIG_H ${PTHREAD_CFLAGS} ${GLIB_CFLAGS} -I.. -I../..
+CFLAGS += ${LIB_CFLAGS}
 
-LIBS += ${GLIB_LIBS} ${MOWGLI_LIBS}
+LIBS += ${PTHREAD_LIBS} ${GLIB_LIBS} -lm

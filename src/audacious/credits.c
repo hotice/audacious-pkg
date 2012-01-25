@@ -23,15 +23,17 @@
  *  Audacious or using our public API to be a derived work.
  */
 
+#include <stddef.h>
+
 #include "config.h"
 #include "i18n.h"
 #include "misc.h"
 
-static const gchar *audacious_brief =
+static const char * audacious_brief =
  "<big><b>Audacious %s</b></big>\n"
- "Copyright (C) 2005-2011 Audacious Team";
+ "Copyright (C) 2005-2012 Audacious Team";
 
-static const gchar *credit_text[] = {
+static const char * const credit_text[] = {
     N_("Core developers:"),
     "Christian Birchinger",
     "Michael Färber",
@@ -75,13 +77,14 @@ static const gchar *credit_text[] = {
     "William Pitcock",
     "Derek Pomery",
     "Jonathan Schleifer",
-    "Andrew O. Shadoura",
+    "Andrew Shadura",
     "Tony Vroon",
     "Yoshiki Yazawa",
     NULL,
 
     N_("Patch authors:"),
     "Chris Arepantis",
+    "Anatoly Arzhnikov",
     "Alexis Ballier",
     "Eric Barch",
     "Carlo Bramini",
@@ -93,6 +96,7 @@ static const gchar *credit_text[] = {
     "Mike Frysinger",
     "Mark Glines",
     "Hans de Goede",
+    "David Guglielmi",
     "Michael Hanselmann",
     "Juho Heikkinen",
     "Joseph Jezak",
@@ -100,6 +104,7 @@ static const gchar *credit_text[] = {
     "Jussi Judin",
     "Teru Kamogashira",
     "Chris Kehler",
+    "Thomas Lange",
     "Mark Loeser",
     "Alex Maclean",
     "Mikael Magnusson",
@@ -176,7 +181,10 @@ static const gchar *credit_text[] = {
     NULL
 };
 
-static const gchar *translators_text[] = {
+static const char * const translators_text[] = {
+    N_("Argentinian Spanish:"),
+    "Adrián Ramirez Escalante",
+    NULL,
     N_("Belarusian:"),
     "Darafei Praliaskouski",
     NULL,
@@ -185,6 +193,7 @@ static const gchar *translators_text[] = {
     NULL,
     N_("Brazilian Portuguese:"),
     "Fábio Antunes",
+    "Karen Eliot",
     "Philipi Pinto",
     NULL,
     N_("Breton:"),
@@ -195,9 +204,10 @@ static const gchar *translators_text[] = {
     NULL,
     N_("Catalan:"),
     "Ernest Adrogué",
+    "Jordi Amenós",
     NULL,
     N_("Chinese:"),
-    "Chi Chiu Tsu",
+    "Tse Chih Chiu",
     NULL,
     N_("Croatian:"),
     "Marin Glibic",
@@ -213,13 +223,15 @@ static const gchar *translators_text[] = {
     "Ivar Smolin",
     NULL,
     N_("Finnish:"),
-    "Pauli Virtanen",
     "Matti Hämäläinen",
+    "Elias Julkunen",
+    "Pauli Virtanen",
     NULL,
     N_("French:"),
     "Adam Cecile",
     "Stanislas Zeller",
     "Stany Henry",
+    "Jean-Alexandre Anglès d'Auriac",
     NULL,
     N_("German:"),
     "Matthias Debus",
@@ -245,6 +257,7 @@ static const gchar *translators_text[] = {
     NULL,
     N_("Italian:"),
     "Alessio D'Ascanio",
+    "Jacopo Lorenzetti",
     "Diego Pettenò",
     NULL,
     N_("Japanese:"),
@@ -259,13 +272,19 @@ static const gchar *translators_text[] = {
     N_("Lithuanian:"),
     "Paul Daukas",
     "Rimas Kudelis",
+    "Algimantas Margevičius",
     NULL,
     N_("Macedonian:"),
     "Arangel Angov",
     NULL,
+    N_("Mexican Spanish:"),
+    "Jorge A. García Sosa",
+    NULL,
     N_("Polish:"),
-    "Wojciech Myrda",
+    "Artur Czechowski",
     "Michał Kiedrowicz",
+    "Wojciech Myrda",
+    "Piotr Sokół",
     "Szymon Weihs",
     NULL,
     N_("Portuguese:"),
@@ -283,6 +302,7 @@ static const gchar *translators_text[] = {
     "Strahinja Kustudić",
     NULL,
     N_("Serbian (Cyrillic):"),
+    "Мирослав Николић",
     "Strahinja Kustudić",
     NULL,
     N_("Simplified Chinese:"),
@@ -290,13 +310,16 @@ static const gchar *translators_text[] = {
     NULL,
     N_("Slovak:"),
     "Andrej Herceg",
+    "Tomáš Vadina",
     NULL,
     N_("Spanish:"),
+    "Jordi Amenós",
+    "Jorge Andrés",
     "Cosme Domínguez Díaz",
+    "Adrián Ramirez Escalante",
     "Jeki Sinneo Leinos",
     "Francisco Javier F. Serrador",
     "Gustavo D. Vranjes",
-    "Jorge Andrés",
     NULL,
     N_("Swedish:"),
     "Martin Persenius",
@@ -304,6 +327,7 @@ static const gchar *translators_text[] = {
     N_("Traditional Chinese:"),
     "Cheng-Wei Chien",
     "Sylecn Song",
+    "Ruei-Yuan Lu",
     "Yang Zhang",
     NULL,
     N_("Turkish:"),
@@ -311,7 +335,12 @@ static const gchar *translators_text[] = {
     "Eren Turkay",
     NULL,
     N_("Ukrainian:"),
+    "Kostyantyn Fedenko",
+    "Rax Garfield",
     "Mykola Lynnyk",
+    NULL,
+    N_("Vietnamese:"),
+    "Lê Trường An",
     NULL,
     N_("Welsh:"),
     "Edward Brocklesby",
@@ -321,8 +350,8 @@ static const gchar *translators_text[] = {
     NULL
 };
 
-void
-get_audacious_credits(const gchar ** brief, const gchar *** credits, const gchar ***translators)
+void get_audacious_credits (const char * * brief, const char * const * *
+ credits, const char * const * * translators)
 {
     if (brief != NULL)
         *brief = audacious_brief;

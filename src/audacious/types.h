@@ -22,34 +22,40 @@
 #ifndef AUDACIOUS_TYPES_H
 #define AUDACIOUS_TYPES_H
 
-#include <glib.h>
-
 #define AUD_EQUALIZER_NBANDS 10
 #define EQUALIZER_MAX_GAIN 12
 
+enum {
+ PLUGIN_TYPE_TRANSPORT,
+ PLUGIN_TYPE_PLAYLIST,
+ PLUGIN_TYPE_INPUT,
+ PLUGIN_TYPE_EFFECT,
+ PLUGIN_TYPE_OUTPUT,
+ PLUGIN_TYPE_VIS,
+ PLUGIN_TYPE_GENERAL,
+ PLUGIN_TYPE_IFACE,
+ PLUGIN_TYPES};
+
 typedef struct PluginHandle PluginHandle;
 
-#ifdef _AUDACIOUS_CORE
 typedef const struct _Plugin Plugin;
-#endif
-
-typedef const struct _InputPlugin InputPlugin;
-typedef const struct _OutputPlugin OutputPlugin;
-typedef const struct _EffectPlugin EffectPlugin;
-typedef const struct _GeneralPlugin GeneralPlugin;
-typedef const struct _VisPlugin VisPlugin;
 typedef const struct _TransportPlugin TransportPlugin;
 typedef const struct _PlaylistPlugin PlaylistPlugin;
+typedef const struct _InputPlugin InputPlugin;
+typedef const struct _EffectPlugin EffectPlugin;
+typedef const struct _OutputPlugin OutputPlugin;
+typedef const struct _VisPlugin VisPlugin;
+typedef const struct _GeneralPlugin GeneralPlugin;
+typedef const struct _IfacePlugin IfacePlugin;
 
-typedef struct _Iface Iface;
 typedef struct _PluginPreferences PluginPreferences;
 typedef struct _PreferencesWidget PreferencesWidget;
 
 typedef struct {
-    gfloat track_gain; /* dB */
-    gfloat track_peak; /* 0-1 */
-    gfloat album_gain; /* dB */
-    gfloat album_peak; /* 0-1 */
+    float track_gain; /* dB */
+    float track_peak; /* 0-1 */
+    float album_gain; /* dB */
+    float album_peak; /* 0-1 */
 } ReplayGainInfo;
 
 #endif

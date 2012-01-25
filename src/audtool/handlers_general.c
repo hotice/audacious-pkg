@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include <mowgli.h>
 #include <locale.h>
 #include "libaudclient/audctrl.h"
 #include "audtool.h"
@@ -57,7 +56,7 @@ void set_volume(gint argc, gchar **argv)
 	}
 
 	current_volume = audacious_remote_get_main_volume(dbus_proxy);
-	switch (argv[1][0]) 
+	switch (argv[1][0])
 	{
 		case '+':
 		case '-':
@@ -84,40 +83,6 @@ void mainwin_show(gint argc, gchar **argv)
     }
     else if (!g_ascii_strcasecmp(argv[1], "off")) {
         audacious_remote_main_win_toggle(dbus_proxy, FALSE);
-        return;
-    }
-}
-
-void playlist_show(gint argc, gchar **argv)
-{
-	if (argc < 2) {
-        audtool_whine_args(argv[0], "<on/off>");
-        exit(1);
-    }
-
-    if (!g_ascii_strcasecmp(argv[1], "on")) {
-        audacious_remote_pl_win_toggle(dbus_proxy, TRUE);
-        return;
-    }
-    else if (!g_ascii_strcasecmp(argv[1], "off")) {
-        audacious_remote_pl_win_toggle(dbus_proxy, FALSE);
-        return;
-    }
-}
-
-void equalizer_show(gint argc, gchar **argv)
-{
-	if (argc < 2) {
-        audtool_whine_args(argv[0], "<on/off>");
-        exit(1);
-    }
-
-    if (!g_ascii_strcasecmp(argv[1] ,"on")) {
-        audacious_remote_eq_win_toggle(dbus_proxy, TRUE);
-        return;
-    }
-    else if (!g_ascii_strcasecmp(argv[1] ,"off")) {
-        audacious_remote_eq_win_toggle(dbus_proxy, FALSE);
         return;
     }
 }
@@ -244,12 +209,7 @@ void get_handlers_list(gint argc, gchar **argv)
 
     audtool_report("");
 	audtool_report("Handlers may be prefixed with `--' (GNU-style long-options) or not, your choice.");
-	audtool_report("Report bugs to http://bugzilla.atheme.org/");
-}
-
-void activate(gint argc, gchar **argv)
-{
-    audacious_remote_activate(dbus_proxy);
+	audtool_report("Report bugs to http://redmine.audacious-media-player.org/");
 }
 
 void toggle_aot(gint argc, gchar **argv)

@@ -1,5 +1,7 @@
-/*  Audacious
- *  Copyright (c) 2006-2007 William Pitcock
+/*
+ *  vfs.c
+ *  Copyright 2006-2011 William Pitcock, Daniel Barkalow, Ralf Ertzinger,
+ *                      Yoshiki Yazawa, Matti Hämäläinen, and John Lindgren
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,6 +19,7 @@
  *  Audacious or using our public API to be a derived work.
  */
 
+#include <glib.h>
 #include <inttypes.h>
 
 #include "vfs.h"
@@ -27,7 +30,19 @@
 #include <sys/types.h>
 #include <string.h>
 
-#include <mowgli.h>
+#define VFS_SIG ('V' | ('F' << 8) | ('S' << 16))
+
+/**
+ * @struct _VFSFile
+ * #VFSFile objects describe an opened VFS stream, basically being
+ * similar in purpose as stdio FILE
+ */
+struct _VFSFile {
+    char * uri;               /**< The URI of the stream */
+    VFSConstructor * base;    /**< The base vtable used for VFS functions */
+    void * handle;            /**< Opaque data used by the transport plugins */
+    int sig;                  /**< Used to detect invalid or twice-closed objects */
+};
 
 /* Audacious core provides us with a function that looks up a VFS transport for
  * a given URI scheme.  Since this function will load plugins as needed, it can
@@ -35,93 +50,26 @@
  * vfs_prepare must be called from the main thread to look up any needed
  * transports beforehand. */
 
-typedef struct {
-    VFSConstructor * transport;
-    gboolean prepared;
-} LookupNode;
+static VFSConstructor * (* lookup_func) (const char * scheme) = NULL;
 
-static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
-static GThread * lookup_thread = NULL;
-static VFSConstructor * (* lookup_func) (const gchar * scheme) = NULL;
-static mowgli_patricia_t * lookup_table = NULL;
-
-void vfs_set_lookup_func (VFSConstructor * (* func) (const gchar * scheme))
+void vfs_set_lookup_func (VFSConstructor * (* func) (const char * scheme))
 {
-    g_static_mutex_lock (& mutex);
-
-    lookup_thread = g_thread_self ();
     lookup_func = func;
-
-    if (! lookup_table)
-        lookup_table = mowgli_patricia_create (NULL);
-
-    g_static_mutex_unlock (& mutex);
 }
 
-static VFSConstructor * do_lookup (const gchar * scheme, gboolean prepare)
-{
-    g_return_val_if_fail (lookup_thread && lookup_func && lookup_table, NULL);
+static bool_t verbose = FALSE;
 
-    LookupNode * node = mowgli_patricia_retrieve (lookup_table, scheme);
-    if (! node)
-    {
-        node = g_slice_new (LookupNode);
-        node->transport = NULL;
-        node->prepared = FALSE;
-        mowgli_patricia_add (lookup_table, scheme, node);
-    }
-
-    if (prepare)
-        node->prepared = TRUE;
-
-    /* vfs_prepare can only be called from the main thread.  vfs_fopen can only
-     * be called from the main thread unless vfs_prepare has been called. */
-    if (prepare || ! node->prepared)
-        g_return_val_if_fail (g_thread_self () == lookup_thread, NULL);
-
-    /* do the actual lookup if needed, but only in the main thread */
-    if (! node->transport && g_thread_self () == lookup_thread)
-    {
-        node->transport = lookup_func (scheme);
-        /* This is normal for custom URI schemes.
-        if (! node->transport)
-            fprintf (stderr, "No transport plugin found for URI scheme \"%s\".\n", scheme); */
-    }
-
-    return node->transport;
-}
-
-void vfs_prepare (const gchar * scheme)
-{
-    g_static_mutex_lock (& mutex);
-    do_lookup (scheme, TRUE);
-    g_static_mutex_unlock (& mutex);
-}
-
-void vfs_prepare_filename (const gchar * path)
-{
-    const gchar * s = strstr (path, "://");
-    g_return_if_fail (s);
-    gchar scheme[s - path + 1];
-    strncpy (scheme, path, s - path);
-    scheme[s - path] = 0;
-
-    vfs_prepare (scheme);
-}
-
-static gboolean verbose = FALSE;
-
-void vfs_set_verbose (gboolean set)
+void vfs_set_verbose (bool_t set)
 {
     verbose = set;
 }
 
-static void logger (const gchar * format, ...)
+static void logger (const char * format, ...)
 {
-    static gchar last[256] = "";
-    static gint repeated = 0;
+    static char last[256] = "";
+    static int repeated = 0;
 
-    gchar buf[256];
+    char buf[256];
 
     va_list args;
     va_start (args, format);
@@ -137,10 +85,30 @@ static void logger (const gchar * format, ...)
             printf ("VFS: (last message repeated %d times)\n", repeated);
             repeated = 0;
         }
-        
+
         fputs (buf, stdout);
         strcpy (last, buf);
     }
+}
+
+VFSFile * vfs_new (const char * path, VFSConstructor * vtable, void * handle)
+{
+    VFSFile * file = g_slice_new (VFSFile);
+    file->uri = str_get (path);
+    file->base = vtable;
+    file->handle = handle;
+    file->sig = VFS_SIG;
+    return file;
+}
+
+const char * vfs_get_filename (VFSFile * file)
+{
+    return file->uri;
+}
+
+void * vfs_get_handle (VFSFile * file)
+{
+    return file->handle;
 }
 
 /**
@@ -152,40 +120,37 @@ static void logger (const gchar * format, ...)
  * @return On success, a #VFSFile object representing the stream.
  */
 VFSFile *
-vfs_fopen(const gchar * path,
-          const gchar * mode)
+vfs_fopen(const char * path,
+          const char * mode)
 {
     g_return_val_if_fail (path && mode, NULL);
     g_return_val_if_fail (lookup_func, NULL);
 
-    VFSFile *file;
-    VFSConstructor *vtable = NULL;
-
-    const gchar * s = strstr (path, "://");
+    const char * s = strstr (path, "://");
     g_return_val_if_fail (s, NULL);
-    gchar scheme[s - path + 1];
+    char scheme[s - path + 1];
     strncpy (scheme, path, s - path);
     scheme[s - path] = 0;
 
-    g_static_mutex_lock (& mutex);
-    vtable = do_lookup (scheme, FALSE);
-    g_static_mutex_unlock (& mutex);
-
+    VFSConstructor * vtable = lookup_func (scheme);
     if (! vtable)
         return NULL;
 
-    file = vtable->vfs_fopen_impl(path, mode);
+    const gchar * sub;
+    uri_parse (path, NULL, NULL, & sub, NULL);
+
+    gchar buf[sub - path + 1];
+    memcpy (buf, path, sub - path);
+    buf[sub - path] = 0;
+
+    void * handle = vtable->vfs_fopen_impl (buf, mode);
+    if (! handle)
+        return NULL;
+
+    VFSFile * file = vfs_new (path, vtable, handle);
 
     if (verbose)
         logger ("VFS: <%p> open (mode %s) %s\n", file, mode, path);
-
-    if (file == NULL)
-        return NULL;
-
-    file->uri = g_strdup(path);
-    file->base = vtable;
-    file->ref = 1;
-    file->sig = VFS_SIG;
 
     return file;
 }
@@ -196,26 +161,23 @@ vfs_fopen(const gchar * path,
  * @param file A #VFSFile object to destroy.
  * @return -1 on failure, 0 on success.
  */
-gint
+int
 vfs_fclose(VFSFile * file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, -1);
 
     if (verbose)
-        printf ("VFS: <%p> close\n", file);
+        logger ("VFS: <%p> close\n", file);
 
-    gint ret = 0;
-
-    if (--file->ref > 0)
-        return -1;
+    int ret = 0;
 
     if (file->base->vfs_fclose_impl(file) != 0)
         ret = -1;
 
-    g_free(file->uri);
+    str_unref (file->uri);
 
     memset (file, 0, sizeof (VFSFile));
-    g_free (file);
+    g_slice_free (VFSFile, file);
 
     return ret;
 }
@@ -229,15 +191,15 @@ vfs_fclose(VFSFile * file)
  * @param file #VFSFile object that represents the VFS stream.
  * @return The number of elements succesfully read.
  */
-gint64 vfs_fread (void * ptr, gint64 size, gint64 nmemb, VFSFile * file)
+int64_t vfs_fread (void * ptr, int64_t size, int64_t nmemb, VFSFile * file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, 0);
 
-    gint64 readed = file->base->vfs_fread_impl (ptr, size, nmemb, file);
-    
-    if (verbose)
+    int64_t readed = file->base->vfs_fread_impl (ptr, size, nmemb, file);
+
+/*    if (verbose)
         logger ("VFS: <%p> read %"PRId64" elements of size %"PRId64" = "
-         "%"PRId64"\n", file, nmemb, size, readed);
+         "%"PRId64"\n", file, nmemb, size, readed); */
 
     return readed;
 }
@@ -251,11 +213,11 @@ gint64 vfs_fread (void * ptr, gint64 size, gint64 nmemb, VFSFile * file)
  * @param file #VFSFile object that represents the VFS stream.
  * @return The number of elements succesfully written.
  */
-gint64 vfs_fwrite (const void * ptr, gint64 size, gint64 nmemb, VFSFile * file)
+int64_t vfs_fwrite (const void * ptr, int64_t size, int64_t nmemb, VFSFile * file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, 0);
 
-    gint64 written = file->base->vfs_fwrite_impl (ptr, size, nmemb, file);
+    int64_t written = file->base->vfs_fwrite_impl (ptr, size, nmemb, file);
 
     if (verbose)
         logger ("VFS: <%p> write %"PRId64" elements of size %"PRId64" = "
@@ -270,7 +232,7 @@ gint64 vfs_fwrite (const void * ptr, gint64 size, gint64 nmemb, VFSFile * file)
  * @param file #VFSFile object that represents the VFS stream.
  * @return On success, a character. Otherwise, EOF.
  */
-gint
+int
 vfs_getc(VFSFile *file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, EOF);
@@ -288,8 +250,8 @@ vfs_getc(VFSFile *file)
  * @param file #VFSFile object that represents the VFS stream.
  * @return On success, 0. Otherwise, EOF.
  */
-gint
-vfs_ungetc(gint c, VFSFile *file)
+int
+vfs_ungetc(int c, VFSFile *file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, EOF);
 
@@ -312,10 +274,10 @@ vfs_ungetc(gint c, VFSFile *file)
  * @param whence Type of the seek: SEEK_CUR, SEEK_SET or SEEK_END.
  * @return On success, 0. Otherwise, -1.
  */
-gint
+int
 vfs_fseek(VFSFile * file,
-          gint64 offset,
-          gint whence)
+          int64_t offset,
+          int whence)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, -1);
 
@@ -349,12 +311,12 @@ vfs_rewind(VFSFile * file)
  * @param file #VFSFile object that represents the VFS stream.
  * @return On success, the current position. Otherwise, -1.
  */
-gint64
+int64_t
 vfs_ftell(VFSFile * file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, -1);
 
-    gint64 told = file->base->vfs_ftell_impl (file);
+    int64_t told = file->base->vfs_ftell_impl (file);
 
     if (verbose)
         logger ("VFS: <%p> tell = %"PRId64"\n", file, told);
@@ -368,12 +330,12 @@ vfs_ftell(VFSFile * file)
  * @param file #VFSFile object that represents the VFS stream.
  * @return On success, whether or not the VFS stream is at EOF. Otherwise, FALSE.
  */
-gboolean
+bool_t
 vfs_feof(VFSFile * file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, TRUE);
 
-    gboolean eof = file->base->vfs_feof_impl (file);
+    bool_t eof = file->base->vfs_feof_impl (file);
 
     if (verbose)
         logger ("VFS: <%p> eof = %s\n", file, eof ? "yes" : "no");
@@ -388,7 +350,7 @@ vfs_feof(VFSFile * file)
  * @param length The length to truncate at.
  * @return On success, 0. Otherwise, -1.
  */
-gint vfs_ftruncate (VFSFile * file, gint64 length)
+int vfs_ftruncate (VFSFile * file, int64_t length)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, -1);
 
@@ -404,11 +366,11 @@ gint vfs_ftruncate (VFSFile * file, gint64 length)
  * @param file #VFSFile object that represents the VFS stream.
  * @return On success, the size of the file in bytes. Otherwise, -1.
  */
-gint64 vfs_fsize (VFSFile * file)
+int64_t vfs_fsize (VFSFile * file)
 {
     g_return_val_if_fail (file && file->sig == VFS_SIG, -1);
 
-    gint64 size = file->base->vfs_fsize_impl (file);
+    int64_t size = file->base->vfs_fsize_impl (file);
 
     if (verbose)
         logger ("VFS: <%p> size = %"PRId64"\n", file, size);
@@ -423,8 +385,8 @@ gint64 vfs_fsize (VFSFile * file)
  * @param field The string constant field name to get.
  * @return On success, a copy of the value of the field. Otherwise, NULL.
  */
-gchar *
-vfs_get_metadata(VFSFile * file, const gchar * field)
+char *
+vfs_get_metadata(VFSFile * file, const char * field)
 {
     if (file == NULL)
         return NULL;
@@ -441,18 +403,18 @@ vfs_get_metadata(VFSFile * file, const gchar * field)
  * @param test A GFileTest to run.
  * @return The result of g_file_test().
  */
-gboolean
-vfs_file_test(const gchar * path, GFileTest test)
+bool_t
+vfs_file_test(const char * path, int test)
 {
     if (strncmp (path, "file://", 7))
         return FALSE; /* only local files are handled */
 
-    gchar * path2 = uri_to_filename (path);
+    char * path2 = uri_to_filename (path);
 
     if (path2 == NULL)
         path2 = g_strdup(path);
 
-    gboolean ret = g_file_test (path2, test);
+    bool_t ret = g_file_test (path2, test);
 
     g_free(path2);
 
@@ -465,11 +427,11 @@ vfs_file_test(const gchar * path, GFileTest test)
  * @param path A path to test.
  * @return TRUE if the file is writeable, otherwise FALSE.
  */
-gboolean
-vfs_is_writeable(const gchar * path)
+bool_t
+vfs_is_writeable(const char * path)
 {
     struct stat info;
-    gchar * realfn = uri_to_filename (path);
+    char * realfn = uri_to_filename (path);
 
     if (stat(realfn, &info) == -1)
         return FALSE;
@@ -480,34 +442,14 @@ vfs_is_writeable(const gchar * path)
 }
 
 /**
- * Increments the amount of references that are using this FD.
- * References are removed by calling vfs_fclose on the handle returned
- * from this function. If the amount of references reaches zero, then
- * the file will be closed.
- *
- * @param in The VFSFile handle to mark as duplicated.
- * @return VFSFile handle, which is same as given input.
- */
-VFSFile *
-vfs_dup(VFSFile *in)
-{
-    g_return_val_if_fail(in != NULL, NULL);
-
-    in->ref++;
-
-    return in;
-}
-
-/**
  * Tests if a path is remote uri.
  *
  * @param path A path to test.
  * @return TRUE if the file is remote, otherwise FALSE.
  */
-gboolean
-vfs_is_remote(const gchar * path)
+bool_t vfs_is_remote (const char * path)
 {
-    return strncasecmp (path, "file://", 7) ? TRUE : FALSE;
+    return strncmp (path, "file://", 7) ? TRUE : FALSE;
 }
 
 /**
@@ -516,18 +458,7 @@ vfs_is_remote(const gchar * path)
  * @param file A #VFSFile object to test.
  * @return TRUE if the file is streaming, otherwise FALSE.
  */
-gboolean
-vfs_is_streaming(VFSFile *file)
+bool_t vfs_is_streaming (VFSFile * file)
 {
-    off_t size = 0;
-
-    if (file == NULL)
-        return FALSE;
-
-    size = file->base->vfs_fsize_impl(file);
-
-    if (size == -1)
-        return TRUE;
-    else
-        return FALSE;
+    return (vfs_fsize (file) < 0);
 }

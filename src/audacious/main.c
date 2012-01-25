@@ -24,7 +24,11 @@
  */
 
 #include <errno.h>
-#include <limits.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <gtk/gtk.h>
 
@@ -36,7 +40,7 @@
 
 #ifdef USE_DBUS
 #include "audctrl.h"
-#include "dbus-service.h"
+#include "dbus.h"
 #endif
 
 #ifdef USE_EGGSM
@@ -44,46 +48,34 @@
 #include "eggsmclient.h"
 #endif
 
-#include "audconfig.h"
-#include "configdb.h"
 #include "debug.h"
 #include "drct.h"
 #include "equalizer.h"
-#include "glib-compat.h"
 #include "i18n.h"
 #include "interface.h"
+#include "main.h"
 #include "misc.h"
 #include "playback.h"
 #include "playlist.h"
 #include "plugins.h"
 #include "util.h"
 
-/* chardet.c */
-void chardet_init (void);
-
-/* mpris-signals.c */
-void mpris_signals_init (void);
-void mpris_signals_cleanup (void);
-
-/* signals.c */
-void signals_init (void);
-
-/* smclient.c */
-void smclient_init (void);
-
 #define AUTOSAVE_INTERVAL 300 /* seconds */
 
+bool_t headless;
+
 static struct {
-    gchar **filenames;
-    gint session;
-    gboolean play, stop, pause, fwd, rew, play_pause, show_jump_box;
-    gboolean enqueue, mainwin, remote, activate;
-    gboolean enqueue_to_temp;
-    gboolean version;
-    gchar *previous_session_id;
+    char **filenames;
+    int session;
+    bool_t play, stop, pause, fwd, rew, play_pause, show_jump_box;
+    bool_t enqueue, mainwin, remote;
+    bool_t enqueue_to_temp;
+    bool_t version;
+    bool_t verbose;
+    char *previous_session_id;
 } options;
 
-static gchar * aud_paths[AUD_PATH_COUNT];
+static char * aud_paths[AUD_PATH_COUNT];
 
 static void make_dirs(void)
 {
@@ -94,16 +86,15 @@ static void make_dirs(void)
 #endif
 
     make_directory(aud_paths[AUD_PATH_USER_DIR], mode755);
-    make_directory(aud_paths[AUD_PATH_USER_PLUGIN_DIR], mode755);
     make_directory(aud_paths[AUD_PATH_PLAYLISTS_DIR], mode755);
 }
 
-static void normalize_path (gchar * path)
+static void normalize_path (char * path)
 {
 #ifdef _WIN32
     string_replace_char (path, '/', '\\');
 #endif
-    gint len = strlen (path);
+    int len = strlen (path);
 #ifdef _WIN32
     if (len > 3 && path[len - 1] == '\\') /* leave "C:\" */
 #else
@@ -112,13 +103,13 @@ static void normalize_path (gchar * path)
         path[len - 1] = 0;
 }
 
-static gchar * last_path_element (gchar * path)
+static char * last_path_element (char * path)
 {
-    gchar * slash = strrchr (path, G_DIR_SEPARATOR);
+    char * slash = strrchr (path, G_DIR_SEPARATOR);
     return (slash && slash[1]) ? slash + 1 : NULL;
 }
 
-static void strip_path_element (gchar * path, gchar * elem)
+static void strip_path_element (char * path, char * elem)
 {
 #ifdef _WIN32
     if (elem > path + 3)
@@ -130,15 +121,21 @@ static void strip_path_element (gchar * path, gchar * elem)
         elem[0] = 0; /* leave [drive letter and] leading slash */
 }
 
-static void relocate_path (gchar * * pathp, const gchar * old, const gchar * new)
+static void relocate_path (char * * pathp, const char * old, const char * new)
 {
-    gchar * path = * pathp;
-    gint len = strlen (old);
+    char * path = * pathp;
+    int oldlen = strlen (old);
+    int newlen = strlen (new);
+
+    if (oldlen && old[oldlen - 1] == G_DIR_SEPARATOR)
+        oldlen --;
+    if (newlen && new[newlen - 1] == G_DIR_SEPARATOR)
+        newlen --;
 
 #ifdef _WIN32
-    if (strncasecmp (path, old, len))
+    if (strncasecmp (path, old, oldlen) || (path[oldlen] && path[oldlen] != G_DIR_SEPARATOR))
 #else
-    if (strncmp (path, old, len))
+    if (strncmp (path, old, oldlen) || (path[oldlen] && path[oldlen] != G_DIR_SEPARATOR))
 #endif
     {
         fprintf (stderr, "Failed to relocate a data path.  Falling back to "
@@ -146,7 +143,7 @@ static void relocate_path (gchar * * pathp, const gchar * old, const gchar * new
         return;
     }
 
-    * pathp = g_strconcat (new, path + len, NULL);
+    * pathp = g_strdup_printf ("%.*s%s", newlen, new, path + oldlen);
     g_free (path);
 }
 
@@ -168,8 +165,8 @@ static void relocate_paths (void)
 
     /* Compare the compile-time path to the executable and the actual path to
      * see if we have been moved. */
-    gchar * old = g_strdup (aud_paths[AUD_PATH_BIN_DIR]);
-    gchar * new = get_path_to_self ();
+    char * old = g_strdup (aud_paths[AUD_PATH_BIN_DIR]);
+    char * new = get_path_to_self ();
     if (! new)
     {
 ERR:
@@ -180,14 +177,14 @@ ERR:
     normalize_path (new);
 
     /* Strip the name of the executable file, leaving the path. */
-    gchar * base = last_path_element (new);
+    char * base = last_path_element (new);
     if (! base)
         goto ERR;
     strip_path_element (new, base);
 
     /* Strip innermost folder names from both paths as long as they match.  This
      * leaves a compile-time prefix and a run-time one to replace it with. */
-    gchar * a, * b;
+    char * a, * b;
     while ((a = last_path_element (old)) && (b = last_path_element (new)) &&
 #ifdef _WIN32
      ! strcasecmp (a, b))
@@ -215,8 +212,8 @@ static void init_paths (void)
 {
     relocate_paths ();
 
-    const gchar * xdg_config_home = g_get_user_config_dir ();
-    const gchar * xdg_data_home = g_get_user_data_dir ();
+    const char * xdg_config_home = g_get_user_config_dir ();
+    const char * xdg_data_home = g_get_user_data_dir ();
 
 #ifdef _WIN32
     /* Some libraries (libmcs) and plugins (filewriter) use these variables,
@@ -230,14 +227,13 @@ static void init_paths (void)
     aud_paths[AUD_PATH_USER_DIR] = g_build_filename(xdg_config_home, "audacious", NULL);
     aud_paths[AUD_PATH_USER_PLUGIN_DIR] = g_build_filename(xdg_data_home, "audacious", "Plugins", NULL);
     aud_paths[AUD_PATH_PLAYLISTS_DIR] = g_build_filename(aud_paths[AUD_PATH_USER_DIR], "playlists", NULL);
-    aud_paths[AUD_PATH_PLAYLIST_FILE] = g_build_filename(aud_paths[AUD_PATH_USER_DIR], "playlist.xspf", NULL);
     aud_paths[AUD_PATH_GTKRC_FILE] = g_build_filename(aud_paths[AUD_PATH_USER_DIR], "gtkrc", NULL);
 
-    for (gint i = 0; i < AUD_PATH_COUNT; i ++)
+    for (int i = 0; i < AUD_PATH_COUNT; i ++)
         AUDDBG ("Data path: %s\n", aud_paths[i]);
 }
 
-const gchar * get_path (gint id)
+const char * get_path (int id)
 {
     g_return_val_if_fail (id >= 0 && id < AUD_PATH_COUNT, NULL);
     return aud_paths[id];
@@ -254,14 +250,14 @@ static GOptionEntry cmd_entries[] = {
     {"enqueue", 'e', 0, G_OPTION_ARG_NONE, &options.enqueue, N_("Add files to the playlist"), NULL},
     {"enqueue-to-temp", 'E', 0, G_OPTION_ARG_NONE, &options.enqueue_to_temp, N_("Add new files to a temporary playlist"), NULL},
     {"show-main-window", 'm', 0, G_OPTION_ARG_NONE, &options.mainwin, N_("Display the main window"), NULL},
-    {"activate", 'a', 0, G_OPTION_ARG_NONE, &options.activate, N_("Display all open Audacious windows"), NULL},
     {"version", 'v', 0, G_OPTION_ARG_NONE, &options.version, N_("Show version"), NULL},
-    {"verbose", 'V', 0, G_OPTION_ARG_NONE, &cfg.verbose, N_("Print debugging messages"), NULL},
+    {"verbose", 'V', 0, G_OPTION_ARG_NONE, &options.verbose, N_("Print debugging messages"), NULL},
+    {"headless", 'h', 0, G_OPTION_ARG_NONE, & headless, N_("Headless mode (beta)"), NULL},
     {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, N_("FILE..."), NULL},
     {NULL},
 };
 
-static void parse_options (gint * argc, gchar *** argv)
+static void parse_options (int * argc, char *** argv)
 {
     GOptionContext *context;
     GError *error = NULL;
@@ -270,7 +266,7 @@ static void parse_options (gint * argc, gchar *** argv)
     options.session = -1;
 
     context = g_option_context_new(_("- play multimedia files"));
-    g_option_context_add_main_entries(context, cmd_entries, PACKAGE_NAME);
+    g_option_context_add_main_entries(context, cmd_entries, PACKAGE);
     g_option_context_add_group(context, gtk_get_option_group(FALSE));
 #ifdef USE_EGGSM
     g_option_context_add_group(context, egg_sm_client_get_option_group());
@@ -285,65 +281,72 @@ static void parse_options (gint * argc, gchar *** argv)
     }
 
     g_option_context_free (context);
+
+    verbose = options.verbose;
 }
 
-static gboolean get_lock (void)
+static bool_t get_lock (void)
 {
-    gchar path[PATH_MAX];
-    snprintf (path, sizeof path, "%s" G_DIR_SEPARATOR_S "lock",
-     aud_paths[AUD_PATH_USER_DIR]);
-
+    char * path = g_strdup_printf ("%s" G_DIR_SEPARATOR_S "lock", aud_paths[AUD_PATH_USER_DIR]);
     int handle = open (path, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 
     if (handle < 0)
     {
         if (errno != EEXIST)
             fprintf (stderr, "Cannot create %s: %s.\n", path, strerror (errno));
+
+        g_free (path);
         return FALSE;
     }
 
     close (handle);
+    g_free (path);
     return TRUE;
 }
 
 static void release_lock (void)
 {
-    gchar path[PATH_MAX];
-    snprintf (path, sizeof path, "%s" G_DIR_SEPARATOR_S "lock",
-     aud_paths[AUD_PATH_USER_DIR]);
-
+    char * path = g_strdup_printf ("%s" G_DIR_SEPARATOR_S "lock", aud_paths[AUD_PATH_USER_DIR]);
     unlink (path);
+    g_free (path);
 }
 
-static GList * convert_filenames (void)
+static Index * convert_filenames (void)
 {
     if (! options.filenames)
         return NULL;
 
-    gchar * * f = options.filenames;
-    GList * list = NULL;
-    gchar * cur = g_get_current_dir ();
+    Index * filenames = index_new ();
+    char * * f = options.filenames;
+    char * cur = g_get_current_dir ();
 
-    for (gint i = 0; f[i]; i ++)
+    for (int i = 0; f[i]; i ++)
     {
-        gchar * uri;
+        char * uri = NULL;
 
         if (strstr (f[i], "://"))
-            uri = g_strdup (f[i]);
+            uri = str_get (f[i]);
         else if (g_path_is_absolute (f[i]))
-            uri = filename_to_uri (f[i]);
+        {
+            char * tmp = filename_to_uri (f[i]);
+            uri = str_get (tmp);
+            free (tmp);
+        }
         else
         {
-            gchar * tmp = g_build_filename (cur, f[i], NULL);
-            uri = filename_to_uri (tmp);
-            g_free (tmp);
+            char * tmp = g_build_filename (cur, f[i], NULL);
+            char * tmp2 = filename_to_uri (tmp);
+            uri = str_get (tmp2);
+            free (tmp);
+            free (tmp2);
         }
 
-        list = g_list_prepend (list, uri);
+        if (uri)
+            index_append (filenames, uri);
     }
 
     g_free (cur);
-    return g_list_reverse (list);
+    return filenames;
 }
 
 static void do_remote (void)
@@ -353,10 +356,21 @@ static void do_remote (void)
 
     if (session && audacious_remote_is_running (session))
     {
-        GList * list = convert_filenames ();
+        Index * filenames = convert_filenames ();
 
-        if (list)
+        /* if no command line options, then present running instance */
+        if (! (filenames || options.play || options.pause || options.play_pause ||
+         options.stop || options.rew || options.fwd || options.show_jump_box ||
+         options.mainwin))
+            options.mainwin = TRUE;
+
+        if (filenames)
         {
+            GList * list = NULL;
+
+            for (int f = index_count (filenames); f --; )
+                list = g_list_prepend (list, index_get (filenames, f));
+
             if (options.enqueue_to_temp)
                 audacious_remote_playlist_open_list_to_temp (session, list);
             else if (options.enqueue)
@@ -364,8 +378,12 @@ static void do_remote (void)
             else
                 audacious_remote_playlist_open_list (session, list);
 
-            g_list_foreach (list, (GFunc) g_free, NULL);
             g_list_free (list);
+
+            for (int f = 0; f < index_count (filenames); f ++)
+                str_unref (index_get (filenames, f));
+
+            index_free (filenames);
         }
 
         if (options.play)
@@ -382,8 +400,6 @@ static void do_remote (void)
             audacious_remote_playlist_next (session);
         if (options.show_jump_box)
             audacious_remote_show_jtf_box (session);
-        if (options.activate)
-            audacious_remote_activate (session);
         if (options.mainwin)
             audacious_remote_main_win_toggle (session, TRUE);
 
@@ -391,49 +407,32 @@ static void do_remote (void)
     }
 #endif
 
-    GtkWidget * dialog = gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_WARNING,
-     GTK_BUTTONS_OK_CANCEL, _("Audacious seems to be already running but is "
-     "not responding.  You can start another instance of the program, but "
-     "please be warned that this can cause data loss.  If Audacious is not "
-     "running, you can safely ignore this message.  Press OK to start "
-     "Audacious or Cancel to quit."));
-
-    g_signal_connect (dialog, "destroy", (GCallback) gtk_widget_destroyed,
-     & dialog);
-
-    if (gtk_dialog_run ((GtkDialog *) dialog) != GTK_RESPONSE_OK)
-        exit (EXIT_FAILURE);
-
-    if (dialog)
-        gtk_widget_destroy (dialog);
+    fprintf (stderr, "WARNING: Audacious seems to be already running but is not responding.\n");
 }
 
 static void do_commands (void)
 {
-    GList * list = convert_filenames ();
+    bool_t resume = get_bool (NULL, "resume_playback_on_startup");
 
-    if (list)
+    Index * filenames = convert_filenames ();
+    if (filenames)
     {
         if (options.enqueue_to_temp)
         {
-            drct_pl_open_temp_list (list);
-            cfg.resume_state = 0;
+            drct_pl_open_temp_list (filenames);
+            resume = FALSE;
         }
         else if (options.enqueue)
-            drct_pl_add_list (list, -1);
+            drct_pl_add_list (filenames, -1);
         else
         {
-            drct_pl_open_list (list);
-            cfg.resume_state = 0;
+            drct_pl_open_list (filenames);
+            resume = FALSE;
         }
-
-        g_list_foreach (list, (GFunc) g_free, NULL);
-        g_list_free (list);
     }
 
-    if (cfg.resume_playback_on_startup && cfg.resume_state > 0)
-        playback_play (cfg.resume_playback_on_startup_time, cfg.resume_state ==
-         2);
+    if (resume)
+        playlist_resume ();
 
     if (options.play || options.play_pause)
     {
@@ -446,29 +445,19 @@ static void do_commands (void)
     if (options.show_jump_box)
         interface_show_jump_to_track ();
     if (options.mainwin)
-        interface_toggle_visibility ();
+        interface_show (TRUE);
 }
 
-static void init_one (gint * p_argc, gchar * * * p_argv)
+static void init_one (void)
 {
     init_paths ();
     make_dirs ();
 
-    bindtextdomain (PACKAGE_NAME, aud_paths[AUD_PATH_LOCALE_DIR]);
-    bind_textdomain_codeset (PACKAGE_NAME, "UTF-8");
-    bindtextdomain (PACKAGE_NAME "-plugins", aud_paths[AUD_PATH_LOCALE_DIR]);
-    bind_textdomain_codeset (PACKAGE_NAME "-plugins", "UTF-8");
-    textdomain (PACKAGE_NAME);
-
-    mowgli_init ();
-    chardet_init ();
-
-    g_thread_init (NULL);
-    gdk_threads_init ();
-    gdk_threads_enter ();
-
-    gtk_rc_add_default_file (aud_paths[AUD_PATH_GTKRC_FILE]);
-    gtk_init (p_argc, p_argv);
+    bindtextdomain (PACKAGE, aud_paths[AUD_PATH_LOCALE_DIR]);
+    bind_textdomain_codeset (PACKAGE, "UTF-8");
+    bindtextdomain (PACKAGE "-plugins", aud_paths[AUD_PATH_LOCALE_DIR]);
+    bind_textdomain_codeset (PACKAGE "-plugins", "UTF-8");
+    textdomain (PACKAGE);
 
 #ifdef USE_EGGSM
     egg_sm_client_set_mode (EGG_SM_CLIENT_MODE_NORMAL);
@@ -476,17 +465,25 @@ static void init_one (gint * p_argc, gchar * * * p_argv)
 #endif
 }
 
-static void init_two (void)
+static void init_two (int * p_argc, char * * * p_argv)
 {
-    hook_init ();
-    tag_init ();
+    if (! headless)
+    {
+        g_thread_init (NULL);
+        gdk_threads_init ();
+        gdk_threads_enter ();
 
-    aud_config_load ();
-    tag_set_verbose (cfg.verbose);
-    vfs_set_verbose (cfg.verbose);
+        gtk_rc_add_default_file (aud_paths[AUD_PATH_GTKRC_FILE]);
+        gtk_init (p_argc, p_argv);
+    }
+
+    config_load ();
+    chardet_init ();
+
+    tag_set_verbose (verbose);
+    vfs_set_verbose (verbose);
 
     eq_init ();
-    register_interface_hooks ();
 
 #ifdef HAVE_SIGWAIT
     signals_init ();
@@ -499,6 +496,8 @@ static void init_two (void)
     start_plugins_one ();
 
     playlist_init ();
+    adder_init ();
+    art_init ();
     load_playlists ();
 
 #ifdef USE_DBUS
@@ -518,39 +517,55 @@ static void shut_down (void)
     mpris_signals_cleanup ();
 
     AUDDBG ("Capturing state.\n");
-    aud_config_save ();
-    save_playlists ();
+    hook_call ("config save", NULL);
+    save_playlists (TRUE);
 
     AUDDBG ("Unloading highlevel plugins.\n");
     stop_plugins_two ();
 
     AUDDBG ("Stopping playback.\n");
     if (playback_get_playing ())
+    {
+        bool_t stop_after_song = get_bool (NULL, "stop_after_current_song");
         playback_stop ();
+        set_bool (NULL, "stop_after_current_song", stop_after_song);
+    }
 
+#ifdef USE_DBUS
+    cleanup_dbus ();
+#endif
+
+    adder_cleanup ();
+    art_cleanup ();
+    history_cleanup ();
     playlist_end ();
 
     AUDDBG ("Unloading lowlevel plugins.\n");
     stop_plugins_one ();
 
     AUDDBG ("Saving configuration.\n");
-    cfg_db_flush ();
+    config_save ();
+    config_cleanup ();
+
+    eq_cleanup ();
+
+    strpool_shutdown ();
 
     gdk_threads_leave ();
 }
 
-static gboolean autosave_cb (void * unused)
+bool_t do_autosave (void)
 {
     AUDDBG ("Saving configuration.\n");
-    aud_config_save ();
-    cfg_db_flush ();
-    save_playlists ();
+    hook_call ("config save", NULL);
+    save_playlists (FALSE);
+    config_save ();
     return TRUE;
 }
 
-gint main(gint argc, gchar ** argv)
+int main(int argc, char ** argv)
 {
-    init_one (& argc, & argv);
+    init_one ();
     parse_options (& argc, & argv);
 
     if (options.version)
@@ -563,13 +578,14 @@ gint main(gint argc, gchar ** argv)
         do_remote (); /* may exit */
 
     AUDDBG ("No remote session; starting up.\n");
-    init_two ();
+    init_two (& argc, & argv);
 
     AUDDBG ("Startup complete.\n");
-    g_timeout_add_seconds (AUTOSAVE_INTERVAL, autosave_cb, NULL);
-    hook_associate ("quit", (HookFunction) gtk_main_quit, NULL);
+    g_timeout_add_seconds (AUTOSAVE_INTERVAL, (GSourceFunc) do_autosave, NULL);
 
+    hook_associate ("quit", (HookFunction) gtk_main_quit, NULL);
     gtk_main ();
+    hook_dissociate ("quit", (HookFunction) gtk_main_quit);
 
     shut_down ();
     release_lock ();

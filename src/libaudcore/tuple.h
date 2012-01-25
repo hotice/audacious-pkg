@@ -1,6 +1,7 @@
 /*
- * Audacious
- * Copyright (c) 2006-2007 Audacious team
+ * tuple.h
+ * Copyright 2007-2011 William Pitcock, Christian Birchinger, Matti Hämäläinen,
+ *                     Giacomo Lozito, Eugene Zagidullin, and John Lindgren
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +18,16 @@
  * The Audacious team does not consider modular code linking to
  * Audacious or using our public API to be a derived work.
  */
+
 /**
  * @file tuple.h
  * @brief Basic Tuple handling API.
  */
 
-#ifndef AUDACIOUS_TUPLE_H
-#define AUDACIOUS_TUPLE_H
+#ifndef LIBAUDCORE_TUPLE_H
+#define LIBAUDCORE_TUPLE_H
 
-#include <glib.h>
-#include <mowgli.h>
-
-G_BEGIN_DECLS
+#include <libaudcore/core.h>
 
 /** Ordered enum for basic #Tuple fields.
  * @sa TupleBasicType
@@ -40,9 +39,8 @@ enum {
     FIELD_COMMENT,      /**< Freeform comment */
     FIELD_GENRE,        /**< Song's genre */
 
-    FIELD_TRACK,
     FIELD_TRACK_NUMBER,
-    FIELD_LENGTH,       /**< Track length in seconds */
+    FIELD_LENGTH,       /**< Track length in milliseconds */
     FIELD_YEAR,         /**< Year of production/performance/etc */
     FIELD_QUALITY,      /**< String representing quality, such as
                              "lossy", "lossless", "sequenced"  */
@@ -51,10 +49,9 @@ enum {
     FIELD_FILE_NAME,    /**< File name part of the location URI */
     FIELD_FILE_PATH,    /**< Path part of the location URI */
     FIELD_FILE_EXT,     /**< Filename extension part of the location URI */
-    FIELD_SONG_ARTIST,
 
-    FIELD_MTIME,        /**< Playlist entry modification time for internal use */
-    FIELD_FORMATTER,    /**< Playlist entry Tuplez formatting string */
+    FIELD_SONG_ARTIST,
+    FIELD_COMPOSER,     /**< Composer of song, if different than artist. */
     FIELD_PERFORMER,
     FIELD_COPYRIGHT,
     FIELD_DATE,
@@ -80,10 +77,7 @@ enum {
     FIELD_GAIN_GAIN_UNIT,
     FIELD_GAIN_PEAK_UNIT,
 
-    FIELD_COMPOSER,     /**< Composer of song, if different than artist. */
-
-    /* Special field, must always be last */
-    FIELD_LAST
+    TUPLE_FIELDS
 };
 
 typedef enum {
@@ -92,66 +86,92 @@ typedef enum {
     TUPLE_UNKNOWN
 } TupleValueType;
 
-typedef struct {
-    gchar *name;
-    TupleValueType type;
-} TupleBasicType;
+int tuple_field_by_name (const char * name);
+const char * tuple_field_get_name (int field);
+TupleValueType tuple_field_get_type (int field);
 
-extern const TupleBasicType tuple_fields[FIELD_LAST];
+typedef struct _Tuple Tuple;
 
-#define TUPLE_NAME_MAX 20
+/* Creates a new, blank tuple with a reference count of one. */
+Tuple * tuple_new (void);
 
-typedef struct {
-    gchar name[TUPLE_NAME_MAX]; /* for standard fields, the empty string */
-    TupleValueType type;
-    union {
-        gchar *string;
-        gint integer;
-    } value;
-} TupleValue;
+/* Increments the reference count of <tuple> by one. */
+Tuple * tuple_ref (Tuple * tuple);
 
-/**
- * Structure for holding and passing around miscellaneous track
- * metadata. This is not the same as a playlist entry, though.
- */
-typedef struct _Tuple {
-    mowgli_object_t parent;
-    mowgli_patricia_t *dict;        /**< Mowgli dictionary for holding other than basic values. */
-    TupleValue *values[FIELD_LAST]; /**< Basic #Tuple values, entry is NULL if not set. */
-    gint nsubtunes;                 /**< Number of subtunes, if any. Values greater than 0
-                                         mean that there are subtunes and #subtunes array
-                                         may be set. */
-    gint *subtunes;                 /**< Array of gint containing subtune index numbers.
-                                         Can be NULL if indexing is linear or if
-                                         there are no subtunes. */
-} Tuple;
+/* Decrements the reference count of <tuple> by one.  If the reference count
+ * drops to zero, releases all memory used by <tuple>. */
+void tuple_unref (Tuple * tuple);
 
-
-Tuple *tuple_new(void);
+/* Makes a copy of <tuple>.  Only use tuple_copy() if you need to modify one
+ * copy of the tuple while not modifying the other.  In most cases, tuple_ref()
+ * is more appropriate. */
 Tuple *tuple_copy(const Tuple *);
-void tuple_set_filename(Tuple *tuple, const gchar *filename);
-Tuple *tuple_new_from_filename(const gchar *filename);
-gboolean tuple_associate_string_rel(Tuple *tuple, const gint nfield, const gchar *field, gchar *string);
-gboolean tuple_associate_string(Tuple *tuple, const gint nfield, const gchar *field, const gchar *string);
-gboolean tuple_associate_int(Tuple *tuple, const gint nfield, const gchar *field, gint integer);
-void tuple_disassociate(Tuple *tuple, const gint nfield, const gchar *field);
-void tuple_disassociate_now(TupleValue *value);
-TupleValueType tuple_get_value_type (const Tuple * tuple, gint nfield,
- const gchar * field);
-const gchar * tuple_get_string (const Tuple * tuple, gint nfield, const gchar *
- field);
-gint tuple_get_int (const Tuple * tuple, gint nfield, const gchar * field);
-#define tuple_free(x) mowgli_object_unref(x);
+
+/* Parses the URI <filename> and sets FIELD_FILE_NAME, FIELD_FILE_PATH,
+ * FIELD_FILE_EXT, and FIELD_SUBSONG_ID accordingly. */
+void tuple_set_filename(Tuple *tuple, const char *filename);
+
+/* Convenience function, equivalent to calling tuple_new() and then
+ * tuple_set_filename(). */
+Tuple *tuple_new_from_filename(const char *filename);
+
+/* Sets a field to the integer value <x>. */
+void tuple_set_int (Tuple * tuple, int nfield, const char * field, int x);
+
+/* Sets the field specified by <nfield> (one of the FIELD_* constants) or
+ * <field> (one of the names returned by tuple_field_get_name() to the string
+ * value <str>.  Only one of <nfield> or <field> may be set.  If <nfield> is
+ * set, <field> must be NULL; if <field> is set, <nfield> must be -1.  As a
+ * special case, if <str> is NULL, the result is equivalent to calling
+ * tuple_unset(). */
+void tuple_set_str (Tuple * tuple, int nfield, const char * field, const char * str);
+
+/* Clears any value that a field is currently set to. */
+void tuple_unset (Tuple * tuple, int nfield, const char * field);
+
+/* Returns the value type of a field, or TUPLE_UNKNOWN if the field has not been
+ * set to any value. */
+TupleValueType tuple_get_value_type (const Tuple * tuple, int nfield,
+ const char * field);
+
+/* Returns the string value of a field.  The returned string is pooled and must
+ * be released with str_unref() when no longer needed.  If the field has not
+ * been set to any value, returns NULL. */
+char * tuple_get_str (const Tuple * tuple, int nfield, const char * field);
+
+/* Returns the integer value of a field.  If the field has not been set to any
+ * value, returns 0.  (In hindsight, it would have been better to return -1 in
+ * this case.  If you need to distinguish between a value of 0 and a field not
+ * set to any value, use tuple_get_value_type().) */
+int tuple_get_int (const Tuple * tuple, int nfield, const char * field);
 
 /* Fills in format-related fields (specifically FIELD_CODEC, FIELD_QUALITY, and
- * FIELD_BITRATE.  Plugins should use this function instead of setting these
+ * FIELD_BITRATE).  Plugins should use this function instead of setting these
  * fields individually so that the style is consistent across file formats.
  * <format> should be a brief description such as "Microsoft WAV", "MPEG-1 layer
  * 3", "Audio CD", and so on.  <samplerate> is in Hertz.  <bitrate> is in 1000
  * bits per second. */
-void tuple_set_format (Tuple * tuple, const gchar * format, gint channels, gint
- samplerate, gint bitrate);
+void tuple_set_format (Tuple * tuple, const char * format, int channels, int
+ samplerate, int bitrate);
 
-G_END_DECLS
+/* In addition to the normal fields, tuples contain an integer array of subtune
+ * ID numbers.  This function sets that array.  It also sets FIELD_SUBSONG_NUM
+ * to the value <n_subtunes>. */
+void tuple_set_subtunes (Tuple * tuple, int n_subtunes, const int * subtunes);
 
-#endif /* AUDACIOUS_TUPLE_H */
+/* Returns the length of the subtune array.  If the array has not been set,
+ * returns zero.  Note that if FIELD_SUBSONG_NUM is changed after
+ * tuple_set_subtunes() is called, this function returns the value <n_subtunes>
+ * passed to tuple_set_subtunes(), not the value of FIELD_SUBSONG_NUM. */
+int tuple_get_n_subtunes (Tuple * tuple);
+
+/* Returns the <n>th member of the subtune array. */
+int tuple_get_nth_subtune (Tuple * tuple, int n);
+
+/* Generates a formatted title string for <tuple> according to <format>.  The
+ * syntax of <format> is documented in tuple_formatter.c.  The returned string
+ * is pooled and must be released with str_unref() when no longer need.  The
+ * returned string is never NULL, though it may be the empty string. */
+char * tuple_format_title (Tuple * tuple, const char * format);
+
+#endif /* LIBAUDCORE_TUPLE_H */

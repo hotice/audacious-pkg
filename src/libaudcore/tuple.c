@@ -1,6 +1,7 @@
 /*
- * Audacious
- * Copyright (c) 2006-2007 Audacious team
+ * tuple.c
+ * Copyright 2007-2011 William Pitcock, Christian Birchinger, Matti Hämäläinen,
+ *                     Giacomo Lozito, Eugene Zagidullin, and John Lindgren
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,34 +18,74 @@
  * The Audacious team does not consider modular code linking to
  * Audacious or using our public API to be a derived work.
  */
+
 /**
  * @file tuple.c
  * @brief Basic Tuple handling API.
  */
 
 #include <glib.h>
-#include <mowgli.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <audacious/i18n.h>
 
+#include "audstrings.h"
 #include "config.h"
 #include "tuple.h"
-#include "audstrings.h"
-#include "stringpool.h"
+#include "tuple_formatter.h"
 
-static gboolean set_string (Tuple * tuple, const gint nfield,
- const gchar * field, gchar * string, gboolean take);
+#define BLOCK_VALS 4
+
+typedef struct {
+    char *name;
+    TupleValueType type;
+} TupleBasicType;
+
+typedef union {
+    char * str;
+    int x;
+} TupleVal;
+
+typedef struct _TupleBlock TupleBlock;
+
+struct _TupleBlock {
+    TupleBlock * next;
+    char fields[BLOCK_VALS];
+    TupleVal vals[BLOCK_VALS];
+};
+
+/**
+ * Structure for holding and passing around miscellaneous track
+ * metadata. This is not the same as a playlist entry, though.
+ */
+struct _Tuple {
+    int refcount;
+    int64_t setmask;
+    TupleBlock * blocks;
+
+    int nsubtunes;                 /**< Number of subtunes, if any. Values greater than 0
+                                         mean that there are subtunes and #subtunes array
+                                         may be set. */
+    int *subtunes;                 /**< Array of int containing subtune index numbers.
+                                         Can be NULL if indexing is linear or if
+                                         there are no subtunes. */
+};
+
+#define BIT(i) ((int64_t) 1 << (i))
 
 /** Ordered table of basic #Tuple field names and their #TupleValueType.
  */
-const TupleBasicType tuple_fields[FIELD_LAST] = {
+static const TupleBasicType tuple_fields[TUPLE_FIELDS] = {
     { "artist",         TUPLE_STRING },
     { "title",          TUPLE_STRING },
     { "album",          TUPLE_STRING },
     { "comment",        TUPLE_STRING },
     { "genre",          TUPLE_STRING },
 
-    { "track",          TUPLE_STRING },
     { "track-number",   TUPLE_INT },
     { "length",         TUPLE_INT },
     { "year",           TUPLE_INT },
@@ -54,10 +95,9 @@ const TupleBasicType tuple_fields[FIELD_LAST] = {
     { "file-name",      TUPLE_STRING },
     { "file-path",      TUPLE_STRING },
     { "file-ext",       TUPLE_STRING },
-    { "song-artist",    TUPLE_STRING },
 
-    { "mtime",          TUPLE_INT },
-    { "formatter",      TUPLE_STRING },
+    { "song-artist",    TUPLE_STRING },
+    { "composer",       TUPLE_STRING },
     { "performer",      TUPLE_STRING },
     { "copyright",      TUPLE_STRING },
     { "date",           TUPLE_STRING },
@@ -76,113 +116,182 @@ const TupleBasicType tuple_fields[FIELD_LAST] = {
     { "gain-track-peak", TUPLE_INT },
     { "gain-gain-unit", TUPLE_INT },
     { "gain-peak-unit", TUPLE_INT },
-
-    { "composer",       TUPLE_STRING },
 };
 
+typedef struct {
+    const char * name;
+    int field;
+} FieldDictEntry;
 
-/** A mowgli heap containing all the allocated tuples. */
-static mowgli_heap_t *tuple_heap = NULL;
+/* used for binary search, MUST be in alphabetical order */
+static const FieldDictEntry field_dict[TUPLE_FIELDS] = {
+ {"album", FIELD_ALBUM},
+ {"artist", FIELD_ARTIST},
+ {"bitrate", FIELD_BITRATE},
+ {"codec", FIELD_CODEC},
+ {"comment", FIELD_COMMENT},
+ {"composer", FIELD_COMPOSER},
+ {"copyright", FIELD_COPYRIGHT},
+ {"date", FIELD_DATE},
+ {"file-ext", FIELD_FILE_EXT},
+ {"file-name", FIELD_FILE_NAME},
+ {"file-path", FIELD_FILE_PATH},
+ {"gain-album-gain", FIELD_GAIN_ALBUM_GAIN},
+ {"gain-album-peak", FIELD_GAIN_ALBUM_PEAK},
+ {"gain-gain-unit", FIELD_GAIN_GAIN_UNIT},
+ {"gain-peak-unit", FIELD_GAIN_PEAK_UNIT},
+ {"gain-track-gain", FIELD_GAIN_TRACK_GAIN},
+ {"gain-track-peak", FIELD_GAIN_TRACK_PEAK},
+ {"genre", FIELD_GENRE},
+ {"length", FIELD_LENGTH},
+ {"mime-type", FIELD_MIMETYPE},
+ {"performer", FIELD_PERFORMER},
+ {"quality", FIELD_QUALITY},
+ {"segment-end", FIELD_SEGMENT_END},
+ {"segment-start", FIELD_SEGMENT_START},
+ {"song-artist", FIELD_SONG_ARTIST},
+ {"subsong-id", FIELD_SUBSONG_ID},
+ {"subsong-num", FIELD_SUBSONG_NUM},
+ {"title", FIELD_TITLE},
+ {"track-number", FIELD_TRACK_NUMBER},
+ {"year", FIELD_YEAR}};
 
-/** A mowgli heap containing values contained by tuples. */
-static mowgli_heap_t *tuple_value_heap = NULL;
-static mowgli_object_class_t tuple_klass;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
-/** Global lock to preserve data consistency of heaps */
-static GStaticMutex tuple_mutex = G_STATIC_MUTEX_INIT;
 
-//@{
-/**
- * Convenience macros to lock the globally
- * used internal Tuple system structures.
- */
-#define TUPLE_LOCK_WRITE(X)     g_static_mutex_lock (& tuple_mutex)
-#define TUPLE_UNLOCK_WRITE(X)   g_static_mutex_unlock (& tuple_mutex)
-#define TUPLE_LOCK_READ(X)      g_static_mutex_lock (& tuple_mutex)
-#define TUPLE_UNLOCK_READ(X)    g_static_mutex_unlock (& tuple_mutex)
-//@}
-
-static void tuple_value_destroy (TupleValue * value)
+static int field_dict_compare (const void * a, const void * b)
 {
-    if (value->type == TUPLE_STRING)
-        stringpool_unref (value->value.string);
-
-    memset (value, 0, sizeof (TupleValue));
-    mowgli_heap_free (tuple_value_heap, value);
+    return strcmp (((FieldDictEntry *) a)->name, ((FieldDictEntry *) b)->name);
 }
 
-/* iterative destructor of tuple values. */
-static void tuple_value_destroy_cb (const gchar * key, void * data, void * priv)
+int tuple_field_by_name (const char * name)
 {
-    tuple_value_destroy (data);
+    FieldDictEntry find = {name, -1};
+    FieldDictEntry * found = bsearch (& find, field_dict, TUPLE_FIELDS,
+     sizeof (FieldDictEntry), field_dict_compare);
+
+    if (found)
+        return found->field;
+
+    fprintf (stderr, "Unknown tuple field name \"%s\".\n", name);
+    return -1;
 }
 
-static void
-tuple_destroy(gpointer data)
+const char * tuple_field_get_name (int field)
 {
-    Tuple *tuple = (Tuple *) data;
-    gint i;
+    if (field < 0 || field >= TUPLE_FIELDS)
+        return NULL;
 
-    TUPLE_LOCK_WRITE();
-    mowgli_patricia_destroy(tuple->dict, tuple_value_destroy_cb, NULL);
+    return tuple_fields[field].name;
+}
 
-    for (i = 0; i < FIELD_LAST; i++)
+TupleValueType tuple_field_get_type (int field)
+{
+    if (field < 0 || field >= TUPLE_FIELDS)
+        return TUPLE_UNKNOWN;
+
+    return tuple_fields[field].type;
+}
+
+static TupleVal * lookup_val (Tuple * tuple, int field, bool_t add, bool_t remove)
+{
+    if ((tuple->setmask & BIT (field)))
     {
-        if (tuple->values[i])
-            tuple_value_destroy (tuple->values[i]);
+        for (TupleBlock * block = tuple->blocks; block; block = block->next)
+        {
+            for (int i = 0; i < BLOCK_VALS; i ++)
+            {
+                if (block->fields[i] == field)
+                {
+                    if (remove)
+                    {
+                        tuple->setmask &= ~BIT (field);
+                        block->fields[i] = -1;
+                    }
+
+                    return & block->vals[i];
+                }
+            }
+        }
+    }
+
+    if (! add)
+        return NULL;
+
+    tuple->setmask |= BIT (field);
+
+    for (TupleBlock * block = tuple->blocks; block; block = block->next)
+    {
+        for (int i = 0; i < BLOCK_VALS; i ++)
+        {
+            if (block->fields[i] < 0)
+            {
+                block->fields[i] = field;
+                return & block->vals[i];
+            }
+        }
+    }
+
+    TupleBlock * block = g_slice_new0 (TupleBlock);
+    memset (block->fields, -1, BLOCK_VALS);
+
+    block->next = tuple->blocks;
+    tuple->blocks = block;
+
+    block->fields[0] = field;
+    return & block->vals[0];
+}
+
+static void tuple_destroy_unlocked (Tuple * tuple)
+{
+    TupleBlock * next;
+    for (TupleBlock * block = tuple->blocks; block; block = next)
+    {
+        next = block->next;
+
+        for (int i = 0; i < BLOCK_VALS; i ++)
+        {
+            int field = block->fields[i];
+            if (field >= 0 && tuple_fields[field].type == TUPLE_STRING)
+                str_unref (block->vals[i].str);
+        }
+
+        memset (block, 0, sizeof (TupleBlock));
+        g_slice_free (TupleBlock, block);
     }
 
     g_free(tuple->subtunes);
 
     memset (tuple, 0, sizeof (Tuple));
-    mowgli_heap_free(tuple_heap, tuple);
-    TUPLE_UNLOCK_WRITE();
+    g_slice_free (Tuple, tuple);
 }
 
-static Tuple *
-tuple_new_unlocked(void)
+Tuple * tuple_new (void)
 {
-    Tuple *tuple;
-
-    if (tuple_heap == NULL)
-    {
-        tuple_heap = mowgli_heap_create(sizeof(Tuple), 512, BH_NOW);
-        tuple_value_heap = mowgli_heap_create(sizeof(TupleValue), 1024, BH_NOW);
-        mowgli_object_class_init(&tuple_klass, "audacious.tuple", tuple_destroy, FALSE);
-    }
-
-    /* FIXME: use mowgli_object_bless_from_class() in mowgli 0.4
-       when it is released --nenolod */
-    tuple = mowgli_heap_alloc(tuple_heap);
-    memset(tuple, 0, sizeof(Tuple));
-    mowgli_object_init(mowgli_object(tuple), NULL, &tuple_klass, NULL);
-
-    tuple->dict = mowgli_patricia_create(string_canonize_case);
-
+    Tuple * tuple = g_slice_new0 (Tuple);
+    tuple->refcount = 1;
     return tuple;
 }
 
-/**
- * Allocates a new empty #Tuple structure. Must be freed via tuple_free().
- *
- * @return Pointer to newly allocated Tuple.
- */
-Tuple *
-tuple_new(void)
+Tuple * tuple_ref (Tuple * tuple)
 {
-    Tuple *tuple;
+    pthread_mutex_lock (& mutex);
 
-    TUPLE_LOCK_WRITE();
+    tuple->refcount ++;
 
-    tuple = tuple_new_unlocked();
-
-    TUPLE_UNLOCK_WRITE();
+    pthread_mutex_unlock (& mutex);
     return tuple;
 }
 
-static TupleValue *
-tuple_associate_data(Tuple *tuple, const gint cnfield, const gchar *field, TupleValueType ftype);
+void tuple_unref (Tuple * tuple)
+{
+    pthread_mutex_lock (& mutex);
 
+    if (! -- tuple->refcount)
+        tuple_destroy_unlocked (tuple);
+
+    pthread_mutex_unlock (& mutex);
+}
 
 /**
  * Sets filename/URI related fields of a #Tuple structure, based
@@ -192,70 +301,30 @@ tuple_associate_data(Tuple *tuple, const gint cnfield, const gchar *field, Tuple
  * @param[in] filename Filename URI.
  * @param[in,out] tuple Tuple structure to manipulate.
  */
-void tuple_set_filename (Tuple * tuple, const gchar * name)
+void tuple_set_filename (Tuple * tuple, const char * filename)
 {
-    const gchar * slash;
-    if ((slash = strrchr (name, '/')))
+    const char * base, * ext, * sub;
+    int isub;
+
+    uri_parse (filename, & base, & ext, & sub, & isub);
+
+    char path[base - filename + 1];
+    str_decode_percent (filename, base - filename, path);
+    tuple_set_str (tuple, FIELD_FILE_PATH, NULL, path);
+
+    char name[ext - base + 1];
+    str_decode_percent (base, ext - base, name);
+    tuple_set_str (tuple, FIELD_FILE_NAME, NULL, name);
+
+    if (ext < sub)
     {
-        gchar path[slash - name + 2];
-        memcpy (path, name, slash - name + 1);
-        path[slash - name + 1] = 0;
-
-        set_string (tuple, FIELD_FILE_PATH, NULL, uri_to_display (path), TRUE);
-        name = slash + 1;
+        char extbuf[sub - ext];
+        str_decode_percent (ext + 1, sub - ext - 1, extbuf);
+        tuple_set_str (tuple, FIELD_FILE_EXT, NULL, extbuf);
     }
 
-    gchar buf[strlen (name) + 1];
-    strcpy (buf, name);
-
-    gchar * c;
-    if ((c = strrchr (buf, '?')))
-    {
-        gint sub;
-        if (sscanf (c + 1, "%d", & sub) == 1)
-            tuple_associate_int (tuple, FIELD_SUBSONG_ID, NULL, sub);
-
-        * c = 0;
-    }
-
-    gchar * base = uri_to_display (buf);
-
-    if ((c = strrchr (base, '.')))
-        set_string (tuple, FIELD_FILE_EXT, NULL, c + 1, FALSE);
-
-    set_string (tuple, FIELD_FILE_NAME, NULL, base, TRUE);
-}
-
-/**
- * Creates a copy of given TupleValue structure, with copied data.
- *
- * @param[in] src TupleValue structure to be made a copy of.
- * @return Pointer to newly allocated TupleValue or NULL
- *         if error occured or source was NULL.
- */
-static TupleValue *
-tuple_copy_value(TupleValue *src)
-{
-    TupleValue *res;
-
-    if (src == NULL) return NULL;
-
-    res = mowgli_heap_alloc(tuple_value_heap);
-    g_strlcpy(res->name, src->name, TUPLE_NAME_MAX);
-    res->type = src->type;
-
-    switch (src->type) {
-    case TUPLE_STRING:
-        res->value.string = stringpool_get (src->value.string, FALSE);
-        break;
-    case TUPLE_INT:
-        res->value.integer = src->value.integer;
-        break;
-    default:
-        mowgli_heap_free (tuple_value_heap, res);
-        return NULL;
-    }
-    return res;
+    if (sub[0])
+        tuple_set_int (tuple, FIELD_SUBSONG_ID, NULL, isub);
 }
 
 /**
@@ -264,41 +333,32 @@ tuple_copy_value(TupleValue *src)
  * @param[in] src Tuple structure to be made a copy of.
  * @return Pointer to newly allocated Tuple.
  */
-Tuple *
-tuple_copy(const Tuple *src)
+Tuple * tuple_copy (const Tuple * old)
 {
-    Tuple *dst;
-    TupleValue * tv, * copied;
-    mowgli_patricia_iteration_state_t state;
-    gint i;
+    pthread_mutex_lock (& mutex);
 
-    g_return_val_if_fail(src != NULL, NULL);
+    Tuple * new = tuple_new ();
 
-    TUPLE_LOCK_WRITE();
-
-    dst = tuple_new_unlocked();
-
-    /* Copy basic fields */
-    for (i = 0; i < FIELD_LAST; i++)
-        dst->values[i] = tuple_copy_value(src->values[i]);
-
-    /* Copy dictionary contents */
-    MOWGLI_PATRICIA_FOREACH (tv, & state, src->dict)
+    for (int f = 0; f < TUPLE_FIELDS; f ++)
     {
-        if ((copied = tuple_copy_value (tv)) != NULL)
-            mowgli_patricia_add (dst->dict, copied->name, copied);
+        TupleVal * oldval = lookup_val ((Tuple *) old, f, FALSE, FALSE);
+        if (oldval)
+        {
+            TupleVal * newval = lookup_val (new, f, TRUE, FALSE);
+            if (tuple_fields[f].type == TUPLE_STRING)
+                newval->str = str_ref (oldval->str);
+            else
+                newval->x = oldval->x;
+        }
     }
 
-    /* Copy subtune number information */
-    if (src->subtunes && src->nsubtunes > 0)
-    {
-        dst->nsubtunes = src->nsubtunes;
-        dst->subtunes = g_new(gint, dst->nsubtunes);
-        memcpy(dst->subtunes, src->subtunes, sizeof(gint) * dst->nsubtunes);
-    }
+    new->nsubtunes = old->nsubtunes;
 
-    TUPLE_UNLOCK_WRITE();
-    return dst;
+    if (old->subtunes)
+        new->subtunes = g_memdup (old->subtunes, sizeof (int) * old->nsubtunes);
+
+    pthread_mutex_unlock (& mutex);
+    return new;
 }
 
 /**
@@ -309,7 +369,7 @@ tuple_copy(const Tuple *src)
  * @return Pointer to newly allocated Tuple.
  */
 Tuple *
-tuple_new_from_filename(const gchar *filename)
+tuple_new_from_filename(const char *filename)
 {
     Tuple *tuple = tuple_new();
 
@@ -317,236 +377,66 @@ tuple_new_from_filename(const gchar *filename)
     return tuple;
 }
 
-
-static gint
-tuple_get_nfield(const gchar *field)
+void tuple_set_int (Tuple * tuple, int nfield, const char * field, int x)
 {
-    gint i;
-    for (i = 0; i < FIELD_LAST; i++)
-        if (!strcmp(field, tuple_fields[i].name))
-            return i;
-    return -1;
+    if (nfield < 0)
+        nfield = tuple_field_by_name (field);
+    if (nfield < 0 || nfield >= TUPLE_FIELDS || tuple_fields[nfield].type != TUPLE_INT)
+        return;
+
+    pthread_mutex_lock (& mutex);
+
+    TupleVal * val = lookup_val (tuple, nfield, TRUE, FALSE);
+    val->x = x;
+
+    pthread_mutex_unlock (& mutex);
 }
 
-
-/**
- * (Re)associates data into given #Tuple field.
- * If specified field already exists in the #Tuple, any data from it
- * is freed and this current TupleValue struct is returned.
- *
- * If field does NOT exist, a new structure is allocated from global
- * heap, added to Tuple and returned.
- *
- * @attention This function has (unbalanced) Tuple structure unlocking,
- * so please make sure you use it only exactly like it is used in
- * #tuple_associate_string(), etc.
- *
- * @param[in] tuple Tuple structure to be manipulated.
- * @param[in] cnfield #TupleBasicType index or -1 if key name is to be used instead.
- * @param[in] field String acting as key name or NULL if nfield is used.
- * @param[in] ftype Type of the field to be associated.
- * @return Pointer to associated TupleValue structure.
- */
-static TupleValue *
-tuple_associate_data(Tuple *tuple, const gint cnfield, const gchar *field, TupleValueType ftype)
+void tuple_set_str (Tuple * tuple, int nfield, const char * field, const char * str)
 {
-    const gchar *tfield = field;
-    gint nfield = cnfield;
-    TupleValue *value = NULL;
-
-    g_return_val_if_fail(tuple != NULL, NULL);
-    g_return_val_if_fail(cnfield < FIELD_LAST, NULL);
-
-    /* Check for known fields */
-    if (nfield < 0) {
-        nfield = tuple_get_nfield(field);
-        if (nfield >= 0)
-            g_warning("Tuple FIELD_* not used for '%s'!\n", field);
+    if (! str)
+    {
+        tuple_unset (tuple, nfield, field);
+        return;
     }
 
-    /* Check if field was known */
-    if (nfield >= 0) {
-        tfield = tuple_fields[nfield].name;
-        value = tuple->values[nfield];
+    if (nfield < 0)
+        nfield = tuple_field_by_name (field);
+    if (nfield < 0 || nfield >= TUPLE_FIELDS || tuple_fields[nfield].type != TUPLE_STRING)
+        return;
 
-        if (ftype != tuple_fields[nfield].type) {
-            g_warning("Invalid type for [%s](%d->%d), %d != %d\n",
-                tfield, cnfield, nfield, ftype, tuple_fields[nfield].type);
-            //mowgli_throw_exception_val(audacious.tuple.invalid_type_request, 0);
-            TUPLE_UNLOCK_WRITE();
-            return NULL;
-        }
-    } else {
-        value = mowgli_patricia_retrieve(tuple->dict, tfield);
-    }
+    pthread_mutex_lock (& mutex);
 
-    if (value != NULL) {
-        /* Value exists, just delete old associated data */
-        if (value->type == TUPLE_STRING) {
-            stringpool_unref(value->value.string);
-            value->value.string = NULL;
-        }
-    } else {
-        /* Allocate a new value */
-        value = mowgli_heap_alloc(tuple_value_heap);
-        value->type = ftype;
+    TupleVal * val = lookup_val (tuple, nfield, TRUE, FALSE);
+    if (val->str)
+        str_unref (val->str);
+    val->str = str_get (str);
 
-        if (nfield >= 0)
+    pthread_mutex_unlock (& mutex);
+}
+
+void tuple_unset (Tuple * tuple, int nfield, const char * field)
+{
+    if (nfield < 0)
+        nfield = tuple_field_by_name (field);
+    if (nfield < 0 || nfield >= TUPLE_FIELDS)
+        return;
+
+    pthread_mutex_lock (& mutex);
+
+    TupleVal * val = lookup_val (tuple, nfield, FALSE, TRUE);
+    if (val)
+    {
+        if (tuple_fields[nfield].type == TUPLE_STRING)
         {
-            value->name[0] = 0;
-            tuple->values[nfield] = value;
+            str_unref (val->str);
+            val->str = NULL;
         }
         else
-        {
-            g_strlcpy (value->name, tfield, TUPLE_NAME_MAX);
-            mowgli_patricia_add(tuple->dict, tfield, value);
-        }
+            val->x = 0;
     }
 
-    return value;
-}
-
-static gboolean set_string (Tuple * tuple, const gint nfield,
- const gchar * field, gchar * string, gboolean take)
-{
-    TUPLE_LOCK_WRITE ();
-
-    TupleValue * value = tuple_associate_data (tuple, nfield, field,
-     TUPLE_STRING);
-    if (! value)
-    {
-        if (take)
-            g_free (string);
-        return FALSE;
-    }
-
-    if (! string)
-        value->value.string = NULL;
-    else
-        value->value.string = stringpool_get (string, take);
-
-    TUPLE_UNLOCK_WRITE ();
-    return TRUE;
-}
-
-/**
- * Associates copy of given string to a field in specified #Tuple.
- * If field already exists, old value is freed and replaced.
- *
- * Desired field can be specified either by key name or if it is
- * one of basic fields, by #TupleBasicType index.
- *
- * @param[in] tuple #Tuple structure pointer.
- * @param[in] nfield #TupleBasicType index or -1 if key name is to be used instead.
- * @param[in] field String acting as key name or NULL if nfield is used.
- * @param[in] string String to be associated to given field in Tuple.
- * @return TRUE if operation was succesful, FALSE if not.
- */
-
-gboolean tuple_associate_string (Tuple * tuple, const gint nfield,
- const gchar * field, const gchar * string)
-{
-    if (string && ! g_utf8_validate (string, -1, NULL))
-    {
-        fprintf (stderr, "Invalid UTF-8: %s.\n", string);
-        return set_string (tuple, nfield, field, str_to_utf8 (string), TRUE);
-    }
-
-    gboolean ret = set_string (tuple, nfield, field, (gchar *) string, FALSE);
-    return ret;
-}
-
-/**
- * Associates given string to a field in specified #Tuple. The caller
- * gives up ownership of the string. If field already exists, old
- * value is freed and replaced.
- *
- * Desired field can be specified either by key name or if it is
- * one of basic fields, by #TupleBasicType index.
- *
- * @param[in] tuple #Tuple structure pointer.
- * @param[in] nfield #TupleBasicType index or -1 if key name is to be used instead.
- * @param[in] field String acting as key name or NULL if nfield is used.
- * @param[in] string String to be associated to given field in Tuple.
- * @return TRUE if operation was succesful, FALSE if not.
- */
-
-gboolean tuple_associate_string_rel (Tuple * tuple, const gint nfield,
- const gchar * field, gchar * string)
-{
-    if (string && ! g_utf8_validate (string, -1, NULL))
-    {
-        fprintf (stderr, "Invalid UTF-8: %s.\n", string);
-        gchar * copy = str_to_utf8 (string);
-        g_free (string);
-        string = copy;
-    }
-
-    return set_string (tuple, nfield, field, string, TRUE);
-}
-
-/**
- * Associates given integer to a field in specified #Tuple.
- * If field already exists, old value is freed and replaced.
- *
- * Desired field can be specified either by key name or if it is
- * one of basic fields, by #TupleBasicType index.
- *
- * @param[in] tuple #Tuple structure pointer.
- * @param[in] nfield #TupleBasicType index or -1 if key name is to be used instead.
- * @param[in] field String acting as key name or NULL if nfield is used.
- * @param[in] integer Integer to be associated to given field in Tuple.
- * @return TRUE if operation was succesful, FALSE if not.
- */
-gboolean
-tuple_associate_int(Tuple *tuple, const gint nfield, const gchar *field, gint integer)
-{
-    TupleValue *value;
-
-    TUPLE_LOCK_WRITE();
-    if ((value = tuple_associate_data(tuple, nfield, field, TUPLE_INT)) == NULL)
-        return FALSE;
-
-    value->value.integer = integer;
-
-    TUPLE_UNLOCK_WRITE();
-    return TRUE;
-}
-
-/**
- * Disassociates given field from specified #Tuple structure.
- * Desired field can be specified either by key name or if it is
- * one of basic fields, by #TupleBasicType index.
- *
- * @param[in] tuple #Tuple structure pointer.
- * @param[in] cnfield #TupleBasicType index or -1 if key name is to be used instead.
- * @param[in] field String acting as key name or NULL if nfield is used.
- */
-void
-tuple_disassociate(Tuple *tuple, const gint cnfield, const gchar *field)
-{
-    TupleValue *value;
-    gint nfield = cnfield;
-
-    g_return_if_fail(tuple != NULL);
-    g_return_if_fail(nfield < FIELD_LAST);
-
-    if (nfield < 0)
-        nfield = tuple_get_nfield(field);
-
-    TUPLE_LOCK_WRITE();
-    if (nfield < 0)
-        /* why _delete()? because _delete() returns the dictnode's data on success */
-        value = mowgli_patricia_delete(tuple->dict, field);
-    else {
-        value = tuple->values[nfield];
-        tuple->values[nfield] = NULL;
-    }
-
-    if (value)
-        tuple_value_destroy (value);
-
-    TUPLE_UNLOCK_WRITE();
+    pthread_mutex_unlock (& mutex);
 }
 
 /**
@@ -559,71 +449,42 @@ tuple_disassociate(Tuple *tuple, const gint cnfield, const gchar *field)
  * @param[in] field String acting as key name or NULL if nfield is used.
  * @return #TupleValueType of the field or TUPLE_UNKNOWN if there was an error.
  */
-TupleValueType tuple_get_value_type (const Tuple * tuple, gint cnfield,
- const gchar * field)
+TupleValueType tuple_get_value_type (const Tuple * tuple, int nfield, const char * field)
 {
-    TupleValueType type = TUPLE_UNKNOWN;
-    gint nfield = cnfield;
-
-    g_return_val_if_fail(tuple != NULL, TUPLE_UNKNOWN);
-    g_return_val_if_fail(nfield < FIELD_LAST, TUPLE_UNKNOWN);
-
     if (nfield < 0)
-        nfield = tuple_get_nfield(field);
+        nfield = tuple_field_by_name (field);
+    if (nfield < 0 || nfield >= TUPLE_FIELDS)
+        return TUPLE_UNKNOWN;
 
-    TUPLE_LOCK_READ();
-    if (nfield < 0) {
-        TupleValue *value;
-        if ((value = mowgli_patricia_retrieve(tuple->dict, field)) != NULL)
-            type = value->type;
-    } else {
-        if (tuple->values[nfield])
-            type = tuple->values[nfield]->type;
-    }
+    pthread_mutex_lock (& mutex);
 
-    TUPLE_UNLOCK_READ();
+    TupleValueType type = TUPLE_UNKNOWN;
+
+    TupleVal * val = lookup_val ((Tuple *) tuple, nfield, FALSE, FALSE);
+    if (val)
+        type = tuple_fields[nfield].type;
+
+    pthread_mutex_unlock (& mutex);
     return type;
 }
 
-/**
- * Returns pointer to a string associated to #Tuple field.
- * Desired field can be specified either by key name or if it is
- * one of basic fields, by #TupleBasicType index.
- *
- * @param[in] tuple #Tuple structure pointer.
- * @param[in] cnfield #TupleBasicType index or -1 if key name is to be used instead.
- * @param[in] field String acting as key name or NULL if nfield is used.
- * @return Pointer to string or NULL if the field/key did not exist.
- * The returned string is const, and must not be freed or modified.
- */
-const gchar * tuple_get_string (const Tuple * tuple, gint cnfield, const gchar *
- field)
+char * tuple_get_str (const Tuple * tuple, int nfield, const char * field)
 {
-    TupleValue *value;
-    gint nfield = cnfield;
-
-    g_return_val_if_fail(tuple != NULL, NULL);
-    g_return_val_if_fail(nfield < FIELD_LAST, NULL);
-
     if (nfield < 0)
-        nfield = tuple_get_nfield(field);
-
-    TUPLE_LOCK_READ();
-    if (nfield < 0)
-        value = mowgli_patricia_retrieve(tuple->dict, field);
-    else
-        value = tuple->values[nfield];
-
-    if (value) {
-        if (value->type != TUPLE_STRING)
-            mowgli_throw_exception_val(audacious.tuple.invalid_type_request, NULL);
-
-        TUPLE_UNLOCK_READ();
-        return value->value.string;
-    } else {
-        TUPLE_UNLOCK_READ();
+        nfield = tuple_field_by_name (field);
+    if (nfield < 0 || nfield >= TUPLE_FIELDS || tuple_fields[nfield].type != TUPLE_STRING)
         return NULL;
-    }
+
+    pthread_mutex_lock (& mutex);
+
+    char * str = NULL;
+
+    TupleVal * val = lookup_val ((Tuple *) tuple, nfield, FALSE, FALSE);
+    if (val)
+        str = str_ref (val->str);
+
+    pthread_mutex_unlock (& mutex);
+    return str;
 }
 
 /**
@@ -638,45 +499,35 @@ const gchar * tuple_get_string (const Tuple * tuple, gint cnfield, const gchar *
  *
  * @bug There is no way to distinguish error situations if the associated value is zero.
  */
-gint tuple_get_int (const Tuple * tuple, gint cnfield, const gchar * field)
+int tuple_get_int (const Tuple * tuple, int nfield, const char * field)
 {
-    TupleValue *value;
-    gint nfield = cnfield;
-
-    g_return_val_if_fail(tuple != NULL, 0);
-    g_return_val_if_fail(nfield < FIELD_LAST, 0);
-
     if (nfield < 0)
-        nfield = tuple_get_nfield(field);
-
-    TUPLE_LOCK_READ();
-    if (nfield < 0)
-        value = mowgli_patricia_retrieve(tuple->dict, field);
-    else
-        value = tuple->values[nfield];
-
-    if (value) {
-        if (value->type != TUPLE_INT)
-            mowgli_throw_exception_val(audacious.tuple.invalid_type_request, 0);
-
-        TUPLE_UNLOCK_READ();
-        return value->value.integer;
-    } else {
-        TUPLE_UNLOCK_READ();
+        nfield = tuple_field_by_name (field);
+    if (nfield < 0 || nfield >= TUPLE_FIELDS || tuple_fields[nfield].type != TUPLE_INT)
         return 0;
-    }
+
+    pthread_mutex_lock (& mutex);
+
+    int x = 0;
+
+    TupleVal * val = lookup_val ((Tuple *) tuple, nfield, FALSE, FALSE);
+    if (val)
+        x = val->x;
+
+    pthread_mutex_unlock (& mutex);
+    return x;
 }
 
 #define APPEND(b, ...) snprintf (b + strlen (b), sizeof b - strlen (b), \
  __VA_ARGS__)
 
-void tuple_set_format (Tuple * t, const gchar * format, gint chans, gint rate,
- gint brate)
+void tuple_set_format (Tuple * t, const char * format, int chans, int rate,
+ int brate)
 {
     if (format)
-        tuple_associate_string (t, FIELD_CODEC, NULL, format);
+        tuple_set_str (t, FIELD_CODEC, NULL, format);
 
-    gchar buf[32];
+    char buf[32];
     buf[0] = 0;
 
     if (chans > 0)
@@ -686,7 +537,8 @@ void tuple_set_format (Tuple * t, const gchar * format, gint chans, gint rate,
         else if (chans == 2)
             APPEND (buf, _("Stereo"));
         else
-            APPEND (buf, _("%d channels"), chans);
+            APPEND (buf, dngettext (PACKAGE, "%d channel", "%d channels",
+             chans), chans);
 
         if (rate > 0)
             APPEND (buf, ", ");
@@ -696,8 +548,62 @@ void tuple_set_format (Tuple * t, const gchar * format, gint chans, gint rate,
         APPEND (buf, "%d kHz", rate / 1000);
 
     if (buf[0])
-        tuple_associate_string (t, FIELD_QUALITY, NULL, buf);
-    
+        tuple_set_str (t, FIELD_QUALITY, NULL, buf);
+
     if (brate > 0)
-        tuple_associate_int (t, FIELD_BITRATE, NULL, brate);
+        tuple_set_int (t, FIELD_BITRATE, NULL, brate);
+}
+
+void tuple_set_subtunes (Tuple * tuple, int n_subtunes, const int * subtunes)
+{
+    pthread_mutex_lock (& mutex);
+
+    g_free (tuple->subtunes);
+    tuple->subtunes = NULL;
+
+    tuple->nsubtunes = n_subtunes;
+    if (subtunes)
+        tuple->subtunes = g_memdup (subtunes, sizeof (int) * n_subtunes);
+
+    pthread_mutex_unlock (& mutex);
+}
+
+int tuple_get_n_subtunes (Tuple * tuple)
+{
+    pthread_mutex_lock (& mutex);
+
+    int n_subtunes = tuple->nsubtunes;
+
+    pthread_mutex_unlock (& mutex);
+    return n_subtunes;
+}
+
+int tuple_get_nth_subtune (Tuple * tuple, int n)
+{
+    pthread_mutex_lock (& mutex);
+
+    int subtune = -1;
+    if (n >= 0 && n < tuple->nsubtunes)
+        subtune = tuple->subtunes ? tuple->subtunes[n] : 1 + n;
+
+    pthread_mutex_unlock (& mutex);
+    return subtune;
+}
+
+char * tuple_format_title (Tuple * tuple, const char * format)
+{
+    static const gint fallbacks[] = {FIELD_TITLE, FIELD_FILE_NAME, FIELD_FILE_PATH};
+
+    char * title = tuple_formatter_process_string (tuple, format);
+
+    for (int i = 0; i < G_N_ELEMENTS (fallbacks); i ++)
+    {
+        if (title && title[0])
+            break;
+
+        str_unref (title);
+        title = tuple_get_str (tuple, fallbacks[i], NULL);
+    }
+
+    return title ? title : str_get ("");
 }

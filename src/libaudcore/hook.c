@@ -1,182 +1,109 @@
-/*  Audacious
- *  Copyright (c) 2006-2007 William Pitcock
+/*
+ * hook.c
+ * Copyright 2011 John Lindgren
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
-#include <stdio.h>
+#include <glib.h>
+#include <pthread.h>
 #include <string.h>
 
-#include <glib.h>
+#include "core.h"
 #include "hook.h"
 
-static GThread * hook_thread;
-static GSList *hook_list;
+typedef struct {
+    HookFunction func;
+    void * user;
+} HookItem;
 
-void hook_init (void)
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+static GHashTable * hooks;
+
+/* str_unref() may be a macro */
+static void str_unref_cb (void * str)
 {
-    hook_thread = g_thread_self ();
+    str_unref (str);
 }
 
-static Hook *
-hook_find(const gchar *name)
+void hook_associate (const char * name, HookFunction func, void * user)
 {
-    GSList *list;
+    pthread_mutex_lock (& mutex);
 
-    for (list = hook_list; list != NULL; list = g_slist_next(list))
+    if (! hooks)
+        hooks = g_hash_table_new_full (g_str_hash, g_str_equal, str_unref_cb, NULL);
+
+    HookItem * item = g_slice_new (HookItem);
+    item->func = func;
+    item->user = user;
+
+    GList * items = g_hash_table_lookup (hooks, name);
+    items = g_list_prepend (items, item);
+    g_hash_table_insert (hooks, str_get (name), items);
+
+    pthread_mutex_unlock (& mutex);
+}
+
+void hook_dissociate_full (const char * name, HookFunction func, void * user)
+{
+    pthread_mutex_lock (& mutex);
+
+    if (! hooks)
+        goto DONE;
+
+    GList * items = g_hash_table_lookup (hooks, name);
+
+    GList * node = items;
+    while (node)
     {
-        Hook *hook = (Hook *) list->data;
+        HookItem * item = node->data;
+        GList * next = node->next;
 
-        if (!g_ascii_strcasecmp(hook->name, name))
-            return hook;
-    }
-
-    return NULL;
-}
-
-void
-hook_register(const gchar *name)
-{
-    Hook *hook;
-
-    g_return_if_fail(name != NULL);
-
-    if (hook_find(name) != NULL)
-        return;
-
-    hook = g_new0(Hook, 1);
-    hook->name = g_strdup(name);
-    hook->items = NULL;
-
-    hook_list = g_slist_append(hook_list, hook);
-}
-
-gint
-hook_associate(const gchar *name, HookFunction func, gpointer user_data)
-{
-    Hook *hook;
-    HookItem *hookitem;
-
-    g_return_val_if_fail(name != NULL, -1);
-    g_return_val_if_fail(func != NULL, -1);
-
-    hook = hook_find(name);
-
-    if (hook == NULL)
-    {
-        hook_register(name);
-        hook = hook_find(name);
-    }
-
-    /* this *cant* happen */
-    g_return_val_if_fail(hook != NULL, -1);
-
-    hookitem = g_new0(HookItem, 1);
-    hookitem->func = func;
-    hookitem->user_data = user_data;
-
-    hook->items = g_slist_append(hook->items, hookitem);
-    return 0;
-}
-
-gint
-hook_dissociate(const gchar *name, HookFunction func)
-{
-    Hook *hook;
-    GSList *iter;
-
-    g_return_val_if_fail(name != NULL, -1);
-    g_return_val_if_fail(func != NULL, -1);
-
-    hook = hook_find(name);
-
-    if (hook == NULL)
-        return -1;
-
-    iter = hook->items;
-    while (iter != NULL)
-    {
-        HookItem *hookitem = (HookItem*)iter->data;
-        if (hookitem->func == func)
+        if (item->func == func && (! user || item->user == user))
         {
-            hook->items = g_slist_delete_link(hook->items, iter);
-            g_free( hookitem );
-            return 0;
+            items = g_list_delete_link (items, node);
+            g_slice_free (HookItem, item);
         }
-        iter = g_slist_next(iter);
+
+        node = next;
     }
-    return -1;
+
+    if (items)
+        g_hash_table_insert (hooks, str_get (name), items);
+    else
+        g_hash_table_remove (hooks, name);
+
+DONE:
+    pthread_mutex_unlock (& mutex);
 }
 
-gint
-hook_dissociate_full(const gchar *name, HookFunction func, gpointer user_data)
+void hook_call (const char * name, void * data)
 {
-    Hook *hook;
-    GSList *iter;
+    pthread_mutex_lock (& mutex);
 
-    g_return_val_if_fail(name != NULL, -1);
-    g_return_val_if_fail(func != NULL, -1);
+    if (! hooks)
+        goto DONE;
 
-    hook = hook_find(name);
+    GList * node = g_hash_table_lookup (hooks, name);
 
-    if (hook == NULL)
-        return -1;
-
-    iter = hook->items;
-    while (iter != NULL)
+    for (; node; node = node->next)
     {
-        HookItem *hookitem = (HookItem*)iter->data;
-        if (hookitem->func == func && hookitem->user_data == user_data)
-        {
-            hook->items = g_slist_delete_link(hook->items, iter);
-            g_free( hookitem );
-            return 0;
-        }
-        iter = g_slist_next(iter);
-    }
-    return -1;
-}
-
-void
-hook_call(const gchar *name, gpointer hook_data)
-{
-    Hook *hook;
-    GSList *iter;
-
-    // Some plugins (skins, cdaudio-ng, maybe others) set up hooks that are not
-    // thread safe. We can disagree about whether that's the way it should be;
-    // but that's the way it is, so live with it. -jlindgren
-    if (g_thread_self () != hook_thread)
-    {
-        fprintf (stderr, "Warning: Unsafe hook_call of \"%s\" from secondary "
-         "thread. (Use event_queue instead.)\n", name);
-        return;
+        HookItem * item = node->data;
+        item->func (data, item->user);
     }
 
-    hook = hook_find(name);
-
-    if (hook == NULL)
-        return;
-
-    for (iter = hook->items; iter != NULL; iter = g_slist_next(iter))
-    {
-        HookItem *hookitem = (HookItem*)iter->data;
-
-        g_return_if_fail(hookitem->func != NULL);
-
-        hookitem->func(hook_data, hookitem->user_data);
-    }
+DONE:
+    pthread_mutex_unlock (& mutex);
 }

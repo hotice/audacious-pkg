@@ -17,6 +17,8 @@ LOCALES = ast.po \
 	  de.po \
 	  el.po \
 	  es.po \
+	  es_AR.po \
+	  es_MX.po \
 	  et.po \
 	  eu.po \
 	  fi.po \
@@ -38,11 +40,13 @@ LOCALES = ast.po \
 	  ro.po \
 	  ru.po \
 	  sk.po \
+	  sl.po \
 	  sr@Latn.po \
 	  sr.po \
 	  sv.po \
 	  tr.po \
 	  uk.po \
+	  vi.po \
 	  zh_CN.po \
 	  zh_TW.po
 
@@ -55,7 +59,7 @@ update-pot:
 	@echo Updating $(POTTEMPLATE) ...
 	xgettext --default-domain=$(PACKAGE) --language=C \
 	--keyword=_ --keyword=N_ --from-code="utf-8" \
-	--msgid-bugs-address="http://jira.atheme.org/" \
+	--msgid-bugs-address="http://redmine.audacious-media-player.org/" \
 	--directory=.. --files-from=POTFILES.in -o $(POTTEMPLATE)
 
 update-po: update-pot

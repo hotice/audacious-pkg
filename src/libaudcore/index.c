@@ -1,22 +1,20 @@
 /*
  * index.c
- * Copyright 2009-2010 John Lindgren
+ * Copyright 2009-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <stdlib.h>
@@ -26,39 +24,43 @@
 
 #include "index.h"
 
-struct index
-{
+struct _Index {
     void * * data;
-    gint count, size;
-    gint (* compare) (const void * a, const void * b, void * data);
-    void * compare_data;
+    int count, size;
 };
 
-struct index * index_new (void)
+typedef struct {
+    int (* compare) (const void * a, const void * b);
+} CompareWrapper;
+
+typedef struct {
+    int (* compare) (const void * a, const void * b, void * data);
+    void * data;
+} CompareWrapper2;
+
+Index * index_new (void)
 {
-    struct index * index = g_slice_new (struct index);
+    Index * index = g_slice_new (Index);
 
     index->data = NULL;
     index->count = 0;
     index->size = 0;
-    index->compare = NULL;
-    index->compare_data = NULL;
 
     return index;
 }
 
-void index_free (struct index * index)
+void index_free (Index * index)
 {
     g_free (index->data);
-    g_slice_free (struct index, index);
+    g_slice_free (Index, index);
 }
 
-gint index_count (struct index * index)
+int index_count (Index * index)
 {
     return index->count;
 }
 
-void index_allocate (struct index * index, gint size)
+void index_allocate (Index * index, int size)
 {
     if (size <= index->size)
         return;
@@ -72,17 +74,17 @@ void index_allocate (struct index * index, gint size)
     index->data = g_realloc (index->data, sizeof (void *) * index->size);
 }
 
-void index_set (struct index * index, gint at, void * value)
+void index_set (Index * index, int at, void * value)
 {
     index->data[at] = value;
 }
 
-void * index_get (struct index * index, gint at)
+void * index_get (Index * index, int at)
 {
     return index->data[at];
 }
 
-static void make_room (struct index * index, gint at, gint count)
+static void make_room (Index * index, int at, int count)
 {
     index_allocate (index, index->count + count);
 
@@ -93,88 +95,81 @@ static void make_room (struct index * index, gint at, gint count)
     index->count += count;
 }
 
-void index_insert (struct index * index, gint at, void * value)
+void index_insert (Index * index, int at, void * value)
 {
     make_room (index, at, 1);
     index->data[at] = value;
 }
 
-void index_append (struct index * index, void * value)
+void index_append (Index * index, void * value)
 {
     index_insert (index, index->count, value);
 }
 
-void index_copy_set (struct index * source, gint from, struct index * target,
- gint to, gint count)
+void index_copy_set (Index * source, int from, Index * target,
+ int to, int count)
 {
     memcpy (target->data + to, source->data + from, sizeof (void *) * count);
 }
 
-void index_copy_insert (struct index * source, gint from, struct index * target,
- gint to, gint count)
+void index_copy_insert (Index * source, int from, Index * target,
+ int to, int count)
 {
     make_room (target, to, count);
     memcpy (target->data + to, source->data + from, sizeof (void *) * count);
 }
 
-void index_copy_append (struct index * source, gint from, struct index * target,
- gint count)
+void index_copy_append (Index * source, int from, Index * target,
+ int count)
 {
     index_copy_insert (source, from, target, target->count, count);
 }
 
-void index_merge_insert (struct index * first, gint at, struct index * second)
+void index_merge_insert (Index * first, int at, Index * second)
 {
     index_copy_insert (second, 0, first, at, second->count);
 }
 
-void index_merge_append (struct index * first, struct index * second)
+void index_merge_append (Index * first, Index * second)
 {
     index_copy_insert (second, 0, first, first->count, second->count);
 }
 
-void index_move (struct index * index, gint from, gint to, gint count)
+void index_move (Index * index, int from, int to, int count)
 {
     memmove (index->data + to, index->data + from, sizeof (void *) * count);
 }
 
-void index_delete (struct index * index, gint at, gint count)
+void index_delete (Index * index, int at, int count)
 {
     index->count -= count;
     memmove (index->data + at, index->data + at + count, sizeof (void *) *
      (index->count - at));
 }
 
-static gint index_compare (const void * a, const void * b, void * _compare)
+static int index_compare (const void * ap, const void * bp, void * _wrapper)
 {
-    gint (* compare) (const void *, const void *) = _compare;
-
-    return compare (* (const void * *) a, * (const void * *) b);
+    CompareWrapper * wrapper = _wrapper;
+    return wrapper->compare (* (const void * *) ap, * (const void * *) bp);
 }
 
-void index_sort (struct index * index, gint (* compare) (const void *, const
- void *))
+void index_sort (Index * index, int (* compare) (const void *, const void *))
 {
+    CompareWrapper wrapper = {compare};
     g_qsort_with_data (index->data, index->count, sizeof (void *),
-     index_compare, compare);
+     index_compare, & wrapper);
 }
 
-static gint index_compare_with_data (const void * a, const void * b, void *
- _index)
+static int index_compare2 (const void * ap, const void * bp, void * _wrapper)
 {
-    struct index * index = _index;
-
-    return index->compare (* (const void * *) a, * (const void * *) b,
-     index->compare_data);
+    CompareWrapper2 * wrapper = _wrapper;
+    return wrapper->compare (* (const void * *) ap, * (const void * *) bp, wrapper->data);
 }
 
-void index_sort_with_data (struct index * index, gint (* compare)
+void index_sort_with_data (Index * index, int (* compare)
  (const void * a, const void * b, void * data), void * data)
 {
-    index->compare = compare;
-    index->compare_data = data;
+    CompareWrapper2 wrapper = {compare, data};
     g_qsort_with_data (index->data, index->count, sizeof (void *),
-     index_compare_with_data, index);
-    index->compare = NULL;
-    index->compare_data = NULL;
+     index_compare2, & wrapper);
 }

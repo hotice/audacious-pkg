@@ -1,50 +1,45 @@
 /*
  * index.h
- * Copyright 2009-2010 John Lindgren
+ * Copyright 2009-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
-#ifndef AUDACIOUS_INDEX_H
-#define AUDACIOUS_INDEX_H
+#ifndef LIBAUDCORE_INDEX_H
+#define LIBAUDCORE_INDEX_H
 
-struct index;
+struct _Index;
+typedef struct _Index Index;
 
-struct index * index_new (void);
-void index_free (struct index * index);
-gint index_count (struct index * index);
-void index_allocate (struct index * index, gint size);
-void index_set (struct index * index, gint at, void * value);
-void * index_get (struct index * index, gint at);
-void index_insert (struct index * index, gint at, void * value);
-void index_append (struct index * index, void * value);
-void index_copy_set (struct index * source, gint from, struct index * target,
- gint to, gint count);
-void index_copy_insert (struct index * source, gint from, struct index * target,
- gint to, gint count);
-void index_copy_append (struct index * source, gint from, struct index * target,
- gint count);
-void index_merge_insert (struct index * first, gint at, struct index * second);
-void index_merge_append (struct index * first, struct index * second);
-void index_move (struct index * index, gint from, gint to, gint count);
-void index_delete (struct index * index, gint at, gint count);
-void index_sort (struct index * index, gint (* compare) (const void * a,
- const void * b));
-void index_sort_with_data (struct index * index, gint (* compare)
- (const void * a, const void * b, void * data), void * data);
+Index * index_new (void);
+void index_free (Index * index);
+int index_count (Index * index);
+void index_allocate (Index * index, int size);
+void index_set (Index * index, int at, void * value);
+void * index_get (Index * index, int at);
+void index_insert (Index * index, int at, void * value);
+void index_append (Index * index, void * value);
+void index_copy_set (Index * source, int from, Index * target, int to, int count);
+void index_copy_insert (Index * source, int from, Index * target, int to, int count);
+void index_copy_append (Index * source, int from, Index * target, int count);
+void index_merge_insert (Index * first, int at, Index * second);
+void index_merge_append (Index * first, Index * second);
+void index_move (Index * index, int from, int to, int count);
+void index_delete (Index * index, int at, int count);
+void index_sort (Index * index, int (* compare) (const void * a, const void * b));
+void index_sort_with_data (Index * index, int (* compare) (const void * a,
+ const void * b, void * data), void * data);
 
-#endif
+#endif /* LIBAUDCORE_INDEX_H */

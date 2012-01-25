@@ -1,26 +1,23 @@
-/*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2010  Audacious development team
+/*
+ * ui_urlopener.c
+ * Copyright 1998-2003 XMMS development team
+ * Copyright 2003-2004 BMP development team
+ * Copyright 2008-2011 Tomasz Moń and John Lindgren
  *
- *  Based on BMP:
- *  Copyright (C) 2003-2004  BMP development team.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; under version 3 of the License.
  *
- *  Based on XMMS:
- *  Copyright (C) 1998-2003  XMMS development team.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses>.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
- *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * The Audacious team does not consider modular code linking to
+ * Audacious or using our public API to be a derived work.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -30,7 +27,6 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include <audacious/audconfig.h>
 #include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/drct.h>
@@ -39,20 +35,14 @@
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
 
-static void
-urlopener_add_url_callback(GtkWidget * widget,
-                      GtkEntry * entry)
+static void urlopener_add_url_callback (GtkWidget * widget, GtkEntry * entry)
 {
-    const gchar *text;
-
-    text = gtk_entry_get_text(entry);
-    aud_util_add_url_history_entry(text);
+    aud_history_add (gtk_entry_get_text (entry));
 }
 
-GtkWidget * urlopener_add_url_dialog_new (GCallback func, gboolean open)
+GtkWidget * urlopener_add_url_dialog_new (GCallback func, bool_t open)
 {
     GtkWidget * win, * vbox, * bbox, * cancel, * ok, * combo, * entry;
-    GList *url;
 
     win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title ((GtkWindow *) win, open ? _("Open URL") : _("Add URL"));
@@ -71,9 +61,9 @@ GtkWidget * urlopener_add_url_dialog_new (GCallback func, gboolean open)
     gtk_window_set_focus(GTK_WINDOW(win), entry);
     gtk_entry_set_text(GTK_ENTRY(entry), "");
 
-    for (url = aud_cfg->url_history; url; url = g_list_next(url))
-        gtk_combo_box_text_append_text ((GtkComboBoxText *) combo,
-         (const gchar *) url->data);
+    const char * path;
+    for (int i = 0; (path = aud_history_get (i)); i ++)
+        gtk_combo_box_text_append_text ((GtkComboBoxText *) combo, path);
 
     g_signal_connect(entry, "activate",
                      G_CALLBACK(urlopener_add_url_callback),
@@ -114,7 +104,7 @@ static void
 on_add_url_add_clicked(GtkWidget * widget,
                        GtkWidget * entry)
 {
-    const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
+    const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
 
     if (text != NULL && * text)
         aud_drct_pl_add (text, -1);
@@ -124,13 +114,13 @@ static void
 on_add_url_ok_clicked(GtkWidget * widget,
                       GtkWidget * entry)
 {
-    const gchar *text = gtk_entry_get_text(GTK_ENTRY(entry));
+    const char *text = gtk_entry_get_text(GTK_ENTRY(entry));
 
     if (text != NULL && * text)
         aud_drct_pl_open (text);
 }
 
-void audgui_show_add_url_window (gboolean open)
+void audgui_show_add_url_window (bool_t open)
 {
     static GtkWidget *url_window = NULL;
 

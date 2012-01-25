@@ -1,30 +1,25 @@
 /*
- * libaudgui/infopopup.c
- * Copyright 2006 William Pitcock, Tony Vroon, George Averill, Giacomo Lozito,
- *  Derek Pomery and Yoshiki Yazawa.
- * Copyright 2010 John Lindgren
+ * infopopup.c
+ * Copyright 2006-2011 William Pitcock, Giacomo Lozito, and John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <gtk/gtk.h>
 #include <string.h>
 
-#include <audacious/audconfig.h>
 #include <audacious/drct.h>
 #include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
@@ -35,20 +30,9 @@
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
 
-static const gchar * get_default_artwork (void)
-{
-    static gchar * path = NULL;
-    if (! path)
-        path = g_strdup_printf ("%s/images/audio.png",
-         aud_get_path (AUD_PATH_DATA_DIR));
-    return path;
-}
-
-#define DEFAULT_ARTWORK (get_default_artwork ())
-
 static GtkWidget * infopopup = NULL;
 
-static void infopopup_entry_set_text (const gchar * entry_name, const gchar *
+static void infopopup_entry_set_text (const char * entry_name, const char *
  text)
 {
     GtkWidget * widget = g_object_get_data ((GObject *) infopopup, entry_name);
@@ -57,62 +41,37 @@ static void infopopup_entry_set_text (const gchar * entry_name, const gchar *
     gtk_label_set_text ((GtkLabel *) widget, text);
 }
 
-static void infopopup_entry_set_image (const gchar * entry_name, const gchar *
- text)
+static void infopopup_entry_set_image (int playlist, int entry)
 {
-    GtkWidget * widget = g_object_get_data ((GObject *) infopopup, entry_name);
-    GdkPixbuf * pixbuf;
-    gint width, height;
-    gfloat aspect;
+    GtkWidget * widget = g_object_get_data ((GObject *) infopopup, "image");
+    g_return_if_fail (widget);
 
-    pixbuf = gdk_pixbuf_new_from_file (text, NULL);
-    g_return_if_fail (pixbuf != NULL);
+    GdkPixbuf * pixbuf = audgui_pixbuf_for_entry (playlist, entry);
 
-    width = gdk_pixbuf_get_width (pixbuf);
-    height = gdk_pixbuf_get_height (pixbuf);
-
-    if (strcmp (DEFAULT_ARTWORK, text))
+    if (pixbuf)
     {
-        GdkPixbuf * pixbuf2;
-
-        aspect = height / (gfloat) width;
-
-        if (aspect > 1)
-        {
-            height = aud_cfg->filepopup_pixelsize * aspect;
-            width = aud_cfg->filepopup_pixelsize;
-        }
-        else
-        {
-            height = aud_cfg->filepopup_pixelsize;
-            width = aud_cfg->filepopup_pixelsize / aspect;
-        }
-
-        pixbuf2 = gdk_pixbuf_scale_simple (pixbuf, width, height,
-         GDK_INTERP_BILINEAR);
+        audgui_pixbuf_scale_within (& pixbuf, 96);
+        gtk_image_set_from_pixbuf ((GtkImage *) widget, pixbuf);
         g_object_unref (pixbuf);
-        pixbuf = pixbuf2;
     }
-
-    gtk_image_set_from_pixbuf ((GtkImage *) widget, pixbuf);
-    g_object_unref (pixbuf);
+    else
+        gtk_image_clear ((GtkImage *) widget);
 }
 
-static gboolean infopopup_progress_cb (void * unused)
+static bool_t infopopup_progress_cb (void * unused)
 {
     GtkWidget * progressbar = g_object_get_data ((GObject *) infopopup,
      "progressbar");
-    gchar * tooltip_file = g_object_get_data ((GObject *) infopopup, "file");
-    gint length = GPOINTER_TO_INT (g_object_get_data ((GObject *) infopopup,
+    char * tooltip_file = g_object_get_data ((GObject *) infopopup, "file");
+    int length = GPOINTER_TO_INT (g_object_get_data ((GObject *) infopopup,
      "length"));
-    gint playlist, entry, time;
-    const gchar * filename;
-    gchar * progress_time;
+    int playlist, entry, time;
+    char * progress_time;
 
     g_return_val_if_fail (tooltip_file != NULL, FALSE);
     g_return_val_if_fail (length > 0, FALSE);
 
-    if (! aud_cfg->filepopup_showprogressbar || ! aud_drct_get_playing ())
+    if (! aud_get_bool (NULL, "filepopup_showprogressbar") || ! aud_drct_get_playing ())
         goto HIDE;
 
     playlist = aud_playlist_get_playing ();
@@ -125,14 +84,17 @@ static gboolean infopopup_progress_cb (void * unused)
     if (entry == -1)
         goto HIDE;
 
-    filename = aud_playlist_entry_get_filename (playlist, entry);
-
+    char * filename = aud_playlist_entry_get_filename (playlist, entry);
     if (strcmp (filename, tooltip_file))
+    {
+        str_unref (filename);
         goto HIDE;
+    }
+    str_unref (filename);
 
     time = aud_drct_get_time ();
     gtk_progress_bar_set_fraction ((GtkProgressBar *) progressbar, time /
-     (gfloat) length);
+     (float) length);
     progress_time = g_strdup_printf ("%d:%02d", time / 60000, (time / 1000) % 60);
     gtk_progress_bar_set_text ((GtkProgressBar *) progressbar, progress_time);
     g_free (progress_time);
@@ -154,7 +116,7 @@ static void infopopup_progress_init (void)
 
 static void infopopup_progress_start (void)
 {
-    gint sid = g_timeout_add (500, (GSourceFunc) infopopup_progress_cb, NULL);
+    int sid = g_timeout_add (500, (GSourceFunc) infopopup_progress_cb, NULL);
 
     g_object_set_data ((GObject *) infopopup, "progress_sid", GINT_TO_POINTER
      (sid));
@@ -162,7 +124,7 @@ static void infopopup_progress_start (void)
 
 static void infopopup_progress_stop (void)
 {
-    gint sid = GPOINTER_TO_INT (g_object_get_data ((GObject *) infopopup,
+    int sid = GPOINTER_TO_INT (g_object_get_data ((GObject *) infopopup,
      "progress_sid"));
 
     if (! sid)
@@ -174,12 +136,12 @@ static void infopopup_progress_stop (void)
 }
 
 static void infopopup_add_category (GtkWidget * infopopup_data_table,
- const gchar * category, const gchar * header_data, const gchar * label_data,
- gint position)
+ const char * category, const char * header_data, const char * label_data,
+ int position)
 {
     GtkWidget * infopopup_data_info_header = gtk_label_new ("");
     GtkWidget * infopopup_data_info_label = gtk_label_new ("");
-    gchar * markup;
+    char * markup;
 
     gtk_misc_set_alignment ((GtkMisc *) infopopup_data_info_header, 0, 0.5);
     gtk_misc_set_alignment ((GtkMisc *) infopopup_data_info_label, 0, 0.5);
@@ -219,11 +181,7 @@ static void infopopup_create (void)
 
     infopopup_data_image = gtk_image_new ();
     gtk_misc_set_alignment ((GtkMisc *) infopopup_data_image, 0.5, 0);
-    gtk_image_set_from_file ((GtkImage *) infopopup_data_image, DEFAULT_ARTWORK);
-
-    g_object_set_data ((GObject *) infopopup, "image_artwork",
-     infopopup_data_image);
-    g_object_set_data ((GObject *) infopopup, "last_artwork", NULL);
+    g_object_set_data ((GObject *) infopopup, "image", infopopup_data_image);
     gtk_box_pack_start ((GtkBox *) infopopup_hbox, infopopup_data_image, FALSE,
      FALSE, 0);
 
@@ -267,21 +225,15 @@ static void infopopup_create (void)
     gtk_widget_show_all (infopopup_hbox);
 }
 
-#if 0
-static void infopopup_destroy (void)
+/* calls str_unref() on <text> */
+static void infopopup_update_data (char * text, const char * label_data,
+ const char * header_data)
 {
-    infopopup_progress_stop (infopopup);
-    g_free (g_object_get_data ((GObject *) infopopup, "last_artwork"));
-    gtk_widget_destroy (infopopup);
-}
-#endif
-
-static void infopopup_update_data (const gchar * text, const gchar * label_data,
- const gchar * header_data)
-{
-    if (text != NULL)
+    if (text)
     {
         infopopup_entry_set_text (label_data, text);
+        str_unref (text);
+
         gtk_widget_show ((GtkWidget *) g_object_get_data ((GObject *) infopopup,
          header_data));
         gtk_widget_show ((GtkWidget *) g_object_get_data ((GObject *) infopopup,
@@ -311,14 +263,12 @@ static void infopopup_clear (void)
     gtk_window_resize ((GtkWindow *) infopopup, 1, 1);
 }
 
-static void infopopup_show (const gchar * filename, const Tuple * tuple,
- const gchar * title)
+static void infopopup_show (int playlist, int entry, const char * filename,
+ const Tuple * tuple, const char * title)
 {
-    gint x, y, h, w;
-    gchar * last_artwork;
-    gint length, value;
-    gchar * tmp;
-    const gchar * title2;
+    int x, y, h, w;
+    int length, value;
+    char * tmp;
 
     if (infopopup == NULL)
         infopopup_create ();
@@ -329,49 +279,30 @@ static void infopopup_show (const gchar * filename, const Tuple * tuple,
     g_object_set_data ((GObject *) infopopup, "file", g_strdup (filename));
 
     /* use title from tuple if possible */
-    if ((title2 = tuple_get_string (tuple, FIELD_TITLE, NULL)))
-        title = title2;
+    char * title2 = tuple_get_str (tuple, FIELD_TITLE, NULL);
+    if (! title2)
+        title2 = str_get (title);
 
-    infopopup_update_data (title, "label_title", "header_title");
-    infopopup_update_data (tuple_get_string (tuple, FIELD_ARTIST, NULL),
-     "label_artist", "header_artist");
-    infopopup_update_data (tuple_get_string (tuple, FIELD_ALBUM, NULL),
-     "label_album", "header_album");
-    infopopup_update_data (tuple_get_string (tuple, FIELD_GENRE, NULL),
-     "label_genre", "header_genre");
+    infopopup_update_data (title2, "label_title", "header_title");
+    infopopup_update_data (tuple_get_str (tuple, FIELD_ARTIST, NULL), "label_artist", "header_artist");
+    infopopup_update_data (tuple_get_str (tuple, FIELD_ALBUM, NULL), "label_album", "header_album");
+    infopopup_update_data (tuple_get_str (tuple, FIELD_GENRE, NULL), "label_genre", "header_genre");
 
     length = tuple_get_int (tuple, FIELD_LENGTH, NULL);
-    tmp = (length > 0) ? g_strdup_printf ("%d:%02d", length / 60000, length /
-     1000 % 60) : NULL;
+    tmp = (length > 0) ? str_printf ("%d:%02d", length / 60000, length / 1000 % 60) : NULL;
     infopopup_update_data (tmp, "label_tracklen", "header_tracklen");
-    g_free (tmp);
 
     g_object_set_data ((GObject *) infopopup, "length" , GINT_TO_POINTER (length));
 
     value = tuple_get_int (tuple, FIELD_YEAR, NULL);
-    tmp = (value > 0) ? g_strdup_printf ("%d", value) : NULL;
+    tmp = (value > 0) ? str_printf ("%d", value) : NULL;
     infopopup_update_data (tmp, "label_year", "header_year");
-    g_free (tmp);
 
     value = tuple_get_int (tuple, FIELD_TRACK_NUMBER, NULL);
-    tmp = (value > 0) ? g_strdup_printf ("%d", value) : NULL;
+    tmp = (value > 0) ? str_printf ("%d", value) : NULL;
     infopopup_update_data (tmp, "label_tracknum", "header_tracknum");
-    g_free (tmp);
 
-    last_artwork = g_object_get_data ((GObject *) infopopup, "last_artwork");
-    tmp = aud_get_associated_image_file (filename);
-
-    if (tmp == NULL)
-        tmp = g_strdup (DEFAULT_ARTWORK);
-
-    if (last_artwork == NULL || strcmp (tmp, last_artwork))
-    {
-        infopopup_entry_set_image ("image_artwork", tmp);
-        g_free (last_artwork);
-        g_object_set_data ((GObject *) infopopup, "last_artwork", tmp);
-    }
-    else
-        g_free (tmp);
+    infopopup_entry_set_image (playlist, entry);
 
     /* start a timer that updates a progress bar if the tooltip
        is shown for the song that is being currently played */
@@ -402,24 +333,25 @@ static void infopopup_show (const gchar * filename, const Tuple * tuple,
     gtk_widget_show (infopopup);
 }
 
-void audgui_infopopup_show (gint playlist, gint entry)
+void audgui_infopopup_show (int playlist, int entry)
 {
-    const gchar * filename = aud_playlist_entry_get_filename (playlist, entry);
-    const Tuple * tuple = aud_playlist_entry_get_tuple (playlist, entry, FALSE);
+    char * filename = aud_playlist_entry_get_filename (playlist, entry);
+    char * title = aud_playlist_entry_get_title (playlist, entry, FALSE);
+    Tuple * tuple = aud_playlist_entry_get_tuple (playlist, entry, FALSE);
 
-    g_return_if_fail (filename != NULL);
+    if (filename && title && tuple)
+        infopopup_show (playlist, entry, filename, tuple, title);
 
-    if (tuple == NULL) /* FIXME: show an error popup if this happens */
-        return;
-
-    infopopup_show (filename, tuple, aud_playlist_entry_get_title (playlist,
-     entry, FALSE));
+    str_unref (filename);
+    str_unref (title);
+    if (tuple)
+        tuple_unref (tuple);
 }
 
 void audgui_infopopup_show_current (void)
 {
-    gint playlist = aud_playlist_get_playing ();
-    gint position;
+    int playlist = aud_playlist_get_playing ();
+    int position;
 
     if (playlist == -1)
         playlist = aud_playlist_get_active ();
@@ -434,6 +366,9 @@ void audgui_infopopup_show_current (void)
 
 void audgui_infopopup_hide (void)
 {
+    if (! infopopup)
+        return;
+
     infopopup_progress_stop ();
     gtk_widget_hide (infopopup);
 }

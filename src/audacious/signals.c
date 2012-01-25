@@ -21,16 +21,18 @@
 
 #include <signal.h>
 #include <glib.h>
-#include <libaudcore/eventqueue.h>
+
+#include <libaudcore/hook.h>
 
 #include "config.h"
+#include "main.h"
 
 #ifdef HAVE_SIGWAIT
 static sigset_t signal_set;
 
 static void * signal_thread (void * data)
 {
-    gint signal;
+    int signal;
 
     while (! sigwait (& signal_set, & signal))
         event_queue ("quit", NULL);

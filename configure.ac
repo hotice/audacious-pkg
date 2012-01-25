@@ -2,49 +2,70 @@ dnl ***
 dnl *** Process this file with autoconf to produce a configure script.
 dnl ***
 
-dnl Require autoconf 2.59 or later
-AC_PREREQ([2.59])
-
 dnl Initialize
-AC_INIT([audacious], [2.5.0])
-AC_COPYRIGHT([(C) 2005-2011 Audacious Team])
-AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
-AC_GNU_SOURCE
-
-AC_CONFIG_HEADERS([config.h])
-PKG_PROG_PKG_CONFIG
-
-dnl buildsystem bootstrap
-dnl =====================
-dnl XXX kludge for FreeBSD
-if test -d "/usr/X11R6/include"; then
-    CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
-fi
+dnl ==========
+AC_PREREQ([2.59])
+AC_INIT([audacious], [3.2])
+AC_COPYRIGHT([(C) 2005-2012 Audacious Team])
 
 AC_SUBST([PACKAGE], [AC_PACKAGE_TARNAME])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
 AC_DEFINE_UNQUOTED([PACKAGE], "$PACKAGE", [Name of package])
 AC_DEFINE_UNQUOTED([VERSION], "$VERSION", [Version number of package])
 
-BUILDSYS_INIT
-BUILDSYS_PROG_IMPLIB
-BUILDSYS_SHARED_LIB
-IMPLIB_LIBS=""
-AC_SUBST([IMPLIB_LIBS])
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+AC_CONFIG_HEADERS([config.h])
 
+AUD_COMMON_PROGS
+
+BUILDSYS_INIT
+BUILDSYS_SHARED_LIB
+
+dnl Byte order
+dnl ==========
+AC_C_BIGENDIAN([BIGENDIAN=1], [BIGENDIAN=0],
+ [AC_MSG_ERROR([Unknown machine byte order])],
+ [AC_MSG_ERROR([Universal builds are not supported, sorry])])
+AC_SUBST([BIGENDIAN])
+
+dnl Headers and functions
+dnl ===============================
+AC_CHECK_HEADERS([execinfo.h regex.h rxposix.h rx/rxposix.h])
+AC_CHECK_FUNCS([sigwait backtrace])
+
+AC_MSG_CHECKING([for cexpf])
+OLD_LIBS="$LIBS"
+LIBS="$LIBS -lm"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <complex.h>
+                                 #include <stdio.h>],
+                                [printf ("%f", crealf (cexpf (1)))])],
+               [AC_MSG_RESULT(yes)
+                AC_DEFINE([HAVE_CEXPF], [1], [Define if cexpf is present])],
+               [AC_MSG_RESULT(no)])
+LIBS="$OLD_LIBS"
+
+AC_MSG_CHECKING([for /proc/self/exe])
+if test -e "/proc/self/exe" ; then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE([HAVE_PROC_SELF_EXE], [1], [Define if the /proc/self/exe symlink is supported])
+else
+    AC_MSG_RESULT(no)
+fi
+
+dnl gettext
+dnl =======
+AM_GNU_GETTEXT([external])
+if test "$MSGFMT" = ":" ; then
+    AC_MSG_ERROR([msgfmt was not found; have you installed gettext?])
+fi
 
 dnl Build stamp
 dnl ===========
 AC_ARG_WITH([buildstamp],
  AS_HELP_STRING([--with-buildstamp=XXX], [Set build stamp to XXX]),
  AC_DEFINE_UNQUOTED([BUILDSTAMP], "$withval", [Build stamp]),
- AC_DEFINE_UNQUOTED([BUILDSTAMP], "UNSUPPORTED VERSION", [Build stamp]))
-
-
-dnl Large file support
-dnl ==================
-CPPFLAGS="$CPPFLAGS -D_FILE_OFFSET_BITS=64"
+ AC_DEFINE_UNQUOTED([BUILDSTAMP], "unknown build", [Build stamp]))
 
 dnl Activation of text console (MS-Windows ONLY)
 dnl ============================================
@@ -54,54 +75,41 @@ AC_ARG_ENABLE([text-console],
 [use_text_console=no]
 )
 
-dnl Plugin stuff
-dnl ========================
-SHARED_SUFFIX="$PLUGIN_SUFFIX"
-AC_SUBST([SHARED_SUFFIX])
-AC_DEFINE_UNQUOTED([SHARED_SUFFIX], "${SHARED_SUFFIX}",
-    [Define the shared module suffix extension on your platform.])
-
-AC_MSG_CHECKING([for Windows or Macintosh])
+AC_MSG_CHECKING([for Microsoft Windows])
 case "$target" in
     *mingw*)
-        AC_MSG_RESULT([Windows])
+        AC_MSG_RESULT([yes])
+        have_mswindows=yes
         if test "x$use_text_console" = "xno"; then
             LDFLAGS="$LDFLAGS -Wl,-subsystem,windows"
         fi
         ;;
-    *apple*)
-        AC_MSG_RESULT([Macintosh])
-        LDFLAGS="$LDFLAGS -framework CoreFoundation -framework CoreServices -framework Carbon"
-        ;;
     *)
         AC_MSG_RESULT([no])
+        have_mswindows=no
         ;;
 esac
 
-dnl GNU gettext
-dnl ===========
-AM_GNU_GETTEXT([external])
+AUD_CONDITIONAL([HAVE_MSWINDOWS], [have_mswindows])
 
-if test "$MSGFMT" = ":" ; then
-    AC_MSG_ERROR([msgfmt was not found!  You may need to install gettext.])
-fi
-
-
-dnl Checks common for core and plugins
-dnl ==================================
+dnl Check for GTK+
+dnl ==============
 
 AC_ARG_ENABLE([gtk3],
- [AS_HELP_STRING([--enable-gtk3], [Use GTK3 instead of GTK2])],
- [use_gtk3=yes], [use_gtk3=no])
+ [AS_HELP_STRING([--disable-gtk3], [Use GTK2 even if GTK3 is present])],
+ [use_gtk3=$enableval], [use_gtk3=yes])
 
-AUD_COMMON_PROGS
+if test $use_gtk3 = yes ; then
+    PKG_CHECK_MODULES([GTK], [gtk+-3.0 >= 3.0.0], [use_gtk3=yes], [use_gtk3=no])
+fi
 
+if test $use_gtk3 = no ; then
+    PKG_CHECK_MODULES([GTK], [gtk+-2.0 >= 2.12.0], [use_gtk3=no],
+     AC_MSG_ERROR([Cannot find GTK headers.  Aborting ...]))
+fi
 
-dnl Check for headers and functions
-dnl ===============================
-AC_CHECK_HEADERS([unistd.h fcntl.h limits.h fts.h execinfo.h sys/errno.h regex.h rxposix.h rx/rxposix.h])
-AC_CHECK_FUNCS([sigwait])
-
+AC_SUBST([GTK_LIBS])
+AC_SUBST([GTK_CFLAGS])
 
 ### ---------------------------------------------------------------------------
 dnl Path settings
@@ -118,10 +126,8 @@ fi
 AUD_ARG_ENABLE([rpath], [yes], [disable rpath])
 
 if test "x$enable_rpath" = "xyes"; then
-    AUDLDFLAGS="-Wl,-rpath,${libdir}"
+    LDFLAGS="$LDFLAGS -Wl,-rpath,${libdir}"
 fi
-
-AC_SUBST([AUDLDFLAGS])
 
 ### ---------------------------------------------------------------------------
 dnl Chardet support
@@ -129,7 +135,7 @@ dnl ===============
 AUD_ARG_ENABLE([chardet], [yes],
 [charset detection support],
 [
-    PKG_CHECK_MODULES([LIBGUESS], [libguess], [enable_chardet=yes], [enable_chardet=no])
+    PKG_CHECK_MODULES([LIBGUESS], [libguess >= 1.1], [enable_chardet=yes], [enable_chardet=no])
 
     if test "x$enable_chardet" = "xyes"; then
         AC_DEFINE([USE_CHARDET], 1, [Define if character set detection enabled])
@@ -153,15 +159,10 @@ AUD_ARG_ENABLE([dbus], [yes],
     if test "x$DBUS_BINDING_TOOL" = "xno" || test "x$GLIB_GENMARSHAL" = "xno" || test "x$enable_dbus" = "xno" ; then
         enable_dbus="no"
     else
-        ADD_PC_REQUIRES([dbus-1 >= 0.60])
-        ADD_PC_REQUIRES([dbus-glib-1 >= 0.60])
         AC_DEFINE([USE_DBUS], 1, [Define if D-Bus support enabled])
-        AC_DEFINE([DBUS_SERVICES_DIR], "$datadir/dbus-1/services",
-            [Location of D-Bus services directory])
-        LIBAUDCLIENT_LDFLAGS="$AUDLDFLAGS -laudclient"
+        LIBAUDCLIENT_LDFLAGS="-laudclient"
         AC_SUBST([DBUS_CFLAGS])
         AC_SUBST([DBUS_LIBS])
-        AC_SUBST([DBUS_SERVICES_DIR])
         AC_SUBST([DBUS_BINDING_TOOL])
         AC_SUBST([LIBAUDCLIENT_LDFLAGS])
     fi
@@ -268,65 +269,6 @@ AUD_ARG_ENABLE([sm], [yes],
 AUD_CONDITIONAL([USE_EGGSM], [enable_sm])
 
 ### ---------------------------------------------------------------------------
-dnl Ugly system checks
-dnl ==================
-AC_MSG_CHECKING([if __ELF__ is defined])
-AC_EGREP_CPP([yes],
-    [#ifdef __ELF__
-        yes
-     #endif
-    ],
-    [is_elf=yes],
-    [is_elf=no]
-)
-AC_MSG_RESULT([$is_elf])
-
-have_solaris=no
-have_sun=no
-ARCH_DEFINES=""
-case $host in
-    *-*-openbsd* | *-*-netbsd* | *-*-mirbsd*)
-        have_sun=yes
-        if test "x${is_elf}" = "xno"; then
-            AC_DEFINE([SYMBOL_PREFIX], "_", [Define to symbol prefix, if any])
-        fi
-    ;;
-    *-*-darwin*)
-        AC_DEFINE([SYMBOL_PREFIX], "_", [Define to symbol prefix, if any])
-    ;;
-    *-hpux-*)
-        ARCH_DEFINES="-DHPUX"
-    ;;
-    *-*-solaris* | *-*-sunos*)
-        have_solaris=yes
-    ;;
-esac
-
-arch_type=other
-x86_asm=no
-case $host in
-    i386-*-* | i486-*-* | i586-*-* | i686-*-* | i86pc-*-*)
-        arch_type=ix86
-        case $host in
-            *-*-netbsd* | *-*openbsd*)
-            ;;
-            *)
-                ARCH_DEFINES="-DI386_ASSEM"
-                x86_asm=yes
-            ;;
-        esac
-    ;;
-esac
-
-AC_SUBST([ARCH_DEFINES])
-
-dnl XXX delete ASAP -nenolod
-AUD_CONDITIONAL([ARCH_X86], [arch_type], [ix86])
-AUD_CONDITIONAL([USE_X86ASM], [x86_asm])
-AUD_CONDITIONAL([HAVE_SOLARIS], [have_solaris])
-AUD_CONDITIONAL([HAVE_SUN], [have_sun])
-
-### ---------------------------------------------------------------------------
 dnl Define plugin directories
 dnl =========================
 plugindir="$libdir/audacious"
@@ -376,6 +318,7 @@ AC_CONFIG_FILES([
     extra.mk
     man/audtool.1
     man/audacious.1
+    src/libaudcore/audio.h
 ])
 
 BUILDSYS_TOUCH_DEPS
@@ -398,9 +341,6 @@ echo ""
 echo "  Automatic character code detection:     $enable_chardet"
 echo "  D-Bus support:                          $enable_dbus"
 echo "  Session management (eggsm)              $enable_sm"
-echo ""
-echo "  SSE2:                                   $enable_sse2"
-echo "  AltiVec:                                $enable_altivec"
 echo ""
 
 if test "x$AUDACIOUS_PATH" != "xno" && test "x$prefix/bin/audacious" != "x$AUDACIOUS_PATH"; then

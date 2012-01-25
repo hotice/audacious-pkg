@@ -1,4604 +1,1242 @@
-# Translation of audacious.pot to Ukrainian for Beep Media Player.
-# Copyright (C) 2005 Mykola Lynnyk<definer@users.sf.net> 
-# Переклад здійснено на основі перекладу XMMS 
-# Дмитра Ковальова 
-# Based on XMMS translation by Dmytro Koval'ov <kov@tokyo.email.ne.jp> 
+# Ukrainian translation for Audacious
+# Copyright (C) Audacious translators
+# This file is distributed under the same license as the Audacious package.
 #
+# Translators:
+# Kostyantyn Fedenko <fedenko@ukr.net>, 2011.
+# NaiLi Rootaerc <theism@mail.ru>, 2012.
+# Rax Garfield (http://biokillaz.com/), 2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: bmp 0.9.7\n"
-"Report-Msgid-Bugs-To: http://jira.atheme.org/\n"
-"POT-Creation-Date: 2011-04-16 01:36-0400\n"
-"PO-Revision-Date: 2005-12-17 11:01+0400\n"
-"Last-Translator: Mykola Lynnyk<pydefiner@gmail.com>\n"
-"Language-Team: Ukrainian <linux@linux.org.ua>\n"
-"Language: uk\n"
+"Project-Id-Version: Audacious\n"
+"Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
+"POT-Creation-Date: 2012-01-11 08:54-0500\n"
+"PO-Revision-Date: 2012-01-13 11:46+0000\n"
+"Last-Translator: NaiLi Rootaerc <theism@mail.ru>\n"
+"Language-Team: Ukrainian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: src/audacious/chardet.c:37
-msgid "  (invalid UTF-8)"
-msgstr "  (недопустима послідовність Юнікод)"
-
-#: src/audacious/credits.c:35
-#, fuzzy
-msgid "Core developers:"
-msgstr "Разробники:"
-
-#: src/audacious/credits.c:49
-msgid "Graphics:"
-msgstr ""
-
-#: src/audacious/credits.c:54
-#, fuzzy
-msgid "Default skin:"
-msgstr "Основний (%s)"
-
-#: src/audacious/credits.c:60
-msgid "Plugin development:"
-msgstr ""
-
-#: src/audacious/credits.c:83
-msgid "Patch authors:"
-msgstr ""
-
-#: src/audacious/credits.c:126
-#, fuzzy
-msgid "1.x developers:"
-msgstr "Разробники:"
-
-#: src/audacious/credits.c:148
-#, fuzzy
-msgid "BMP Developers:"
-msgstr "Разробники:"
-
-#: src/audacious/credits.c:180
-#, fuzzy
-msgid "Belarusian:"
-msgstr "Угорський"
-
-#: src/audacious/credits.c:183
-msgid "Basque:"
-msgstr ""
-
-#: src/audacious/credits.c:186
-msgid "Brazilian Portuguese:"
-msgstr ""
-
-#: src/audacious/credits.c:190
-msgid "Breton:"
-msgstr ""
-
-#: src/audacious/credits.c:193
-#, fuzzy
-msgid "Bulgarian:"
-msgstr "Угорський"
-
-#: src/audacious/credits.c:196
-#, fuzzy
-msgid "Catalan:"
-msgstr "Італійський:"
-
-#: src/audacious/credits.c:199
-#, fuzzy
-msgid "Chinese:"
-msgstr "Китайський:"
-
-#: src/audacious/credits.c:202
-#, fuzzy
-msgid "Croatian:"
-msgstr "Знаходження:"
-
-#: src/audacious/credits.c:205
-msgid "Czech:"
-msgstr "Чеський:"
-
-#: src/audacious/credits.c:208
-msgid "Dutch:"
-msgstr "Голладський:"
-
-#: src/audacious/credits.c:212
-#, fuzzy
-msgid "Estonian:"
-msgstr "Румунський:"
-
-#: src/audacious/credits.c:215
-#, fuzzy
-msgid "Finnish:"
-msgstr "Іспанський:"
-
-#: src/audacious/credits.c:219
-msgid "French:"
-msgstr "Французький:"
-
-#: src/audacious/credits.c:224
-msgid "German:"
-msgstr "Німецький:"
-
-#: src/audacious/credits.c:231
-#, fuzzy
-msgid "Georgian:"
-msgstr "Німецький:"
-
-#: src/audacious/credits.c:234
-msgid "Greek:"
-msgstr "Грецький:"
-
-#: src/audacious/credits.c:239
-msgid "Hindi:"
-msgstr ""
-
-#: src/audacious/credits.c:242
-msgid "Hungarian:"
-msgstr "Угорський"
-
-#: src/audacious/credits.c:246
-msgid "Italian:"
-msgstr "Італійський:"
-
-#: src/audacious/credits.c:250
-msgid "Japanese:"
-msgstr "Японський:"
-
-#: src/audacious/credits.c:253
-msgid "Korean:"
-msgstr "Корейський:"
-
-#: src/audacious/credits.c:256
-#, fuzzy
-msgid "Latvian:"
-msgstr "Знаходження:"
-
-#: src/audacious/credits.c:259
-msgid "Lithuanian:"
-msgstr "Литовський:"
-
-#: src/audacious/credits.c:263
-msgid "Macedonian:"
-msgstr "Македонський"
-
-#: src/audacious/credits.c:266
-msgid "Polish:"
-msgstr "Польский:"
-
-#: src/audacious/credits.c:271
-#, fuzzy
-msgid "Portuguese:"
-msgstr "Порт:"
-
-#: src/audacious/credits.c:274
-msgid "Romanian:"
-msgstr "Румунський:"
-
-#: src/audacious/credits.c:278
-msgid "Russian:"
-msgstr "Російський:"
-
-#: src/audacious/credits.c:282
-msgid "Serbian (Latin):"
-msgstr ""
-
-#: src/audacious/credits.c:285
-msgid "Serbian (Cyrillic):"
-msgstr ""
-
-#: src/audacious/credits.c:288
-msgid "Simplified Chinese:"
-msgstr ""
-
-#: src/audacious/credits.c:291
-msgid "Slovak:"
-msgstr "Словацький"
-
-#: src/audacious/credits.c:294
-msgid "Spanish:"
-msgstr "Іспанський:"
-
-#: src/audacious/credits.c:301
-msgid "Swedish:"
-msgstr "Шведський:"
-
-#: src/audacious/credits.c:304
-msgid "Traditional Chinese:"
-msgstr ""
-
-#: src/audacious/credits.c:309
-msgid "Turkish:"
-msgstr ""
-
-#: src/audacious/credits.c:313
-msgid "Ukrainian:"
-msgstr "Український:"
-
-#: src/audacious/credits.c:316
-msgid "Welsh:"
-msgstr "Валлійський:"
-
-#: src/audacious/drct.c:254
-#, fuzzy
-msgid "Temporary Playlist"
-msgstr "Завантажии список програвання"
-
-#: src/audacious/equalizer_preset.c:186
-#, c-format
-msgid "Error importing Winamp EQF file '%s'"
-msgstr ""
-
-#: src/audacious/folder-add.c:63
+#: src/audacious/adder.c:77
 msgid "Searching ..."
-msgstr ""
+msgstr "Пошук ..."
 
-#: src/audacious/folder-add.c:89
+#: src/audacious/adder.c:113
 #, c-format
 msgid "%d file found"
 msgid_plural "%d files found"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Знайдено %d файл"
+msgstr[1] "Знайдено %d файли"
+msgstr[2] "Знайдено %d файлів"
 
-#: src/audacious/main.c:247
+#: src/audacious/chardet.c:39
+msgid "  (invalid UTF-8)"
+msgstr "  (недопустима послідовність Юнікод)"
+
+#: src/audacious/credits.c:37
+msgid "Core developers:"
+msgstr "Основні розробники:"
+
+#: src/audacious/credits.c:51
+msgid "Graphics:"
+msgstr "Графіка:"
+
+#: src/audacious/credits.c:56
+msgid "Default skin:"
+msgstr "Стандартна обкладинка:"
+
+#: src/audacious/credits.c:62
+msgid "Plugin development:"
+msgstr "Розробка модулів:"
+
+#: src/audacious/credits.c:85
+msgid "Patch authors:"
+msgstr "Автори патчів:"
+
+#: src/audacious/credits.c:131
+msgid "1.x developers:"
+msgstr "Розробники версії 1.x:"
+
+#: src/audacious/credits.c:153
+msgid "BMP Developers:"
+msgstr "Розробники BMP:"
+
+#: src/audacious/credits.c:185
+msgid "Belarusian:"
+msgstr "Білоруська:"
+
+#: src/audacious/credits.c:188
+msgid "Basque:"
+msgstr "Баскська:"
+
+#: src/audacious/credits.c:191
+msgid "Brazilian Portuguese:"
+msgstr "Бразильська португальська:"
+
+#: src/audacious/credits.c:196
+msgid "Breton:"
+msgstr "Бретонська:"
+
+#: src/audacious/credits.c:199
+msgid "Bulgarian:"
+msgstr "Болгарська:"
+
+#: src/audacious/credits.c:202
+msgid "Catalan:"
+msgstr "Каталонська:"
+
+#: src/audacious/credits.c:206
+msgid "Chinese:"
+msgstr "Китайська:"
+
+#: src/audacious/credits.c:209
+msgid "Croatian:"
+msgstr "Хорватська:"
+
+#: src/audacious/credits.c:212
+msgid "Czech:"
+msgstr "Чеська:"
+
+#: src/audacious/credits.c:215
+msgid "Dutch:"
+msgstr "Нідерландська:"
+
+#: src/audacious/credits.c:219
+msgid "Estonian:"
+msgstr "Естонська:"
+
+#: src/audacious/credits.c:222
+msgid "Finnish:"
+msgstr "Фінська:"
+
+#: src/audacious/credits.c:227
+msgid "French:"
+msgstr "Французька:"
+
+#: src/audacious/credits.c:233
+msgid "German:"
+msgstr "Німецька:"
+
+#: src/audacious/credits.c:240
+msgid "Georgian:"
+msgstr "Грузинська:"
+
+#: src/audacious/credits.c:243
+msgid "Greek:"
+msgstr "Грецька:"
+
+#: src/audacious/credits.c:248
+msgid "Hindi:"
+msgstr "Хінді:"
+
+#: src/audacious/credits.c:251
+msgid "Hungarian:"
+msgstr "Угорська:"
+
+#: src/audacious/credits.c:255
+msgid "Italian:"
+msgstr "Італійська:"
+
+#: src/audacious/credits.c:260
+msgid "Japanese:"
+msgstr "Японська:"
+
+#: src/audacious/credits.c:263
+msgid "Korean:"
+msgstr "Корейська:"
+
+#: src/audacious/credits.c:266
+msgid "Latvian:"
+msgstr "Латиська:"
+
+#: src/audacious/credits.c:269
+msgid "Lithuanian:"
+msgstr "Литовська:"
+
+#: src/audacious/credits.c:274
+msgid "Macedonian:"
+msgstr "Македонська:"
+
+#: src/audacious/credits.c:277
+msgid "Mexican Spanish:"
+msgstr "Іспанська мова, Мексика:"
+
+#: src/audacious/credits.c:280
+msgid "Polish:"
+msgstr "Польська:"
+
+#: src/audacious/credits.c:287
+msgid "Portuguese:"
+msgstr "Португальська:"
+
+#: src/audacious/credits.c:290
+msgid "Romanian:"
+msgstr "Румунська:"
+
+#: src/audacious/credits.c:294
+msgid "Russian:"
+msgstr "Російська:"
+
+#: src/audacious/credits.c:298
+msgid "Serbian (Latin):"
+msgstr "Сербська (латиниця):"
+
+#: src/audacious/credits.c:301
+msgid "Serbian (Cyrillic):"
+msgstr "Сербська (кирилиця):"
+
+#: src/audacious/credits.c:305
+msgid "Simplified Chinese:"
+msgstr "Спрощена китайська:"
+
+#: src/audacious/credits.c:308
+msgid "Slovak:"
+msgstr "Словацька:"
+
+#: src/audacious/credits.c:312
+msgid "Spanish:"
+msgstr "Іспанська:"
+
+#: src/audacious/credits.c:320
+msgid "Swedish:"
+msgstr "Шведська:"
+
+#: src/audacious/credits.c:323
+msgid "Traditional Chinese:"
+msgstr "Традиційна китайська:"
+
+#: src/audacious/credits.c:329
+msgid "Turkish:"
+msgstr "Турецька:"
+
+#: src/audacious/credits.c:333
+msgid "Ukrainian:"
+msgstr "Українська:"
+
+#: src/audacious/credits.c:338
+msgid "Vietnamese:"
+msgstr "В’єтнамська:"
+
+#: src/audacious/credits.c:341
+msgid "Welsh:"
+msgstr "Валлійська:"
+
+#: src/audacious/equalizer_preset.c:180
+#, c-format
+msgid "Error importing Winamp EQF file '%s'"
+msgstr "Не вдалося імпортувати Winamp EQF файл '%s'"
+
+#: src/audacious/main.c:243
 msgid "Skip backwards in playlist"
-msgstr "Перейти до попередньої пісні у списку"
+msgstr "Перейти до попередньої доріжки у списку"
 
-#: src/audacious/main.c:248
+#: src/audacious/main.c:244
 msgid "Start playing current playlist"
 msgstr "Почати програвати поточний список"
 
-#: src/audacious/main.c:249
+#: src/audacious/main.c:245
 msgid "Pause current song"
 msgstr "Призупинити поточну пісню"
 
-#: src/audacious/main.c:250
+#: src/audacious/main.c:246
 msgid "Stop current song"
 msgstr "Зупинити поточну пісню"
 
-#: src/audacious/main.c:251
+#: src/audacious/main.c:247
 msgid "Pause if playing, play otherwise"
 msgstr "Призупинити, якщо що-небуть програється, в іншому випадку програвати"
 
-#: src/audacious/main.c:252
+#: src/audacious/main.c:248
 msgid "Skip forward in playlist"
-msgstr "Перейти до наступної пісні у списку пісень"
+msgstr "Перейти до наступної доріжки у списку відтворення"
+
+#: src/audacious/main.c:249
+msgid "Display Jump to File dialog"
+msgstr "Показати діалог переходу до файлу"
+
+#: src/audacious/main.c:250
+msgid "Add files to the playlist"
+msgstr "Додати файли до списку відтворення"
+
+#: src/audacious/main.c:251
+msgid "Add new files to a temporary playlist"
+msgstr "Додати нові файли до тимчасового списку відтворення"
+
+#: src/audacious/main.c:252
+msgid "Display the main window"
+msgstr "Показати головне вікно"
 
 #: src/audacious/main.c:253
-#, fuzzy
-msgid "Display Jump to File dialog"
-msgstr "/Перейти до файлу"
+msgid "Show version"
+msgstr "Показати версію"
 
 #: src/audacious/main.c:254
-#, fuzzy
-msgid "Add files to the playlist"
-msgstr "Не очищати список програвання"
+msgid "Print debugging messages"
+msgstr "Друкувати повідомлення про налагодження"
 
 #: src/audacious/main.c:255
-#, fuzzy
-msgid "Add new files to a temporary playlist"
-msgstr "Не очищати список програвання"
+msgid "Headless mode (beta)"
+msgstr "Headless-режим (як демон і без X11, бета)"
 
 #: src/audacious/main.c:256
-#, fuzzy
-msgid "Display the main window"
-msgstr "Показати головне вікно."
-
-#: src/audacious/main.c:257
-msgid "Display all open Audacious windows"
-msgstr ""
-
-#: src/audacious/main.c:258
-#, fuzzy
-msgid "Show version"
-msgstr "/Показати редактор списку пісень"
-
-#: src/audacious/main.c:259
-msgid "Print debugging messages"
-msgstr ""
-
-#: src/audacious/main.c:260
 msgid "FILE..."
-msgstr ""
+msgstr "ФАЙЛ..."
 
-#: src/audacious/main.c:272
+#: src/audacious/main.c:268
 msgid "- play multimedia files"
-msgstr ""
+msgstr "- програти мультимедійні файли"
 
-#: src/audacious/main.c:282
+#: src/audacious/main.c:278
 #, c-format
 msgid ""
 "%s: %s\n"
 "Try `%s --help' for more information.\n"
 msgstr ""
+"%s: %s\n"
+"Спробуйте `%s --help' для отримання докладнішого опису.\n"
 
-#: src/audacious/main.c:395
-msgid ""
-"Audacious seems to be already running but is not responding.  You can start "
-"another instance of the program, but please be warned that this can cause "
-"data loss.  If Audacious is not running, you can safely ignore this "
-"message.  Press OK to start Audacious or Cancel to quit."
-msgstr ""
-
-#: src/audacious/main.c:558
+#: src/audacious/main.c:573
 msgid "Audacious"
-msgstr ""
+msgstr "Audacious"
 
-#: src/audacious/playback.c:375
+#: src/audacious/playback.c:307
 #, c-format
 msgid "No decoder found for %s."
+msgstr "Не знайдено декодер для %s."
+
+#: src/audacious/playlist-files.c:53
+#, c-format
+msgid "Cannot %s %s: unsupported file extension."
+msgstr "Неможливо %s %s: розширення файлу не підтримується."
+
+#: src/audacious/playlist-files.c:54
+msgid "save"
+msgstr "зберегти"
+
+#: src/audacious/playlist-files.c:54
+msgid "load"
+msgstr "завантажити"
+
+#: src/audacious/playlist-new.c:131
+msgid "New Playlist"
+msgstr "Новий список відтворення"
+
+#: src/audacious/playlist-new.c:132
+msgid "Now Playing"
+msgstr "Зараз відтворюється"
+
+#: src/audacious/playlist-new.c:1630
+msgid ""
+"The playlist cannot be sorted because metadata scanning is still in progress"
+" (or has been disabled)."
 msgstr ""
+"Список відтворення неможливо відсортувати, поки сканування метаданих триває "
+"або вимкнено."
 
-#: src/audacious/playback.c:519
-#, fuzzy
-msgid "Buffering ..."
-msgstr "Буфер"
+#: src/audacious/ui_preferences.c:85
+msgid "Audio"
+msgstr "Звук"
 
-#: src/audacious/playlist-new.c:288
-#, fuzzy
-msgid "Untitled Playlist"
-msgstr "Зберегти список програвання"
+#: src/audacious/ui_preferences.c:86
+msgid "Network"
+msgstr "Мережа"
+
+#: src/audacious/ui_preferences.c:87 src/audacious/ui_preferences.c:1603
+msgid "Playlist"
+msgstr "Список відтворення"
 
 #: src/audacious/ui_preferences.c:88
-#, fuzzy
-msgid "Audio"
-msgstr "Про Audacious"
-
-#: src/audacious/ui_preferences.c:89
-#, fuzzy
-msgid "Replay Gain"
-msgstr "Підсилення при програванні"
-
-#: src/audacious/ui_preferences.c:90
-msgid "Network"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:91 src/audacious/ui_preferences.c:1790
-msgid "Playlist"
-msgstr "Список програвання"
-
-#: src/audacious/ui_preferences.c:92
 msgid "Plugins"
 msgstr "Модулі"
 
-#: src/audacious/ui_preferences.c:98 src/libaudgui/infopopup.c:241
+#: src/audacious/ui_preferences.c:94 src/libaudgui/infopopup.c:199
 msgid "Artist"
 msgstr "Виконавець"
 
-#: src/audacious/ui_preferences.c:99 src/libaudgui/infopopup.c:243
+#: src/audacious/ui_preferences.c:95 src/libaudgui/infopopup.c:201
 msgid "Album"
 msgstr "Альбом"
 
-#: src/audacious/ui_preferences.c:100 src/libaudgui/infopopup.c:239
-#: src/libaudgui/ui_playlist_manager.c:208
+#: src/audacious/ui_preferences.c:96 src/libaudgui/infopopup.c:197
+#: src/libaudgui/ui_playlist_manager.c:279
 msgid "Title"
 msgstr "Заголовок"
 
-#: src/audacious/ui_preferences.c:101
+#: src/audacious/ui_preferences.c:97
 msgid "Tracknumber"
 msgstr "Номер доріжки"
 
-#: src/audacious/ui_preferences.c:102 src/libaudgui/infopopup.c:245
+#: src/audacious/ui_preferences.c:98 src/libaudgui/infopopup.c:203
 msgid "Genre"
 msgstr "Стиль"
 
-#: src/audacious/ui_preferences.c:103
+#: src/audacious/ui_preferences.c:99
 msgid "Filename"
 msgstr "Ім'я файлу"
 
-#: src/audacious/ui_preferences.c:104
+#: src/audacious/ui_preferences.c:100
 msgid "Filepath"
 msgstr "Шлях до файлу"
 
-#: src/audacious/ui_preferences.c:105
+#: src/audacious/ui_preferences.c:101
 msgid "Date"
 msgstr "Дата"
 
-#: src/audacious/ui_preferences.c:106 src/libaudgui/infopopup.c:247
+#: src/audacious/ui_preferences.c:102 src/libaudgui/infopopup.c:205
 msgid "Year"
 msgstr "Рік"
 
-#: src/audacious/ui_preferences.c:107
+#: src/audacious/ui_preferences.c:103
 msgid "Comment"
 msgstr "Коментар"
 
-#: src/audacious/ui_preferences.c:108
-#, fuzzy
+#: src/audacious/ui_preferences.c:104
 msgid "Codec"
-msgstr "/Закрити"
+msgstr "Кодек"
 
-#: src/audacious/ui_preferences.c:109
+#: src/audacious/ui_preferences.c:105
 msgid "Quality"
 msgstr "Якість"
 
-#: src/audacious/ui_preferences.c:114
+#: src/audacious/ui_preferences.c:111
 msgid "None"
 msgstr "Нічого"
 
+#: src/audacious/ui_preferences.c:112
+msgid "Arabic"
+msgstr "Арабська"
+
+#: src/audacious/ui_preferences.c:113
+msgid "Baltic"
+msgstr "Балтійські мови"
+
+#: src/audacious/ui_preferences.c:114
+msgid "Chinese"
+msgstr "Китайська"
+
 #: src/audacious/ui_preferences.c:115
-#, fuzzy
-msgid "Japanese"
-msgstr "Японський:"
+msgid "Greek"
+msgstr "Грецька"
 
 #: src/audacious/ui_preferences.c:116
-#, fuzzy
-msgid "Taiwanese"
-msgstr "Японський:"
+msgid "Hebrew"
+msgstr "Іврит"
 
 #: src/audacious/ui_preferences.c:117
-#, fuzzy
-msgid "Chinese"
-msgstr "Китайський:"
+msgid "Japanese"
+msgstr "Японська"
 
 #: src/audacious/ui_preferences.c:118
-#, fuzzy
 msgid "Korean"
-msgstr "Корейський:"
+msgstr "Корейська"
 
 #: src/audacious/ui_preferences.c:119
-#, fuzzy
-msgid "Russian"
-msgstr "Російський:"
+msgid "Polish"
+msgstr "Польська"
 
 #: src/audacious/ui_preferences.c:120
-#, fuzzy
-msgid "Greek"
-msgstr "Грецький:"
+msgid "Russian"
+msgstr "Російська"
 
 #: src/audacious/ui_preferences.c:121
-msgid "Hebrew"
-msgstr ""
+msgid "Taiwanese"
+msgstr "Тайванська"
 
 #: src/audacious/ui_preferences.c:122
 msgid "Turkish"
-msgstr ""
+msgstr "Турецька"
 
-#: src/audacious/ui_preferences.c:123
-msgid "Arabic"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:124
-#, fuzzy
-msgid "Polish"
-msgstr "Польский:"
-
-#: src/audacious/ui_preferences.c:125
-#, fuzzy
-msgid "Baltic"
-msgstr "Кельтська"
-
-#: src/audacious/ui_preferences.c:126
-#, fuzzy
-msgid "Universal"
-msgstr "Стиль"
-
-#: src/audacious/ui_preferences.c:146
-#, fuzzy
-msgid "<b>Bit Depth</b>"
-msgstr "Бітова частота:"
+#: src/audacious/ui_preferences.c:144
+msgid "Album mode"
+msgstr "Режим альбому"
 
 #: src/audacious/ui_preferences.c:147
-msgid "Output bit depth:"
-msgstr ""
+msgid "<b>Output Settings</b>"
+msgstr "<b>Параметри виводу</b>"
 
-#: src/audacious/ui_preferences.c:148
-msgid ""
-"All streams will be converted to this bit depth.\n"
-"This should be the max supported bit depth of\n"
-"the sound card or output plugin."
-msgstr ""
-
-#: src/audacious/ui_preferences.c:151
-#, fuzzy
-msgid "<b>Volume Control</b>"
-msgstr "Керування гучністю:"
+#: src/audacious/ui_preferences.c:149
+msgid "Bit depth:"
+msgstr "Амплітудна розрядність:"
 
 #: src/audacious/ui_preferences.c:152
-msgid "Use software volume control"
-msgstr "Програмне керування гучністю"
+msgid "Buffer size:"
+msgstr "Розмір буфера:"
 
 #: src/audacious/ui_preferences.c:154
-msgid ""
-"Use software volume control. This may be useful for situations where your "
-"audio system does not support controlling the playback volume."
-msgstr ""
+msgid "ms"
+msgstr "мс"
+
+#: src/audacious/ui_preferences.c:155
+msgid "Use software volume control (not recommended)"
+msgstr "Програмно керувати гучністю (не рекомендовано)"
+
+#: src/audacious/ui_preferences.c:157
+msgid "<b>Replay Gain</b>"
+msgstr "<b>Replay Gain</b>"
 
 #: src/audacious/ui_preferences.c:158
-msgid "Amplify all files:"
-msgstr ""
+msgid "Enable Replay Gain"
+msgstr "Увімкнути Replay Gain"
 
-#: src/audacious/ui_preferences.c:159 src/audacious/ui_preferences.c:161
-msgid "dB"
-msgstr ""
+#: src/audacious/ui_preferences.c:161
+msgid "Prevent clipping (recommended)"
+msgstr "Запобігати зрізанню (рекомендовано)"
 
-#: src/audacious/ui_preferences.c:160
-msgid "Amplify untagged files:"
-msgstr ""
+#: src/audacious/ui_preferences.c:163
+msgid "<b>Adjust Levels</b>"
+msgstr "<b>Регулювати рівні</b>"
 
 #: src/audacious/ui_preferences.c:164
-#, fuzzy
-msgid "<b>Replay Gain</b>"
-msgstr "<b>Ім'я файлу</b>"
+msgid "Amplify all files:"
+msgstr "Підсилювати всі файли:"
 
-#: src/audacious/ui_preferences.c:165
-#, fuzzy
-msgid "Enable Replay Gain"
-msgstr "Вмикнути підсилення програвання"
+#: src/audacious/ui_preferences.c:166 src/audacious/ui_preferences.c:169
+msgid "dB"
+msgstr "дБ"
 
 #: src/audacious/ui_preferences.c:167
-#, fuzzy
-msgid "<b>Mode</b>"
-msgstr "<b>Інформація про пісню та виконавця</b>"
-
-#: src/audacious/ui_preferences.c:168
-#, fuzzy
-msgid "Single track mode"
-msgstr "/Інформація про пісню"
-
-#: src/audacious/ui_preferences.c:170
-#, fuzzy
-msgid "Album mode"
-msgstr "Альбом"
+msgid "Amplify untagged files:"
+msgstr "Підсилювати непозначені файли:"
 
 #: src/audacious/ui_preferences.c:172
-#, fuzzy
-msgid "<b>Adjust Levels</b>"
-msgstr "<b>Колесо миші</b>"
+msgid "Proxy hostname:"
+msgstr "Адреса проксі-сервера:"
 
-#: src/audacious/ui_preferences.c:175
-#, fuzzy
-msgid "<b>Clipping Prevention</b>"
-msgstr "Конфігурація програвача компакт-дисків"
+#: src/audacious/ui_preferences.c:173
+msgid "Proxy port:"
+msgstr "Порт:"
 
 #: src/audacious/ui_preferences.c:176
-#, fuzzy
-msgid "Enable clipping prevention"
-msgstr "Дозволити попередження перескакування звуку"
-
-#: src/audacious/ui_preferences.c:180
-msgid "Proxy hostname:"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:181
-#, fuzzy
-msgid "Proxy port:"
-msgstr "Проксі:"
-
-#: src/audacious/ui_preferences.c:185
-#, fuzzy
 msgid "Proxy username:"
 msgstr "Ім'я користувача:"
 
-#: src/audacious/ui_preferences.c:186
-#, fuzzy
+#: src/audacious/ui_preferences.c:177
 msgid "Proxy password:"
 msgstr "Пароль:"
 
-#: src/audacious/ui_preferences.c:190
-#, fuzzy
+#: src/audacious/ui_preferences.c:181
 msgid "<b>Proxy Configuration</b>"
-msgstr "Конфігурація програвача компакт-дисків"
+msgstr "<b>Конфігурація проксі</b>"
 
-#: src/audacious/ui_preferences.c:191
+#: src/audacious/ui_preferences.c:182
 msgid "Enable proxy usage"
-msgstr ""
+msgstr "Використовувати проксі"
 
-#: src/audacious/ui_preferences.c:194
-#, fuzzy
+#: src/audacious/ui_preferences.c:185
 msgid "Use authentication with proxy"
-msgstr "Використовувати автентикацію"
+msgstr "Використовувати автентифікацію"
 
-#: src/audacious/ui_preferences.c:197
-msgid ""
-"<span size=\"small\">Changing these settings will require a restart of "
-"Audacious.</span>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:201
+#: src/audacious/ui_preferences.c:193
 msgid "Auto character encoding detector for:"
-msgstr ""
+msgstr "Автоматичне визначення кодування символів для:"
 
-#: src/audacious/ui_preferences.c:209
+#: src/audacious/ui_preferences.c:198
 msgid "Fallback character encodings:"
-msgstr ""
+msgstr "Стандартне кодування символів:"
+
+#: src/audacious/ui_preferences.c:202
+msgid "<b>Behavior</b>"
+msgstr "<b>Поведінка</b>"
+
+#: src/audacious/ui_preferences.c:203
+msgid "Continue playback on startup"
+msgstr "Продовжити відтворення під час запуску"
+
+#: src/audacious/ui_preferences.c:205
+msgid "Advance when the current song is deleted"
+msgstr "Заздалегідь, коли поточна пісня буде видалена"
+
+#: src/audacious/ui_preferences.c:207
+msgid "Clear the playlist when opening files"
+msgstr "Очищати список відтворення під час відкриття файлів"
 
 #: src/audacious/ui_preferences.c:209
-msgid ""
-"List of character encodings used for fall back conversion of metadata. If "
-"automatic character encoding detector failed or has been disabled, encodings "
-"in this list would be treated as candidates of the encoding of metadata, and "
-"fall back conversion from these encodings to UTF-8 would be attempted."
-msgstr ""
-
-#: src/audacious/ui_preferences.c:213
-#, fuzzy
-msgid "<b>Behavior</b>"
-msgstr "Бітова частота:"
-
-#: src/audacious/ui_preferences.c:214
-msgid "Continue playback on startup"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:216
-msgid "Advance when the current song is deleted"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:218
-#, fuzzy
-msgid "Clear the playlist when opening files"
-msgstr "/Сортувати список/За назвою"
-
-#: src/audacious/ui_preferences.c:220
-#, fuzzy
 msgid "Open files in a temporary playlist"
-msgstr "Не очищати список програвання"
+msgstr "Відкривати файли у тимчасовому списку відтворення"
 
-#: src/audacious/ui_preferences.c:222
+#: src/audacious/ui_preferences.c:211
 msgid "<b>Metadata</b>"
-msgstr "<b>Інформація про пісню та виконавця</b>"
+msgstr "<b>Метадані</b>"
 
-#: src/audacious/ui_preferences.c:501
+#: src/audacious/ui_preferences.c:212
+msgid "Do not load metadata for songs until played"
+msgstr "Не завантажувати метадані доріжок до відтворення"
+
+#: src/audacious/ui_preferences.c:230
+msgid "TITLE"
+msgstr "НАЗВА"
+
+#: src/audacious/ui_preferences.c:231
+msgid "ARTIST - TITLE"
+msgstr "ВИКОНАВЕЦЬ - НАЗВА"
+
+#: src/audacious/ui_preferences.c:232
+msgid "ARTIST - ALBUM - TITLE"
+msgstr "ВИКОНАВЕЦЬ - АЛЬБОМ - НАЗВА"
+
+#: src/audacious/ui_preferences.c:233
+msgid "ARTIST - ALBUM - TRACK. TITLE"
+msgstr "ВИКОНАВЕЦЬ - АЛЬБОМ - ДОРІЖКА. НАЗВА"
+
+#: src/audacious/ui_preferences.c:234
+msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
+msgstr "ВИКОНАВЕЦЬ [ АЛЬБОМ ] ДОРІЖКА. НАЗВА"
+
+#: src/audacious/ui_preferences.c:235
+msgid "ALBUM - TITLE"
+msgstr "АЛЬБОМ - НАЗВА"
+
+#: src/audacious/ui_preferences.c:556
 msgid "Category"
 msgstr "Категорія"
 
-#: src/audacious/ui_preferences.c:815
-#, fuzzy
+#: src/audacious/ui_preferences.c:780
 msgid "Popup Information Settings"
-msgstr "Конфігурація програвача компакт-дисків"
+msgstr "Налаштування спливаючої інформації"
 
-#: src/audacious/ui_preferences.c:824
+#: src/audacious/ui_preferences.c:789
 msgid "<b>Cover image retrieve</b>"
-msgstr ""
+msgstr "<b>Пошук обкладинки</b>"
 
-#: src/audacious/ui_preferences.c:829
+#: src/audacious/ui_preferences.c:794
 msgid ""
 "While searching for the album's cover, Audacious looks for certain words in "
 "the filename. You can specify those words in the lists below, separated "
 "using commas."
 msgstr ""
+"Під час пошуку обкладинки Audacious шукає певні слова в іменах файлів. Ви "
+"можете вказати ці слова у списку нижче, розділивши їх комами."
 
-#: src/audacious/ui_preferences.c:846
+#: src/audacious/ui_preferences.c:811
 msgid "Exclude:"
-msgstr ""
+msgstr "Включаючи:"
 
-#: src/audacious/ui_preferences.c:853
-#, fuzzy
+#: src/audacious/ui_preferences.c:818
 msgid "Include:"
-msgstr "Незалежні"
+msgstr "Виключаючи:"
 
-#: src/audacious/ui_preferences.c:870
+#: src/audacious/ui_preferences.c:835
 msgid "Recursively search for cover"
-msgstr ""
+msgstr "Рекурсивний пошук обкладинки"
 
-#: src/audacious/ui_preferences.c:880
+#: src/audacious/ui_preferences.c:845
 msgid "Search depth: "
-msgstr ""
+msgstr "Глибина пошуку:"
 
-#: src/audacious/ui_preferences.c:894
+#: src/audacious/ui_preferences.c:859
 msgid "Use per-file cover"
-msgstr ""
+msgstr "Шукати обкладинку для кожного файлу"
 
-#: src/audacious/ui_preferences.c:897
-#, fuzzy
+#: src/audacious/ui_preferences.c:862
 msgid "<b>Miscellaneous</b>"
-msgstr "<b>_Різне</b>"
+msgstr "<b>Різне</b>"
 
-#: src/audacious/ui_preferences.c:906
+#: src/audacious/ui_preferences.c:871
 msgid "Show Progress bar for the current track"
-msgstr ""
+msgstr "Показувати індикатор для поточної доріжки"
 
-#: src/audacious/ui_preferences.c:916
+#: src/audacious/ui_preferences.c:881
 msgid "Delay until filepopup comes up: "
-msgstr ""
+msgstr "Затримка до появи спливаючої інформації:"
 
-#: src/audacious/ui_preferences.c:1459
-#, fuzzy
-msgid "<b>Song Display</b>"
-msgstr "<b>Відображення назви пісни</b>"
-
-#: src/audacious/ui_preferences.c:1468
-msgid "Show song numbers"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1479
-msgid "Show leading zeroes (02:00 instead of 2:00)"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1501
-msgid "Show information about titlestring format"
-msgstr "Показати інформацію про рядок назви"
-
-#: src/audacious/ui_preferences.c:1514
-msgid "TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1515
-msgid "ARTIST - TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1516
-msgid "ARTIST - ALBUM - TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1517
-msgid "ARTIST - ALBUM - TRACK. TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1518
-msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1519
-msgid "ALBUM - TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1520
-#, fuzzy
+#: src/audacious/ui_preferences.c:1309
 msgid "Custom"
-msgstr "Особливий рядок:"
+msgstr "Власні налаштування"
 
-#: src/audacious/ui_preferences.c:1527
+#: src/audacious/ui_preferences.c:1352
+msgid "<b>Song Display</b>"
+msgstr "<b>Відображення пісні</b>"
+
+#: src/audacious/ui_preferences.c:1361
+msgid "Show song numbers"
+msgstr "Показувати номер пісні"
+
+#: src/audacious/ui_preferences.c:1372
+msgid "Show leading zeroes (02:00 instead of 2:00)"
+msgstr "Показувати нульові старші розряди (02:00 замість 2:00)"
+
+#: src/audacious/ui_preferences.c:1394
+msgid "Show information about titlestring format"
+msgstr "Показувати інформацію про формат назви"
+
+#: src/audacious/ui_preferences.c:1410
 msgid "Custom string:"
-msgstr "Особливий рядок:"
+msgstr "Власний формат:"
 
-#: src/audacious/ui_preferences.c:1534
+#: src/audacious/ui_preferences.c:1417
 msgid "Title format:"
 msgstr "Формат назви:"
 
-#: src/audacious/ui_preferences.c:1545
-#, fuzzy
+#: src/audacious/ui_preferences.c:1428
 msgid "<b>Popup Information</b>"
-msgstr "Конфігурація програвача компакт-дисків"
+msgstr "<b>Спливаюча інформація</b>"
 
-#: src/audacious/ui_preferences.c:1560
+#: src/audacious/ui_preferences.c:1443
 msgid "Show popup information for playlist entries"
-msgstr ""
+msgstr "Показувати спливаючу інформацію для доріжок списку відтворення"
 
-#: src/audacious/ui_preferences.c:1562
+#: src/audacious/ui_preferences.c:1444
 msgid ""
 "Toggles popup information window for the pointed entry in the playlist. The "
 "window shows title of song, name of album, genre, year of publish, track "
 "number, track length, and artwork."
 msgstr ""
+"Умикає спливаюче вікно з інформацією про вибрану доріжку у списку "
+"відтворення. Вікно містить назву пісні, альбому, жанр, рік, номер доріжки, "
+"тривалість пісні й обкладинку альбому."
 
-#: src/audacious/ui_preferences.c:1568
+#: src/audacious/ui_preferences.c:1455
 msgid "Edit settings for popup information"
-msgstr ""
+msgstr "Змінити налаштування спливаючої інформації"
 
-#: src/audacious/ui_preferences.c:1698
-#, fuzzy
-msgid "<b>Audio System</b>"
-msgstr "<b>Попередні установки</b>"
+#: src/audacious/ui_preferences.c:1544
+msgid "Output plugin:"
+msgstr "Модуль виведення:"
 
-#: src/audacious/ui_preferences.c:1715
-#, fuzzy
-msgid "Buffer size:"
-msgstr "Розмір буфера (кбайт):"
-
-#: src/audacious/ui_preferences.c:1734
-#, fuzzy
-msgid "Current output plugin:"
-msgstr "_Поточний модуль виводу звуку:"
-
-#: src/audacious/ui_preferences.c:1790
-#, fuzzy
+#: src/audacious/ui_preferences.c:1603
 msgid "Transport"
-msgstr "Перекладачі"
+msgstr "Засоби сполучення"
 
-#: src/audacious/ui_preferences.c:1790
+#: src/audacious/ui_preferences.c:1603
 msgid "Input"
-msgstr ""
+msgstr "Вхід"
 
-#: src/audacious/ui_preferences.c:1791
-#, fuzzy
+#: src/audacious/ui_preferences.c:1604
 msgid "Effect"
-msgstr "<b>Ефекти</b>"
+msgstr "Ефекти"
 
-#: src/audacious/ui_preferences.c:1791
-#, fuzzy
+#: src/audacious/ui_preferences.c:1604
 msgid "Visualization"
-msgstr "/Режим _візуалізації"
+msgstr "Визуализация"
 
-#: src/audacious/ui_preferences.c:1791
+#: src/audacious/ui_preferences.c:1604
 msgid "General"
-msgstr ""
+msgstr "Загальна"
 
-#: src/audacious/ui_preferences.c:1831
+#: src/audacious/ui_preferences.c:1644
 msgid "Audacious Preferences"
 msgstr "Налаштування Audacious"
 
-#: src/audacious/util.c:161
-#, fuzzy, c-format
+#: src/audacious/util.c:120
+#, c-format
 msgid "Could not create directory (%s): %s\n"
-msgstr "Не можу створити директорію (%s): %s"
+msgstr "Не можу створити директорію (%s): %s\n"
 
-#: src/audtool/handlers_playlist.c:248
+#: src/audtool/handlers_playlist.c:273
 msgid "Position not found."
-msgstr ""
+msgstr "Позицію не знайдено."
 
-#: src/audtool/handlers_vitals.c:64
+#: src/audtool/handlers_vitals.c:63
 msgid "No song playing."
-msgstr ""
+msgstr "Нічого не програється."
 
-#: src/libaudcore/tuple.c:685
+#: src/libaudcore/audstrings.c:199
+#, c-format
+msgid "Audio CD, track %s"
+msgstr "Звуковий CD, доріжка %s"
+
+#: src/libaudcore/tuple.c:536
 msgid "Mono"
 msgstr "Моно"
 
-#: src/libaudcore/tuple.c:687
-#, fuzzy
+#: src/libaudcore/tuple.c:538
 msgid "Stereo"
 msgstr "Стерео"
 
-#: src/libaudcore/tuple.c:689
-#, fuzzy, c-format
-msgid "%d channels"
-msgstr "Канали:"
+#: src/libaudcore/tuple.c:540
+#, c-format
+msgid "%d channel"
+msgid_plural "%d channels"
+msgstr[0] "%d канал"
+msgstr[1] "%d канали"
+msgstr[2] "%d каналів"
 
-#: src/libaudgui/confirm.c:65
+#: src/libaudgui/about.c:52 src/libaudgui/about.c:115
+msgid "Credits"
+msgstr "Автори"
+
+#: src/libaudgui/about.c:52
+msgid "Translators"
+msgstr "Перекладачі"
+
+#: src/libaudgui/about.c:91
+msgid "About Audacious"
+msgstr "Про Audacious"
+
+#: src/libaudgui/confirm.c:76
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
 "playlist was exported will be lost."
 msgstr ""
+"Ви впевнені, що хочете закрити %s? Якщо так, то всі зміни з моменту експорту"
+" списку відтворення будуть втрачені."
 
-#: src/libaudgui/confirm.c:77
-#, fuzzy
+#: src/libaudgui/confirm.c:89
 msgid "_Don't show this message again"
 msgstr "Більше не показувати це попередження"
 
-#: src/libaudgui/confirm.c:115
-#, fuzzy
+#: src/libaudgui/confirm.c:126
 msgid "Rename Playlist"
-msgstr "Зберегти список програвання"
+msgstr "Перейменувати список програвання"
 
-#: src/libaudgui/effects-menu.c:76
-#, fuzzy
+#: src/libaudgui/effects-menu.c:74
 msgid "settings ..."
-msgstr "Установки мікшера:"
+msgstr "налаштування ..."
 
-#: src/libaudgui/equalizer.c:68
-#, fuzzy
+#: src/libaudgui/equalizer.c:51
 msgid "_Enable"
-msgstr "Вмикнено"
+msgstr "Увімкнути"
 
-#: src/libaudgui/equalizer.c:140
+#: src/libaudgui/equalizer.c:123
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Гц"
 
-#: src/libaudgui/equalizer.c:140
+#: src/libaudgui/equalizer.c:123
 msgid "63 Hz"
-msgstr ""
+msgstr "63 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:124
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:124
 msgid "250 Hz"
-msgstr ""
+msgstr "250 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:124
 msgid "500 Hz"
-msgstr ""
+msgstr "500 Гц"
 
-#: src/libaudgui/equalizer.c:141
-#, fuzzy
+#: src/libaudgui/equalizer.c:124
 msgid "1 kHz"
-msgstr "1:1 (44 кГц)"
+msgstr "1 кГц"
 
-#: src/libaudgui/equalizer.c:141
-#, fuzzy
+#: src/libaudgui/equalizer.c:124
 msgid "2 kHz"
-msgstr "1:2 (22 кГц)"
+msgstr "2 кГц"
 
-#: src/libaudgui/equalizer.c:142
-#, fuzzy
+#: src/libaudgui/equalizer.c:125
 msgid "4 kHz"
-msgstr "1:1 (44 кГц)"
+msgstr "4 кГц"
 
-#: src/libaudgui/equalizer.c:142
-#, fuzzy
+#: src/libaudgui/equalizer.c:125
 msgid "8 kHz"
-msgstr "1:1 (44 кГц)"
+msgstr "8 кГц"
 
-#: src/libaudgui/equalizer.c:142
-#, fuzzy
+#: src/libaudgui/equalizer.c:125
 msgid "16 kHz"
-msgstr "1:1 (44 кГц)"
+msgstr "18 кГц"
 
-#: src/libaudgui/equalizer.c:147
+#: src/libaudgui/equalizer.c:130
 msgid "Equalizer"
 msgstr "Еквалайзер"
 
-#: src/libaudgui/equalizer.c:163
-#, fuzzy
+#: src/libaudgui/equalizer.c:146
 msgid "Preamp"
-msgstr "Мрія"
+msgstr ""
+"Попереднє\n"
+"підсилення"
 
-#: src/libaudgui/infopopup.c:249
-#, fuzzy
+#: src/libaudgui/infopopup.c:207
 msgid "Track Number"
 msgstr "Номер доріжкии"
 
-#: src/libaudgui/infopopup.c:251
-#, fuzzy
+#: src/libaudgui/infopopup.c:209
 msgid "Track Length"
-msgstr "Довжина доріжки:"
+msgstr "Довжина доріжки"
+
+#: src/libaudgui/infowin.c:75
+msgid "Acid Jazz"
+msgstr "Acid Jazz"
+
+#: src/libaudgui/infowin.c:76
+msgid "Acid Rock"
+msgstr "Acid Rock"
 
 #: src/libaudgui/infowin.c:77
-msgid "Acid Jazz"
-msgstr "Кислотний джаз"
-
-#: src/libaudgui/infowin.c:78
-#, fuzzy
-msgid "Acid Rock"
-msgstr "Тяжкий рок"
-
-#: src/libaudgui/infowin.c:79
 msgid "Ambient"
 msgstr "Ambient"
 
-#: src/libaudgui/infowin.c:80
-#, fuzzy
+#: src/libaudgui/infowin.c:78
 msgid "Bebop"
-msgstr "Бібоп"
+msgstr "Bebop"
+
+#: src/libaudgui/infowin.c:79
+msgid "Bluegrass"
+msgstr "Bluegrass"
+
+#: src/libaudgui/infowin.c:80
+msgid "Blues"
+msgstr "Blues"
 
 #: src/libaudgui/infowin.c:81
-msgid "Bluegrass"
-msgstr "Блакитна трава"
+msgid "Chamber Music"
+msgstr "Chamber Music"
 
 #: src/libaudgui/infowin.c:82
-#, fuzzy
-msgid "Blues"
-msgstr "Блюз"
+msgid "Classical"
+msgstr "Classical"
 
 #: src/libaudgui/infowin.c:83
-msgid "Chamber Music"
-msgstr "Камерна музика"
+msgid "Country"
+msgstr "Country"
 
 #: src/libaudgui/infowin.c:84
-msgid "Classical"
-msgstr "Класична"
+msgid "Death Metal"
+msgstr "Death Metal"
 
 #: src/libaudgui/infowin.c:85
-msgid "Country"
-msgstr "Кантрі"
+msgid "Disco"
+msgstr "Disco"
 
 #: src/libaudgui/infowin.c:86
-msgid "Death Metal"
-msgstr "Дез-метал"
+msgid "Easy Listening"
+msgstr "Easy Listening"
 
 #: src/libaudgui/infowin.c:87
-msgid "Disco"
-msgstr "Диско"
+msgid "Folk"
+msgstr "Folk"
 
 #: src/libaudgui/infowin.c:88
-msgid "Easy Listening"
-msgstr "Легка"
+msgid "Funk"
+msgstr "Funk"
 
 #: src/libaudgui/infowin.c:89
-msgid "Folk"
-msgstr "Фолк"
+msgid "Gangsta Rap"
+msgstr "Gangsta Rap"
 
 #: src/libaudgui/infowin.c:90
-msgid "Funk"
-msgstr "Фанк"
+msgid "Gospel"
+msgstr "Gospel"
 
 #: src/libaudgui/infowin.c:91
-msgid "Gangsta Rap"
-msgstr "Чорний реп"
+msgid "Grunge"
+msgstr "Grunge"
 
 #: src/libaudgui/infowin.c:92
-msgid "Gospel"
-msgstr "Псалм"
+msgid "Hard Rock"
+msgstr "Hard Rock"
 
 #: src/libaudgui/infowin.c:93
-msgid "Grunge"
-msgstr "Гранж"
+msgid "Heavy Metal"
+msgstr "Heavy Metal"
 
 #: src/libaudgui/infowin.c:94
-msgid "Hard Rock"
-msgstr "Тяжкий рок"
+msgid "Hip-hop"
+msgstr "Hip-hop"
 
 #: src/libaudgui/infowin.c:95
-msgid "Heavy Metal"
-msgstr "Тяжкий метал"
+msgid "House"
+msgstr "House"
 
 #: src/libaudgui/infowin.c:96
-#, fuzzy
-msgid "Hip-hop"
-msgstr "Хіп-Хоп"
+msgid "Jazz"
+msgstr "Jazz"
 
 #: src/libaudgui/infowin.c:97
-msgid "House"
-msgstr "Дім"
+msgid "Jungle"
+msgstr "Jungle"
 
 #: src/libaudgui/infowin.c:98
-msgid "Jazz"
-msgstr "Джаз"
+msgid "Metal"
+msgstr "Metal"
 
 #: src/libaudgui/infowin.c:99
-msgid "Jungle"
-msgstr "Джангл"
+msgid "New Age"
+msgstr "New Age"
 
 #: src/libaudgui/infowin.c:100
-msgid "Metal"
-msgstr "Метал"
+msgid "New Wave"
+msgstr "New Wave"
 
 #: src/libaudgui/infowin.c:101
-msgid "New Age"
-msgstr "Нью Ейдж"
+msgid "Noise"
+msgstr "Noise"
 
 #: src/libaudgui/infowin.c:102
-msgid "New Wave"
-msgstr "Нова хвиля"
+msgid "Pop"
+msgstr "Pop"
 
 #: src/libaudgui/infowin.c:103
-msgid "Noise"
-msgstr "Шум"
+msgid "Punk Rock"
+msgstr "Punk Rock"
 
 #: src/libaudgui/infowin.c:104
-msgid "Pop"
-msgstr "Поп"
+msgid "Rap"
+msgstr "Rap"
 
 #: src/libaudgui/infowin.c:105
-msgid "Punk Rock"
-msgstr "Панк-рок"
+msgid "Reggae"
+msgstr "Reggae"
 
 #: src/libaudgui/infowin.c:106
-msgid "Rap"
-msgstr "Реп"
+msgid "Rock"
+msgstr "Rock"
 
 #: src/libaudgui/infowin.c:107
-msgid "Reggae"
-msgstr "Реґґі"
+msgid "Rock and Roll"
+msgstr "Rock and Roll"
 
 #: src/libaudgui/infowin.c:108
-msgid "Rock"
-msgstr "Рок"
+msgid "Rhythm and Blues"
+msgstr "Rhythm and Blues"
 
 #: src/libaudgui/infowin.c:109
-#, fuzzy
-msgid "Rock and Roll"
-msgstr "Рок-н-рол"
+msgid "Ska"
+msgstr "Ska"
 
 #: src/libaudgui/infowin.c:110
-msgid "Rhythm and Blues"
-msgstr ""
+msgid "Soul"
+msgstr "Soul"
 
 #: src/libaudgui/infowin.c:111
-msgid "Ska"
-msgstr "Ска"
+msgid "Swing"
+msgstr "Swing"
 
 #: src/libaudgui/infowin.c:112
-msgid "Soul"
-msgstr "Душа"
+msgid "Techno"
+msgstr "Techno"
 
 #: src/libaudgui/infowin.c:113
-msgid "Swing"
-msgstr "Свінг"
-
-#: src/libaudgui/infowin.c:114
-msgid "Techno"
-msgstr "Техно"
-
-#: src/libaudgui/infowin.c:115
-#, fuzzy
 msgid "Trip-hop"
-msgstr "Тріп-Хоп"
+msgstr "Trip-hop"
 
-#: src/libaudgui/infowin.c:175 src/libaudgui/infowin.c:361
-#: src/libaudgui/infowin.c:364 src/libaudgui/infowin.c:367
-#, fuzzy
+#: src/libaudgui/infowin.c:177 src/libaudgui/infowin.c:363
+#: src/libaudgui/infowin.c:366 src/libaudgui/infowin.c:369
 msgid "<span size=\"small\">n/a</span>"
-msgstr "<span size=\"medium\"><b>Медіа</b></span>"
+msgstr "<span size=\"small\">невідомо</span>"
 
-#: src/libaudgui/infowin.c:265
+#: src/libaudgui/infowin.c:267
 msgid "Metadata updated successfully"
-msgstr ""
+msgstr "Метадані успішно оновлені"
 
-#: src/libaudgui/infowin.c:270
+#: src/libaudgui/infowin.c:272
 msgid "Metadata updating failed"
-msgstr ""
+msgstr "Не вдалося оновити метадані"
 
-#: src/libaudgui/infowin.c:318
-#, fuzzy
+#: src/libaudgui/infowin.c:320
 msgid "Track Information"
-msgstr "Підсилення доріжок:"
+msgstr "Інформація про доріжку"
 
-#: src/libaudgui/infowin.c:350
-#, fuzzy
+#: src/libaudgui/infowin.c:352
 msgid "<span size=\"small\">Format:</span>"
-msgstr "<span size=\"medium\"><b>Загальні</b></span>"
+msgstr "<span size=\"small\">Формат:</span>"
 
-#: src/libaudgui/infowin.c:354
-#, fuzzy
+#: src/libaudgui/infowin.c:356
 msgid "<span size=\"small\">Quality:</span>"
-msgstr "<span size=\"medium\"><b>Медіа</b></span>"
+msgstr "<span size=\"small\">Якість:</span>"
 
-#: src/libaudgui/infowin.c:357
-#, fuzzy
+#: src/libaudgui/infowin.c:359
 msgid "<span size=\"small\">Bitrate:</span>"
-msgstr "<span size=\"medium\"><b>Загальні</b></span>"
+msgstr "<span size=\"small\">Бітрейт:</span>"
 
-#: src/libaudgui/infowin.c:387
-#, fuzzy
+#: src/libaudgui/infowin.c:389
 msgid "<span size=\"small\">Title</span>"
-msgstr "<span size=\"medium\"><b>Медіа</b></span>"
+msgstr "<span size=\"small\">Назва</span>"
 
-#: src/libaudgui/infowin.c:399
-#, fuzzy
+#: src/libaudgui/infowin.c:401
 msgid "<span size=\"small\">Artist</span>"
-msgstr "<span size=\"medium\"><b>Вивід звуку</b></span>"
+msgstr "<span size=\"small\">Виконавець</span>"
 
-#: src/libaudgui/infowin.c:411
-#, fuzzy
+#: src/libaudgui/infowin.c:413
 msgid "<span size=\"small\">Album</span>"
-msgstr "<span size=\"medium\"><b>Вивід звуку</b></span>"
+msgstr "<span size=\"small\">Альбом</span>"
 
-#: src/libaudgui/infowin.c:423
-#, fuzzy
+#: src/libaudgui/infowin.c:425
 msgid "<span size=\"small\">Comment</span>"
-msgstr "<span size=\"medium\"><b>Загальні</b></span>"
+msgstr "<span size=\"small\">Коментар</span>"
 
-#: src/libaudgui/infowin.c:435
-#, fuzzy
+#: src/libaudgui/infowin.c:437
 msgid "<span size=\"small\">Genre</span>"
-msgstr "<span size=\"medium\"><b>Загальні</b></span>"
+msgstr "<span size=\"small\">Жанр</span>"
 
-#: src/libaudgui/infowin.c:456
-#, fuzzy
+#: src/libaudgui/infowin.c:458
 msgid "<span size=\"small\">Year</span>"
-msgstr "<span size=\"medium\"><b>Медіа</b></span>"
+msgstr "<span size=\"small\">Рік</span>"
 
-#: src/libaudgui/infowin.c:467
-#, fuzzy
+#: src/libaudgui/infowin.c:469
 msgid "<span size=\"small\">Track Number</span>"
-msgstr "<span size=\"medium\"><b>Загальні</b></span>"
+msgstr "<span size=\"small\">Номер доріжки</span>"
 
-#: src/libaudgui/infowin.c:549
-#, fuzzy, c-format
+#: src/libaudgui/infowin.c:548
+#, c-format
 msgid "%d kb/s"
-msgstr "%d кБіт/с"
+msgstr "%d кб/с"
 
-#: src/libaudgui/infowin.c:579
+#: src/libaudgui/infowin.c:575
 #, c-format
 msgid "No info available for %s.\n"
-msgstr ""
+msgstr "Інформація недоступна для %s.\n"
 
-#: src/libaudgui/ui_about.c:71
-msgid "About Audacious"
-msgstr "Про Audacious"
+#: src/libaudgui/jump-to-time.c:72
+msgid "Jump to Time"
+msgstr "Перейти до часу"
 
-#: src/libaudgui/ui_about.c:93 src/libaudgui/ui_credits.c:122
-msgid "Credits"
-msgstr "Автори"
+#: src/libaudgui/jump-to-time.c:87
+msgid "mm:ss"
+msgstr "хх:сс"
 
-#: src/libaudgui/ui_credits.c:126
-msgid "Translators"
-msgstr "Перекладачі"
+#: src/libaudgui/playlists.c:33
+msgid "Export Playlist"
+msgstr "Експортувати список відтворення"
 
-#: src/libaudgui/ui_fileopener.c:108
+#: src/libaudgui/playlists.c:33
+msgid "Import Playlist"
+msgstr "Імпортувати список відтворення"
+
+#: src/libaudgui/playlists.c:66
+#, c-format
+msgid "Overwrite %s?"
+msgstr "Перезаписати %s?"
+
+#: src/libaudgui/queue-manager.c:196
+msgid "Queue Manager"
+msgstr "Керування чергою"
+
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Open Files"
 msgstr "Відкрити файли"
 
-#: src/libaudgui/ui_fileopener.c:108
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Add Files"
 msgstr "Додати файли"
 
-#: src/libaudgui/ui_fileopener.c:110
+#: src/libaudgui/ui_fileopener.c:111
 msgid "Close dialog on Open"
 msgstr "Закрити вікно після відкриття"
 
-#: src/libaudgui/ui_fileopener.c:110
+#: src/libaudgui/ui_fileopener.c:111
 msgid "Close dialog on Add"
 msgstr "Закрити вікно після додавання"
 
-#: src/libaudgui/ui_jumptotrack.c:133
-msgid "Un_queue"
-msgstr "В_илучити зі списку"
-
-#: src/libaudgui/ui_jumptotrack.c:135 src/libaudgui/ui_jumptotrack.c:512
+#: src/libaudgui/ui_jumptotrack.c:109 src/libaudgui/ui_jumptotrack.c:117
+#: src/libaudgui/ui_jumptotrack.c:326
 msgid "_Queue"
 msgstr "_Додати до списку"
 
-#: src/libaudgui/ui_jumptotrack.c:399
-msgid "Jump to Track"
+#: src/libaudgui/ui_jumptotrack.c:115
+msgid "Un_queue"
+msgstr "В_илучити зі списку"
+
+#: src/libaudgui/ui_jumptotrack.c:258
+msgid "Jump to Song"
 msgstr "Перейти до доріжки"
 
-#: src/libaudgui/ui_jumptotrack.c:442
+#: src/libaudgui/ui_jumptotrack.c:281
 msgid "Filter: "
 msgstr "Фільтр: "
 
-#: src/libaudgui/ui_jumptotrack.c:443
-#, fuzzy
+#: src/libaudgui/ui_jumptotrack.c:282
 msgid "_Filter:"
-msgstr "Фільтр: "
+msgstr "_Фільтр: "
 
-#: src/libaudgui/ui_jumptotrack.c:461
+#: src/libaudgui/ui_jumptotrack.c:292
 msgid "Remember"
-msgstr ""
+msgstr "Запам'ятати"
 
-#: src/libaudgui/ui_jumptotrack.c:470
-#, fuzzy
+#: src/libaudgui/ui_jumptotrack.c:299
 msgid "Clea_r"
-msgstr "/Очистити чергу"
+msgstr "Очистити"
 
-#: src/libaudgui/ui_jumptotrack.c:504
-#, fuzzy
+#: src/libaudgui/ui_jumptotrack.c:319
 msgid "Close on Jump"
-msgstr "Закрити вікно після відкриття"
+msgstr "Закрити після переходу"
 
-#: src/libaudgui/ui_playlist_manager.c:185
-#, fuzzy
+#: src/libaudgui/ui_playlist_manager.c:253
 msgid "Playlist Manager"
-msgstr "/Не просуватись у списку пісень"
+msgstr "Менеджер списків"
 
-#: src/libaudgui/ui_playlist_manager.c:209
+#: src/libaudgui/ui_playlist_manager.c:280
 msgid "Entries"
-msgstr ""
+msgstr "Елементи"
 
-#: src/libaudgui/ui_playlist_manager.c:227
-#, fuzzy
+#: src/libaudgui/ui_playlist_manager.c:301
 msgid "_Rename"
-msgstr "Ім'я файлу"
+msgstr "Перейменувати"
 
-#: src/libaudgui/ui_playlist_manager.c:251
-#, fuzzy
+#: src/libaudgui/ui_playlist_manager.c:325
 msgid "_Close dialog on activating playlist"
-msgstr "Закрити вікно після відкриття"
+msgstr "Закрити вікно після вибору списку"
 
-#: src/libaudgui/ui_urlopener.c:58
+#: src/libaudgui/ui_urlopener.c:48
 msgid "Open URL"
-msgstr ""
+msgstr "Відкрити адресу"
 
-#: src/libaudgui/ui_urlopener.c:58
+#: src/libaudgui/ui_urlopener.c:48
 msgid "Add URL"
+msgstr "Додати адресу"
+
+#: src/libaudgui/util.c:95
+msgid ""
+"\n"
+"(Further messages have been hidden.)"
 msgstr ""
+"\n"
+"(Наступні повідомлення були приховані.)"
 
 #: src/libeggsmclient/eggdesktopfile.c:165
 msgid "File is not a valid .desktop file"
-msgstr ""
+msgstr "Файл не є коректним файлом .desktop "
 
-#: src/libeggsmclient/eggdesktopfile.c:188
-#, fuzzy, c-format
+#: src/libeggsmclient/eggdesktopfile.c:191
+#, c-format
 msgid "Unrecognized desktop file Version '%s'"
-msgstr "%s: не розпізнано параметру `--%s'\n"
+msgstr "Невідома версія desktop файлу '%s'"
 
-#: src/libeggsmclient/eggdesktopfile.c:968
-#, fuzzy, c-format
+#: src/libeggsmclient/eggdesktopfile.c:974
+#, c-format
 msgid "Starting %s"
-msgstr "Італійський:"
+msgstr "Запускається %s"
 
-#: src/libeggsmclient/eggdesktopfile.c:1110
+#: src/libeggsmclient/eggdesktopfile.c:1116
 msgid "Application does not accept documents on command line"
-msgstr ""
+msgstr "Програма підтримує передачу імені документу через командний рядок"
 
-#: src/libeggsmclient/eggdesktopfile.c:1178
-#, fuzzy, c-format
+#: src/libeggsmclient/eggdesktopfile.c:1184
+#, c-format
 msgid "Unrecognized launch option: %d"
-msgstr "%s: не розпізнано параметру `--%s'\n"
+msgstr "Невідомий параметр запуску: %d"
 
-#: src/libeggsmclient/eggdesktopfile.c:1383
+#: src/libeggsmclient/eggdesktopfile.c:1391
 msgid "Can't pass document URIs to a 'Type=Link' desktop entry"
 msgstr ""
+"Не можу передати URI документа з допомогою запису 'Type = Link' у файлі "
+".desktop"
 
-#: src/libeggsmclient/eggdesktopfile.c:1404
+#: src/libeggsmclient/eggdesktopfile.c:1412
 msgid "Not a launchable item"
-msgstr ""
+msgstr "Елемент не запускається"
 
 #: src/libeggsmclient/eggsmclient.c:226
 msgid "Disable connection to session manager"
-msgstr ""
+msgstr "Вимкнути підключення до менеджера сесій"
 
 #: src/libeggsmclient/eggsmclient.c:229
 msgid "Specify file containing saved configuration"
-msgstr ""
+msgstr "Вкажіть файл, що містить збережену конфігурацю"
 
 #: src/libeggsmclient/eggsmclient.c:229
 msgid "FILE"
-msgstr ""
+msgstr "ФАЙЛ"
 
 #: src/libeggsmclient/eggsmclient.c:232
 msgid "Specify session management ID"
-msgstr ""
+msgstr "Вказати ідентифікатор сесії"
 
 #: src/libeggsmclient/eggsmclient.c:232
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: src/libeggsmclient/eggsmclient.c:253
 msgid "Session management options:"
-msgstr ""
+msgstr "Параметри керування сеансами:"
 
 #: src/libeggsmclient/eggsmclient.c:254
 msgid "Show session management options"
-msgstr ""
+msgstr "Показати параметри керування сеансами"
 
-#, fuzzy
-#~ msgid "%s: Unable to open display, exiting.\n"
-#~ msgstr "audacious: Не можу відкрити екран для показу, вихід.\n"
 
-#, fuzzy
-#~ msgid "Preamp:"
-#~ msgstr "Мрія"
-
-#, fuzzy
-#~ msgid "Default gain:"
-#~ msgstr "Основний (%s)"
-
-#, fuzzy
-#~ msgid "<b>Replay Gain configuration</b>"
-#~ msgstr "Конфігурація програвача компакт-дисків"
-
-#, fuzzy
-#~ msgid "Track gain/peak"
-#~ msgstr "Піковий рівень доріжок:"
-
-#, fuzzy
-#~ msgid "Album gain/peak"
-#~ msgstr "Підсилення альбома:"
-
-#~ msgid "Classic Rock"
-#~ msgstr "Класичний рок"
-
-#~ msgid "Dance"
-#~ msgstr "Танцювальна"
-
-#~ msgid "Oldies"
-#~ msgstr "Ретро"
-
-#~ msgid "Other"
-#~ msgstr "Інші"
-
-#~ msgid "R&B"
-#~ msgstr "Ритм-н-блюз"
-
-#~ msgid "Industrial"
-#~ msgstr "Індустріальний"
-
-#~ msgid "Alternative"
-#~ msgstr "Альтернативна"
-
-#, fuzzy
-#~ msgid "Pranks"
-#~ msgstr "Pranks"
-
-#~ msgid "Soundtrack"
-#~ msgstr "Звукова доріжка"
-
-#~ msgid "Euro-Techno"
-#~ msgstr "Євро-техно"
-
-#~ msgid "Vocal"
-#~ msgstr "Вокал"
-
-#~ msgid "Jazz+Funk"
-#~ msgstr "Джаз+Фанк"
-
-#~ msgid "Fusion"
-#~ msgstr "Ф'южн"
-
-#~ msgid "Trance"
-#~ msgstr "Транс"
-
-#~ msgid "Instrumental"
-#~ msgstr "Інструментальна"
-
-#~ msgid "Acid"
-#~ msgstr "Кислота"
-
-#~ msgid "Game"
-#~ msgstr "Гра"
-
-#~ msgid "Sound Clip"
-#~ msgstr "Звуковий кліп"
-
-#~ msgid "AlternRock"
-#~ msgstr "Альтернативний рок"
-
-#, fuzzy
-#~ msgid "Bass"
-#~ msgstr "Бас"
-
-#~ msgid "Punk"
-#~ msgstr "Панк"
-
-#~ msgid "Space"
-#~ msgstr "Космічна"
-
-#~ msgid "Meditative"
-#~ msgstr "Медитація"
-
-#~ msgid "Instrumental Pop"
-#~ msgstr "Інструментальний поп"
-
-#~ msgid "Instrumental Rock"
-#~ msgstr "Інструментальний рок"
-
-#~ msgid "Ethnic"
-#~ msgstr "Етнічна"
-
-#~ msgid "Gothic"
-#~ msgstr "Готична"
-
-#~ msgid "Darkwave"
-#~ msgstr "Чорна хвиля"
-
-#~ msgid "Techno-Industrial"
-#~ msgstr "Техно-індустріальна"
-
-#~ msgid "Electronic"
-#~ msgstr "Електронна"
-
-#~ msgid "Pop-Folk"
-#~ msgstr "Поп-фолк"
-
-#~ msgid "Eurodance"
-#~ msgstr "Євроданс"
-
-#~ msgid "Dream"
-#~ msgstr "Мрія"
-
-#~ msgid "Southern Rock"
-#~ msgstr "Південний рок"
-
-#~ msgid "Comedy"
-#~ msgstr "Комедійна"
-
-#~ msgid "Cult"
-#~ msgstr "Культова"
-
-#~ msgid "Top 40"
-#~ msgstr "40 найкращих"
-
-#~ msgid "Christian Rap"
-#~ msgstr "Християнський реп"
-
-#~ msgid "Pop/Funk"
-#~ msgstr "Поп/Фанк"
-
-#~ msgid "Native American"
-#~ msgstr "Американська аборигенська"
-
-#~ msgid "Cabaret"
-#~ msgstr "Кабаре"
-
-#~ msgid "Psychedelic"
-#~ msgstr "Психоделічна"
-
-#~ msgid "Rave"
-#~ msgstr "Рейв"
-
-#, fuzzy
-#~ msgid "Showtunes"
-#~ msgstr "Імпровізація"
-
-#~ msgid "Trailer"
-#~ msgstr "Анонс"
-
-#~ msgid "Lo-Fi"
-#~ msgstr "Lo-Fi"
-
-#~ msgid "Tribal"
-#~ msgstr "Племінна"
-
-#~ msgid "Acid Punk"
-#~ msgstr "Кислотний панк"
-
-#~ msgid "Polka"
-#~ msgstr "Полька"
-
-#, fuzzy
-#~ msgid "Retro"
-#~ msgstr "Ретро"
-
-#~ msgid "Musical"
-#~ msgstr "Музична"
-
-#~ msgid "Folk/Rock"
-#~ msgstr "Фолк/Рок"
-
-#~ msgid "National Folk"
-#~ msgstr "Національний фолк"
-
-#~ msgid "Fast-Fusion"
-#~ msgstr "Швидкий фьюжн"
-
-#~ msgid "Latin"
-#~ msgstr "Латиноамериканська"
-
-#~ msgid "Revival"
-#~ msgstr "Відродження"
-
-#~ msgid "Celtic"
-#~ msgstr "Кельтська"
-
-#~ msgid "Avantgarde"
-#~ msgstr "Авангард"
-
-#~ msgid "Gothic Rock"
-#~ msgstr "Готичний рок"
-
-#~ msgid "Progressive Rock"
-#~ msgstr "Прогресивний рок"
-
-#~ msgid "Psychedelic Rock"
-#~ msgstr "Психоделічний рок"
-
-#~ msgid "Symphonic Rock"
-#~ msgstr "Симфонічний рок"
-
-#~ msgid "Slow Rock"
-#~ msgstr "Повільний рок"
-
-#~ msgid "Big Band"
-#~ msgstr "Біґ-бенд"
-
-#~ msgid "Chorus"
-#~ msgstr "Хор"
-
-#~ msgid "Acoustic"
-#~ msgstr "Акустична"
-
-#~ msgid "Humour"
-#~ msgstr "Гумор"
-
-#~ msgid "Speech"
-#~ msgstr "Промова"
-
-#~ msgid "Chanson"
-#~ msgstr "Шансон"
-
-#~ msgid "Opera"
-#~ msgstr "Опера"
-
-#~ msgid "Sonata"
-#~ msgstr "Соната"
-
-#~ msgid "Symphony"
-#~ msgstr "Симфонія"
-
-#~ msgid "Booty Bass"
-#~ msgstr "Booty Bass"
-
-#~ msgid "Primus"
-#~ msgstr "Прима"
-
-#~ msgid "Porn Groove"
-#~ msgstr "Порн грув"
-
-#, fuzzy
-#~ msgid "Satire"
-#~ msgstr "Стерео"
-
-#~ msgid "Slow Jam"
-#~ msgstr "Повільний джем"
-
-#~ msgid "Club"
-#~ msgstr "Клуб"
-
-#~ msgid "Tango"
-#~ msgstr "Танґо"
-
-#~ msgid "Samba"
-#~ msgstr "Самба"
-
-#~ msgid "Folklore"
-#~ msgstr "Фольклор"
-
-#~ msgid "Ballad"
-#~ msgstr "Балада"
-
-#~ msgid "Power Ballad"
-#~ msgstr "Потужна балада"
-
-#~ msgid "Rhythmic Soul"
-#~ msgstr "Ритмічний соул"
-
-#~ msgid "Freestyle"
-#~ msgstr "Вільний стиль"
-
-#~ msgid "Duet"
-#~ msgstr "Дует"
-
-#~ msgid "Drum Solo"
-#~ msgstr "Соло на ударних"
-
-#~ msgid "A Cappella"
-#~ msgstr "Акапелла"
-
-#~ msgid "Euro-House"
-#~ msgstr "Евро-дім"
-
-#~ msgid "Dance Hall"
-#~ msgstr "Танцювальний зал"
-
-#~ msgid "Goa"
-#~ msgstr "Гоа"
-
-#~ msgid "Drum & Bass"
-#~ msgstr "Ударні та бас"
-
-#~ msgid "Club-House"
-#~ msgstr "Клуб-дім"
-
-#~ msgid "Hardcore"
-#~ msgstr "Нардкор"
-
-#~ msgid "Terror"
-#~ msgstr "Терор"
-
-#~ msgid "Indie"
-#~ msgstr "Незалежні"
-
-#~ msgid "BritPop"
-#~ msgstr "Британський поп"
-
-#~ msgid "Negerpunk"
-#~ msgstr "Чорний панк"
-
-#~ msgid "Polsk Punk"
-#~ msgstr "Польский панк"
-
-#~ msgid "Beat"
-#~ msgstr "Біт"
-
-#~ msgid "Christian Gangsta Rap"
-#~ msgstr "Чорний християнський реп"
-
-#~ msgid "Black Metal"
-#~ msgstr "Чорний метал"
-
-#~ msgid "Crossover"
-#~ msgstr "Перехідний"
-
-#~ msgid "Contemporary Christian"
-#~ msgstr "Сучасна християнська"
-
-#~ msgid "Christian Rock"
-#~ msgstr "Християнський рок"
-
-#~ msgid "Merengue"
-#~ msgstr "Меренга"
-
-#~ msgid "Salsa"
-#~ msgstr "Сальса"
-
-#~ msgid "Thrash Metal"
-#~ msgstr "Треш метал"
-
-#~ msgid "Anime"
-#~ msgstr "Мультиплікація"
-
-#~ msgid "JPop"
-#~ msgstr "Японський поп"
-
-#~ msgid "Synthpop"
-#~ msgstr "Електронний поп"
-
-#, fuzzy
-#~ msgid ""
-#~ "<big><b>Audacious %s</b></big>\n"
-#~ "An audio player for many platforms.\n"
-#~ "Copyright (C) 2005-2011 Audacious Development Team"
-#~ msgstr ""
-#~ "<big><b>Beep Media Player %s</b></big>\n"
-#~ "Мультимедійний програвач на основі  BMP та XMMS\n"
-#~ "\n"
-#~ "Copyright (C) 2005 Команда розробників Audacious\n"
-
-#~ msgid "Unable to create log file (%s)!\n"
-#~ msgstr "Не можу створити файл журналу (%s)!\n"
-
-#, fuzzy
-#~ msgid "Playback"
-#~ msgstr "/_Програвання"
-
-#~ msgid "<b>Playback</b>"
-#~ msgstr "<b>Відтворення</b>"
-
-#~ msgid "Don't advance in the playlist"
-#~ msgstr "Не просуватись в списку програвання"
-
-#~ msgid ""
-#~ "When finished playing a song, don't automatically advance to the next."
-#~ msgstr ""
-#~ "По завершенню програвання пісні, не пересуватись автоматично до наступної."
-
-#~ msgid "Enabled"
-#~ msgstr "Вмикнено"
-
-#~ msgid "Description"
-#~ msgstr "Опис"
-
-#, fuzzy
-#~ msgid "Output Plugin Preferences"
-#~ msgstr "Модуль виводу звуку OSS"
-
-#, fuzzy
-#~ msgid "Output Plugin Information"
-#~ msgstr "Конфіґурація модуля виводу ESD"
-
-#, fuzzy
-#~ msgid "_Decoder list:"
-#~ msgstr "Декодування"
-
-#, fuzzy
-#~ msgid "<span size=\"medium\"><b>Decoders</b></span>"
-#~ msgstr "<span size=\"medium\"><b>Загальні</b></span>"
-
-#~ msgid "_General plugin list:"
-#~ msgstr "_Список модулів загального призначення:"
-
-#~ msgid "<span size=\"medium\"><b>General</b></span>"
-#~ msgstr "<span size=\"medium\"><b>Загальні</b></span>"
-
-#~ msgid "_Visualization plugin list:"
-#~ msgstr "Список модулів _візуалізації:"
-
-#~ msgid "<b>Visualization</b>"
-#~ msgstr "<b>Візуалізація</b>"
-
-#, fuzzy
-#~ msgid "Effect plugins:"
-#~ msgstr "Список модулів _ефектів:"
-
-#~ msgid "<b>Effects</b>"
-#~ msgstr "<b>Ефекти</b>"
-
-#, fuzzy
-#~ msgid "<span size=\"small\">General</span>"
-#~ msgstr "<span size=\"medium\"><b>Загальні</b></span>"
-
-#, fuzzy
-#~ msgid "<span size=\"small\">Location</span>"
-#~ msgstr "<span size=\"xx-large\"><b>Миша</b></span>"
-
-#, fuzzy
-#~ msgid "<span size=\"small\">Raw Metadata</span>"
-#~ msgstr "<span size=\"medium\"><b>Медіа</b></span>"
-
-#, fuzzy
-#~ msgid "Value"
-#~ msgstr "Блюз"
-
-#, fuzzy
-#~ msgid "3 kHz"
-#~ msgstr "1:1 (44 кГц)"
-
-#, fuzzy
-#~ msgid "6 kHz"
-#~ msgstr "1:1 (44 кГц)"
-
-#, fuzzy
-#~ msgid ""
-#~ "Available interfaces:\n"
-#~ "\n"
-#~ msgstr "Доступні _попередні установки:"
-
-#, fuzzy
-#~ msgid "Available Plugin Preferences:\n"
-#~ msgstr "Доступні _попередні установки:"
-
-#, fuzzy
-#~ msgid "Add/Open URL Dialog"
-#~ msgstr "Вікно додавання файлів"
-
-#~ msgid "Don't clear the playlist"
-#~ msgstr "Не очищати список програвання"
-
-#~ msgid "Filename:"
-#~ msgstr "Ім'я файлу:"
-
-#~ msgid "No input plugin recognized this file"
-#~ msgstr "Жоден модуль вводу не розпізнає цей файл"
-
-#~ msgid "Input plugin: %s"
-#~ msgstr "Модуль вводу: %s"
-
-#, fuzzy
-#~ msgid "ZOH Interpolation"
-#~ msgstr "Використовувати автентикацію"
-
-#, fuzzy
-#~ msgid "Linear Interpolation"
-#~ msgstr "Використовувати автентикацію"
-
-#, fuzzy
-#~ msgid "Sampling Rate [Hz]:"
-#~ msgstr "Частота:"
-
-#, fuzzy
-#~ msgid "Interpolation Engine:"
-#~ msgstr "Використовувати автентикацію"
-
-#, fuzzy
-#~ msgid "Detect file formats by extension."
-#~ msgstr "Не позбавляти файли розширення"
-
-#, fuzzy
-#~ msgid "<b>Sampling Rate Converter</b>"
-#~ msgstr "Частота:"
-
-#, fuzzy
-#~ msgid "Enable Sampling Rate Converter"
-#~ msgstr "Частота:"
-
-#, fuzzy
-#~ msgid "<b>Advanced</b>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid ""
-#~ "<big><b>Audacious %s</b></big>\n"
-#~ "\n"
-#~ "Copyright (C) 2005-2009 Audacious Development Team"
-#~ msgstr ""
-#~ "<big><b>Beep Media Player %s</b></big>\n"
-#~ "Мультимедійний програвач на основі  BMP та XMMS\n"
-#~ "\n"
-#~ "Copyright (C) 2005 Команда розробників Audacious\n"
-
-#~ msgid "Load metadata from playlists and files"
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісні з музичних файлів і списків програвання"
-
-#~ msgid "Load metadata (tag information) from music files."
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісню та виконавця (інформаційний тег) з "
-#~ "музичних файлів."
-
-#~ msgid "Jump to Time"
-#~ msgstr "Перейти до часу"
-
-#~ msgid "minutes:seconds"
-#~ msgstr "хвилин:секунд"
-
-#~ msgid "Track length:"
-#~ msgstr "Довжина доріжки:"
-
-#, fuzzy
-#~ msgid "Save as Static Playlist"
-#~ msgstr "Зберегти список програвання"
-
-#~ msgid "Error writing playlist \"%s\": %s"
-#~ msgstr "Помилка при записі списку програвання \"%s\": %s"
-
-#~ msgid "%s already exist. Continue?"
-#~ msgstr "%s вже існує. Продовжити?"
-
-#, fuzzy
-#~ msgid ""
-#~ "<b><big>Unable to save playlist.</big></b>\n"
-#~ "\n"
-#~ "Unknown file type for '%s'.\n"
-#~ msgstr ""
-#~ "<b><big>Не можу зберегти список програвання.</big></b>\n"
-#~ "\n"
-
-#~ msgid "Presets"
-#~ msgstr "Попередні установки"
-
-#~ msgid "Mouse"
-#~ msgstr "Миша"
-
-#~ msgid "Pause between songs"
-#~ msgstr "Пауза між піснями"
-
-#~ msgid "Pause for"
-#~ msgstr "Призупиняти на"
-
-#~ msgid "seconds"
-#~ msgstr "секунд"
-
-#~ msgid "<b>Filename</b>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#~ msgid "Convert underscores to blanks"
-#~ msgstr "Перетворювати підкреслення в пробіл"
-
-#~ msgid "Convert %20 to blanks"
-#~ msgstr "Перетворювати %20 в пробіл"
-
-#, fuzzy
-#~ msgid "<b>File Dialog</b>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#~ msgid "Changes volume by"
-#~ msgstr "Змінює гучність на"
-
-#~ msgid "percent"
-#~ msgstr "відсотків"
-
-#~ msgid "Scrolls playlist by"
-#~ msgstr "Поворот колеса миші прокручує список програвання на"
-
-#~ msgid "lines"
-#~ msgstr "рядків"
-
-#, fuzzy
-#~ msgid "Stop after Current Song"
-#~ msgstr "Зупинити поточну пісню"
-
-#, fuzzy
-#~ msgid "Peaks"
-#~ msgstr "Pranks"
-
-#, fuzzy
-#~ msgid "Repeat"
-#~ msgstr "/Повторювати"
-
-#, fuzzy
-#~ msgid "Shuffle"
-#~ msgstr "/Випадково"
-
-#, fuzzy
-#~ msgid "No Playlist Advance"
-#~ msgstr "/Не просуватись у списку пісень"
-
-#, fuzzy
-#~ msgid "Play"
-#~ msgstr "/Грати"
-
-#, fuzzy
-#~ msgid "Pause"
-#~ msgstr "/Призупинити"
-
-#, fuzzy
-#~ msgid "Stop"
-#~ msgstr "/Зупинити"
-
-#, fuzzy
-#~ msgid "Previous"
-#~ msgstr "/Попередня пісня"
-
-#, fuzzy
-#~ msgid "Next"
-#~ msgstr "/Наступна пісня"
-
-#, fuzzy
-#~ msgid "Visualization Mode"
-#~ msgstr "/Режим візуалізації"
-
-#, fuzzy
-#~ msgid "Analyzer Mode"
-#~ msgstr "/Режим аналізатора/Полум'я"
-
-#, fuzzy
-#~ msgid "Scope Mode"
-#~ msgstr "/Режим графіка"
-
-#, fuzzy
-#~ msgid "Voiceprint Mode"
-#~ msgstr "/Режим аналізатора/Полум'я"
-
-#, fuzzy
-#~ msgid "WindowShade VU Mode"
-#~ msgstr "/При мінімізованому вікні"
-
-#, fuzzy
-#~ msgid "Refresh Rate"
-#~ msgstr "/Частота поновлення"
-
-#, fuzzy
-#~ msgid "Analyzer Falloff"
-#~ msgstr "/Падіння аналізатора"
-
-#, fuzzy
-#~ msgid "Peaks Falloff"
-#~ msgstr "/Падіння піків"
-
-#, fuzzy
-#~ msgid "New Playlist"
-#~ msgstr "Зберегти список програвання"
-
-#, fuzzy
-#~ msgid "Select Next Playlist"
-#~ msgstr "Вибір шрифту для списку програвання"
-
-#, fuzzy
-#~ msgid "Select Previous Playlist"
-#~ msgstr "/Сортувати вибране/За назвою"
-
-#, fuzzy
-#~ msgid "Delete Playlist"
-#~ msgstr "Вибір шрифту для списку програвання"
-
-#, fuzzy
-#~ msgid "Load List"
-#~ msgstr "/Сортувати список"
-
-#, fuzzy
-#~ msgid "Loads a playlist file into the selected playlist."
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісню та виконавця при відображенні файлу в "
-#~ "списку програвання"
-
-#, fuzzy
-#~ msgid "Save List"
-#~ msgstr "/Новий список"
-
-#, fuzzy
-#~ msgid "Saves the selected playlist."
-#~ msgstr "Вибір шрифту для списку програвання"
-
-#, fuzzy
-#~ msgid "Save Default List"
-#~ msgstr "/Зберегти/Стандартні "
-
-#, fuzzy
-#~ msgid "Saves the selected playlist to the default location."
-#~ msgstr "Вибір шрифту для списку програвання"
-
-#, fuzzy
-#~ msgid "Refresh List"
-#~ msgstr "/Частота поновлення"
-
-#, fuzzy
-#~ msgid "List Manager"
-#~ msgstr "/Не просуватись у списку пісень"
-
-#, fuzzy
-#~ msgid "Opens the playlist manager."
-#~ msgstr "Не очищати список програвання"
-
-#, fuzzy
-#~ msgid "View"
-#~ msgstr "/Вигляд"
-
-#, fuzzy
-#~ msgid "Add Internet Address..."
-#~ msgstr "/Додати адресу інтернет..."
-
-#, fuzzy
-#~ msgid "Adds a remote track to the playlist."
-#~ msgstr "Не очищати список програвання"
-
-#, fuzzy
-#~ msgid "Add Files..."
-#~ msgstr "/Додати файли..."
-
-#, fuzzy
-#~ msgid "Search and Select"
-#~ msgstr "/Сортувати вибране"
-
-#, fuzzy
-#~ msgid "Invert Selection"
-#~ msgstr "/Інвертувати вибране"
-
-#, fuzzy
-#~ msgid "Inverts the selected and unselected entries."
-#~ msgstr "Вибір шрифту для списку програвання"
-
-#~ msgid "Select All"
-#~ msgstr "Вибрати все"
-
-#, fuzzy
-#~ msgid "Select None"
-#~ msgstr "/Сортувати вибране"
-
-#, fuzzy
-#~ msgid "Deselects all of the playlist entries."
-#~ msgstr "Не очищати список програвання"
-
-#, fuzzy
-#~ msgid "Remove All"
-#~ msgstr "/Видалити все"
-
-#, fuzzy
-#~ msgid "Removes all entries from the playlist."
-#~ msgstr "/Видалити недоступні файли"
-
-#, fuzzy
-#~ msgid "Clear Queue"
-#~ msgstr "/Очистити чергу"
-
-#, fuzzy
-#~ msgid "Clears the queue associated with this playlist."
-#~ msgstr "Вибір шрифту для списку програвання"
-
-#, fuzzy
-#~ msgid "Remove Unavailable Files"
-#~ msgstr "/Видалити недоступні файли"
-
-#, fuzzy
-#~ msgid "Removes unavailable files from the playlist."
-#~ msgstr "/Видалити недоступні файли"
-
-#, fuzzy
-#~ msgid "Remove Duplicates"
-#~ msgstr "/Видалити вибране"
-
-#, fuzzy
-#~ msgid "By Title"
-#~ msgstr "Заголовок"
-
-#, fuzzy
-#~ msgid "Removes duplicate entries from the playlist by title."
-#~ msgstr "/Сортувати список/За шляхом й іменем файлу"
-
-#, fuzzy
-#~ msgid "By Filename"
-#~ msgstr "Ім'я файлу"
-
-#, fuzzy
-#~ msgid "Removes duplicate entries from the playlist by filename."
-#~ msgstr "/Сортувати список/За шляхом й іменем файлу"
-
-#, fuzzy
-#~ msgid "By Path + Filename"
-#~ msgstr "/Сортувати список/За шляхом й іменем файлу"
-
-#, fuzzy
-#~ msgid "Removes duplicate entries from the playlist by their full path."
-#~ msgstr "/Сортувати список/За шляхом й іменем файлу"
-
-#, fuzzy
-#~ msgid "Remove Unselected"
-#~ msgstr "/Видалити НЕ вибране"
-
-#, fuzzy
-#~ msgid "Remove unselected entries from the playlist."
-#~ msgstr "/Сортувати список/За шляхом й іменем файлу"
-
-#, fuzzy
-#~ msgid "Remove Selected"
-#~ msgstr "/Видалити вибране"
-
-#, fuzzy
-#~ msgid "Remove selected entries from the playlist."
-#~ msgstr "/Сортувати список/За шляхом й іменем файлу"
-
-#, fuzzy
-#~ msgid "Randomize List"
-#~ msgstr "/Перемішати список"
-
-#, fuzzy
-#~ msgid "Randomizes the playlist."
-#~ msgstr "/Перемішати список"
-
-#, fuzzy
-#~ msgid "Reverse List"
-#~ msgstr "/Інвертувати список"
-
-#, fuzzy
-#~ msgid "Reverses the playlist."
-#~ msgstr "Не очищати список програвання"
-
-#, fuzzy
-#~ msgid "Sort List"
-#~ msgstr "/Сортувати список"
-
-#, fuzzy
-#~ msgid "Sorts the list by title."
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "By Album"
-#~ msgstr "Альбом"
-
-#, fuzzy
-#~ msgid "Sorts the list by album."
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "By Artist"
-#~ msgstr "Виконавець"
-
-#, fuzzy
-#~ msgid "Sorts the list by artist."
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "Sorts the list by filename."
-#~ msgstr "/Сортувати список/За іменем файлу"
-
-#, fuzzy
-#~ msgid "Sorts the list by full pathname."
-#~ msgstr "/Сортувати список/За іменем файлу"
-
-#, fuzzy
-#~ msgid "By Date"
-#~ msgstr "Дата"
-
-#, fuzzy
-#~ msgid "Sorts the list by modification time."
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "By Track Number"
-#~ msgstr "Номер доріжкии"
-
-#, fuzzy
-#~ msgid "Sorts the list by track number."
-#~ msgstr "/Сортувати список/За датою"
-
-#, fuzzy
-#~ msgid "By Playlist Entry"
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "Sorts the list by playlist entry."
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "Sort Selected"
-#~ msgstr "/Сортувати вибране"
-
-#, fuzzy
-#~ msgid "File"
-#~ msgstr "Сатира"
-
-#, fuzzy
-#~ msgid "Components"
-#~ msgstr "Коментар"
-
-#, fuzzy
-#~ msgid "View Track Details"
-#~ msgstr "/Інформація про пісню"
-
-#, fuzzy
-#~ msgid "Play File"
-#~ msgstr "/Програвати файли"
-
-#, fuzzy
-#~ msgid "Load and play a file"
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісні з музичних файлів і списків програвання"
-
-#, fuzzy
-#~ msgid "Play Location"
-#~ msgstr "/Програвати знаходження"
-
-#, fuzzy
-#~ msgid "Plugin services"
-#~ msgstr "Модулі"
-
-#, fuzzy
-#~ msgid "Preferences"
-#~ msgstr "/Налаштування"
-
-#, fuzzy
-#~ msgid "Open preferences window"
-#~ msgstr "Вікно налаштувань"
-
-#, fuzzy
-#~ msgid "_Quit"
-#~ msgstr "/_Вийти"
-
-#, fuzzy
-#~ msgid "Quit Audacious"
-#~ msgstr "Про Audacious"
-
-#, fuzzy
-#~ msgid "Set A-B"
-#~ msgstr "Вибрати все"
-
-#, fuzzy
-#~ msgid "Clear A-B"
-#~ msgstr "/Очистити чергу"
-
-#, fuzzy
-#~ msgid "Jump to Playlist Start"
-#~ msgstr "/Перейти до першої пісні у списку"
-
-#, fuzzy
-#~ msgid "Jump to File"
-#~ msgstr "/Перейти до файлу"
-
-#, fuzzy
-#~ msgid "Queue Toggle"
-#~ msgstr "/Поставити пісню в чергу"
-
-#, fuzzy
-#~ msgid "Load"
-#~ msgstr "/Завантажити"
-
-#, fuzzy
-#~ msgid "Import"
-#~ msgstr "/Імпорт"
-
-#, fuzzy
-#~ msgid "Save"
-#~ msgstr "/Зберегти"
-
-#, fuzzy
-#~ msgid "Delete"
-#~ msgstr "/Стерти"
-
-#~ msgid "Preset"
-#~ msgstr "Попередня установка"
-
-#~ msgid "Load preset"
-#~ msgstr "Завантажити установки"
-
-#, fuzzy
-#~ msgid "Auto-load preset"
-#~ msgstr "/Завантажити/Автоматичні установки"
-
-#, fuzzy
-#~ msgid "Load auto-load preset"
-#~ msgstr "/Завантажити/Автоматичні установки"
-
-#~ msgid "Default"
-#~ msgstr "Основна"
-
-#, fuzzy
-#~ msgid "Load default preset into equalizer"
-#~ msgstr "Зберегти автоматичні установки"
-
-#, fuzzy
-#~ msgid "Zero"
-#~ msgstr "Ретро"
-
-#, fuzzy
-#~ msgid "Set equalizer preset levels to zero"
-#~ msgstr "Зберегти установки еквалайзера"
-
-#, fuzzy
-#~ msgid "From file"
-#~ msgstr "/Завантажити/З файлу"
-
-#, fuzzy
-#~ msgid "Load preset from file"
-#~ msgstr "Завантажити установки"
-
-#, fuzzy
-#~ msgid "From WinAMP EQF file"
-#~ msgstr "/Завантажити/З файлу EQF WinAMP"
-
-#, fuzzy
-#~ msgid "Load preset from WinAMP EQF file"
-#~ msgstr "/Завантажити/З файлу EQF WinAMP"
-
-#, fuzzy
-#~ msgid "WinAMP Presets"
-#~ msgstr "/Імпорт/Установки WinAMP"
-
-#, fuzzy
-#~ msgid "Import WinAMP presets"
-#~ msgstr "/Імпорт/Установки WinAMP"
-
-#~ msgid "Save preset"
-#~ msgstr "Зберегти установки"
-
-#, fuzzy
-#~ msgid "Save auto-load preset"
-#~ msgstr "/Зберегти/Автоматичні установки"
-
-#, fuzzy
-#~ msgid "Save default preset"
-#~ msgstr "Зберегти автоматичні установки"
-
-#, fuzzy
-#~ msgid "To file"
-#~ msgstr "/Завантажити/З файлу"
-
-#, fuzzy
-#~ msgid "Save preset to file"
-#~ msgstr "Зберегти установки"
-
-#, fuzzy
-#~ msgid "To WinAMP EQF file"
-#~ msgstr "/Зберегти/В файл EQF WinAMP"
-
-#, fuzzy
-#~ msgid "Save preset to WinAMP EQF file"
-#~ msgstr "/Зберегти/В файл EQF WinAMP"
-
-#~ msgid "Delete preset"
-#~ msgstr "Стерти установки"
-
-#, fuzzy
-#~ msgid "Delete auto-load preset"
-#~ msgstr "/Стерти/Автоматичні установки"
-
-#~ msgid ""
-#~ "<b><big>Unable to load skin.</big></b>\n"
-#~ "\n"
-#~ "Check that skin at '%s' is usable and default skin is properly installed "
-#~ "at '%s'\n"
-#~ msgstr ""
-#~ "<b><big>Не можу завантажити тему.</big></b>\n"
-#~ "\n"
-#~ "Перевірте,чи придатна до використання тема '%s' і встановлена типова тема "
-#~ "в '%s'\n"
-
-#, fuzzy
-#~ msgid "Audacious core developers:"
-#~ msgstr "Налаштування Audacious"
-
-#~ msgid "Audacious Equalizer"
-#~ msgstr "Еквалайзер Audacious"
-
-#, fuzzy
-#~ msgid "Play files"
-#~ msgstr "/Програвати файли"
-
-#, fuzzy
-#~ msgid "Load files"
-#~ msgstr "/Завантажити/З файлу"
-
-#~ msgid "VBR"
-#~ msgstr "VBR"
-
-#, fuzzy
-#~ msgid "mono"
-#~ msgstr "Моно"
-
-#, fuzzy
-#~ msgid "Show main player window"
-#~ msgstr "Вибір шрифту для головного вікна"
-
-#, fuzzy
-#~ msgid "Ignore"
-#~ msgstr "Нічого"
-
-#, fuzzy
-#~ msgid "Seek to: %d:%-2.2d/%d:%-2.2d (%d%%)"
-#~ msgstr "ПЕРЕМОТАТИ НА: %d:%-2.2d/%d:%-2.2d (%d%%)"
-
-#, fuzzy
-#~ msgid "Options Menu"
-#~ msgstr "Параметри"
-
-#, fuzzy
-#~ msgid "Disable 'Always On Top'"
-#~ msgstr "/Завжди згори"
-
-#, fuzzy
-#~ msgid "Enable 'Always On Top'"
-#~ msgstr "/Завжди згори"
-
-#, fuzzy
-#~ msgid "File Info Box"
-#~ msgstr "Інформація про файл"
-
-#, fuzzy
-#~ msgid "Disable 'GUI Scaling'"
-#~ msgstr "Заборонити теги ID3V2"
-
-#, fuzzy
-#~ msgid "Visualization Menu"
-#~ msgstr "/Режим візуалізації"
-
-#~ msgid ""
-#~ "<b><big>Couldn't open audio.</big></b>\n"
-#~ "\n"
-#~ "Please check that:\n"
-#~ "1. You have the correct output plugin selected.\n"
-#~ "2. No other programs is blocking the soundcard.\n"
-#~ "3. Your soundcard is configured properly.\n"
-#~ msgstr ""
-#~ "<b><big>Не можу відкрити аудіопристрій</big></b>\n"
-#~ "\n"
-#~ "Будь-ласка впевніться, що:\n"
-#~ "1. Ви вибрали вірний вихідний модуль\n"
-#~ "2. Інші програми не блокують звукову плату\n"
-#~ "3. Ваша звукова плата сконфіґурована вірно \n"
-
-#, fuzzy
-#~ msgid "Autoscroll Songname"
-#~ msgstr "/Автоматична прокрутка назви пісні"
-
-#, fuzzy
-#~ msgid "Show Player"
-#~ msgstr "/Показати редактор списку пісень"
-
-#, fuzzy
-#~ msgid "Show Playlist Editor"
-#~ msgstr "/Показати редактор списку пісень"
-
-#, fuzzy
-#~ msgid "Show Equalizer"
-#~ msgstr "/Еквалайзер"
-
-#, fuzzy
-#~ msgid "Always on Top"
-#~ msgstr "/Завжди згори"
-
-#, fuzzy
-#~ msgid "Put on All Workspaces"
-#~ msgstr "/На всі стільниці"
-
-#, fuzzy
-#~ msgid "Roll up Player"
-#~ msgstr "/Згорнути програвач"
-
-#, fuzzy
-#~ msgid "Roll up Playlist Editor"
-#~ msgstr "/Згорнути редактор списку програвання"
-
-#, fuzzy
-#~ msgid "Roll up Equalizer"
-#~ msgstr "/Згорнути еквалайзер"
-
-#, fuzzy
-#~ msgid "Scale"
-#~ msgstr "/Зберегти"
-
-#, fuzzy
-#~ msgid "Analyzer"
-#~ msgstr "/Режим аналізатора"
-
-#, fuzzy
-#~ msgid "Scope"
-#~ msgstr "/Режим графіка"
-
-#, fuzzy
-#~ msgid "Voiceprint"
-#~ msgstr "/Режим аналізатора/Полум'я"
-
-#, fuzzy
-#~ msgid "Normal"
-#~ msgstr "Формат ID3-тегу:"
-
-#, fuzzy
-#~ msgid "Fire"
-#~ msgstr "Сатира"
-
-#, fuzzy
-#~ msgid "Vertical Lines"
-#~ msgstr "/Режим аналізатора/Вертикальні лінії"
-
-#, fuzzy
-#~ msgid "Lines"
-#~ msgstr "рядків"
-
-#, fuzzy
-#~ msgid "Bars"
-#~ msgstr "Бас"
-
-#, fuzzy
-#~ msgid "Dot Scope"
-#~ msgstr "/Режим графіка/Точки"
-
-#, fuzzy
-#~ msgid "Line Scope"
-#~ msgstr "/Режим графіка/Лінії"
-
-#, fuzzy
-#~ msgid "Solid Scope"
-#~ msgstr "/Режим графіка/Заливка"
-
-#, fuzzy
-#~ msgid "Smooth"
-#~ msgstr "Моно"
-
-#, fuzzy
-#~ msgid "Full (~50 fps)"
-#~ msgstr "/Частота поновлення/Повна (~50 fps)"
-
-#, fuzzy
-#~ msgid "Half (~25 fps)"
-#~ msgstr "/Частота поновлення/Половина (~25 fps)"
-
-#, fuzzy
-#~ msgid "Quarter (~13 fps)"
-#~ msgstr "/Частота  поновлення/Четверть (~13 fps)"
-
-#, fuzzy
-#~ msgid "Eighth (~6 fps)"
-#~ msgstr "/Частота поновлення/Восьма (~6 fps)"
-
-#, fuzzy
-#~ msgid "Slowest"
-#~ msgstr "Імпровізація"
-
-#, fuzzy
-#~ msgid "Slow"
-#~ msgstr "низьке"
-
-#, fuzzy
-#~ msgid "Medium"
-#~ msgstr "середнє"
-
-#, fuzzy
-#~ msgid "Time Elapsed"
-#~ msgstr "/Час від початку"
-
-#, fuzzy
-#~ msgid "Time Remaining"
-#~ msgstr "/Час, що залишився"
-
-#, fuzzy
-#~ msgid "Plugin Services"
-#~ msgstr "Модулі"
-
-#, fuzzy
-#~ msgid "Search entries in active playlist"
-#~ msgstr "Показувати номери пісень у списку програвання"
-
-#, fuzzy
-#~ msgid "Title: "
-#~ msgstr "Назва:"
-
-#, fuzzy
-#~ msgid "Album: "
-#~ msgstr "Альбом:"
-
-#, fuzzy
-#~ msgid "Artist: "
-#~ msgstr "Виконавець:"
-
-#, fuzzy
-#~ msgid "Filename: "
-#~ msgstr "Ім'я файлу:"
-
-#~ msgid "Audacious Playlist Editor"
-#~ msgstr "/Показати редактор списку пісень"
-
-#~ msgid "Appearance"
-#~ msgstr "Зовнішній вигляд"
-
-#~ msgid "<b>_Fonts</b>"
-#~ msgstr "<b>_Шрифти</b>"
-
-#~ msgid "_Player:"
-#~ msgstr "_Головне вікно програвача:"
-
-#~ msgid "Select main player window font:"
-#~ msgstr "Вибір шрифту для головного вікна"
-
-#~ msgid "_Playlist:"
-#~ msgstr "_Список програвання:"
-
-#, fuzzy
-#~ msgid "Select playlist font:"
-#~ msgstr "Вибір шрифту для головного вікна"
-
-#~ msgid "Use Bitmap fonts if available"
-#~ msgstr "Використовувати растрові шрифти (якщо наявні)"
-
-#~ msgid "<b>_Miscellaneous</b>"
-#~ msgstr "<b>_Різне</b>"
-
-#~ msgid "Show track numbers in playlist"
-#~ msgstr "Показувати номери пісень у списку програвання"
-
-#, fuzzy
-#~ msgid "Show separators in playlist"
-#~ msgstr "Показувати номери пісень у списку програвання"
-
-#~ msgid "On load"
-#~ msgstr "При відкритті"
-
-#~ msgid "Load metadata when adding the file to the playlist or opening it"
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісню та виконавця при додаванні файлу в "
-#~ "список програвання або відкритті"
-
-#~ msgid "On display"
-#~ msgstr "При відображенні"
-
-#, fuzzy
-#~ msgid ""
-#~ "Load metadata on demand when displaying the file in the playlist. You may "
-#~ "need to set \"Detect file formats on demand\" in Audio page for full "
-#~ "benefit."
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісню та виконавця при додаванні файлу в "
-#~ "список програвання або відкритті"
-
-#, fuzzy
-#~ msgid "Blue"
-#~ msgstr "Блюз"
-
-#, fuzzy
-#~ msgid "Green"
-#~ msgstr "Грецький:"
-
-#~ msgid "<b>_Skin</b>"
-#~ msgstr "<b>_Тема</b>"
-
-#, fuzzy
-#~ msgid "Refresh skin list"
-#~ msgstr "/Частота поновлення"
-
-#~ msgid "PREAMP"
-#~ msgstr "PREAMP"
-
-#~ msgid "60HZ"
-#~ msgstr "60 Гц"
-
-#~ msgid "170HZ"
-#~ msgstr "170 Гц"
-
-#~ msgid "310HZ"
-#~ msgstr "310 Гц"
-
-#~ msgid "600HZ"
-#~ msgstr "600 Гц"
-
-#~ msgid "1KHZ"
-#~ msgstr "1 кГц"
-
-#~ msgid "3KHZ"
-#~ msgstr "3 кГц"
-
-#~ msgid "6KHZ"
-#~ msgstr "6 кГц"
-
-#~ msgid "12KHZ"
-#~ msgstr "12 кГц"
-
-#~ msgid "14KHZ"
-#~ msgstr "14 кГц"
-
-#~ msgid "16KHZ"
-#~ msgstr "16 кГц"
-
-#~ msgid "Use custom cursors"
-#~ msgstr "Використовувати курсори, встановлені темою"
-
-#, fuzzy
-#~ msgid "Reload Plugins"
-#~ msgstr "Модулі"
-
-#~ msgid ""
-#~ "Sorry, threads isn't supported on your platform.\n"
-#~ "\n"
-#~ "If you're on a libc5 based linux system and installed Glib & GTK+ before "
-#~ "you\n"
-#~ "installed LinuxThreads you need to recompile Glib & GTK+.\n"
-#~ msgstr ""
-#~ "Вибачте, гілки не підтрумуються на вашій платформі.\n"
-#~ "\n"
-#~ "Якщо ви використовуєте лінукс систему на основі libc5 і встановленими "
-#~ "Glib і GTK+ вам\n"
-#~ "перед встановленням LinuxThreads слід перекомпілювати Glib і GTK+.\n"
-
-#, fuzzy
-#~ msgid "Error in Audacious."
-#~ msgstr "Про Audacious"
-
-#, fuzzy
-#~ msgid "Enable 6 dB hard limiter"
-#~ msgstr "Дозволити підсилення 6дБ + жорстке обмеження"
-
-#, fuzzy
-#~ msgid "Select which Audacious session ID to use"
-#~ msgstr "Встановити сесію для audacious/ВМР/XMMS (типова: 0)"
-
-#~ msgid "<b>Presets</b>"
-#~ msgstr "<b>Попередні установки</b>"
-
-#~ msgid "File preset extension:"
-#~ msgstr "Розширення файлу попередніх установок:"
-
-#~ msgid "Directory preset file:"
-#~ msgstr "Каталогу попередніх установок:"
-
-#, fuzzy
-#~ msgid ""
-#~ "TITLE\n"
-#~ "ARTIST - TITLE\n"
-#~ "ARTIST - ALBUM - TITLE\n"
-#~ "ARTIST - ALBUM - TRACK. TITLE\n"
-#~ "ARTIST [ ALBUM ] - TRACK. TITLE\n"
-#~ "ALBUM - TITLE\n"
-#~ "Custom"
-#~ msgstr ""
-#~ "Назва\n"
-#~ "Виконавець - Назва\n"
-#~ "Виконавець - Альбом - Назва\n"
-#~ "Альбом - Назва\n"
-#~ "Особливе"
-
-#, fuzzy
-#~ msgid "Track Information Window"
-#~ msgstr "Підсилення доріжок:"
-
-#~ msgid "Preferences Window"
-#~ msgstr "Вікно налаштувань"
-
-#, fuzzy
-#~ msgid "Close"
-#~ msgstr "/Закрити"
-
-#, fuzzy
-#~ msgid "<b>Artist:</b> %s"
-#~ msgstr "Виконавець"
-
-#, fuzzy
-#~ msgid "<b>Title:</b> %s"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid "<b>Album:</b> %s"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid "Audacious last.fm radio tuner"
-#~ msgstr "/Показати редактор списку пісень"
-
-#, fuzzy
-#~ msgid "<b>Artist:</b>"
-#~ msgstr "Виконавець"
-
-#, fuzzy
-#~ msgid "<b>Title:</b>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid "<b>Album:</b>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#~ msgid "VOLUME: %d%%"
-#~ msgstr "ГУЧНІСТЬ: %d%%"
-
-#~ msgid "BALANCE: %d%% LEFT"
-#~ msgstr "БАЛАНС: %d%% ЛІВОРУЧ"
-
-#~ msgid "BALANCE: CENTER"
-#~ msgstr "БАЛАНС: ЦЕНТР"
-
-#~ msgid "BALANCE: %d%% RIGHT"
-#~ msgstr "БАЛАНС: %d%% ПРАВОРУЧ"
-
-#, fuzzy
-#~ msgid "Last.fm radio"
-#~ msgstr "/Програвати знаходження"
-
-#, fuzzy
-#~ msgid "Play Last.fm radio"
-#~ msgstr "/Програвати знаходження"
-
-#, fuzzy
-#~ msgid "Converter Type:"
-#~ msgstr "Перетворити кодування"
-
-#~ msgid ""
-#~ "<b><big>No playable CD found.</big></b>\n"
-#~ "\n"
-#~ "No CD inserted, or inserted CD is not an audio CD.\n"
-#~ msgstr ""
-#~ "<b><big>Не знайдено звукового CD.</big></b>\n"
-#~ "\n"
-#~ "Компакт-диск відсутній або не містить аудіодоріжок.\n"
-
-#, fuzzy
-#~ msgid "Add CD..."
-#~ msgstr "/Додати CD..."
-
-#, fuzzy
-#~ msgid "Play CD"
-#~ msgstr "/Грати"
-
-#~ msgid "Performer/Artist"
-#~ msgstr "Виконавець/Артист"
-
-#~ msgid "File name"
-#~ msgstr "Назва файлу"
-
-#~ msgid "File path"
-#~ msgstr "Маршрут до файлу"
-
-#~ msgid "File extension"
-#~ msgstr "Розширення файлу"
-
-#~ msgid "Track name"
-#~ msgstr "Назва доріжки"
-
-#~ msgid "Track number"
-#~ msgstr "Номер доріжкии"
-
-#~ msgid "%{n:...%}: Display \"...\" only if element %n is present"
-#~ msgstr "%{n:...%}: Відображати \"...\", коли елемент %n присутній"
-
-#, fuzzy
-#~ msgid ""
-#~ "Sorry, your GTK+ version (%d.%d.%d) does not work with Audacious.\n"
-#~ "Please use GTK+ %s or newer.\n"
-#~ msgstr ""
-#~ "Вибачте, ваша GTK+ версія (%d.%d.%d) не працюватиме з BMP.\n"
-#~ "Будь-ласка, викоритовуйте GTK+ %s або кращу.\n"
-
-#~ msgid "OPTIONS MENU"
-#~ msgstr "МЕНЮ ОПЦІЙ"
-
-#~ msgid "DISABLE ALWAYS ON TOP"
-#~ msgstr "ЗАБОРОНИТИ СПЛИВАННЯ НАГОРУ"
-
-#~ msgid "ENABLE ALWAYS ON TOP"
-#~ msgstr "ДОЗВОЛИТИ СПЛИВАННЯ НАГОРУ "
-
-#~ msgid "FILE INFO BOX"
-#~ msgstr "ВІКНО ІНФОРМАЦІЇ ФАЙЛУ"
-
-#~ msgid "VISUALIZATION MENU"
-#~ msgstr "МЕНЮ ВІЗУАЛІЗАЦІЇ"
-
-#, fuzzy
-#~ msgid "Track name: "
-#~ msgstr "Назви доріжок:"
-
-#~ msgid ""
-#~ "<b><big>Unable to play files.</big></b>\n"
-#~ "\n"
-#~ "The following files could not be played. Please check that:\n"
-#~ "1. they are accessible.\n"
-#~ "2. you have enabled the media plugins required."
-#~ msgstr ""
-#~ "<b><big>Не можу грати файли.</big></b>\n"
-#~ "\n"
-#~ "Певні файли не можуть бути відтворені. Будь-ласка, перевірте :\n"
-#~ "1. Наявність цих файлів.\n"
-#~ "2. Увімкнення необхідних аудіо-модулів."
-
-#~ msgid "Show more _details"
-#~ msgstr "_Докладніше"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "Received SIGSEGV\n"
-#~ "\n"
-#~ "This could be a bug in Audacious. If you don't know why this happened, "
-#~ "file a bug at http://bugs-meta.atheme.org/\n"
-#~ "\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Отрмано SIGSEGV\n"
-#~ "\n"
-#~ "Можливо, це помилка в Audacious. Якщо ви не знаєте, чому це сталось, "
-#~ "відправте повідомлення на at http://bugs.nenolod.net/\n"
-#~ "\n"
-
-#, fuzzy
-#~ msgid "Enable playlist transparency"
-#~ msgstr "Вмикнути підсилення програвання"
-
-#~ msgid "%s: option `%s' is ambiguous\n"
-#~ msgstr "%s: параметр `%s' - неоднозначний\n"
-
-#~ msgid "%s: option `--%s' doesn't allow an argument\n"
-#~ msgstr "%s: параметр `--%s' не може мати аргументів\n"
-
-#~ msgid "%s: option `%c%s' doesn't allow an argument\n"
-#~ msgstr "%s: параметр `%c%s' не може мати аргументу\n"
-
-#~ msgid "%s: option `%s' requires an argument\n"
-#~ msgstr "%s: параметру `%s' необхідний аргумент\n"
-
-#~ msgid "%s: unrecognized option `%c%s'\n"
-#~ msgstr "%s: не розпізнано параметру `%c%s'\n"
-
-#~ msgid "%s: illegal option -- %c\n"
-#~ msgstr "%s: невірний параметр -- %c\n"
-
-#~ msgid "%s: invalid option -- %c\n"
-#~ msgstr "%s: невірний параметр -- %c\n"
-
-#~ msgid "%s: option requires an argument -- %c\n"
-#~ msgstr "%s: параметру необхідний аргумент -- %c\n"
-
-#~ msgid "%s: option `-W %s' is ambiguous\n"
-#~ msgstr "%s: параметр `-W %s' неоднозначний\n"
-
-#~ msgid "%s: option `-W %s' doesn't allow an argument\n"
-#~ msgstr "%s: опція `-W %s' не повинна мати аргумента\n"
-
-#~ msgid ""
-#~ "Usage: audacious [options] [files] ...\n"
-#~ "\n"
-#~ "Options:\n"
-#~ "--------\n"
-#~ msgstr ""
-#~ "Використання: audacious [параметри] [файли] ...\n"
-#~ "\n"
-#~ "Параметри:\n"
-#~ "--------\n"
-
-#~ msgid "Display this text and exit"
-#~ msgstr "Надрукувати цей текст і вийти"
-
-#, fuzzy
-#~ msgid "Activate Audacious"
-#~ msgstr "Активувати audacious"
-
-#~ msgid "Previous session ID"
-#~ msgstr "Ідентифікатор попередньго сеансу"
-
-#~ msgid "Print version number and exit\n"
-#~ msgstr "Надрукувати номер версії і завершити роботу.\n"
-
-#~ msgid "Add/Open Files dialog"
-#~ msgstr "Вікно додавання файлів"
-
-#~ msgid "Close Dialog on Add"
-#~ msgstr "Закрити вікно після додавання"
-
-#~ msgid "Deselect All"
-#~ msgstr "Скасувати виділення"
-
-#, fuzzy
-#~ msgid "Artist Popup"
-#~ msgstr "Виконавець"
-
-#, fuzzy
-#~ msgid "<i>Genre</i>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid "<i>Year</i>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid "<i>Track Number</i>"
-#~ msgstr "Номер доріжкии"
-
-#, fuzzy
-#~ msgid "<i>Track Length</i>"
-#~ msgstr "Довжина доріжки:"
-
-#~ msgid "/View Track Details"
-#~ msgstr "/Інформація про пісню"
-
-#~ msgid "/Visualization Mode/Analyzer"
-#~ msgstr "/Режим візуалізації/Аналізатор"
-
-#~ msgid "/Visualization Mode/Scope"
-#~ msgstr "/Режим візуалізації/Графік"
-
-#, fuzzy
-#~ msgid "/Visualization Mode/Voiceprint"
-#~ msgstr "/Режим візуалізації/Графік"
-
-#~ msgid "/Visualization Mode/Off"
-#~ msgstr "/Режим візуализації/Вимкнено"
-
-#~ msgid "/Analyzer Mode/Normal"
-#~ msgstr "/Режим аналізатора/Звичайний"
-
-#~ msgid "/Analyzer Mode/Lines"
-#~ msgstr "/Режим аналізатора/Лінії"
-
-#~ msgid "/Analyzer Mode/Bars"
-#~ msgstr "/Режим аналізатора/Смуги"
-
-#~ msgid "/Analyzer Mode/Peaks"
-#~ msgstr "/Режим аналізатора/Піки"
-
-#, fuzzy
-#~ msgid "/Voiceprint mode/Normal"
-#~ msgstr "/Режим аналізатора/Звичайний"
-
-#~ msgid "/WindowShade VU Mode/Normal"
-#~ msgstr "/При мінімізованому окне/Звичайний"
-
-#~ msgid "/WindowShade VU Mode/Smooth"
-#~ msgstr "/При мінімізованому вікні/Плавний"
-
-#~ msgid "/Analyzer Falloff/Slowest"
-#~ msgstr "/Падіння Аналізатора/Найповільніше"
-
-#~ msgid "/Analyzer Falloff/Slow"
-#~ msgstr "/Падіння Аналізатора/Повільне"
-
-#~ msgid "/Analyzer Falloff/Medium"
-#~ msgstr "/Падіння Аналізатора/Середнє"
-
-#~ msgid "/Analyzer Falloff/Fast"
-#~ msgstr "/Падіння Аналізатора/Швидке"
-
-#~ msgid "/Analyzer Falloff/Fastest"
-#~ msgstr "/Падіння Аналізатора/Найшвидше"
-
-#~ msgid "/Peaks Falloff/Slowest"
-#~ msgstr "/Падіння піків/Найповільніше"
-
-#~ msgid "/Peaks Falloff/Slow"
-#~ msgstr "/Падіння піків/Повільне"
-
-#~ msgid "/Peaks Falloff/Medium"
-#~ msgstr "/Падіння піків/Середнє"
-
-#~ msgid "/Peaks Falloff/Fast"
-#~ msgstr "/Падіння піків/Швидке"
-
-#~ msgid "/Peaks Falloff/Fastest"
-#~ msgstr "/Падіння піків/Найшвидше"
-
-#~ msgid "/-"
-#~ msgstr "/-"
-
-#~ msgid "/Jump to Time"
-#~ msgstr "/Перейти до часу"
-
-#~ msgid "/About Audacious"
-#~ msgstr "/Про Audacious"
-
-#~ msgid "/Files..."
-#~ msgstr "/Додати Файли..."
-
-#~ msgid "/Internet location..."
-#~ msgstr "/Додати Адресу в інтернет..."
-
-#, fuzzy
-#~ msgid "New List"
-#~ msgstr "/Новий список"
-
-#, fuzzy
-#~ msgid "Creates a new playlist."
-#~ msgstr "Показувати номери пісень у списку програвання"
-
-#, fuzzy
-#~ msgid "Displays track information."
-#~ msgstr "Підсилення доріжок:"
-
-#~ msgid "/Load/Preset"
-#~ msgstr "/Завантажити/Попередні установки"
-
-#~ msgid "/Load/Default"
-#~ msgstr "/Завантажити/По замовчанню"
-
-#~ msgid "/Load/Zero"
-#~ msgstr "/Завантажити/Нуль"
-
-#~ msgid "/Save"
-#~ msgstr "/Зберегти"
-
-#~ msgid "/Save/Preset"
-#~ msgstr "/Зберегти/Установки"
-
-#~ msgid "/Save/Default"
-#~ msgstr "/Зберегти/Стандартні "
-
-#~ msgid "/Save/To file"
-#~ msgstr "/Зберегти/В файл"
-
-#~ msgid "/Delete/Preset"
-#~ msgstr "/Стерти/Установки"
-
-#~ msgid "Load auto-preset"
-#~ msgstr "Завантажити автоматичні установкии"
-
-#~ msgid "Load equalizer preset"
-#~ msgstr "Завантажити установки еквалайзера"
-
-#~ msgid "Delete auto-preset"
-#~ msgstr "Стерти автоматичні установки"
-
-#, fuzzy
-#~ msgid "/Remove Duplicates/By Title"
-#~ msgstr "/Сортувати список/За назвою"
-
-#, fuzzy
-#~ msgid "/Remove Duplicates/By Filename"
-#~ msgstr "/Сортувати список/За іменем файлу"
-
-#~ msgid "/Update View"
-#~ msgstr "/Обновити видимий список"
-
-#~ msgid "/Select All"
-#~ msgstr "Вибрати все"
-
-#~ msgid "/Sort List/By Date"
-#~ msgstr "/Сортувати список/За датою"
-
-#~ msgid "/Sort Selection/By Title"
-#~ msgstr "/Сортувати вибране/За назвою"
-
-#, fuzzy
-#~ msgid "/Sort Selection/By Artist"
-#~ msgstr "/Сортувати вибране/За назвою"
-
-#~ msgid "/Sort Selection/By Filename"
-#~ msgstr "/Сортувати вибране/За іменем файлу"
-
-#~ msgid "/Sort Selection/By Path + Filename"
-#~ msgstr "/Сортувати вибране/За шляхом й іменем файлу"
-
-#~ msgid "/Sort Selection/By Date"
-#~ msgstr "/Сортувати вибране/За датою"
-
-#, fuzzy
-#~ msgid "/Sort Selection/By Track Number"
-#~ msgstr "/Сортувати вибране/За датою"
-
-#, fuzzy
-#~ msgid "/Sort Selection/By Playlist Entry"
-#~ msgstr "/Сортувати вибране/За назвою"
-
-#, fuzzy
-#~ msgid "<b>_Miscillaneous UI Features</b>"
-#~ msgstr "<b>_Різне</b>"
-
-#, fuzzy
-#~ msgid "About AudioCompress"
-#~ msgstr "Про Audacious"
-
-#~ msgid "Ok"
-#~ msgstr "ОК"
-
-#, fuzzy
-#~ msgid "Extra Stereo Plugin %s"
-#~ msgstr "Модуль запису на диск %s"
-
-#, fuzzy
-#~ msgid "About Extra Stereo Plugin"
-#~ msgstr "Про модуль ESounD"
-
-#, fuzzy
-#~ msgid "Effect intensity:"
-#~ msgstr "Список модулів _ефектів:"
-
-#~ msgid "Cancel"
-#~ msgstr "Скасувати"
-
-#~ msgid "Apply"
-#~ msgstr "Застосувати"
-
-#, fuzzy
-#~ msgid "About LIRC Audacious Plugin"
-#~ msgstr "Про модуль підтримки формату MPEG"
-
-#, fuzzy
-#~ msgid "LIRC Plugin "
-#~ msgstr "Модулі"
-
-#, fuzzy
-#~ msgid "LIRC Plugin"
-#~ msgstr "Модулі"
-
-#~ msgid "Username:"
-#~ msgstr "Ім'я користувача:"
-
-#~ msgid "Password:"
-#~ msgstr "Пароль:"
-
-#, fuzzy
-#~ msgid "About Scrobbler Plugin"
-#~ msgstr "Про модуль ESounD"
-
-#, fuzzy
-#~ msgid "Scrobbler Plugin"
-#~ msgstr "Модулі"
-
-#~ msgid "Song Change %s"
-#~ msgstr "Зміна пісні %s"
-
-#~ msgid "Commands"
-#~ msgstr "Коментар"
-
-#~ msgid "Command:"
-#~ msgstr "Коментар:"
-
-#, fuzzy
-#~ msgid "Command to run when Audacious reaches the end of the playlist."
-#~ msgstr ""
-#~ "Завантажувати інформацію про пісню та виконавця при відображенні файлу в "
-#~ "списку програвання"
-
-#, fuzzy
-#~ msgid "About "
-#~ msgstr "Про програму"
-
-#, fuzzy
-#~ msgid "AMIDI-Plug - warning"
-#~ msgstr "Зміна налаштувань модуля підтримки MikMod"
-
-#, fuzzy
-#~ msgid "AMIDI-Plug - select file"
-#~ msgstr "Зміна налаштувань модуля підтримки MikMod"
-
-#, fuzzy
-#~ msgid "AMIDI-Plug - configuration"
-#~ msgstr "Зміна налаштувань модуля підтримки MikMod"
-
-#~ msgid "Name:"
-#~ msgstr "Ім'я:"
-
-#, fuzzy
-#~ msgid " MIDI Info "
-#~ msgstr "Інформація про компакт"
-
-#, fuzzy
-#~ msgid "Length (msec):"
-#~ msgstr "Довжина:"
-
-#, fuzzy
-#~ msgid "Num of Tracks:"
-#~ msgstr "Перейти до доріжки"
-
-#~ msgid "CD Audio Plugin"
-#~ msgstr "Модуль підтримки аудіо компакт-дисків"
-
-#~ msgid "CD Audio Track %02u"
-#~ msgstr "CD аудіо доріжка %02u"
-
-#~ msgid "(unknown)"
-#~ msgstr "(невідомо)"
-
-#~ msgid "Drive %d"
-#~ msgstr "Пристрій %d"
-
-#~ msgid ""
-#~ "Failed to open device %s\n"
-#~ "Error: %s\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Не можу відкрити пристрій %s\n"
-#~ "Помилка: %s\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "Failed to read \"Table of Contents\"\n"
-#~ "Maybe no disc in the drive?\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Не можу прочитати \"Оглавление\"\n"
-#~ "Може диск не вставлений в привід?\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "Device %s OK.\n"
-#~ "Disc has %d tracks"
-#~ msgstr ""
-#~ "Привід %s: ОК.\n"
-#~ "На дискі %d доріжок"
-
-#~ msgid " (%d data tracks)"
-#~ msgstr " (%d доріжок з даними)"
-
-#~ msgid ""
-#~ "\n"
-#~ "Total length: %d:%d\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Загальна довжина: %d:%d\n"
-
-#~ msgid ""
-#~ "Digital audio extraction not tested as the disc has no audio tracks\n"
-#~ msgstr ""
-#~ "Цифрове зчитування аудіо не тестовано, оскільки на диску нема "
-#~ "аудіодоріжок\n"
-
-#~ msgid ""
-#~ "Digital audio extraction test: OK\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Тестування цифрового зчитування: OK\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "Digital audio extraction test failed: %s\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Тестування цифрового зчитування не вдалось: %s\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "Failed to check directory %s\n"
-#~ "Error: %s"
-#~ msgstr ""
-#~ "Не можу перевірити каталог %s\n"
-#~ "Помилка: %s"
-
-#~ msgid "Error: %s exist, but is not a directory"
-#~ msgstr "Помилка: %s існує, але не каталог"
-
-#~ msgid "Directory %s OK."
-#~ msgstr "Каталог %s в порядку.."
-
-#~ msgid "Device:"
-#~ msgstr "Пристрій:"
-
-#~ msgid "_Device:"
-#~ msgstr "_Пристрій:"
-
-#~ msgid "Dir_ectory:"
-#~ msgstr "_Каталог:"
-
-#~ msgid "Play mode:"
-#~ msgstr "Режим програвання:"
-
-#~ msgid "Analog"
-#~ msgstr "Аналоговий"
-
-#~ msgid "Digital audio extraction"
-#~ msgstr "Цифрове зчитування аудіо"
-
-#~ msgid "No mixer"
-#~ msgstr "Немає мікшера"
-
-#~ msgid "CDROM drive"
-#~ msgstr "Компакт-диск"
-
-#~ msgid "OSS mixer"
-#~ msgstr "Мікшер OSS"
-
-#~ msgid "Check drive..."
-#~ msgstr "Перевірити пристрій..."
-
-#~ msgid "Remove drive"
-#~ msgstr "Прибрати пристрій"
-
-#~ msgid "CD Audio Player Configuration"
-#~ msgstr "Конфігурація програвача компакт-дисків"
-
-#~ msgid "Add drive"
-#~ msgstr "Додати пристрій"
-
-#~ msgid "Device"
-#~ msgstr "Пристрій"
-
-#~ msgid "CDDB:"
-#~ msgstr "CDDB:"
-
-#~ msgid "Use CDDB"
-#~ msgstr "Використовувати CDDB"
-
-#~ msgid "Get server list"
-#~ msgstr "Отримати список серверів"
-
-#~ msgid "Show network window"
-#~ msgstr "Показати вікно мережі"
-
-#~ msgid "CDDB server:"
-#~ msgstr "Cервер CDDB :"
-
-#~ msgid "CD Index:"
-#~ msgstr "Індекс CD:"
-
-#~ msgid "Use CD Index"
-#~ msgstr "Використовувати індекс компакт-дисків"
-
-#~ msgid "CD Index server:"
-#~ msgstr "Сервер індексів CD:"
-
-#~ msgid "Override generic titles"
-#~ msgstr "Має перевагу над загальними заголовками"
-
-#~ msgid "Name format:"
-#~ msgstr "Формат назви:"
-
-#~ msgid "CD Info"
-#~ msgstr "Інформація про компакт"
-
-#, fuzzy
-#~ msgid "Japanese (EUC-JP)"
-#~ msgstr "Японський:"
-
-#, fuzzy
-#~ msgid "Unicode (UTF-8)"
-#~ msgstr "  (недопустима послідовність Юнікод)"
-
-#, fuzzy
-#~ msgid "Korean (UHC)"
-#~ msgstr "Корейський:"
-
-#~ msgid "Select the directory where you want to store the MPEG streams:"
-#~ msgstr "Виберіть директорію для запису потоків MPEG:"
-
-#, fuzzy
-#~ msgid "Flac Configuration"
-#~ msgstr "Конфігурація програвача компакт-дисків"
-
-#~ msgid "Convert character set from :"
-#~ msgstr "Перетворити кодування із:"
-
-#~ msgid "to :"
-#~ msgstr "на :"
-
-#, fuzzy
-#~ msgid "Enable ReplayGain processing"
-#~ msgstr "Вмикнути підсилення програвання"
-
-#~ msgid "Resolution"
-#~ msgstr "Роздільність:"
-
-#~ msgid "Without ReplayGain"
-#~ msgstr "Без підсилення при програванні"
-
-#~ msgid "Dither 24bps to 16bps"
-#~ msgstr "Змішувати 24bps до 16bps"
-
-#~ msgid "With ReplayGain"
-#~ msgstr "З підсиленням при програванні"
-
-#, fuzzy
-#~ msgid "Enable dithering"
-#~ msgstr "Вмикнено"
-
-#~ msgid "Noise shaping"
-#~ msgstr "Фомування шуму"
-
-#~ msgid "high"
-#~ msgstr "високе"
-
-#~ msgid "Dither to"
-#~ msgstr "Змішувати до"
-
-#~ msgid "16 bps"
-#~ msgstr "16 біт"
-
-#~ msgid "24 bps"
-#~ msgstr "24 біт"
-
-#~ msgid "Output"
-#~ msgstr "Вивід"
-
-#~ msgid "Buffering:"
-#~ msgstr "Буфер:"
-
-#~ msgid "Buffer size (kb):"
-#~ msgstr "Розмір буфера (кбайт):"
-
-#~ msgid "Pre-buffer (percent):"
-#~ msgstr "Попереднє буферування (відсотків):"
-
-#~ msgid "Save stream to disk:"
-#~ msgstr "Записати потік на диск:"
-
-#~ msgid "Save stream to disk"
-#~ msgstr "Записати потік на диск:"
-
-#~ msgid "Path:"
-#~ msgstr "Маршрут:"
-
-#~ msgid "Browse"
-#~ msgstr "Переглянути"
-
-#~ msgid "SHOUT/Icecast:"
-#~ msgstr "SHOUT/Icecast:"
-
-#~ msgid "Enable Icecast Metadata UDP Channel"
-#~ msgstr "Вмикнути потік заголовків SHOUT/Icecast"
-
-#~ msgid "Streaming"
-#~ msgstr "Потік"
-
-#, fuzzy
-#~ msgid "About Flac Plugin"
-#~ msgstr "Про модуль ESounD"
-
-#, fuzzy
-#~ msgid "Samplerate: %d Hz"
-#~ msgstr "Частота:"
-
-#, fuzzy
-#~ msgid "Channels: %d"
-#~ msgstr "Канали:"
-
-#, fuzzy
-#~ msgid ""
-#~ "Samples: %llu\n"
-#~ "Length: %d:%.2d"
-#~ msgstr ""
-#~ "\n"
-#~ "Загальна довжина: %d:%d\n"
-
-#, fuzzy
-#~ msgid "Filesize: %ld B"
-#~ msgstr "Розмір файлу:"
-
-#~ msgid "Comment:"
-#~ msgstr "Коментар:"
-
-#~ msgid "Date:"
-#~ msgstr "Дата:"
-
-#~ msgid "Track number:"
-#~ msgstr "Номер доріжки:"
-
-#~ msgid "Genre:"
-#~ msgstr "Стиль:"
-
-#, fuzzy
-#~ msgid "Remove Tag"
-#~ msgstr "/Видалити все"
-
-#, fuzzy
-#~ msgid "FLAC Info:"
-#~ msgstr "Інформація про компакт"
-
-#, fuzzy
-#~ msgid "File Info - %s"
-#~ msgstr "Інформація про файл"
-
-#~ msgid "Error"
-#~ msgstr "Помилка"
-
-#~ msgid "LOOKING UP %s"
-#~ msgstr "ШУКАЮ %s"
-
-#~ msgid "Couldn't look up host %s"
-#~ msgstr "Не можу знайти хост %s"
-
-#~ msgid "CONNECTING TO %s:%d"
-#~ msgstr "З'ЄДНУЮСЬ З %s:%d"
-
-#~ msgid "Couldn't connect to host %s"
-#~ msgstr "Не можу під'єднатись до хосту %s"
-
-#~ msgid "CONNECTED: WAITING FOR REPLY"
-#~ msgstr "ПЗ'ЄДНАНО: ЧЕКАЮ НА ВІДПОВІДЬ"
-
-#~ msgid ""
-#~ "Couldn't connect to host %s\n"
-#~ "Server reported: %s"
-#~ msgstr ""
-#~ "Не можу підключитись до хоста  %s\n"
-#~ "Сервер повідомив: %s"
-
-#~ msgid "PRE-BUFFERING: %dKB/%dKB"
-#~ msgstr "ПРЕ-БУФЕР: %dКб/%dКб"
-
-#, fuzzy
-#~ msgid "FLAC Audio Plugin"
-#~ msgstr "Модуль підтримки аудіо компакт-дисків"
-
-#, fuzzy
-#~ msgid "ModPlug Configuration"
-#~ msgstr "Зміна налаштувань модуля підтримки MikMod"
-
-#~ msgid "16 bit"
-#~ msgstr "16 біт"
-
-#~ msgid "8 bit"
-#~ msgstr "8 біт"
-
-#, fuzzy
-#~ msgid "Resampling"
-#~ msgstr "Потік"
-
-#, fuzzy
-#~ msgid "Fast Playlist Info"
-#~ msgstr "Завантажии список програвання"
-
-#, fuzzy
-#~ msgid "Reverb"
-#~ msgstr "Сервер"
-
-#, fuzzy
-#~ msgid "Depth"
-#~ msgstr "Дует"
-
-#, fuzzy
-#~ msgid "Amount"
-#~ msgstr "Про програму"
-
-#, fuzzy
-#~ msgid "Range"
-#~ msgstr "Рейв"
-
-#, fuzzy
-#~ msgid "MOD Info"
-#~ msgstr "Інформація про компакт"
-
-#, fuzzy
-#~ msgid "Samples"
-#~ msgstr "Сальса"
-
-#, fuzzy
-#~ msgid "Instruments"
-#~ msgstr "Інструментальна"
-
-#, fuzzy
-#~ msgid "About Modplug"
-#~ msgstr "Про модуль ESounD"
-
-#~ msgid "MPEG Audio Plugin Configuration"
-#~ msgstr "Зміна налаштувань модуля підтримки формату MPEG"
-
-#~ msgid "Resolution:"
-#~ msgstr "Роздільність:"
-
-#~ msgid "Channels:"
-#~ msgstr "Канали:"
-
-#~ msgid "Stereo (if available)"
-#~ msgstr "Стерео (якщо наявне)"
-
-#~ msgid "Down sample:"
-#~ msgstr "Зменшити частоту тактування:"
-
-#~ msgid "1:1 (44 kHz)"
-#~ msgstr "1:1 (44 кГц)"
-
-#~ msgid "1:2 (22 kHz)"
-#~ msgstr "1:2 (22 кГц)"
-
-#~ msgid "1:4 (11 kHz)"
-#~ msgstr "1:4 (11 кГц)"
-
-#~ msgid "Decoder"
-#~ msgstr "Декодування"
-
-#~ msgid "ID3 Tags:"
-#~ msgstr "ID3-теги:"
-
-#~ msgid "ID3 format:"
-#~ msgstr "Формат ID3-тегу:"
-
-#~ msgid "Joint stereo"
-#~ msgstr "Об'єднане стерео"
-
-#~ msgid "Dual channel"
-#~ msgstr "Подвійний канал"
-
-#~ msgid "Single channel"
-#~ msgstr "Одинарний канал"
-
-#~ msgid "%d KBit/s"
-#~ msgstr "%d кБіт/с"
-
-#~ msgid "%ld Hz"
-#~ msgstr "%ld Гц"
-
-#~ msgid "50/15 ms"
-#~ msgstr "50/15 мс"
-
-#~ msgid "CCIT J.17"
-#~ msgstr "CCIT J.17"
-
-#~ msgid "No"
-#~ msgstr "Ні"
-
-#~ msgid "Yes"
-#~ msgstr "Так"
-
-#~ msgid " MPEG Info "
-#~ msgstr " Інформація MPEG: "
-
-#~ msgid "MPEG Level:"
-#~ msgstr "MPEG рівень:"
-
-#~ msgid "Bit rate:"
-#~ msgstr "Бітова частота:"
-
-#~ msgid "Sample rate:"
-#~ msgstr "Частота:"
-
-#~ msgid "File size:"
-#~ msgstr "Розмір файлу:"
-
-#, fuzzy
-#~ msgid "Mode:"
-#~ msgstr "Миша"
-
-#~ msgid "Error Protection:"
-#~ msgstr "Захист від помилок:"
-
-#~ msgid "Copyright:"
-#~ msgstr "Авторське право:"
-
-#~ msgid "Original:"
-#~ msgstr "Оригінальний:"
-
-#~ msgid "Emphasis:"
-#~ msgstr "Виразний:"
-
-#~ msgid " ID3 Tag "
-#~ msgstr " ID3-тег "
-
-#~ msgid "Year:"
-#~ msgstr "Рік:"
-
-#~ msgid "N/A"
-#~ msgstr "N/A"
-
-#~ msgid "%s"
-#~ msgstr "%s"
-
-#~ msgid "%lu Bytes"
-#~ msgstr "%lu байт"
-
-#, fuzzy
-#~ msgid "Couldn't connect to host %s:%d"
-#~ msgstr "Не можу під'єднатись до хосту %s"
-
-#, fuzzy
-#~ msgid "PRE-BUFFERING: %zuKB/%zuKB"
-#~ msgstr "ПРЕ-БУФЕР: %dКб/%dКб"
-
-#~ msgid "About MPEG Audio Plugin"
-#~ msgstr "Про модуль підтримки формату MPEG"
-
-#~ msgid "MPEG Audio Plugin"
-#~ msgstr "Модуль підтримки MPEG"
-
-#, fuzzy
-#~ msgid "TiMidity Configuration"
-#~ msgstr "Зміна налаштувань модуля підтримки MikMod"
-
-#, fuzzy
-#~ msgid "Sample Width"
-#~ msgstr "Частота:"
-
-#, fuzzy
-#~ msgid "TiMidity Configuration File"
-#~ msgstr "Зміна налаштувань модуля підтримки MikMod"
-
-#, fuzzy
-#~ msgid "TiMidity Player %s"
-#~ msgstr "Програвач MikMod %s"
-
-#, fuzzy
-#~ msgid "TiMidity Plugin %s"
-#~ msgstr "Модуль запису на диск %s"
-
-#, fuzzy
-#~ msgid "Couldn't load MIDI file"
-#~ msgstr "Не можу завантижити специфікатор вирівнювання"
-
-#~ msgid "Select the directory where you want to store the Ogg Vorbis streams:"
-#~ msgstr "Виберіть директорію для запису потоків Ogg Vorbis:"
-
-#~ msgid "Ogg Vorbis Audio Plugin Configuration"
-#~ msgstr "Зміна налаштувань модуля підтримки формату Ogg Vorbis"
-
-#~ msgid "Ogg Vorbis Tags:"
-#~ msgstr "Теги Ogg Vorbis:"
-
-#~ msgid "ReplayGain Settings:"
-#~ msgstr "Установки для підсилення програвання"
-
-#~ msgid "ReplayGain Type:"
-#~ msgstr "Тип підсилення прогавання:"
-
-#~ msgid "use Track Gain/Peak"
-#~ msgstr "користуватись підсиленням/піковими рівнями для доріжок"
-
-#~ msgid "use Album Gain/Peak"
-#~ msgstr "користуватись підсиленням/піковими рівнями для альбому"
-
-#~ msgid "Enable 6dB Boost + Hard Limiting"
-#~ msgstr "Дозволити підсилення 6дБ + жорстке обмеження"
-
-#~ msgid ""
-#~ "An error occured:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Сталася помилка:\n"
-#~ "%s"
-
-#~ msgid "Error!"
-#~ msgstr "Помилка!"
-
-#~ msgid "Failed to modify tag (open)"
-#~ msgstr "Не можу змінити тег(відкрити)"
-
-#~ msgid "Failed to modify tag (close)"
-#~ msgstr "Не можу змінити тег(закрити)"
-
-#~ msgid "Failed to modify tag"
-#~ msgstr "Не можу змінити тег"
-
-#~ msgid " Ogg Vorbis Tag "
-#~ msgstr " Тег Ogg Vorbis "
-
-#~ msgid "Description:"
-#~ msgstr "Опис:"
-
-#~ msgid "Version:"
-#~ msgstr "Версія:"
-
-#~ msgid "ISRC number:"
-#~ msgstr "Номер ISRC:"
-
-#~ msgid "Organization:"
-#~ msgstr "Організація:"
-
-#~ msgid " Ogg Vorbis ReplayGain "
-#~ msgstr " Ogg Vorbis ReplayGain"
-
-#~ msgid "Album peak:"
-#~ msgstr "Піковий рівень альбома:"
-
-#~ msgid " Ogg Vorbis Info "
-#~ msgstr "Інформація Ogg Vorbis: "
-
-#~ msgid "Length:"
-#~ msgstr "Довжина:"
-
-#~ msgid "%d KBit/s (nominal)"
-#~ msgstr "%d кБіт/с (номінал)"
-
-#~ msgid "%d Hz"
-#~ msgstr "%d Гц"
-
-#~ msgid "%d"
-#~ msgstr "%d"
-
-#~ msgid "%d:%.2d"
-#~ msgstr "%d:%.2d"
-
-#~ msgid "%d Bytes"
-#~ msgstr "%d байт"
-
-#~ msgid "Ogg Vorbis Audio Plugin"
-#~ msgstr "Модуль підтримки Ogg Vorbis"
-
-#~ msgid "About Ogg Vorbis Audio Plugin"
-#~ msgstr "Про модуль піддтримки формату Ogg Vorbis"
-
-#~ msgid ""
-#~ "Ogg Vorbis Plugin by the Xiph.org Foundation\n"
-#~ "\n"
-#~ "Original code by\n"
-#~ "Tony Arcieri <bascule@inferno.tusculum.edu>\n"
-#~ "Contributions from\n"
-#~ "Chris Montgomery <monty@xiph.org>\n"
-#~ "Peter Alm <peter@xmms.org>\n"
-#~ "Michael Smith <msmith@labyrinth.edu.au>\n"
-#~ "Jack Moffitt <jack@icecast.org>\n"
-#~ "Jorn Baayen <jorn@nl.linux.org>\n"
-#~ "Haavard Kvaalen <havardk@xmms.org>\n"
-#~ "Gian-Carlo Pascutto <gcp@sjeng.org>\n"
-#~ "\n"
-#~ "Visit the Xiph.org Foundation at http://www.xiph.org/\n"
-#~ msgstr ""
-#~ "Модуль Ogg Vorbis від Фундації Xing.org\n"
-#~ "\n"
-#~ "Програмування\n"
-#~ "Tony Arcieri <bascule@inferno.tusculum.edu>\n"
-#~ "Внески від\n"
-#~ "Chris Montgomery <monty@xiph.org>\n"
-#~ "Peter Alm <peter@xmms.org>\n"
-#~ "Michael Smith <msmith@labyrinth.edu.au>\n"
-#~ "Jack Moffitt <jack@icecast.org>\n"
-#~ "Jorn Baayen <jorn@nl.linux.org>\n"
-#~ "Haavard Kvaalen <havardk@xmms.org>\n"
-#~ "Gian-Carlo Pascutto <gcp@sjeng.org>\n"
-#~ "\n"
-#~ "Відвідайте майданчик фундації Xing.org за адресою http://www.xiph.org/\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "Adapted for Audacious usage by Tony Vroon <chainsaw@gentoo.org>\n"
-#~ "from the xmms_sndfile plugin which is:\n"
-#~ "Copyright (C) 2000, 2002 Erik de Castro Lopo\n"
-#~ "\n"
-#~ "This program is free software ; you can redistribute it and/or modify \n"
-#~ "it under the terms of the GNU General Public License as published by \n"
-#~ "the Free Software Foundation ; either version 2 of the License, or \n"
-#~ "(at your option) any later version. \n"
-#~ " \n"
-#~ "This program is distributed in the hope that it will be useful, \n"
-#~ "but WITHOUT ANY WARRANTY ; without even the implied warranty of \n"
-#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  \n"
-#~ "See the GNU General Public License for more details. \n"
-#~ "\n"
-#~ "You should have received a copy of the GNU General Public \n"
-#~ "License along with this program ; if not, write to \n"
-#~ "the Free Software Foundation, Inc., \n"
-#~ "51 Franklin Street, Fifth Floor, \n"
-#~ "Boston, MA  02110-1301  USA"
-#~ msgstr ""
-#~ "Модуль XMMS ESounD\n"
-#~ "\n"
-#~ "Ця програма належить до вільного програмного забезпечення. Ви маєте\n"
-#~ "право розповсюджувати та/або видозмінювати її керуючись при цьому\n"
-#~ "умовами Загальної Публічної Ліцензії GNU у такому вигляді, як вона\n"
-#~ "була опублікована Фундацією Вільного Програмного забезпечення (Free\n"
-#~ "Software Foundation) або версією 2 Ліцензії, або (на Ваш вибір)\n"
-#~ "будь-якою пізнішою версією.\n"
-#~ "\n"
-#~ "Ця програма розповсюджується із сподіваннями, що вона може бути\n"
-#~ "корисною, але БЕЗ НІЯКОЇ ГАРАНТІЇ, навіть без уявної гарантії того, що\n"
-#~ "ця програма може бути КУПЛЕНОЮ або ПІДХОДИТЬ ПІД ЯКУСЬ ПЕВНУ\n"
-#~ "МЕТУ. Подальші подробиці дивіться у Загальній Публічній Ліцензії GNU.\n"
-#~ "\n"
-#~ "Ви маєте отримати копію Загальної Публічної Ліцензії GNU разом з цією\n"
-#~ "програмою. Якщо ж ні напишіть у Фундацію Вільного Програмного\n"
-#~ "забезпечення за адресою  59 Temple Place - Suite 330, Boston, MA\n"
-#~ "02111-1307, USA."
-
-#~ msgid "WAV Audio Plugin"
-#~ msgstr "Модуль підтримки WAV"
-
-#, fuzzy
-#~ msgid "WMA Player %s"
-#~ msgstr "Програвач MikMod %s"
-
-#, fuzzy
-#~ msgid "About %s"
-#~ msgstr "Про програму"
-
-#, fuzzy
-#~ msgid " Close "
-#~ msgstr "/Закрити"
-
-#~ msgid "About OSS Driver"
-#~ msgstr "Про модуль виводу OSS"
-
-#, fuzzy
-#~ msgid ""
-#~ "Audacious OSS Driver\n"
-#~ "\n"
-#~ " This program is free software; you can redistribute it and/or modify\n"
-#~ "it under the terms of the GNU General Public License as published by\n"
-#~ "the Free Software Foundation; either version 2 of the License, or\n"
-#~ "(at your option) any later version.\n"
-#~ "\n"
-#~ "This program is distributed in the hope that it will be useful,\n"
-#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-#~ "GNU General Public License for more details.\n"
-#~ "\n"
-#~ "You should have received a copy of the GNU General Public License\n"
-#~ "along with this program; if not, write to the Free Software\n"
-#~ "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA "
-#~ "02110-1301,\n"
-#~ "USA."
-#~ msgstr ""
-#~ "Драйвер XMMS OSS \n"
-#~ "\n"
-#~ "Ця програма належить до вільного програмного забезпечення. Ви маєте\n"
-#~ "право розповсюджувати та/або видозмінювати її керуючись при цьому\n"
-#~ "умовами Загальної Публічної Ліцензії GNU у такому вигляді, як вона\n"
-#~ "була опублікована Фундацією Вільного Програмного забезпечення (Free\n"
-#~ "Software Foundation) або версією 2 Ліцензії, або (на Ваш вибір)\n"
-#~ "будь-якою пізнішою версією.\n"
-#~ "\n"
-#~ "Ця програма розповсюджується із сподіваннями, що вона може бути\n"
-#~ "корисною, але БЕЗ НІЯКОЇ ГАРАНТІЇ, навіть без уявної гарантії того, що\n"
-#~ "ця програма може бути КУПЛЕНОЮ або ПІДХОДИТЬ ПІД ЯКУСЬ ПЕВНУ\n"
-#~ "МЕТУ. Подальші подробиці дивіться у Загальній Публічній Ліцензії GNU.\n"
-#~ "\n"
-#~ "Ви маєте отримати копію Загальної Публічної Ліцензії GNU разом з цією\n"
-#~ "програмою. Якщо ж ні напишіть у Фундацію Вільного Програмного\n"
-#~ "забезпечення за адресою  59 Temple Place - Suite 330, Boston, MA\n"
-#~ "02111-1307, USA."
-
-#~ msgid "Default (%s)"
-#~ msgstr "Основний (%s)"
-
-#~ msgid "OSS Driver configuration"
-#~ msgstr "Конфігурація драйвера OSS"
-
-#~ msgid "Audio device:"
-#~ msgstr "Звуковий пристрій:"
-
-#~ msgid "Use alternate device:"
-#~ msgstr "Користуватися іншим пристроєм:"
-
-#~ msgid "Mixer device:"
-#~ msgstr "Пристрій мікшера:"
-
-#~ msgid "Devices"
-#~ msgstr "Пристрої"
-
-#~ msgid "Buffer size (ms):"
-#~ msgstr "Розмір буфера (мс):"
-
-#~ msgid "Mixer Settings:"
-#~ msgstr "Установки мікшера:"
-
-#~ msgid "Volume controls Master not PCM"
-#~ msgstr "Гучністю керує Master, а не PCM"
-
-#~ msgid "Mixer"
-#~ msgstr "Мікшер"
-
-#~ msgid "About ALSA Driver"
-#~ msgstr "Про драйвер  ALSA"
-
-#, fuzzy
-#~ msgid ""
-#~ "Audacious ALSA Driver\n"
-#~ "\n"
-#~ " This program is free software; you can redistribute it and/or modify\n"
-#~ "it under the terms of the GNU General Public License as published by\n"
-#~ "the Free Software Foundation; either version 2 of the License, or\n"
-#~ "(at your option) any later version.\n"
-#~ "\n"
-#~ "This program is distributed in the hope that it will be useful,\n"
-#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-#~ "GNU General Public License for more details.\n"
-#~ "\n"
-#~ "You should have received a copy of the GNU General Public License\n"
-#~ "along with this program; if not, write to the Free Software\n"
-#~ "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA "
-#~ "02110-1301,\n"
-#~ "USA.\n"
-#~ "Author: Matthieu Sozeau (mattam@altern.org)"
-#~ msgstr ""
-#~ "Драйвер XMMS ALSA \n"
-#~ "\n"
-#~ "Ця програма належить до вільного програмного забезпечення. Ви маєте\n"
-#~ "право розповсюджувати та/або видозмінювати її керуючись при цьому\n"
-#~ "умовами Загальної Публічної Ліцензії GNU у такому вигляді, як вона\n"
-#~ "була опублікована Фундацією Вільного Програмного забезпечення (Free\n"
-#~ "Software Foundation) або версією 2 Ліцензії, або (на Ваш вибір)\n"
-#~ "будь-якою пізнішою версією.\n"
-#~ "\n"
-#~ "Ця програма розповсюджується із сподіваннями, що вона може бути\n"
-#~ "корисною, але БЕЗ НІЯКОЇ ГАРАНТІЇ, навіть без уявної гарантії того, що\n"
-#~ "ця програма може бути КУПЛЕНОЮ або ПІДХОДИТЬ ПІД ЯКУСЬ ПЕВНУ\n"
-#~ "МЕТУ. Подальші подробиці дивіться у Загальній Публічній Ліцензії GNU.\n"
-#~ "\n"
-#~ "Ви маєте отримати копію Загальної Публічної Ліцензії GNU разом з цією\n"
-#~ "програмою. Якщо ж ні напишіть у Фундацію Вільного Програмного\n"
-#~ "забезпечення за адресою  59 Temple Place - Suite 330, Boston, MA\n"
-#~ "02111-1307, USA."
-
-#~ msgid "ALSA %s output plugin"
-#~ msgstr "Модуль виводу звуку ALSA %s"
-
-#~ msgid "Unknown soundcard"
-#~ msgstr "Невідома звукова карта"
-
-#~ msgid "Default PCM device (%s)"
-#~ msgstr "Основний PCM пристрій (%s)"
-
-#~ msgid "ALSA Driver configuration"
-#~ msgstr "Конфігурація драйвера ALSA"
-
-#~ msgid "Mixer:"
-#~ msgstr "Мікшер:"
-
-#~ msgid "Mixer card:"
-#~ msgstr "Пристрій мікшера:"
-
-#~ msgid "Device settings"
-#~ msgstr "Установки мікшера"
-
-#, fuzzy
-#~ msgid "Soundcard:"
-#~ msgstr "Звукова доріжка"
-
-#~ msgid "Buffer time (ms):"
-#~ msgstr "Час буфера (мс):"
-
-#~ msgid "Period time (ms):"
-#~ msgstr "Розмір періоду (мс):"
-
-#~ msgid "Advanced settings"
-#~ msgstr "Додаткові установки"
-
-#, fuzzy
-#~ msgid "aRts Driver configuration"
-#~ msgstr "Конфігурація драйвера OSS"
-
-#~ msgid "Disk Writer Plugin %s"
-#~ msgstr "Модуль запису на диск %s"
-
-#~ msgid ""
-#~ "You cannot use the Disk Writer plugin\n"
-#~ "when you're running in realtime mode."
-#~ msgstr ""
-#~ "Ви не можете використовувати модуль запису на диск\n"
-#~ "працюючи в режимі реального часу."
-
-#~ msgid "Select the directory where you want to store the output files:"
-#~ msgstr "Виберіть директорію для запису потоків MPEG:"
-
-#~ msgid "Disk Writer Configuration"
-#~ msgstr "Конфігурація модуля запису на диск"
-
-#~ msgid "About ESounD Plugin"
-#~ msgstr "Про модуль ESounD"
-
-#, fuzzy
-#~ msgid ""
-#~ "Audacious ESounD Plugin\n"
-#~ "\n"
-#~ " This program is free software; you can redistribute it and/or modify\n"
-#~ "it under the terms of the GNU General Public License as published by\n"
-#~ "the Free Software Foundation; either version 2 of the License, or\n"
-#~ "(at your option) any later version.\n"
-#~ "\n"
-#~ "This program is distributed in the hope that it will be useful,\n"
-#~ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-#~ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-#~ "GNU General Public License for more details.\n"
-#~ "\n"
-#~ "You should have received a copy of the GNU General Public License\n"
-#~ "along with this program; if not, write to the Free Software\n"
-#~ "Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA "
-#~ "02110-1301,\n"
-#~ "USA."
-#~ msgstr ""
-#~ "Модуль XMMS ESounD\n"
-#~ "\n"
-#~ "Ця програма належить до вільного програмного забезпечення. Ви маєте\n"
-#~ "право розповсюджувати та/або видозмінювати її керуючись при цьому\n"
-#~ "умовами Загальної Публічної Ліцензії GNU у такому вигляді, як вона\n"
-#~ "була опублікована Фундацією Вільного Програмного забезпечення (Free\n"
-#~ "Software Foundation) або версією 2 Ліцензії, або (на Ваш вибір)\n"
-#~ "будь-якою пізнішою версією.\n"
-#~ "\n"
-#~ "Ця програма розповсюджується із сподіваннями, що вона може бути\n"
-#~ "корисною, але БЕЗ НІЯКОЇ ГАРАНТІЇ, навіть без уявної гарантії того, що\n"
-#~ "ця програма може бути КУПЛЕНОЮ або ПІДХОДИТЬ ПІД ЯКУСЬ ПЕВНУ\n"
-#~ "МЕТУ. Подальші подробиці дивіться у Загальній Публічній Ліцензії GNU.\n"
-#~ "\n"
-#~ "Ви маєте отримати копію Загальної Публічної Ліцензії GNU разом з цією\n"
-#~ "програмою. Якщо ж ні напишіть у Фундацію Вільного Програмного\n"
-#~ "забезпечення за адресою  59 Temple Place - Suite 330, Boston, MA\n"
-#~ "02111-1307, USA."
-
-#~ msgid "Host:"
-#~ msgstr "Хост:"
-
-#~ msgid "Use remote host"
-#~ msgstr "Користуватися віддаленим хостом"
-
-#~ msgid "Volume controls OSS mixer"
-#~ msgstr "Гучністю керує мікшер OSS"
-
-#~ msgid "Server"
-#~ msgstr "Сервер"
-
-#~ msgid "eSound Output Plugin"
-#~ msgstr "Вихідний модуль ESounD"
-
-#, fuzzy
-#~ msgid "About JACK Output Plugin 0.15"
-#~ msgstr "Вихідний модуль ESounD"
-
-#, fuzzy
-#~ msgid "About the Sun Driver"
-#~ msgstr "Про модуль виводу OSS"
-
-#, fuzzy
-#~ msgid "Audio control device:"
-#~ msgstr "Звуковий пристрій:"
-
-#, fuzzy
-#~ msgid "Volume controls device:"
-#~ msgstr "Керування гучністю:"
-
-#, fuzzy
-#~ msgid "Sun driver configuration"
-#~ msgstr "Конфігурація драйвера OSS"
-
-#~ msgid "/Toggle Decorations"
-#~ msgstr "/Перемикнути відображення обрамлення"
-
-#~ msgid "Blur scope"
-#~ msgstr "Розмитий осцилоскоп"
-
-#~ msgid "Blur Scope: Color selection"
-#~ msgstr "Розмитий осцилоскоп: вибір кольору"
-
-#~ msgid "Options:"
-#~ msgstr "Параметри:"
-
-#~ msgid "** DOUBLESIZE HAS BEEN REMOVED **"
-#~ msgstr "** ПОДВІЙНИЙ РОЗМІР УСУНУТО **"
-
-#, fuzzy
-#~ msgid "<b>_Transparency</b>"
-#~ msgstr "<b>Відтворення</b>"
-
-#, fuzzy
-#~ msgid "Scrobbler Configuration"
-#~ msgstr "Конфігурація програвача компакт-дисків"
-
-#~ msgid "Warning"
-#~ msgstr "Застереження"
-
-#~ msgid "Song Change Configuration"
-#~ msgstr "Конфігурація програвача компакт-дисків"
-
-#, fuzzy
-#~ msgid "Song Metadata"
-#~ msgstr "Соната"
-
-#, fuzzy
-#~ msgid "Port"
-#~ msgstr "Порт:"
-
-#, fuzzy
-#~ msgid "Client name"
-#~ msgstr "Назва файлу"
-
-#, fuzzy
-#~ msgid "Port name"
-#~ msgstr "Назва доріжки"
-
-#, fuzzy
-#~ msgid "ALSA output ports"
-#~ msgstr "Модуль виводу звуку ALSA %s"
-
-#~ msgid "Convert non-UTF8 ID3 tags to UTF8"
-#~ msgstr ""
-#~ "Перетворювати ID3-теги (назви пісень тощо) з локального кодування в Юнікод"
-
-#~ msgid "ID3 encoding:"
-#~ msgstr "Кодування ID3-тегів:"
-
-#, fuzzy
-#~ msgid "Convert non-UTF8 Vorbis tags to UTF8"
-#~ msgstr ""
-#~ "Перетворювати ID3-теги (назви пісень тощо) з локального кодування в Юнікод"
-
-#, fuzzy
-#~ msgid "Vorbis encoding:"
-#~ msgstr "Кодування ID3-тегів:"
-
-#, fuzzy
-#~ msgid "<b>WMA Version:</b>"
-#~ msgstr "<b>Візуалізація</b>"
-
-#, fuzzy
-#~ msgid "<b>Channels:</b>"
-#~ msgstr "Канали:"
-
-#, fuzzy
-#~ msgid "<b>Filesize:</b>"
-#~ msgstr "<b>Ім'я файлу</b>"
-
-#, fuzzy
-#~ msgid "WMA Info"
-#~ msgstr "Інформація про компакт"
-
-#, fuzzy
-#~ msgid "<b>Comments:</b>"
-#~ msgstr "<b>_Шрифти</b>"
-
-#, fuzzy
-#~ msgid "<b>Track:</b>"
-#~ msgstr "<b>Відтворення</b>"
-
-#, fuzzy
-#~ msgid "Tags"
-#~ msgstr "Танґо"
-
-#~ msgid "Edward Brocklesby"
-#~ msgstr "Edward Brocklesby"
-
-#~ msgid "Chong Kai Xiong"
-#~ msgstr "Chong Kai Xiong"
-
-#~ msgid "Milosz Derezynski"
-#~ msgstr "Milosz Derezynski"
-
-#~ msgid "David Lau"
-#~ msgstr "David Lau"
-
-#~ msgid "Ole Andre Vadla Ravnaas"
-#~ msgstr "Ole Andre Vadla Ravnaas"
-
-#~ msgid "Michiel Sikkes"
-#~ msgstr "Michiel Sikkes"
-
-#~ msgid "Bernard Blackham"
-#~ msgstr "Bernard Blackham"
-
-#~ msgid "Oliver Blin"
-#~ msgstr "Oliver Blin"
-
-#~ msgid "Tomas Bzatek"
-#~ msgstr "Tomas Bzatek"
-
-#~ msgid "Jon Dowland"
-#~ msgstr "Jon Dowland"
-
-#~ msgid "Artur Frysiak"
-#~ msgstr "Artur Frysiak"
-
-#~ msgid "Sebastian Kapfer"
-#~ msgstr "Sebastian Kapfer"
-
-#~ msgid "Lukas Koberstein"
-#~ msgstr "Lukas Koberstein"
-
-#~ msgid "Dan Korostelev"
-#~ msgstr "Dan Korostelev <dan@ats.energo.ru>"
-
-#~ msgid "Michael Marineau"
-#~ msgstr "Michiel Sikkes"
-
-#~ msgid "Tim-Philipp Muller"
-#~ msgstr "Tim-Philipp Muller"
-
-#~ msgid "Olivier Samyn"
-#~ msgstr "Olivier Samyn"
-
-#~ msgid "Martijn Vernooij"
-#~ msgstr "Martijn Vernooij"
-
-#~ msgid "Laurens Buhler"
-#~ msgstr "Laurens Buhler"
-
-#~ msgid "David Le Brun"
-#~ msgstr "David Le Brun"
-
-#~ msgid "Matthias Debus"
-#~ msgstr "Matthias Debus"
-
-#~ msgid "Alessio D'Ascanio"
-#~ msgstr "Alessio D'Ascanio"
-
-#~ msgid "DongCheon Park"
-#~ msgstr "DongCheon Park"
-
-#~ msgid "Rimas Kudelis"
-#~ msgstr "Rimas Kudelis"
-
-#~ msgid "Jacek Wolszczak"
-#~ msgstr "Jacek Wolszczak"
-
-#~ msgid "Pavlo Bohmat"
-#~ msgstr "Pavlo Bohmat"
-
-#~ msgid "Martin Persenius"
-#~ msgstr "Martin Persenius"
-
-#~ msgid "<span size=\"xx-large\"><b>Plugins</b></span>"
-#~ msgstr "<span size=\"xx-large\"><b>Модулі</b></span>"
-
-#~ msgid "_Media plugin list:"
-#~ msgstr "_Список модулів підтримки музичних форматів:"
-
-#, fuzzy
-#~ msgid ""
-#~ "The change is now effective in Audacious' configuration database, but "
-#~ "won't take effect for playback until the next song!\n"
-#~ "\n"
-#~ "Optionally, you can stop and restart playback for the change to take "
-#~ "effect."
-#~ msgstr ""
-#~ "Зміни задіяні в конфигурації бази даних BMP, але не матимуть ефекту під "
-#~ "час програвання до наступної пісні!\n"
-#~ "\n"
-#~ "Щоб зміни подіяли, ви можете  перезапустити програвання."
-
-#~ msgid "<span size=\"xx-large\"><b>Appearance</b></span>"
-#~ msgstr "<span size=\"xx-large\"><b>Зовнішній вигляд</b></span>"
-
-#~ msgid "<span size=\"xx-large\"><b>Mouse</b></span>"
-#~ msgstr "<span size=\"xx-large\"><b>Миша</b></span>"
-
-#~ msgid "<span size=\"xx-large\"><b>Playlist</b></span>"
-#~ msgstr "<span size=\"xx-large\"><b>Список програвання</b></span>"
-
-#~ msgid "<span size=\"xx-large\"><b>Equalizer</b></span>"
-#~ msgstr "<span size=\"xx-large\"><b>Еквалайзер</b></span>"
-
-#~ msgid "Use proxy"
-#~ msgstr "Користуватися проксі"
-
-#~ msgid "Frames:"
-#~ msgstr "Кадрів:"
-
-#~ msgid ""
-#~ "Variable,\n"
-#~ "avg. bitrate: %d KBit/s"
-#~ msgstr ""
-#~ "Змінна,\n"
-#~ "Cередня бітова частота:: %d кб/с"
-
-#~ msgid "Francisco Javier F. Serrador"
-#~ msgstr "Francisco Javier F. Serrador"
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Unable to write to file: %s"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Не можу записати в файл: %s"
-
-#~ msgid "Couldn't write tag!"
-#~ msgstr "Не можу записати тег!"
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Unable to open file: %s"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Не можу відкрити файл: %s"
-
-#~ msgid ""
-#~ "%s\n"
-#~ "Unable to truncate file: %s"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Неможливо обрізати файл: %s"
-
-#~ msgid "Couldn't remove tag!"
-#~ msgstr "Не можу стерти тег!"
-
-#~ msgid "No tag to remove!"
-#~ msgstr "Немає тегу для стирання!"
-
-#~ msgid "Copy album tags"
-#~ msgstr "Копіювати теги альбому"
-
-#~ msgid "Paste album tags"
-#~ msgstr "Вставити теги альбому"
-
-#, fuzzy
-#~ msgid "About TiMidity Plugin"
-#~ msgstr "Про модуль підтримки формату MPEG"
-
-#, fuzzy
-#~ msgid "TiMidity Plugin"
-#~ msgstr "Модуль підтримки MPEG"
-
-#, fuzzy
-#~ msgid "Downsample:"
-#~ msgstr "Зменшити частоту тактування:"
-
-#~ msgid "Look for hidden patterns in modules "
-#~ msgstr "Шукати приховані зразки в модулях"
-
-#~ msgid "Content"
-#~ msgstr "Визначати тип по вмісту"
-
-#~ msgid "Extension"
-#~ msgstr "Визначати тип по розширенню"
-
-#~ msgid "Extension and content"
-#~ msgstr "Визначати тип по розширенню і вмісту"
-
-#~ msgid "%s - BMP"
-#~ msgstr "%s - BMP"
-
-#, fuzzy
-#~ msgid "About Libvisual XMMS Plugin"
-#~ msgstr "Про модуль ESounD"
-
-#, fuzzy
-#~ msgid "Visualization Plugins"
-#~ msgstr "Список модулів _візуалізації:"
-
-#~ msgid "All plugins"
-#~ msgstr "Модулі"
-
-#~ msgid "Only non GL plugins"
-#~ msgstr "Тільки НЕ GL модулі"
-
-#~ msgid "Only GL plugins"
-#~ msgstr "Тільки GL модулі"
-
-#~ msgid "Accept"
-#~ msgstr "Прийняти"
-
-#, fuzzy
-#~ msgid " (enabled)"
-#~ msgstr "Вмикнено"
-
-#, fuzzy
-#~ msgid "Version: "
-#~ msgstr "Версія:"
-
-#~ msgid "Author: "
-#~ msgstr "Автор: "
-
-#~ msgid " error"
-#~ msgstr " помилка"
-
-#~ msgid "There is no info for this plugin"
-#~ msgstr "Інформація для цього модулю не наявна"
-
-#~ msgid "The list of input plugins is empty."
-#~ msgstr "Сисок модулів вводу порожній"
-
-#~ msgid "Cannot initialize SDL!\n"
-#~ msgstr "Не можу ініціалізувати SDL!\n"
-
-#~ msgid " will not be loaded."
-#~ msgstr " не буде завантажено"
-
-#~ msgid "Last plugin: (none)"
-#~ msgstr "Останній модуль: (відсутній)"
-
-#~ msgid "Last plugin: %s"
-#~ msgstr "Останній модуль: %s"
-
-#~ msgid "Special thanks to:"
-#~ msgstr "Особливі подяки:"
-
-#~ msgid "bmp: %s"
-#~ msgstr "BMP: %s"
-
-#~ msgid "/Play Directory"
-#~ msgstr "/Програвати каталог"
-
-#~ msgid "Add Folders"
-#~ msgstr "Додати каталог"
-
-#~ msgid "DISABLE ALWAYS ON TOP (N/A)"
-#~ msgstr "ЗАБОРОНИТИ СПЛИВАННЯ НАГОРУ (N/A)"
-
-#~ msgid "ENABLE ALWAYS ON TOP (N/A)"
-#~ msgstr "ДОЗВОЛИТИ СПЛИВАННЯ НАГОРУ  (N/A)"
-
-#, fuzzy
-#~ msgid "/Add Folders..."
-#~ msgstr "/Додати файли..."

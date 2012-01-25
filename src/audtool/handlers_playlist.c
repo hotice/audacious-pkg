@@ -33,7 +33,6 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gi18n.h>
-#include <mowgli.h>
 #include <locale.h>
 #include "libaudclient/audctrl.h"
 #include "audtool.h"
@@ -48,6 +47,32 @@ void playlist_advance(gint argc, gchar **argv)
 	audacious_remote_playlist_next(dbus_proxy);
 }
 
+void playlist_auto_advance_status(gint argc, gchar **argv)
+{
+	if (audacious_remote_is_advance(dbus_proxy))
+	{
+		audtool_report("on");
+	}
+	else
+	{
+		audtool_report("off");
+	}
+}
+
+void playlist_auto_advance_toggle(gint argc, gchar **argv)
+{
+	audacious_remote_toggle_advance(dbus_proxy);
+}
+
+void playlist_stop_after_status (gint argc, gchar * * argv)
+{
+    audtool_report (audacious_remote_is_stop_after (dbus_proxy) ? "on" : "off");
+}
+
+void playlist_stop_after_toggle (gint argc, gchar * * argv)
+{
+    audacious_remote_toggle_stop_after (dbus_proxy);
+}
 
 gint check_args_playlist_pos(gint argc, gchar **argv)
 {

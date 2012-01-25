@@ -1,92 +1,91 @@
 /*
  * audio.c
- * Copyright 2009 John Lindgren
+ * Copyright 2009-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <glib.h>
+#include <stdint.h>
 
 #include "audio.h"
 
 #define FROM_INT_LOOP(NAME, TYPE, SWAP, OFFSET, RANGE) \
-static void NAME (TYPE * in, gfloat * out, gint samples) \
+static void NAME (const TYPE * in, float * out, int samples) \
 { \
-    TYPE * end = in + samples; \
+    const TYPE * end = in + samples; \
     while (in < end) \
-        * out ++ = (TYPE) (SWAP (* in ++) - OFFSET) / (gdouble) RANGE; \
+        * out ++ = (TYPE) (SWAP (* in ++) - OFFSET) / (double) RANGE; \
 }
 
 #define TO_INT_LOOP(NAME, TYPE, SWAP, OFFSET, RANGE) \
-static void NAME (gfloat * in, TYPE * out, gint samples) \
+static void NAME (const float * in, TYPE * out, int samples) \
 { \
-    gfloat * end = in + samples; \
+    const float * end = in + samples; \
     while (in < end) \
     { \
-        gdouble f = * in ++; \
-        * out ++ = SWAP (OFFSET + (TYPE) (CLAMP (f, -1, 1) * (gdouble) RANGE)); \
+        double f = * in ++; \
+        * out ++ = SWAP (OFFSET + (TYPE) (CLAMP (f, -1, 1) * (double) RANGE)); \
     } \
 }
 
-static inline gint8 noop8 (gint8 i) {return i;}
-static inline gint16 noop16 (gint16 i) {return i;}
-static inline gint32 noop32 (gint32 i) {return i;}
+static inline int8_t noop8 (int8_t i) {return i;}
+static inline int16_t noop16 (int16_t i) {return i;}
+static inline int32_t noop32 (int32_t i) {return i;}
 
-FROM_INT_LOOP (from_s8, gint8, noop8, 0x00, 0x7f)
-FROM_INT_LOOP (from_u8, gint8, noop8, 0x80, 0x7f)
-FROM_INT_LOOP (from_s16, gint16, noop16, 0x0000, 0x7fff)
-FROM_INT_LOOP (from_u16, gint16, noop16, 0x8000, 0x7fff)
-FROM_INT_LOOP (from_s24, gint32, noop32, 0x000000, 0x7fffff)
-FROM_INT_LOOP (from_u24, gint32, noop32, 0x800000, 0x7fffff)
-FROM_INT_LOOP (from_s32, gint32, noop32, 0x00000000, 0x7fffffff)
-FROM_INT_LOOP (from_u32, gint32, noop32, 0x80000000, 0x7fffffff)
+FROM_INT_LOOP (from_s8, int8_t, noop8, 0x00, 0x7f)
+FROM_INT_LOOP (from_u8, int8_t, noop8, 0x80, 0x7f)
+FROM_INT_LOOP (from_s16, int16_t, noop16, 0x0000, 0x7fff)
+FROM_INT_LOOP (from_u16, int16_t, noop16, 0x8000, 0x7fff)
+FROM_INT_LOOP (from_s24, int32_t, noop32, 0x000000, 0x7fffff)
+FROM_INT_LOOP (from_u24, int32_t, noop32, 0x800000, 0x7fffff)
+FROM_INT_LOOP (from_s32, int32_t, noop32, 0x00000000, 0x7fffffff)
+FROM_INT_LOOP (from_u32, int32_t, noop32, 0x80000000, 0x7fffffff)
 
-TO_INT_LOOP (to_s8, gint8, noop8, 0x00, 0x7f)
-TO_INT_LOOP (to_u8, gint8, noop8, 0x80, 0x7f)
-TO_INT_LOOP (to_s16, gint16, noop16, 0x0000, 0x7fff)
-TO_INT_LOOP (to_u16, gint16, noop16, 0x8000, 0x7fff)
-TO_INT_LOOP (to_s24, gint32, noop32, 0x000000, 0x7fffff)
-TO_INT_LOOP (to_u24, gint32, noop32, 0x800000, 0x7fffff)
-TO_INT_LOOP (to_s32, gint32, noop32, 0x00000000, 0x7fffffff)
-TO_INT_LOOP (to_u32, gint32, noop32, 0x80000000, 0x7fffffff)
+TO_INT_LOOP (to_s8, int8_t, noop8, 0x00, 0x7f)
+TO_INT_LOOP (to_u8, int8_t, noop8, 0x80, 0x7f)
+TO_INT_LOOP (to_s16, int16_t, noop16, 0x0000, 0x7fff)
+TO_INT_LOOP (to_u16, int16_t, noop16, 0x8000, 0x7fff)
+TO_INT_LOOP (to_s24, int32_t, noop32, 0x000000, 0x7fffff)
+TO_INT_LOOP (to_u24, int32_t, noop32, 0x800000, 0x7fffff)
+TO_INT_LOOP (to_s32, int32_t, noop32, 0x00000000, 0x7fffffff)
+TO_INT_LOOP (to_u32, int32_t, noop32, 0x80000000, 0x7fffffff)
 
-static inline gint16 swap16 (gint16 i) {return GUINT16_SWAP_LE_BE (i);}
-static inline gint32 swap32 (gint32 i) {return GUINT32_SWAP_LE_BE (i);}
+static inline int16_t swap16 (int16_t i) {return GUINT16_SWAP_LE_BE (i);}
+static inline int32_t swap32 (int32_t i) {return GUINT32_SWAP_LE_BE (i);}
 
-FROM_INT_LOOP (from_s16_swap, gint16, swap16, 0x0000, 0x7fff)
-FROM_INT_LOOP (from_u16_swap, gint16, swap16, 0x8000, 0x7fff)
-FROM_INT_LOOP (from_s24_swap, gint32, swap32, 0x000000, 0x7fffff)
-FROM_INT_LOOP (from_u24_swap, gint32, swap32, 0x800000, 0x7fffff)
-FROM_INT_LOOP (from_s32_swap, gint32, swap32, 0x00000000, 0x7fffffff)
-FROM_INT_LOOP (from_u32_swap, gint32, swap32, 0x80000000, 0x7fffffff)
+FROM_INT_LOOP (from_s16_swap, int16_t, swap16, 0x0000, 0x7fff)
+FROM_INT_LOOP (from_u16_swap, int16_t, swap16, 0x8000, 0x7fff)
+FROM_INT_LOOP (from_s24_swap, int32_t, swap32, 0x000000, 0x7fffff)
+FROM_INT_LOOP (from_u24_swap, int32_t, swap32, 0x800000, 0x7fffff)
+FROM_INT_LOOP (from_s32_swap, int32_t, swap32, 0x00000000, 0x7fffffff)
+FROM_INT_LOOP (from_u32_swap, int32_t, swap32, 0x80000000, 0x7fffffff)
 
-TO_INT_LOOP (to_s16_swap, gint16, swap16, 0x0000, 0x7fff)
-TO_INT_LOOP (to_u16_swap, gint16, swap16, 0x8000, 0x7fff)
-TO_INT_LOOP (to_s24_swap, gint32, swap32, 0x000000, 0x7fffff)
-TO_INT_LOOP (to_u24_swap, gint32, swap32, 0x800000, 0x7fffff)
-TO_INT_LOOP (to_s32_swap, gint32, swap32, 0x00000000, 0x7fffffff)
-TO_INT_LOOP (to_u32_swap, gint32, swap32, 0x80000000, 0x7fffffff)
+TO_INT_LOOP (to_s16_swap, int16_t, swap16, 0x0000, 0x7fff)
+TO_INT_LOOP (to_u16_swap, int16_t, swap16, 0x8000, 0x7fff)
+TO_INT_LOOP (to_s24_swap, int32_t, swap32, 0x000000, 0x7fffff)
+TO_INT_LOOP (to_u24_swap, int32_t, swap32, 0x800000, 0x7fffff)
+TO_INT_LOOP (to_s32_swap, int32_t, swap32, 0x00000000, 0x7fffffff)
+TO_INT_LOOP (to_u32_swap, int32_t, swap32, 0x80000000, 0x7fffffff)
 
-typedef void (* FromFunc) (void * in, gfloat * out, gint samples);
-typedef void (* ToFunc) (gfloat * in, void * out, gint samples);
+typedef void (* FromFunc) (const void * in, float * out, int samples);
+typedef void (* ToFunc) (const float * in, void * out, int samples);
 
 struct
 {
-    gint format;
+    int format;
     FromFunc from;
     ToFunc to;
 }
@@ -126,9 +125,9 @@ convert_table [] =
 #endif
 };
 
-void audio_from_int (void * in, gint format, gfloat * out, gint samples)
+void audio_from_int (const void * in, int format, float * out, int samples)
 {
-    gint entry;
+    int entry;
 
     for (entry = 0; entry < G_N_ELEMENTS (convert_table); entry ++)
     {
@@ -140,9 +139,9 @@ void audio_from_int (void * in, gint format, gfloat * out, gint samples)
     }
 }
 
-void audio_to_int (gfloat * in, void * out, gint format, gint samples)
+void audio_to_int (const float * in, void * out, int format, int samples)
 {
-    gint entry;
+    int entry;
 
     for (entry = 0; entry < G_N_ELEMENTS (convert_table); entry ++)
     {
@@ -154,10 +153,10 @@ void audio_to_int (gfloat * in, void * out, gint format, gint samples)
     }
 }
 
-void audio_amplify (gfloat * data, gint channels, gint frames, gfloat * factors)
+void audio_amplify (float * data, int channels, int frames, float * factors)
 {
-    gfloat * end = data + channels * frames;
-    gint channel;
+    float * end = data + channels * frames;
+    int channel;
 
     while (data < end)
     {
