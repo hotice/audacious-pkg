@@ -1,4 +1,4 @@
-audacious (3.2-1) UNRELEASED; urgency=low
+audacious (3.2-1) unstable; urgency=low
 
   * New upstream release. (Closes: #639374, #657081)
   * debian/control:
@@ -9,7 +9,7 @@ audacious (3.2-1) UNRELEASED; urgency=low
   * debian/libaudcore1.symbols: symbols file updated
   * debian/menu: command changed to "/usr/bin/audacious"
 
- -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Wed, 25 Jan 2012 21:30:42 +0100
+ -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Thu, 26 Jan 2012 22:54:40 +0100
 
 audacious (2.4.4-1) unstable; urgency=low
 
