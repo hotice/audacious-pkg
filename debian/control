@@ -3,7 +3,8 @@ Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
 Uploaders: Chris Taylor <ctaylor@debian.org>,
-           Bilal Akhtar <bilalakhtar@ubuntu.com>
+           Bilal Akhtar <bilalakhtar@ubuntu.com>,
+           Cyril Lavier <cyril.lavier@davromaniak.eu>
 Homepage: http://www.audacious-media-player.org/
 Build-Depends: autotools-dev (>= 20100122.1~),
                debhelper (>= 7.0.50~),
