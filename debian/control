@@ -12,10 +12,10 @@ Build-Depends: autotools-dev (>= 20100122.1~),
                libdbus-glib-1-dev (>= 0.60),
                libglade2-dev (>= 2.3.1),
                libgtk2.0-dev (>= 2.10),
+               libguess-dev,
                libmcs-dev (>= 0.7),
                librsvg2-bin,
-               libuchardet-dev,
-               libguess-dev
+               libuchardet-dev
 Standards-Version: 3.9.2
 VCS-Browser: http://git.debian.org/?p=pkg-multimedia/audacious.git;a=summary
 VCS-Git: git://git.debian.org/pkg-multimedia/audacious.git

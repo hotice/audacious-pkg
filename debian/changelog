@@ -1,6 +1,6 @@
 audacious (3.2-1) UNRELEASED; urgency=low
 
-  * New upstream release. (Closes: #639374)
+  * New upstream release. (Closes: #639374, #657081)
   * debian/control:
     + Removed all references to libmowgli
     + Added libuchardet-dev and libguess-dev as build-dep
