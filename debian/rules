@@ -9,6 +9,10 @@ endif
 # Do not link against unused libraries (make dpkg-shlibdeps happy).
 LDFLAGS += -Wl,-z,defs -Wl,--as-needed
 
+ifeq ($(DEB_BUILD_ARCH),sparc)
+export CFLAGS += -O1
+endif
+
 %:
 	dh $@ --with autotools_dev --parallel
 
@@ -24,3 +28,7 @@ override_dh_installdirs:
 	mkdir -p debian/tmp/usr/share/pixmaps
 	convert pixmaps/audacious.png -resize 16x16 debian/tmp/usr/share/pixmaps/audacious-16.xpm
 	convert pixmaps/audacious.png -resize 32x32 debian/tmp/usr/share/pixmaps/audacious-32.xpm
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -f src/libaudcore/audio.h
