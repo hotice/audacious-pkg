@@ -1,1 +1,1 @@
-usr/lib/libaudclient*.so.*
+usr/lib/*/libaudclient*.so.*

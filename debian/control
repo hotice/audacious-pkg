@@ -84,6 +84,7 @@ Description: audacious media player (debugging symbols)
 Package: audacious-dev
 Section: libdevel
 Architecture: any
+Multi-Arch: same
 Depends: libaudclient2 (= ${binary:Version}),
          libaudcore1 (= ${binary:Version}),
          libdbus-1-dev (>= 0.60),
@@ -119,6 +120,8 @@ Description: audacious development files
 
 Package: libaudclient2
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: audacious dbus remote control library
  Audacious is a fork of beep-media-player which supports winamp skins
@@ -142,6 +145,8 @@ Description: audacious dbus remote control library
 
 Package: libaudcore1
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: audacious core engine library
  Audacious is a fork of beep-media-player which supports winamp skins
