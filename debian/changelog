@@ -1,3 +1,17 @@
+audacious (3.2.1-1) unstable; urgency=low
+
+  * Team upload.
+  * New upstream bugfix release:
+    - Single-key playback shortcuts are back.
+    - PulseAudio output plugin sets buffer size correctly.
+    - Buildsystem cleanups.
+    - Translation updates.
+    - Other minor fixes.
+  * Set the -dbg package as Multi-Arch: same.
+  * Update watch file.
+
+ -- Alessio Treglia <alessio@debian.org>  Sun, 19 Feb 2012 18:29:45 +0100
+
 audacious (3.2-2) unstable; urgency=low
 
   [ Cyril Lavier ]
