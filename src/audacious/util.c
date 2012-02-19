@@ -31,8 +31,8 @@
 #include <windows.h>
 #endif
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
 #endif
 
 #include <glib.h>
@@ -44,6 +44,7 @@
 
 #include <libaudcore/audstrings.h>
 
+#include "config.h"
 #include "debug.h"
 #include "i18n.h"
 #include "misc.h"
@@ -144,7 +145,7 @@ char * write_temp_file (void * data, int64_t len)
             return NULL;
         }
 
-        data += written;
+        data = (char *) data + written;
         len -= written;
     }
 
