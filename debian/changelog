@@ -1,7 +1,11 @@
-audacious (3.2-2) UNRELEASED; urgency=low
+audacious (3.2-2) unstable; urgency=low
 
+  [ Cyril Lavier ]
   * debian/rules:
-    + Changed the optimisation level for sparc.
+    + Changed the optimisation level for sparc. (Closes: #659820)
+
+  [ Alessio Treglia ]
+  * Build for Multiarch.
 
  -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Fri, 17 Feb 2012 09:57:08 +0100
 
