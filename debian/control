@@ -16,7 +16,7 @@ Build-Depends: autotools-dev (>= 20100122.1~),
                libmcs-dev (>= 0.7),
                librsvg2-bin,
                libuchardet-dev
-Standards-Version: 3.9.2
+Standards-Version: 3.9.3
 VCS-Browser: http://git.debian.org/?p=pkg-multimedia/audacious.git;a=summary
 VCS-Git: git://git.debian.org/pkg-multimedia/audacious.git
 
