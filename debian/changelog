@@ -1,5 +1,6 @@
 audacious (3.2.1-2) unstable; urgency=low
 
+  * Team upload.
   * Build with GTK3. (LP: #923052)
 
  -- Alessio Treglia <alessio@debian.org>  Thu, 01 Mar 2012 00:12:46 +0100
