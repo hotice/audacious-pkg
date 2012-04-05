@@ -13,6 +13,9 @@
    language is requested. */
 #undef ENABLE_NLS
 
+/* Define to compiler syntax for public symbols */
+#undef EXPORT
+
 /* Define to 1 if you have the `backtrace' function. */
 #undef HAVE_BACKTRACE
 
