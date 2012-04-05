@@ -5,7 +5,7 @@ dnl ***
 dnl Initialize
 dnl ==========
 AC_PREREQ([2.59])
-AC_INIT([audacious], [3.2.1])
+AC_INIT([audacious], [3.2.2])
 AC_COPYRIGHT([(C) 2005-2012 Audacious Team])
 
 AC_SUBST([PACKAGE], [AC_PACKAGE_TARNAME])
@@ -28,6 +28,34 @@ AC_C_BIGENDIAN([BIGENDIAN=1], [BIGENDIAN=0],
  [AC_MSG_ERROR([Unknown machine byte order])],
  [AC_MSG_ERROR([Universal builds are not supported, sorry])])
 AC_SUBST([BIGENDIAN])
+
+dnl Platform
+dnl ========
+AC_MSG_CHECKING([for Microsoft Windows])
+case "$target" in
+    *mingw*)
+        AC_MSG_RESULT([yes])
+        HAVE_MSWINDOWS="yes"
+        ;;
+    *)
+        AC_MSG_RESULT([no])
+        HAVE_MSWINDOWS="no"
+        ;;
+esac
+AC_SUBST([HAVE_MSWINDOWS])
+
+dnl Prevent symbol collisions
+dnl =========================
+if test "x$HAVE_MSWINDOWS" = "xyes" ; then
+    EXPORT="__declspec(dllexport)"
+elif test "x$GCC" = "xyes" ; then
+    CFLAGS="$CFLAGS -fvisibility=hidden"
+    CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+    EXPORT="__attribute__((visibility(\"default\")))"
+else
+    AC_MSG_ERROR([Unknown syntax for EXPORT keyword])
+fi
+AC_DEFINE_UNQUOTED([EXPORT], [$EXPORT], [Define to compiler syntax for public symbols])
 
 dnl Headers and functions
 dnl ===============================
@@ -75,22 +103,9 @@ AC_ARG_ENABLE([text-console],
 [use_text_console=no]
 )
 
-AC_MSG_CHECKING([for Microsoft Windows])
-case "$target" in
-    *mingw*)
-        AC_MSG_RESULT([yes])
-        have_mswindows=yes
-        if test "x$use_text_console" = "xno"; then
-            LDFLAGS="$LDFLAGS -Wl,-subsystem,windows"
-        fi
-        ;;
-    *)
-        AC_MSG_RESULT([no])
-        have_mswindows=no
-        ;;
-esac
-
-AUD_CONDITIONAL([HAVE_MSWINDOWS], [have_mswindows])
+if test "x$HAVE_MSWINDOWS" = "xyes" && test "x$use_text_console" = "xno" ; then
+	LDFLAGS="$LDFLAGS -Wl,-subsystem,windows"
+fi
 
 dnl Check for GTK+
 dnl ==============
