@@ -1,0 +1,16 @@
+Description: Force SONAME bump to avoid breakage.
+Author: Alessio Treglia <alessio@debian.org>
+Bug: http://redmine.audacious-media-player.org/issues/97
+---
+ src/libaudcore/Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- audacious.orig/src/libaudcore/Makefile
++++ audacious/src/libaudcore/Makefile
+@@ -1,5 +1,5 @@
+ LIB = ${LIB_PREFIX}audcore${LIB_SUFFIX}
+-LIB_MAJOR = 1
++LIB_MAJOR = 1debian0
+ LIB_MINOR = 0
+ 
+ SRCS = audio.c \
