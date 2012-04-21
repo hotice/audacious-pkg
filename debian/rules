@@ -9,10 +9,6 @@ endif
 # Do not link against unused libraries (make dpkg-shlibdeps happy).
 LDFLAGS += -Wl,-z,defs -Wl,--as-needed
 
-ifeq ($(DEB_BUILD_ARCH),sparc)
-export CFLAGS += -O1
-endif
-
 %:
 	dh $@ --with autotools_dev --parallel
 
