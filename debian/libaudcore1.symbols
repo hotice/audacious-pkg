@@ -1,52 +1,15 @@
 libaudcore.so.1 libaudcore1 #MINVER#
-(optional)aud_log@Base 2.3
-(optional)aud_log_add_thread_context@Base 2.3
-(optional)aud_log_close@Base 2.3
-(optional)aud_log_delete_thread_context@Base 2.3
-(optional)aud_log_init@Base 2.3
-(optional)aud_log_line@Base 2.3
-(optional)aud_logv@Base 2.3
-(optional)aud_md5_append@Base 2.3
-(optional)aud_md5_finish@Base 2.3
-(optional)aud_md5_init@Base 2.3
  audio_amplify@Base 2.3
  audio_from_int@Base 2.3
  audio_to_int@Base 2.3
-(optional)buffered_file_const@Base 2.3
-(optional)buffered_file_vfs_fclose_impl@Base 2.3
-(optional)buffered_file_vfs_feof_impl@Base 2.3
-(optional)buffered_file_vfs_fopen_impl@Base 2.3
-(optional)buffered_file_vfs_fread_impl@Base 2.3
-(optional)buffered_file_vfs_fseek_impl@Base 2.3
-(optional)buffered_file_vfs_fsize_impl@Base 2.3
-(optional)buffered_file_vfs_ftell_impl@Base 2.3
-(optional)buffered_file_vfs_fwrite_impl@Base 2.3
-(optional)buffered_file_vfs_getc_impl@Base 2.3
-(optional)buffered_file_vfs_metadata_impl@Base 2.3
-(optional)buffered_file_vfs_rewind_impl@Base 2.3
-(optional)buffered_file_vfs_truncate_impl@Base 2.3
-(optional)buffered_file_vfs_ungetc_impl@Base 2.3
-(optional)chardet_to_utf8@Base 2.3
-(optional)convert_dos_path@Base 2.3
- convert_table@Base 2.3
  double_array_to_string@Base 3.2
  double_to_string@Base 3.2
-(optional)escape_shell_chars@Base 2.3
-(optional)event_queue@Base 2.4~beta1
  event_queue_cancel@Base 3.2
  event_queue_full@Base 3.2
-(optional)event_queue_timed@Base 2.4~beta1
-(optional)event_queue_with_data_free@Base 2.4~beta1
-(optional)filename_get_subtune@Base 2.3
-(optional)filename_split_subtune@Base 2.3
  filename_to_uri@Base 2.4.3
-(optional)filename_to_utf8@Base 2.3
  hook_associate@Base 2.4~beta1
  hook_call@Base 2.4~beta1
-(optional)hook_dissociate@Base 2.4~beta1
  hook_dissociate_full@Base 2.4~beta1
-(optional)hook_init@Base 2.4~beta1
-(optional)hook_register@Base 2.4~beta1
  index_allocate@Base 3.2
  index_append@Base 2.3
  index_copy_append@Base 2.4~alpha1
@@ -65,73 +28,36 @@ libaudcore.so.1 libaudcore1 #MINVER#
  index_sort@Base 2.3
  index_sort_with_data@Base 2.4~alpha1
  int_to_string@Base 3.2
-(optional)log_level_names@Base 2.3
-(optional)memfind@Base 2.4~alpha1
-(optional)str_append@Base 2.3
-(optional)str_assert_utf8@Base 2.3
  str_decode_percent@Base 3.2
  str_encode_percent@Base 3.2
  str_get@Base 3.2
  str_has_prefix_nocase@Base 2.3
  str_has_suffix_nocase@Base 2.3
-(optional)str_has_suffixes_nocase@Base 2.3
  str_nget@Base 3.2
  str_printf@Base 3.2
  str_ref@Base 3.2
-(optional)str_replace@Base 2.3
  str_replace_fragment@Base 3.2
-(optional)str_replace_in@Base 2.3
  str_set_utf8_impl@Base 3.2
-(optional)str_skip_chars@Base 2.3
  str_to_utf8@Base 2.3
-(optional)str_to_utf8_fallback@Base 2.3
  str_to_utf8_full@Base 3.2
  str_unref@Base 3.2
  string_compare@Base 2.3
  string_compare_encoded@Base 2.4.2
-(optional)string_cut_extension@Base 2.3
-(optional)string_decode_percent@Base 2.3
-(optional)string_encode_percent@Base 2.4~alpha1
  string_replace_char@Base 2.4~alpha1
  string_to_double@Base 3.2
  string_to_double_array@Base 3.2
  string_to_int@Base 3.2
-(optional)stringpool_get@Base 2.3
-(optional)stringpool_unref@Base 2.3
  strpool_abort@Base 3.2
  strpool_shutdown@Base 3.2
-(optional)tuple_associate_int@Base 2.3
-(optional)tuple_associate_string@Base 2.3
-(optional)tuple_associate_string_rel@Base 2.3
  tuple_copy@Base 2.3
-(optional)tuple_disassociate@Base 2.3
-(optional)tuple_error@Base 2.3
-(optional)tuple_evalctx_add_function@Base 2.3
-(optional)tuple_evalctx_add_var@Base 2.3
- tuple_evalctx_free@Base 2.3
- tuple_evalctx_new@Base 2.3
- tuple_evalctx_reset@Base 2.3
- tuple_evalnode_free@Base 2.3
  tuple_field_by_name@Base 3.2
  tuple_field_get_name@Base 3.2
  tuple_field_get_type@Base 3.2
-(optional)tuple_fields@Base 2.3
  tuple_format_title@Base 3.2
- tuple_formatter_compile@Base 2.3
- tuple_formatter_eval@Base 2.3
-(optional)tuple_formatter_make_title_string@Base 2.3
-(optional)tuple_formatter_print@Base 2.3
-(optional)tuple_formatter_process_construct@Base 2.3
-(optional)tuple_formatter_process_expr@Base 2.3
-(optional)tuple_formatter_process_function@Base 2.3
- tuple_formatter_process_string@Base 2.3
-(optional)tuple_formatter_register_expression@Base 2.3
-(optional)tuple_formatter_register_function@Base 2.3
  tuple_get_int@Base 2.3
  tuple_get_n_subtunes@Base 3.2
  tuple_get_nth_subtune@Base 3.2
  tuple_get_str@Base 3.2
-(optional)tuple_get_string@Base 2.3
  tuple_get_value_type@Base 2.3
  tuple_new@Base 2.3
  tuple_new_from_filename@Base 2.3
@@ -143,22 +69,10 @@ libaudcore.so.1 libaudcore1 #MINVER#
  tuple_set_subtunes@Base 3.2
  tuple_unref@Base 3.2
  tuple_unset@Base 3.2
-(optional)uri_check_utf8@Base 2.4.3
-(optional)uri_is_utf8@Base 2.4.3
  uri_parse@Base 3.2
  uri_to_display@Base 3.2
-(optional)uri_to_display_basename@Base 2.3
-(optional)uri_to_display_dirname@Base 2.3
  uri_to_filename@Base 2.4.3
-(optional)uri_to_utf8@Base 2.4.3
  vfs_async_file_get_contents@Base 2.4~beta1
- vfs_async_file_get_contents_trampoline@Base 2.4~beta1
- vfs_async_file_get_contents_worker@Base 2.4~beta1
-(optional)vfs_buffer_new@Base 2.3
-(optional)vfs_buffer_new_from_string@Base 2.3
-(optional)vfs_buffered_file_new_from_uri@Base 2.3
-(optional)vfs_buffered_file_release_live_fd@Base 2.3
-(optional)vfs_dup@Base 2.3
  vfs_fclose@Base 2.3
  vfs_feof@Base 2.3
  vfs_fget_be16@Base 2.3
@@ -194,16 +108,12 @@ libaudcore.so.1 libaudcore1 #MINVER#
  vfs_is_streaming@Base 2.3
  vfs_is_writeable@Base 2.3
  vfs_new@Base 3.2
-(optional)vfs_register_transport@Base 2.3
  vfs_rewind@Base 2.3
  vfs_set_lookup_func@Base 3.2
  vfs_set_verbose@Base 3.2
-(optional)vfs_transports@Base 2.3
-(optional)vfs_truncate@Base 2.3
  vfs_ungetc@Base 2.3
  vfs_vfprintf@Base 2.3
 libaudgui.so.1 libaudcore1 #MINVER#
- _aud_api_table@Base 2.4~beta1
  audgui_cleanup@Base 3.2
  audgui_confirm_playlist_delete@Base 2.4~alpha1
  audgui_connect_check_box@Base 2.4~alpha1
@@ -212,8 +122,6 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_create_vis_menu@Base 3.2
  audgui_destroy_on_escape@Base 2.4~alpha1
  audgui_export_playlist@Base 3.2
-(optional)audgui_get_library_store@Base 2.4~alpha1
-(optional)audgui_hide_about_window@Base 2.3
  audgui_hide_equalizer_window@Base 2.4~alpha2
  audgui_hide_filebrowser@Base 2.3
  audgui_hide_on_delete@Base 2.4~alpha1
@@ -243,174 +151,24 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_list_update_selection@Base 3.2
  audgui_pixbuf_for_current@Base 3.2
  audgui_pixbuf_for_entry@Base 3.2
-(optional)audgui_pixbuf_for_file@Base 2.4.0
  audgui_pixbuf_from_data@Base 2.4~alpha1
  audgui_pixbuf_scale_within@Base 2.4~alpha1
- audgui_pixbuf_uncache@Base 3.2
  audgui_playlist_manager@Base 3.2
- audgui_playlist_manager_cleanup@Base 3.2
-(optional)audgui_playlist_manager_destroy@Base 2.4~alpha1
-(optional)audgui_playlist_manager_ui_show@Base 2.4~alpha1
- audgui_queue_manager_cleanup@Base 3.2
  audgui_queue_manager_show@Base 3.2
  audgui_register_stock_icons@Base 2.3
  audgui_run_filebrowser@Base 2.3
  audgui_set_default_icon@Base 2.3
  audgui_show_about_window@Base 2.3
  audgui_show_add_url_window@Base 2.3
-(optional)audgui_show_credits_window@Base 2.3
  audgui_show_equalizer_window@Base 2.4~alpha2
  audgui_show_playlist_rename@Base 3.2
  audgui_simple_message@Base 2.4~alpha1
  audgui_urilist_create_from_selected@Base 2.4~alpha2
  audgui_urilist_insert@Base 2.4~alpha2
  audgui_urilist_open@Base 2.4~alpha2
- create_infowin@Base 2.4~alpha1
- genre_fill@Base 2.4~alpha2
-(optional)library_store_row_drop_possible@Base 2.4~alpha1
- ui_jump_to_track_cache_free@Base 2.3
- ui_jump_to_track_cache_new@Base 2.3
- ui_jump_to_track_cache_search@Base 2.3
- urlopener_add_url_dialog_new@Base 2.3
 libaudtag.so.1 libaudcore1 #MINVER#
-(optional)aac@Base 2.3
-(optional)aac_can_handle_file@Base 2.3
-(optional)aac_populate_tuple_from_file@Base 2.3
-(optional)aac_write_tuple_to_file@Base 2.3
-(optional)add_frameFromTupleInt@Base 2.3
-(optional)add_frameFromTupleStr@Base 2.3
-(optional)add_newFrameFromTupleInt@Base 2.3
-(optional)add_newFrameFromTupleStr@Base 2.3
-(optional)add_newISO8859_1FrameFromString@Base 2.3
-(optional)add_tagItemFromTuple@Base 2.3
- ape@Base 2.3
-(optional)ape_can_handle_file@Base 2.3
-(optional)ape_items@Base 2.3
-(optional)ape_populate_tuple_from_file@Base 2.3
-(optional)ape_write_tuple_to_file@Base 2.3
-(optional)assocIntInfo@Base 2.3
-(optional)assocStrInfo@Base 2.3
-(optional)atom_types@Base 2.3
-(optional)computeNewHeader@Base 2.3
- convert_numericgenre_to_text@Base 2.4~alpha1
- convert_text@Base 2.4~alpha2
-(optional)copyAudioData@Base 2.3
-(optional)copyAudioToFile@Base 2.3
- cut_beginning_tag@Base 2.4~alpha1
-(optional)dataAtoms@Base 2.3
-(optional)findAtom@Base 2.3
- find_tag_module@Base 2.3
-(optional)frameIDs@Base 2.3
-(optional)frames@Base 2.3
-(optional)fread_utf16@Base 2.3
-(optional)free_content_descr@Base 2.3
-(optional)free_content_descr_obj@Base 2.3
-(optional)free_ext_content_descr_obj@Base 2.3
-(optional)getAtomID@Base 2.3
-(optional)getFrameID@Base 2.3
-(optional)getTagItemID@Base 2.3
-(optional)get_complete_filepath@Base 2.3
-(optional)get_guid_type@Base 2.3
- get_year@Base 2.3
-(optional)getilstAtom@Base 2.3
-(optional)guid_convert_from_string@Base 2.3
-(optional)guid_convert_to_string@Base 2.3
-(optional)guid_equal@Base 2.3
-(optional)guid_read_from_file@Base 2.3
-(optional)guid_write_to_file@Base 2.3
-(optional)headerPosition@Base 2.3
-(optional)id3@Base 2.3
-(optional)id3_can_handle_file@Base 2.3
-(optional)id3_frames@Base 2.3
-(optional)id3_populate_tuple_from_file@Base 2.3
-(optional)id3_write_tuple_to_file@Base 2.3
- id3v1@Base 2.4~alpha1
- id3v1_can_handle_file@Base 2.4~alpha1
- id3v1_read_tag@Base 2.4~alpha1
- id3v22@Base 2.4~alpha2
- id3v22_read_tag@Base 2.4~alpha2
- id3v24@Base 2.4~alpha1
-(optional)ilstAtom@Base 2.3
-(optional)ilstAtoms@Base 2.3
-(optional)ilstFileOffset@Base 2.3
-(optional)init_tag_modules@Base 2.3
-(optional)isExperimental@Base 2.3
-(optional)isExtendedHeader@Base 2.3
-(optional)isUnsynchronisation@Base 2.3
-(optional)isValidFrame@Base 2.3
-(optional)makeAtomWithData@Base 2.3
-(optional)makeTuple@Base 2.3
-(optional)make_temp_file@Base 2.3
-(optional)newilstSize@Base 2.3
-(optional)number_of_modules@Base 2.3
-(optional)printAtom@Base 2.3
-(optional)print_tuple@Base 2.3
-(optional)readAPEHeader@Base 2.3
-(optional)readAPETagItem@Base 2.3
-(optional)readAllFrames@Base 2.3
-(optional)readAtom@Base 2.3
-(optional)readExtendedHeader@Base 2.3
-(optional)readFrameBody@Base 2.3
-(optional)readGenericFrame@Base 2.3
-(optional)readHeader@Base 2.3
-(optional)readID3v2FrameHeader@Base 2.3
-(optional)readStrDataAtom@Base 2.3
-(optional)readTextFrame@Base 2.3
-(optional)readUTF_8@Base 2.3
- read_BEuint16@Base 2.3
- read_BEuint32@Base 2.3
- read_BEuint64@Base 2.3
- read_LEuint16@Base 2.3
- read_LEuint32@Base 2.3
- read_LEuint64@Base 2.3
-(optional)read_NULLterminatedString@Base 2.3
- read_char_data@Base 2.3
-(optional)read_iso8859_1@Base 2.3
-(optional)read_syncsafe_int32@Base 2.3
- read_uint8@Base 2.3
-(optional)read_unicode@Base 2.3
-(optional)seek@Base 2.3
-(optional)skip@Base 2.3
-(optional)skipFrame@Base 2.3
- syncsafe32@Base 2.4~alpha1
-(optional)tagContainsHeader@Base 2.3
-(optional)tagItems@Base 2.3
-(optional)tagKeys@Base 2.3
  tag_image_read@Base 2.4~alpha1
-(optional)tag_init@Base 2.3
-(optional)tag_modules@Base 2.3
  tag_set_verbose@Base 2.4.2
  tag_tuple_read@Base 2.3
  tag_tuple_write@Base 2.4~alpha1
  tag_tuple_write_to_file@Base 2.3
- tag_verbose@Base 2.4.2
- unix_time@Base 2.3
- unsyncsafe32@Base 2.4~alpha1
-(optional)utf8@Base 2.3
-(optional)wma@Base 2.3
-(optional)wma_can_handle_file@Base 2.3
-(optional)wma_guid_map@Base 2.3
-(optional)wma_populate_tuple_from_file@Base 2.3
-(optional)wma_write_tuple_to_file@Base 2.3
-(optional)writeAllFramesToFile@Base 2.3
-(optional)writeAtom@Base 2.3
-(optional)writeAtomListToFile@Base 2.3
-(optional)writeGenericFrame@Base 2.3
-(optional)writeID3FrameHeaderToFile@Base 2.3
-(optional)writeID3HeaderToFile@Base 2.3
-(optional)writePaddingToFile@Base 2.3
-(optional)writeStrDataAtom@Base 2.3
-(optional)write_ASCII@Base 2.3
- write_BEuint32@Base 2.3
- write_LEuint16@Base 2.3
- write_LEuint32@Base 2.3
- write_LEuint64@Base 2.3
-(optional)write_allTagsToFile@Base 2.3
-(optional)write_apeHeaderToFile@Base 2.3
- write_char_data@Base 2.3
-(optional)write_int32@Base 2.3
-(optional)write_syncsafe_int32@Base 2.3
-(optional)write_tagItemToFile@Base 2.3
- write_uint8@Base 2.3
-(optional)write_utf16@Base 2.3
-(optional)write_utf8@Base 2.3
