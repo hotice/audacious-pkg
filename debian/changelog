@@ -1,8 +1,16 @@
-audacious (3.2.1-3) UNRELEASED; urgency=low
+audacious (3.2.2-1) UNRELEASED; urgency=low
 
-  * Removed the optimisation level tweaking for sparc.
+  * Team upload.
 
- -- Cyril Lavier <cyril.lavier@davromaniak.eu>  Sun, 15 Apr 2012 22:25:34 +0200
+  [ Alessio Treglia ]
+  * New upstream release.
+  * Update symbols file:
+    - Tag disappeared symbols as optional.
+
+  [ Cyril LAVIER ]
+  * debian/rules : Removed the optimisation level tweaking for sparc.
+
+ -- Alessio Treglia <alessio@debian.org>  Wed, 16 May 2012 17:51:18 +0200
 
 audacious (3.2.1-2) unstable; urgency=low
 
