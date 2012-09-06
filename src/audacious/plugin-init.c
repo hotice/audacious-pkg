@@ -2,21 +2,19 @@
  * plugin-init.c
  * Copyright 2010-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <errno.h>
@@ -47,7 +45,7 @@ static void dummy_plugin_stop (PluginHandle * p)
 
 static const struct {
     const char * name;
-    bool_t is_managed, is_single;
+    bool_t is_single;
 
     union {
         struct {
@@ -62,33 +60,27 @@ static const struct {
         } s;
     } u;
 } table[PLUGIN_TYPES] = {
- [PLUGIN_TYPE_TRANSPORT] = {"transport",  TRUE, FALSE, .u.m =
-  {dummy_plugin_start, dummy_plugin_stop}},
- [PLUGIN_TYPE_PLAYLIST] = {"playlist",  TRUE, FALSE, .u.m = {dummy_plugin_start,
-  dummy_plugin_stop}},
- [PLUGIN_TYPE_INPUT] = {"input", TRUE, FALSE, .u.m = {dummy_plugin_start,
-  dummy_plugin_stop}},
- [PLUGIN_TYPE_EFFECT] = {"effect", TRUE, FALSE, .u.m = {effect_plugin_start,
-  effect_plugin_stop}},
- [PLUGIN_TYPE_OUTPUT] = {"output", TRUE, TRUE, .u.s = {output_plugin_probe,
+ [PLUGIN_TYPE_TRANSPORT] = {"transport",  FALSE, .u.m = {dummy_plugin_start, dummy_plugin_stop}},
+ [PLUGIN_TYPE_PLAYLIST] = {"playlist",  FALSE, .u.m = {dummy_plugin_start, dummy_plugin_stop}},
+ [PLUGIN_TYPE_INPUT] = {"input", FALSE, .u.m = {dummy_plugin_start, dummy_plugin_stop}},
+ [PLUGIN_TYPE_EFFECT] = {"effect", FALSE, .u.m = {effect_plugin_start, effect_plugin_stop}},
+ [PLUGIN_TYPE_OUTPUT] = {"output", TRUE, .u.s = {output_plugin_probe,
   output_plugin_get_current, output_plugin_set_current}},
- [PLUGIN_TYPE_VIS] = {"visualization", TRUE, FALSE, .u.m = {vis_plugin_start,
-  vis_plugin_stop}},
- [PLUGIN_TYPE_GENERAL] = {"general", TRUE, FALSE, .u.m = {general_plugin_start,
-  general_plugin_stop}},
- [PLUGIN_TYPE_IFACE] = {"interface", TRUE, TRUE, .u.s = {iface_plugin_probe,
+ [PLUGIN_TYPE_VIS] = {"visualization", FALSE, .u.m = {vis_plugin_start, vis_plugin_stop}},
+ [PLUGIN_TYPE_GENERAL] = {"general", FALSE, .u.m = {general_plugin_start, general_plugin_stop}},
+ [PLUGIN_TYPE_IFACE] = {"interface", TRUE, .u.s = {iface_plugin_probe,
   iface_plugin_get_current, iface_plugin_set_current}}};
 
-static bool_t find_enabled_cb (PluginHandle * p, PluginHandle * * pp)
+static bool_t find_enabled_cb (PluginHandle * p, void * pp)
 {
-    * pp = p;
+    * (PluginHandle * *) pp = p;
     return FALSE;
 }
 
 static PluginHandle * find_enabled (int type)
 {
     PluginHandle * p = NULL;
-    plugin_for_enabled (type, (PluginForEachFunc) find_enabled_cb, & p);
+    plugin_for_enabled (type, find_enabled_cb, & p);
     return p;
 }
 
@@ -142,16 +134,13 @@ static bool_t start_multi_cb (PluginHandle * p, void * type)
 
 static void start_plugins (int type)
 {
-    if (! table[type].is_managed)
-        return;
     if (headless && type == PLUGIN_TYPE_IFACE)
         return;
 
     if (table[type].is_single)
         start_single (type);
     else
-        plugin_for_enabled (type, (PluginForEachFunc) start_multi_cb,
-         GINT_TO_POINTER (type));
+        plugin_for_enabled (type, start_multi_cb, GINT_TO_POINTER (type));
 }
 
 static VFSConstructor * lookup_transport (const char * scheme)
@@ -179,6 +168,12 @@ void start_plugins_two (void)
         start_plugins (i);
 }
 
+static bool_t misc_cleanup_cb (PluginHandle * p, void * unused)
+{
+    plugin_misc_cleanup (p);
+    return TRUE;
+}
+
 static bool_t stop_multi_cb (PluginHandle * p, void * type)
 {
     AUDDBG ("Shutting down %s.\n", plugin_get_name (p));
@@ -188,10 +183,10 @@ static bool_t stop_multi_cb (PluginHandle * p, void * type)
 
 static void stop_plugins (int type)
 {
-    if (! table[type].is_managed)
-        return;
     if (headless && type == PLUGIN_TYPE_IFACE)
         return;
+
+    plugin_for_enabled (type, misc_cleanup_cb, GINT_TO_POINTER (type));
 
     if (table[type].is_single)
     {
@@ -200,8 +195,7 @@ static void stop_plugins (int type)
         table[type].u.s.set_current (NULL);
     }
     else
-        plugin_for_enabled (type, (PluginForEachFunc) stop_multi_cb,
-         GINT_TO_POINTER (type));
+        plugin_for_enabled (type, stop_multi_cb, GINT_TO_POINTER (type));
 }
 
 void stop_plugins_two (void)
@@ -221,7 +215,7 @@ void stop_plugins_one (void)
 
 PluginHandle * plugin_get_current (int type)
 {
-    g_return_val_if_fail (table[type].is_managed && table[type].is_single, NULL);
+    g_return_val_if_fail (table[type].is_single, NULL);
     return table[type].u.s.get_current ();
 }
 
@@ -273,14 +267,12 @@ static bool_t enable_multi (int type, PluginHandle * p, bool_t enable)
 bool_t plugin_enable (PluginHandle * plugin, bool_t enable)
 {
     if (! enable == ! plugin_get_enabled (plugin))
-    {
-        AUDDBG ("%s is already %sabled.\n", plugin_get_name (plugin), enable ?
-         "en" : "dis");
         return TRUE;
-    }
+
+    if (! enable)
+        plugin_misc_cleanup (plugin);
 
     int type = plugin_get_type (plugin);
-    g_return_val_if_fail (table[type].is_managed, FALSE);
 
     if (table[type].is_single)
     {
@@ -313,4 +305,28 @@ int plugin_send_message (PluginHandle * plugin, const char * code, const void * 
         return ENOSYS;
 
     return header->take_message (code, data, size);
+}
+
+void plugin_do_about (PluginHandle * plugin)
+{
+    g_return_if_fail (plugin_get_enabled (plugin));
+    Plugin * header = plugin_get_header (plugin);
+    g_return_if_fail (header);
+
+    if (PLUGIN_HAS_FUNC (header, about))
+        header->about ();
+    else if (PLUGIN_HAS_FUNC (header, about_text))
+        plugin_make_about_window (plugin);
+}
+
+void plugin_do_configure (PluginHandle * plugin)
+{
+    g_return_if_fail (plugin_get_enabled (plugin));
+    Plugin * header = plugin_get_header (plugin);
+    g_return_if_fail (header);
+
+    if (PLUGIN_HAS_FUNC (header, configure))
+        header->configure ();
+    else if (PLUGIN_HAS_FUNC (header, prefs))
+        plugin_make_config_window (plugin);
 }

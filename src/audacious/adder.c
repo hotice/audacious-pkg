@@ -2,21 +2,19 @@
  * adder.c
  * Copyright 2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <dirent.h>
@@ -78,27 +76,19 @@ static bool_t status_cb (void * unused)
         gtk_window_set_resizable ((GtkWindow *) status_window, FALSE);
         gtk_container_set_border_width ((GtkContainer *) status_window, 6);
 
-        GtkWidget * vbox = gtk_vbox_new (FALSE, 6);
+        GtkWidget * vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
         gtk_container_add ((GtkContainer *) status_window, vbox);
 
         status_path_label = gtk_label_new (NULL);
-#if GTK_CHECK_VERSION (3, 0, 0)
         gtk_label_set_width_chars ((GtkLabel *) status_path_label, 40);
         gtk_label_set_max_width_chars ((GtkLabel *) status_path_label, 40);
-#else
-        gtk_widget_set_size_request (status_path_label, 320, -1);
-#endif
         gtk_label_set_ellipsize ((GtkLabel *) status_path_label,
          PANGO_ELLIPSIZE_MIDDLE);
         gtk_box_pack_start ((GtkBox *) vbox, status_path_label, FALSE, FALSE, 0);
 
         status_count_label = gtk_label_new (NULL);
-#if GTK_CHECK_VERSION (3, 0, 0)
         gtk_label_set_width_chars ((GtkLabel *) status_count_label, 40);
         gtk_label_set_max_width_chars ((GtkLabel *) status_count_label, 40);
-#else
-        gtk_widget_set_size_request (status_count_label, 320, -1);
-#endif
         gtk_box_pack_start ((GtkBox *) vbox, status_count_label, FALSE, FALSE, 0);
 
         gtk_widget_show_all (status_window);
@@ -418,10 +408,12 @@ static bool_t add_finish (void * unused)
 
         if (result->play && playlist_entry_count (playlist) > count)
         {
-            playlist_set_playing (playlist);
-            if (! get_bool (NULL, "shuffle"))
+            if (get_bool (NULL, "shuffle"))
+                playlist_next_song (playlist, FALSE);
+            else
                 playlist_set_position (playlist, result->at);
 
+            playlist_set_playing (playlist);
             playback_play (0, FALSE);
         }
 

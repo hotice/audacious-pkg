@@ -106,6 +106,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Suffix for plugins */
+#undef PLUGIN_SUFFIX
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
@@ -114,9 +117,6 @@
 
 /* Define if D-Bus support enabled */
 #undef USE_DBUS
-
-/* Define if session management should be used */
-#undef USE_EGGSM
 
 /* If this macro is defined, use GNU regex library. */
 #undef USE_REGEX_GNU

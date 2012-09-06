@@ -3,792 +3,635 @@
 # This file is distributed under the same license as the Audacious package.
 #
 # Translators:
+#   <marinoszak@gmail.com>, 2012.
+# Marinos Zak <marinoszak@gmail.com>, 2012.
 # Stathis Kamperis <ekamperi@auth.gr>, 2006.
 # Γιάννης  <yannanth@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
-"Report-Msgid-Bugs-To: http://jira.atheme.org/browse/AUD\n"
-"POT-Creation-Date: 2011-10-19 21:32-0400\n"
-"PO-Revision-Date: 2011-10-30 19:23+0000\n"
-"Last-Translator: Evropi <yannanth@gmail.com>\n"
+"Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
+"POT-Creation-Date: 2012-08-11 13:29-0400\n"
+"PO-Revision-Date: 2012-07-26 00:12+0000\n"
+"Last-Translator: John Lindgren <john.lindgren@aol.com>\n"
 "Language-Team: Greek\n"
+"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: src/audacious/adder.c:71
+#: src/audacious/adder.c:75
 msgid "Searching ..."
 msgstr "Αναζήτηση..."
 
-#: src/audacious/adder.c:97
+#: src/audacious/adder.c:103
 #, c-format
 msgid "%d file found"
 msgid_plural "%d files found"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d αρχείο βρέθηκε"
+msgstr[1] "%d αρχεία βρέθηκαν"
 
-#: src/audacious/chardet.c:38
+#: src/audacious/chardet.c:39
 msgid "  (invalid UTF-8)"
 msgstr "  (μη έγκυρο UTF-8)"
 
-#: src/audacious/credits.c:35
-msgid "Core developers:"
-msgstr ""
-
-#: src/audacious/credits.c:49
-msgid "Graphics:"
-msgstr "Γραφικά:"
-
-#: src/audacious/credits.c:54
-msgid "Default skin:"
-msgstr "Προκαθορισμένο skin:"
-
-#: src/audacious/credits.c:60
-msgid "Plugin development:"
-msgstr "Ανάπτυξη πρόσθετων:"
-
-#: src/audacious/credits.c:83
-msgid "Patch authors:"
-msgstr ""
-
-#: src/audacious/credits.c:126
-msgid "1.x developers:"
-msgstr ""
-
-#: src/audacious/credits.c:148
-msgid "BMP Developers:"
-msgstr "Δημιουργοί BMP:"
-
-#: src/audacious/credits.c:180
-msgid "Belarusian:"
-msgstr "Λευκορωσικά:"
-
-#: src/audacious/credits.c:183
-msgid "Basque:"
-msgstr "Βασκικά:"
-
-#: src/audacious/credits.c:186
-msgid "Brazilian Portuguese:"
-msgstr "Πορτογαλικά Βραζιλίας:"
-
-#: src/audacious/credits.c:191
-msgid "Breton:"
-msgstr "Βρετόνικα:"
-
-#: src/audacious/credits.c:194
-msgid "Bulgarian:"
-msgstr "Βουλγαρικά:"
-
-#: src/audacious/credits.c:197
-msgid "Catalan:"
-msgstr "Καταλανικά:"
-
-#: src/audacious/credits.c:200
-msgid "Chinese:"
-msgstr "Κινέζικα:"
-
-#: src/audacious/credits.c:203
-msgid "Croatian:"
-msgstr "Κροατικά:"
-
-#: src/audacious/credits.c:206
-msgid "Czech:"
-msgstr "Τσέχικα:"
-
-#: src/audacious/credits.c:209
-msgid "Dutch:"
-msgstr "Ολλανδικά:"
-
-#: src/audacious/credits.c:213
-msgid "Estonian:"
-msgstr "Εστονικά:"
-
-#: src/audacious/credits.c:216
-msgid "Finnish:"
-msgstr "Φιλανδικά:"
-
-#: src/audacious/credits.c:221
-msgid "French:"
-msgstr "Γαλλικά:"
-
-#: src/audacious/credits.c:227
-msgid "German:"
-msgstr "Γερμανικά:"
-
-#: src/audacious/credits.c:234
-msgid "Georgian:"
-msgstr "Γεωργιανά:"
-
-#: src/audacious/credits.c:237
-msgid "Greek:"
-msgstr "Ελληνικά:"
-
-#: src/audacious/credits.c:242
-msgid "Hindi:"
-msgstr "Ινδικά:"
-
-#: src/audacious/credits.c:245
-msgid "Hungarian:"
-msgstr "Ουγγρικά:"
-
-#: src/audacious/credits.c:249
-msgid "Italian:"
-msgstr "Ιταλικά:"
-
-#: src/audacious/credits.c:253
-msgid "Japanese:"
-msgstr "Ιαπωνικά:"
-
-#: src/audacious/credits.c:256
-msgid "Korean:"
-msgstr "Κορεάτικα:"
-
-#: src/audacious/credits.c:259
-msgid "Latvian:"
-msgstr "Λετωνικά:"
-
-#: src/audacious/credits.c:262
-msgid "Lithuanian:"
-msgstr "Λιθουανικά:"
-
-#: src/audacious/credits.c:267
-msgid "Macedonian:"
-msgstr "Σλαβομακεδονικά:"
-
-#: src/audacious/credits.c:270
-msgid "Polish:"
-msgstr "Πολωνικά:"
-
-#: src/audacious/credits.c:276
-msgid "Portuguese:"
-msgstr "Πορτωγαλικά:"
-
-#: src/audacious/credits.c:279
-msgid "Romanian:"
-msgstr "Ρουμανικά:"
-
-#: src/audacious/credits.c:283
-msgid "Russian:"
-msgstr "Ρώσικα:"
-
-#: src/audacious/credits.c:287
-msgid "Serbian (Latin):"
-msgstr "Σερβικά (λατινικό):"
-
-#: src/audacious/credits.c:290
-msgid "Serbian (Cyrillic):"
-msgstr "Σερβικά (κυριλλικό):"
-
-#: src/audacious/credits.c:293
-msgid "Simplified Chinese:"
-msgstr "Κινέζικα (απλοποιημένη):"
-
-#: src/audacious/credits.c:296
-msgid "Slovak:"
-msgstr "Σλοβακικά:"
-
-#: src/audacious/credits.c:299
-msgid "Spanish:"
-msgstr "Ισπανικά:"
-
-#: src/audacious/credits.c:306
-msgid "Swedish:"
-msgstr "Σουηδικά:"
-
-#: src/audacious/credits.c:309
-msgid "Traditional Chinese:"
-msgstr "Κινέζικα (παραδοσιακή):"
-
-#: src/audacious/credits.c:315
-msgid "Turkish:"
-msgstr "Τουρκικά:"
-
-#: src/audacious/credits.c:319
-msgid "Ukrainian:"
-msgstr "Ουκρανικά:"
-
-#: src/audacious/credits.c:323
-msgid "Vietnamese:"
-msgstr "Βιετναμεζικά:"
-
-#: src/audacious/credits.c:326
-msgid "Welsh:"
-msgstr "Ουαλλικά:"
-
-#: src/audacious/drct.c:234
-msgid "Temporary Playlist"
-msgstr ""
-
-#: src/audacious/equalizer_preset.c:186
+#: src/audacious/equalizer_preset.c:180
 #, c-format
 msgid "Error importing Winamp EQF file '%s'"
 msgstr ""
 
-#: src/audacious/main.c:239
+#: src/audacious/main.c:232
 msgid "Skip backwards in playlist"
 msgstr "Μετάβαση πίσω στη λίστα τραγουδιών"
 
-#: src/audacious/main.c:240
+#: src/audacious/main.c:233
 msgid "Start playing current playlist"
 msgstr "Έναρξη αναπαραγωγής της τρέχουσας λίστας"
 
-#: src/audacious/main.c:241
+#: src/audacious/main.c:234
 msgid "Pause current song"
 msgstr "Παύση τρέχοντος κομματιού"
 
-#: src/audacious/main.c:242
+#: src/audacious/main.c:235
 msgid "Stop current song"
 msgstr "Σταμάτημα τρέχοντος κομματιού"
 
-#: src/audacious/main.c:243
+#: src/audacious/main.c:236
 msgid "Pause if playing, play otherwise"
 msgstr "Παύση αν παίζει, αλλιώς αναπαραγωγή"
 
-#: src/audacious/main.c:244
+#: src/audacious/main.c:237
 msgid "Skip forward in playlist"
 msgstr "Μετάβαση μπροστά στη λίστα τραγουδιών"
 
-#: src/audacious/main.c:245
+#: src/audacious/main.c:238
 msgid "Display Jump to File dialog"
 msgstr ""
 
-#: src/audacious/main.c:246
+#: src/audacious/main.c:239
 msgid "Add files to the playlist"
 msgstr "Προσθήκη αρχείων στη λίστα τραγουδιών"
 
-#: src/audacious/main.c:247
+#: src/audacious/main.c:240
 msgid "Add new files to a temporary playlist"
-msgstr ""
+msgstr "Προσθήκη νέων αρχείων σε μια προσωρινή λίστα αναπαραγωγής"
 
-#: src/audacious/main.c:248
+#: src/audacious/main.c:241
 msgid "Display the main window"
-msgstr ""
+msgstr "Εμφάνιση του κυρίους παραθύρου"
 
-#: src/audacious/main.c:249
+#: src/audacious/main.c:242
 msgid "Show version"
 msgstr "Εμφάνιση έκδοσης"
 
-#: src/audacious/main.c:250
+#: src/audacious/main.c:243
 msgid "Print debugging messages"
-msgstr ""
+msgstr "Εκτύπωση μηνυμάτων εντοπισμού σφαλμάτων"
 
-#: src/audacious/main.c:251
+#: src/audacious/main.c:244
 msgid "Headless mode (beta)"
 msgstr ""
 
-#: src/audacious/main.c:252
+#: src/audacious/main.c:245
 msgid "FILE..."
-msgstr ""
+msgstr "ΑΡΧΕΙΟ"
+
+#: src/audacious/main.c:257
+msgid "- play multimedia files"
+msgstr "- αναπαραγωγή αρχείων πολυμέσων"
 
 #: src/audacious/main.c:264
-msgid "- play multimedia files"
-msgstr ""
-
-#: src/audacious/main.c:274
 #, c-format
 msgid ""
 "%s: %s\n"
 "Try `%s --help' for more information.\n"
 msgstr ""
 
-#: src/audacious/main.c:547
+#: src/audacious/main.c:546
 msgid "Audacious"
 msgstr "Audacious"
 
-#: src/audacious/playback.c:303
+#: src/audacious/playback.c:305
 #, c-format
 msgid "No decoder found for %s."
+msgstr "Δεν βρέθηκε αποκωδικοποιητής για %s.."
+
+#: src/audacious/playlist-files.c:51
+#, c-format
+msgid "Cannot %s %s: unsupported file extension."
 msgstr ""
 
-#: src/audacious/playlist-new.c:315
-msgid "Untitled Playlist"
+#: src/audacious/playlist-files.c:52
+msgid "save"
+msgstr "Αποθήκευση"
+
+#: src/audacious/playlist-files.c:52
+msgid "load"
+msgstr "Φόρτωση"
+
+#: src/audacious/playlist-new.c:121
+msgid "New Playlist"
 msgstr ""
 
-#: src/audacious/playlist-new.c:1496
+#: src/audacious/playlist-new.c:122
+msgid "Now Playing"
+msgstr ""
+
+#: src/audacious/playlist-new.c:1650
 msgid ""
-"The playlist cannot be sorted because metadata scanning is still in progress"
-" (or has been disabled)."
+"The playlist cannot be sorted because metadata scanning is still in progress "
+"(or has been disabled)."
 msgstr ""
 
-#: src/audacious/ui_preferences.c:88
+#: src/audacious/plugin-preferences.c:50
+#, c-format
+msgid "About %s"
+msgstr "Περί %s"
+
+#: src/audacious/plugin-preferences.c:88
+#, c-format
+msgid "%s Settings"
+msgstr "Ρυθμίσεις %s"
+
+#: src/audacious/ui_preferences.c:69
 msgid "Audio"
 msgstr "Ήχος"
 
-#: src/audacious/ui_preferences.c:89
+#: src/audacious/ui_preferences.c:70
 msgid "Network"
-msgstr ""
+msgstr "Δίκτυο"
 
-#: src/audacious/ui_preferences.c:90 src/audacious/ui_preferences.c:1634
+#: src/audacious/ui_preferences.c:71 src/audacious/ui_preferences.c:1237
 msgid "Playlist"
 msgstr "Λίστα αναπαραγωγής"
 
-#: src/audacious/ui_preferences.c:91
+#: src/audacious/ui_preferences.c:72
+msgid "Song Info"
+msgstr "Πληροφορίες τραγουδιού"
+
+#: src/audacious/ui_preferences.c:73
 msgid "Plugins"
 msgstr "Πρόσθετα"
 
-#: src/audacious/ui_preferences.c:97 src/libaudgui/infopopup.c:203
+#: src/audacious/ui_preferences.c:79 src/libaudgui/infopopup.c:194
 msgid "Artist"
 msgstr "Καλλιτέχνης"
 
-#: src/audacious/ui_preferences.c:98 src/libaudgui/infopopup.c:205
+#: src/audacious/ui_preferences.c:80 src/libaudgui/infopopup.c:196
 msgid "Album"
 msgstr "Άλμπουμ"
 
-#: src/audacious/ui_preferences.c:99 src/libaudgui/infopopup.c:201
-#: src/libaudgui/ui_playlist_manager.c:276
+#: src/audacious/ui_preferences.c:81 src/libaudgui/infopopup.c:192
+#: src/libaudgui/ui_playlist_manager.c:287
 msgid "Title"
 msgstr "Τίτλος"
 
-#: src/audacious/ui_preferences.c:100
+#: src/audacious/ui_preferences.c:82
 msgid "Tracknumber"
 msgstr "Νούμερο κομματιού"
 
-#: src/audacious/ui_preferences.c:101 src/libaudgui/infopopup.c:207
+#: src/audacious/ui_preferences.c:83 src/libaudgui/infopopup.c:198
 msgid "Genre"
 msgstr "Γένος"
 
-#: src/audacious/ui_preferences.c:102
+#: src/audacious/ui_preferences.c:84
 msgid "Filename"
 msgstr "Όνομα αρχείου"
 
-#: src/audacious/ui_preferences.c:103
+#: src/audacious/ui_preferences.c:85
 msgid "Filepath"
 msgstr "Διαδρομή αρχείου"
 
-#: src/audacious/ui_preferences.c:104
+#: src/audacious/ui_preferences.c:86
 msgid "Date"
 msgstr "Ημερομηνία"
 
-#: src/audacious/ui_preferences.c:105 src/libaudgui/infopopup.c:209
+#: src/audacious/ui_preferences.c:87 src/libaudgui/infopopup.c:200
 msgid "Year"
 msgstr "Έτος"
 
-#: src/audacious/ui_preferences.c:106
+#: src/audacious/ui_preferences.c:88
 msgid "Comment"
 msgstr "Σχόλιο"
 
-#: src/audacious/ui_preferences.c:107
+#: src/audacious/ui_preferences.c:89
 msgid "Codec"
-msgstr ""
+msgstr "Codec"
 
-#: src/audacious/ui_preferences.c:108
+#: src/audacious/ui_preferences.c:90
 msgid "Quality"
 msgstr "Ποιότητα"
 
-#: src/audacious/ui_preferences.c:114
+#: src/audacious/ui_preferences.c:96
 msgid "None"
 msgstr "Κανένα"
 
-#: src/audacious/ui_preferences.c:115
+#: src/audacious/ui_preferences.c:97
 msgid "Arabic"
 msgstr "Αραβικά"
 
-#: src/audacious/ui_preferences.c:116
+#: src/audacious/ui_preferences.c:98
 msgid "Baltic"
 msgstr "Βαλτικά"
 
-#: src/audacious/ui_preferences.c:117
+#: src/audacious/ui_preferences.c:99
 msgid "Chinese"
 msgstr "Κινέζικα"
 
-#: src/audacious/ui_preferences.c:118
+#: src/audacious/ui_preferences.c:100
 msgid "Greek"
 msgstr "Ελληνικά"
 
-#: src/audacious/ui_preferences.c:119
+#: src/audacious/ui_preferences.c:101
 msgid "Hebrew"
-msgstr ""
+msgstr "Εβραϊκά"
 
-#: src/audacious/ui_preferences.c:120
+#: src/audacious/ui_preferences.c:102
 msgid "Japanese"
-msgstr ""
+msgstr "Ιαπωνικά"
 
-#: src/audacious/ui_preferences.c:121
+#: src/audacious/ui_preferences.c:103
 msgid "Korean"
-msgstr ""
+msgstr "Κορεάτικα"
 
-#: src/audacious/ui_preferences.c:122
+#: src/audacious/ui_preferences.c:104
 msgid "Polish"
-msgstr ""
+msgstr "πολωνικά"
 
-#: src/audacious/ui_preferences.c:123
+#: src/audacious/ui_preferences.c:105
 msgid "Russian"
-msgstr ""
+msgstr "Ρώσικα"
 
-#: src/audacious/ui_preferences.c:124
+#: src/audacious/ui_preferences.c:106
 msgid "Taiwanese"
-msgstr ""
+msgstr "Ταϊβανέζικα"
 
-#: src/audacious/ui_preferences.c:125
+#: src/audacious/ui_preferences.c:107
 msgid "Turkish"
+msgstr "Τούρκικα"
+
+#: src/audacious/ui_preferences.c:114
+msgid "Floating point"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:147
+#: src/audacious/ui_preferences.c:130
 msgid "Album mode"
-msgstr ""
+msgstr "Λειτουργία άλμπουμ"
 
-#: src/audacious/ui_preferences.c:150
+#: src/audacious/ui_preferences.c:133
 msgid "<b>Output Settings</b>"
-msgstr ""
+msgstr "<b>Ρυθμίσεις εξόδου</ b>"
 
-#: src/audacious/ui_preferences.c:152
+#: src/audacious/ui_preferences.c:135
 msgid "Bit depth:"
-msgstr ""
+msgstr "Βάθος Bit:"
 
-#: src/audacious/ui_preferences.c:155
+#: src/audacious/ui_preferences.c:138
 msgid "Buffer size:"
 msgstr "Μέγεθος προσωρινής μνήμης:"
 
-#: src/audacious/ui_preferences.c:157
+#: src/audacious/ui_preferences.c:140
 msgid "ms"
+msgstr "ms"
+
+#: src/audacious/ui_preferences.c:141
+msgid "Soft clipping"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:158
+#: src/audacious/ui_preferences.c:143
 msgid "Use software volume control (not recommended)"
-msgstr ""
+msgstr "Χρησιμοποιήστε λογισμικό ελέγχου έντασης (δεν συνιστάται)"
 
-#: src/audacious/ui_preferences.c:160
+#: src/audacious/ui_preferences.c:145
 msgid "<b>Replay Gain</b>"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:161
+#: src/audacious/ui_preferences.c:146
 msgid "Enable Replay Gain"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:164
+#: src/audacious/ui_preferences.c:149
 msgid "Prevent clipping (recommended)"
-msgstr ""
+msgstr "Αποτροπή αποκοπής (συνιστάται)"
 
-#: src/audacious/ui_preferences.c:166
+#: src/audacious/ui_preferences.c:151
 msgid "<b>Adjust Levels</b>"
-msgstr ""
+msgstr "<b>Ρυθμίσετε τα Επίπεδα</ b>"
 
-#: src/audacious/ui_preferences.c:167
+#: src/audacious/ui_preferences.c:152
 msgid "Amplify all files:"
-msgstr ""
+msgstr "Ενισχύσε όλα τα αρχεία:"
 
-#: src/audacious/ui_preferences.c:169 src/audacious/ui_preferences.c:172
+#: src/audacious/ui_preferences.c:154 src/audacious/ui_preferences.c:157
 msgid "dB"
-msgstr ""
+msgstr "dB"
 
-#: src/audacious/ui_preferences.c:170
+#: src/audacious/ui_preferences.c:155
 msgid "Amplify untagged files:"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:175
+#: src/audacious/ui_preferences.c:160
 msgid "Proxy hostname:"
 msgstr "Διεύθυνση διαμεσολαβητή:"
 
-#: src/audacious/ui_preferences.c:176
+#: src/audacious/ui_preferences.c:161
 msgid "Proxy port:"
 msgstr "Θύρα διαμεσολαβητή:"
 
-#: src/audacious/ui_preferences.c:179
+#: src/audacious/ui_preferences.c:164
 msgid "Proxy username:"
 msgstr "Όνομα χρήστη διαμεσολαβητή:"
 
-#: src/audacious/ui_preferences.c:180
+#: src/audacious/ui_preferences.c:165
 msgid "Proxy password:"
 msgstr "Κωδικός πρόσβασης διαμεσολαβητή:"
 
-#: src/audacious/ui_preferences.c:184
+#: src/audacious/ui_preferences.c:169
 msgid "<b>Proxy Configuration</b>"
 msgstr "<b>Ρύθμιση διαμεσολαβητή</b>"
 
-#: src/audacious/ui_preferences.c:185
+#: src/audacious/ui_preferences.c:170
 msgid "Enable proxy usage"
 msgstr "Χρήση διαμεσολαβητή"
 
-#: src/audacious/ui_preferences.c:188
+#: src/audacious/ui_preferences.c:173
 msgid "Use authentication with proxy"
 msgstr "Χρήση πιστοποίησης με το διαμεσολαβητή"
 
-#: src/audacious/ui_preferences.c:196
+#: src/audacious/ui_preferences.c:181
 msgid "Auto character encoding detector for:"
 msgstr "Αυτόματη αναγνώριση κωδικοσελίδας για:"
 
-#: src/audacious/ui_preferences.c:201
+#: src/audacious/ui_preferences.c:185
 msgid "Fallback character encodings:"
-msgstr ""
+msgstr "Εναλλακτικές κωδικοποιήσεις χαρακτήρων:"
 
-#: src/audacious/ui_preferences.c:205
+#: src/audacious/ui_preferences.c:189
 msgid "<b>Behavior</b>"
-msgstr ""
+msgstr "<b>Συμπεριφορά</b>"
 
-#: src/audacious/ui_preferences.c:206
+#: src/audacious/ui_preferences.c:190
 msgid "Continue playback on startup"
 msgstr "Συνέχεια αναπαραγωγής στην εκκίνηση"
 
-#: src/audacious/ui_preferences.c:208
+#: src/audacious/ui_preferences.c:192
 msgid "Advance when the current song is deleted"
-msgstr ""
+msgstr "Προχώρησε όταν το τρέχων αρχείο διαγραφθεί"
 
-#: src/audacious/ui_preferences.c:210
+#: src/audacious/ui_preferences.c:194
 msgid "Clear the playlist when opening files"
-msgstr ""
+msgstr "Καθάρισμα της λίστας αναπαραγωγής όταν ανοίγουν αρχεία"
 
-#: src/audacious/ui_preferences.c:212
+#: src/audacious/ui_preferences.c:196
 msgid "Open files in a temporary playlist"
-msgstr ""
+msgstr "Άνοιγμα αρχείων σε μια προσωρινή λίστα αναπαραγωγής"
 
-#: src/audacious/ui_preferences.c:214
+#: src/audacious/ui_preferences.c:198
 msgid "<b>Metadata</b>"
 msgstr "<b>Μεταπληροφορίες</b>"
 
-#: src/audacious/ui_preferences.c:215
+#: src/audacious/ui_preferences.c:199
 msgid "Do not load metadata for songs until played"
+msgstr "Μην φορτωθούν τα μεταδεδομένα για τα τραγούδια πρωτού παίξουν"
+
+#: src/audacious/ui_preferences.c:207
+msgid "<b>Album Art</b>"
+msgstr "<b> Άλμπουμ Τέχνης</ b>"
+
+#: src/audacious/ui_preferences.c:208
+msgid "Search for images matching these words (comma-separated):"
+msgstr ""
+"Αναζήτηση για εικόνες που ταιριάζουν με αυτά τα λόγια (διαχωρισμένες με "
+"κόμμα):"
+
+#: src/audacious/ui_preferences.c:210
+msgid "Exclude images matching these words (comma-separated):"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:233
-msgid "TITLE"
-msgstr ""
+#: src/audacious/ui_preferences.c:212
+msgid "Search for images matching song file name"
+msgstr "Αναζήτηση εικόνων που ταιριάζουν με το  όνομα του αρχείου τραγουδιού"
 
-#: src/audacious/ui_preferences.c:234
-msgid "ARTIST - TITLE"
-msgstr ""
+#: src/audacious/ui_preferences.c:214
+msgid "Search recursively"
+msgstr "Αναζήτησε αναδρομικά"
 
-#: src/audacious/ui_preferences.c:235
-msgid "ARTIST - ALBUM - TITLE"
-msgstr ""
+#: src/audacious/ui_preferences.c:216
+msgid "Search depth:"
+msgstr "Βάθος αναζήτησης :"
 
-#: src/audacious/ui_preferences.c:236
-msgid "ARTIST - ALBUM - TRACK. TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:237
-msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:238
-msgid "ALBUM - TITLE"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:577
-msgid "Category"
-msgstr "Κατηγορία"
-
-#: src/audacious/ui_preferences.c:801
-msgid "Popup Information Settings"
-msgstr "Ρυθμίσεις αναδυόμενων πληροφοριών"
-
-#: src/audacious/ui_preferences.c:810
-msgid "<b>Cover image retrieve</b>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:815
-msgid ""
-"While searching for the album's cover, Audacious looks for certain words in "
-"the filename. You can specify those words in the lists below, separated "
-"using commas."
-msgstr ""
-"Κατά την αναζήτηση του εξωφύλλου του cd, το Audacious κοιτάει για "
-"συγκεκριμένες λέξεις στο όνομα του αρχείου. Μπορείτε να εισάγετε τις λέξεις "
-"αυτές στις λίστες παρακάτω, χωρισμένες με κόμματα."
-
-#: src/audacious/ui_preferences.c:832
-msgid "Exclude:"
-msgstr "Αποκλεισμός:"
-
-#: src/audacious/ui_preferences.c:839
-msgid "Include:"
-msgstr "Περίληψη:"
-
-#: src/audacious/ui_preferences.c:856
-msgid "Recursively search for cover"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:866
-msgid "Search depth: "
-msgstr ""
-
-#: src/audacious/ui_preferences.c:880
-msgid "Use per-file cover"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:883
-msgid "<b>Miscellaneous</b>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:892
-msgid "Show Progress bar for the current track"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:902
-msgid "Delay until filepopup comes up: "
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1340
-msgid "Custom"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1383
-msgid "<b>Song Display</b>"
-msgstr "<b>Προβολή τραγουδιού</b>"
-
-#: src/audacious/ui_preferences.c:1392
-msgid "Show song numbers"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1403
-msgid "Show leading zeroes (02:00 instead of 2:00)"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1425
-msgid "Show information about titlestring format"
-msgstr "Εμφάνιση πληροφοριών για τη μορφή του τίτλου"
-
-#: src/audacious/ui_preferences.c:1441
-msgid "Custom string:"
-msgstr "Προσαρμοσμένο αλφαριθμητικό:"
-
-#: src/audacious/ui_preferences.c:1448
-msgid "Title format:"
-msgstr "Μορφή τίτλου:"
-
-#: src/audacious/ui_preferences.c:1459
+#: src/audacious/ui_preferences.c:219
 msgid "<b>Popup Information</b>"
 msgstr "<b>Αναδυόμενες πληροφορίες</b>"
 
-#: src/audacious/ui_preferences.c:1474
-msgid "Show popup information for playlist entries"
-msgstr "Εμφάνιση αναδυόμενων πληροφοριών στη λίστα αναπαραγωγής"
+#: src/audacious/ui_preferences.c:220
+msgid "Show popup information"
+msgstr "Εμφάνιση πληροφορίων σε αναδυόμενο παράθυρο"
 
-#: src/audacious/ui_preferences.c:1475
-msgid ""
-"Toggles popup information window for the pointed entry in the playlist. The "
-"window shows title of song, name of album, genre, year of publish, track "
-"number, track length, and artwork."
+#: src/audacious/ui_preferences.c:222
+msgid "Popup delay (tenths of a second):"
+msgstr "Αναδυόμενη καθυστέρηση (δέκατα του δευτερολέπτου):"
+
+#: src/audacious/ui_preferences.c:225
+msgid "Show time scale for current song"
+msgstr "Εμφάνιση χρονοδιάγραμμα για το τρέχον τραγούδι"
+
+#: src/audacious/ui_preferences.c:239
+msgid "TITLE"
+msgstr "ΤΙΤΛΟΣ"
+
+#: src/audacious/ui_preferences.c:240
+msgid "ARTIST - TITLE"
+msgstr "ΚΑΛΛΙΤΕΧΝΗΣ - ΤΙΤΛΟΣ"
+
+#: src/audacious/ui_preferences.c:241
+msgid "ARTIST - ALBUM - TITLE"
+msgstr "ΚΑΛΛΙΤΕΧΝΗΣ - ΑΛΜΠΟΥΜ - ΤΙΤΛΟΣ"
+
+#: src/audacious/ui_preferences.c:242
+msgid "ARTIST - ALBUM - TRACK. TITLE"
+msgstr "ΚΑΛΛΙΤΕΧΝΗΣ - ΑΛΜΠΟΥΜ - ΤΙΤΛΟΣ ΤΡΑΓΟΥΔΙΟΥ"
+
+#: src/audacious/ui_preferences.c:243
+msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
+msgstr "ΚΑΛΛΙΤΕΧΝΗΣ [ ΑΛΜΠΟΥΜ ] - ΤΙΤΛΟΣ ΤΡΑΓΟΥΔΙΟΥ"
+
+#: src/audacious/ui_preferences.c:244
+msgid "ALBUM - TITLE"
+msgstr "ΑΛΜΠΟΥΜ - ΤΙΤΛΟΣ"
+
+#: src/audacious/ui_preferences.c:457
+msgid "Category"
+msgstr "Κατηγορία"
+
+#: src/audacious/ui_preferences.c:995
+msgid "Custom"
 msgstr ""
-"Ενεργοποιεί αναδυόμενο παράθυρο πληροφοριών για την επιλεγμένη εγγραφή στη "
-"λίστα αναπαραγωγής. Το παράθυρο δείχνει τον τίτλο του τραγουδιού, το όνομα "
-"του δίσκου, το είδος, το έτος κυκλοφορίας, τον αριθμό, το μήκος του "
-"τραγουδιού και το εξώφυλλο."
 
-#: src/audacious/ui_preferences.c:1486
-msgid "Edit settings for popup information"
-msgstr "Επεξεργασία ρυθμίσεων για τις αναδυόμενες πληροφορίες"
+#: src/audacious/ui_preferences.c:1032
+msgid "<b>Song Display</b>"
+msgstr "<b>Προβολή τραγουδιού</b>"
 
-#: src/audacious/ui_preferences.c:1575
+#: src/audacious/ui_preferences.c:1041
+msgid "Show song numbers"
+msgstr "Εμφάνιση αριθμών τραγουδιών"
+
+#: src/audacious/ui_preferences.c:1052
+msgid "Show leading zeroes (02:00 instead of 2:00)"
+msgstr "Εμφάνιση πρωτεύων μηδενικών (02:00 αντί 2:00)"
+
+#: src/audacious/ui_preferences.c:1072
+msgid "Show information about titlestring format"
+msgstr "Εμφάνιση πληροφοριών για τη μορφή του τίτλου"
+
+#: src/audacious/ui_preferences.c:1086
+msgid "Custom string:"
+msgstr "Προσαρμοσμένο αλφαριθμητικό:"
+
+#: src/audacious/ui_preferences.c:1091
+msgid "Title format:"
+msgstr "Μορφή τίτλου:"
+
+#: src/audacious/ui_preferences.c:1178
 msgid "Output plugin:"
-msgstr ""
+msgstr "Έξοδος πρόσθετου"
 
-#: src/audacious/ui_preferences.c:1634
+#: src/audacious/ui_preferences.c:1237
 msgid "Transport"
-msgstr ""
+msgstr "Μεταφορα"
 
-#: src/audacious/ui_preferences.c:1634
+#: src/audacious/ui_preferences.c:1237
 msgid "Input"
-msgstr ""
+msgstr "Εισαγωγή"
 
-#: src/audacious/ui_preferences.c:1635
+#: src/audacious/ui_preferences.c:1238
 msgid "Effect"
-msgstr ""
+msgstr "Εφέ"
 
-#: src/audacious/ui_preferences.c:1635
+#: src/audacious/ui_preferences.c:1238
 msgid "Visualization"
-msgstr ""
+msgstr "Οπτικοποίηση"
 
-#: src/audacious/ui_preferences.c:1635
+#: src/audacious/ui_preferences.c:1238
 msgid "General"
-msgstr ""
+msgstr "Γενικά"
 
-#: src/audacious/ui_preferences.c:1675
+#: src/audacious/ui_preferences.c:1276
 msgid "Audacious Preferences"
 msgstr "Προτιμήσεις του Audacious"
 
-#: src/audacious/util.c:123
+#: src/audacious/util.c:115
 #, c-format
 msgid "Could not create directory (%s): %s\n"
 msgstr ""
 
-#: src/audtool/handlers_playlist.c:274
+#: src/audtool/handlers_playlist.c:262
 msgid "Position not found."
-msgstr ""
+msgstr "Η θέση δεν βρέθηκε."
 
-#: src/audtool/handlers_vitals.c:64
+#: src/audtool/handlers_vitals.c:51
 msgid "No song playing."
+msgstr "Κανένα τραγούδι σε αναπαραγωγή."
+
+#: src/libaudcore/audstrings.c:199
+#, c-format
+msgid "Audio CD, track %s"
 msgstr ""
 
-#: src/libaudcore/tuple.c:685
+#: src/libaudcore/tuple.c:541
 msgid "Mono"
 msgstr "Mono"
 
-#: src/libaudcore/tuple.c:687
+#: src/libaudcore/tuple.c:543
 msgid "Stereo"
-msgstr ""
+msgstr "Στέρεο"
 
-#: src/libaudcore/tuple.c:689
+#: src/libaudcore/tuple.c:545
 #, c-format
 msgid "%d channel"
 msgid_plural "%d channels"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d κανάλι"
+msgstr[1] "%d κανάλια"
 
-#: src/libaudgui/confirm.c:78
+#: src/libaudgui/about.c:38
+msgid "Credits"
+msgstr "Μνεία"
+
+#: src/libaudgui/about.c:38
+msgid "License"
+msgstr "Άδεια"
+
+#: src/libaudgui/about.c:74
+msgid "About Audacious"
+msgstr "Περί Audacious"
+
+#: src/libaudgui/confirm.c:61
+msgid "Close Playlist"
+msgstr ""
+
+#: src/libaudgui/confirm.c:76
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
 "playlist was exported will be lost."
 msgstr ""
 
-#: src/libaudgui/confirm.c:91
+#: src/libaudgui/confirm.c:89
 msgid "_Don't show this message again"
-msgstr ""
+msgstr "_Να μην εμφανιστεί ξανά αυτό το μήνυμα"
 
-#: src/libaudgui/confirm.c:128
+#: src/libaudgui/confirm.c:126
 msgid "Rename Playlist"
-msgstr ""
+msgstr "Μετονομασία λίστας αναπαραγωγής"
 
-#: src/libaudgui/effects-menu.c:76
+#: src/libaudgui/effects-menu.c:72
 msgid "settings ..."
-msgstr ""
+msgstr "ρυθμίσεις ..."
 
-#: src/libaudgui/equalizer.c:52
+#: src/libaudgui/equalizer.c:51
 msgid "_Enable"
-msgstr ""
+msgstr "_Ενεργοποίηση"
 
 #: src/libaudgui/equalizer.c:124
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Hz"
 
 #: src/libaudgui/equalizer.c:124
 msgid "63 Hz"
-msgstr ""
+msgstr "31 Hz"
 
 #: src/libaudgui/equalizer.c:125
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Hz"
 
 #: src/libaudgui/equalizer.c:125
 msgid "250 Hz"
-msgstr ""
+msgstr "250 Hz"
 
 #: src/libaudgui/equalizer.c:125
 msgid "500 Hz"
-msgstr ""
+msgstr "500 Hz"
 
 #: src/libaudgui/equalizer.c:125
 msgid "1 kHz"
-msgstr ""
+msgstr "1 kHz"
 
 #: src/libaudgui/equalizer.c:125
 msgid "2 kHz"
-msgstr ""
+msgstr "2 kHz"
 
 #: src/libaudgui/equalizer.c:126
 msgid "4 kHz"
-msgstr ""
+msgstr "4 kHz"
 
 #: src/libaudgui/equalizer.c:126
 msgid "8 kHz"
-msgstr ""
+msgstr "8 kHz"
 
 #: src/libaudgui/equalizer.c:126
 msgid "16 kHz"
-msgstr ""
+msgstr "16 kHz"
 
 #: src/libaudgui/equalizer.c:131
 msgid "Equalizer"
@@ -796,412 +639,343 @@ msgstr "Ισοσταθμιστής"
 
 #: src/libaudgui/equalizer.c:147
 msgid "Preamp"
-msgstr ""
+msgstr "Προενίσχυση"
 
-#: src/libaudgui/infopopup.c:211
-msgid "Track Number"
-msgstr ""
+#: src/libaudgui/infopopup.c:202
+msgid "Track"
+msgstr "Κομμάτι"
 
-#: src/libaudgui/infopopup.c:213
-msgid "Track Length"
-msgstr ""
+#: src/libaudgui/infopopup.c:204
+msgid "Length"
+msgstr "Μήκος"
 
-#: src/libaudgui/infowin.c:77
+#: src/libaudgui/infowin.c:74
 msgid "Acid Jazz"
 msgstr "Acid Jazz"
 
-#: src/libaudgui/infowin.c:78
+#: src/libaudgui/infowin.c:75
 msgid "Acid Rock"
-msgstr ""
+msgstr "Acid Rock"
 
-#: src/libaudgui/infowin.c:79
+#: src/libaudgui/infowin.c:76
 msgid "Ambient"
 msgstr "Ambient"
 
-#: src/libaudgui/infowin.c:80
+#: src/libaudgui/infowin.c:77
 msgid "Bebop"
-msgstr ""
+msgstr "Bebop"
 
-#: src/libaudgui/infowin.c:81
+#: src/libaudgui/infowin.c:78
 msgid "Bluegrass"
 msgstr "Bluegrass"
 
-#: src/libaudgui/infowin.c:82
+#: src/libaudgui/infowin.c:79
 msgid "Blues"
-msgstr ""
+msgstr "Blues"
 
-#: src/libaudgui/infowin.c:83
+#: src/libaudgui/infowin.c:80
 msgid "Chamber Music"
 msgstr "Chamber Music"
 
-#: src/libaudgui/infowin.c:84
+#: src/libaudgui/infowin.c:81
 msgid "Classical"
 msgstr "Κλασική Μουσική"
 
-#: src/libaudgui/infowin.c:85
+#: src/libaudgui/infowin.c:82
 msgid "Country"
 msgstr "Country"
 
-#: src/libaudgui/infowin.c:86
+#: src/libaudgui/infowin.c:83
 msgid "Death Metal"
 msgstr "Death Metal"
 
-#: src/libaudgui/infowin.c:87
+#: src/libaudgui/infowin.c:84
 msgid "Disco"
 msgstr "Disco"
 
-#: src/libaudgui/infowin.c:88
+#: src/libaudgui/infowin.c:85
 msgid "Easy Listening"
 msgstr "Easy Listening"
 
-#: src/libaudgui/infowin.c:89
+#: src/libaudgui/infowin.c:86
 msgid "Folk"
 msgstr "Folk"
 
-#: src/libaudgui/infowin.c:90
+#: src/libaudgui/infowin.c:87
 msgid "Funk"
 msgstr "Funk"
 
-#: src/libaudgui/infowin.c:91
+#: src/libaudgui/infowin.c:88
 msgid "Gangsta Rap"
 msgstr "Gangsta Rap"
 
-#: src/libaudgui/infowin.c:92
+#: src/libaudgui/infowin.c:89
 msgid "Gospel"
 msgstr "Gospel"
 
-#: src/libaudgui/infowin.c:93
+#: src/libaudgui/infowin.c:90
 msgid "Grunge"
 msgstr "Grunge"
 
-#: src/libaudgui/infowin.c:94
+#: src/libaudgui/infowin.c:91
 msgid "Hard Rock"
 msgstr "Hard Rock"
 
-#: src/libaudgui/infowin.c:95
+#: src/libaudgui/infowin.c:92
 msgid "Heavy Metal"
 msgstr "Heavy Metal"
 
-#: src/libaudgui/infowin.c:96
+#: src/libaudgui/infowin.c:93
 msgid "Hip-hop"
-msgstr ""
+msgstr "Hip-hop"
 
-#: src/libaudgui/infowin.c:97
+#: src/libaudgui/infowin.c:94
 msgid "House"
 msgstr "House"
 
-#: src/libaudgui/infowin.c:98
+#: src/libaudgui/infowin.c:95
 msgid "Jazz"
 msgstr "Jazz"
 
-#: src/libaudgui/infowin.c:99
+#: src/libaudgui/infowin.c:96
 msgid "Jungle"
 msgstr "Jungle"
 
-#: src/libaudgui/infowin.c:100
+#: src/libaudgui/infowin.c:97
 msgid "Metal"
 msgstr "Metal"
 
-#: src/libaudgui/infowin.c:101
+#: src/libaudgui/infowin.c:98
 msgid "New Age"
 msgstr "New Age"
 
-#: src/libaudgui/infowin.c:102
+#: src/libaudgui/infowin.c:99
 msgid "New Wave"
 msgstr "New Wave"
 
-#: src/libaudgui/infowin.c:103
+#: src/libaudgui/infowin.c:100
 msgid "Noise"
 msgstr "Bruit"
 
-#: src/libaudgui/infowin.c:104
+#: src/libaudgui/infowin.c:101
 msgid "Pop"
 msgstr "Pop"
 
-#: src/libaudgui/infowin.c:105
+#: src/libaudgui/infowin.c:102
 msgid "Punk Rock"
 msgstr "Punk Rock"
 
-#: src/libaudgui/infowin.c:106
+#: src/libaudgui/infowin.c:103
 msgid "Rap"
 msgstr "Rap"
 
-#: src/libaudgui/infowin.c:107
+#: src/libaudgui/infowin.c:104
 msgid "Reggae"
 msgstr "Reggae"
 
-#: src/libaudgui/infowin.c:108
+#: src/libaudgui/infowin.c:105
 msgid "Rock"
 msgstr "Ροκ"
 
-#: src/libaudgui/infowin.c:109
+#: src/libaudgui/infowin.c:106
 msgid "Rock and Roll"
-msgstr ""
+msgstr "Rock and Roll"
 
-#: src/libaudgui/infowin.c:110
+#: src/libaudgui/infowin.c:107
 msgid "Rhythm and Blues"
-msgstr ""
+msgstr "Rhythm and Blues"
 
-#: src/libaudgui/infowin.c:111
+#: src/libaudgui/infowin.c:108
 msgid "Ska"
 msgstr "Ska"
 
-#: src/libaudgui/infowin.c:112
+#: src/libaudgui/infowin.c:109
 msgid "Soul"
 msgstr "Soul"
 
-#: src/libaudgui/infowin.c:113
+#: src/libaudgui/infowin.c:110
 msgid "Swing"
 msgstr "Swing"
 
-#: src/libaudgui/infowin.c:114
+#: src/libaudgui/infowin.c:111
 msgid "Techno"
 msgstr "Techno"
 
-#: src/libaudgui/infowin.c:115
+#: src/libaudgui/infowin.c:112
 msgid "Trip-hop"
-msgstr ""
+msgstr "Trip-hop"
 
-#: src/libaudgui/infowin.c:175 src/libaudgui/infowin.c:361
-#: src/libaudgui/infowin.c:364 src/libaudgui/infowin.c:367
+#: src/libaudgui/infowin.c:176 src/libaudgui/infowin.c:365
+#: src/libaudgui/infowin.c:368 src/libaudgui/infowin.c:371
 msgid "<span size=\"small\">n/a</span>"
-msgstr ""
+msgstr "<span size=\"small\">n/a</span>"
 
-#: src/libaudgui/infowin.c:265
+#: src/libaudgui/infowin.c:266
 msgid "Metadata updated successfully"
-msgstr ""
+msgstr "Τα μεταδεδομένα ενημερώθηκαν με επιτυχία"
 
-#: src/libaudgui/infowin.c:270
+#: src/libaudgui/infowin.c:271
 msgid "Metadata updating failed"
-msgstr ""
+msgstr "Η ενημέρωση των μεταδεδομένων απέτυχε"
 
-#: src/libaudgui/infowin.c:318
+#: src/libaudgui/infowin.c:319
 msgid "Track Information"
-msgstr ""
-
-#: src/libaudgui/infowin.c:350
-msgid "<span size=\"small\">Format:</span>"
-msgstr ""
+msgstr "Πληροφορίες κομματιού"
 
 #: src/libaudgui/infowin.c:354
+msgid "<span size=\"small\">Format:</span>"
+msgstr "<span size=\"small\"> Φορμά: </ span>"
+
+#: src/libaudgui/infowin.c:358
 msgid "<span size=\"small\">Quality:</span>"
-msgstr ""
+msgstr "<span size=\"small\"> Ποιότητα: </ span>"
 
-#: src/libaudgui/infowin.c:357
+#: src/libaudgui/infowin.c:361
 msgid "<span size=\"small\">Bitrate:</span>"
-msgstr ""
+msgstr "<span size=\"small\">Bitrate:</span>"
 
-#: src/libaudgui/infowin.c:387
+#: src/libaudgui/infowin.c:385
 msgid "<span size=\"small\">Title</span>"
-msgstr ""
+msgstr "<span size=\"small\">Τίτλος</span>"
 
-#: src/libaudgui/infowin.c:399
+#: src/libaudgui/infowin.c:397
 msgid "<span size=\"small\">Artist</span>"
-msgstr ""
+msgstr "<span size=\"small\">Καλλιτέχνης</span>"
 
-#: src/libaudgui/infowin.c:411
+#: src/libaudgui/infowin.c:409
 msgid "<span size=\"small\">Album</span>"
-msgstr ""
+msgstr "<span size=\"small\">Άλμπουμ</span>"
 
-#: src/libaudgui/infowin.c:423
+#: src/libaudgui/infowin.c:421
 msgid "<span size=\"small\">Comment</span>"
-msgstr ""
+msgstr "<span size=\"small\">Σχόλιο</span>"
 
-#: src/libaudgui/infowin.c:435
+#: src/libaudgui/infowin.c:433
 msgid "<span size=\"small\">Genre</span>"
 msgstr ""
 
-#: src/libaudgui/infowin.c:456
+#: src/libaudgui/infowin.c:455
 msgid "<span size=\"small\">Year</span>"
 msgstr ""
 
-#: src/libaudgui/infowin.c:467
+#: src/libaudgui/infowin.c:464
 msgid "<span size=\"small\">Track Number</span>"
 msgstr ""
 
-#: src/libaudgui/infowin.c:549
+#: src/libaudgui/infowin.c:541
 #, c-format
 msgid "%d kb/s"
 msgstr ""
 
-#: src/libaudgui/infowin.c:579
+#: src/libaudgui/infowin.c:568
 #, c-format
 msgid "No info available for %s.\n"
 msgstr ""
 
-#: src/libaudgui/jump-to-time.c:75
+#: src/libaudgui/jump-to-time.c:52
 msgid "Jump to Time"
 msgstr "Μετάβαση σε χρόνο"
 
-#: src/libaudgui/jump-to-time.c:90
-msgid "mm:ss"
-msgstr ""
+#: src/libaudgui/jump-to-time.c:61
+msgid "Enter time (minutes:seconds):"
+msgstr "Πληκτρολογήστε το χρόνο (λεπτά: δευτερόλεπτα):"
 
-#: src/libaudgui/playlists.c:39
+#: src/libaudgui/playlists.c:33
 msgid "Export Playlist"
 msgstr ""
 
-#: src/libaudgui/playlists.c:39
+#: src/libaudgui/playlists.c:33
 msgid "Import Playlist"
 msgstr ""
 
-#: src/libaudgui/playlists.c:72
+#: src/libaudgui/playlists.c:66
 #, c-format
 msgid "Overwrite %s?"
 msgstr ""
 
-#: src/libaudgui/queue-manager.c:185
+#: src/libaudgui/queue-manager.c:196
 msgid "Queue Manager"
 msgstr ""
 
-#: src/libaudgui/ui_about.c:69
-msgid "About Audacious"
-msgstr "Περί Audacious"
-
-#: src/libaudgui/ui_about.c:90 src/libaudgui/ui_credits.c:122
-msgid "Credits"
-msgstr "Μνεία"
-
-#: src/libaudgui/ui_credits.c:126
-msgid "Translators"
-msgstr "Μεταφραστές"
-
-#: src/libaudgui/ui_fileopener.c:109
+#: src/libaudgui/ui_fileopener.c:107
 msgid "Open Files"
 msgstr "Άνοιγμα αρχείων"
 
-#: src/libaudgui/ui_fileopener.c:109
+#: src/libaudgui/ui_fileopener.c:107
 msgid "Add Files"
 msgstr "Προσθήκη αρχείων"
 
-#: src/libaudgui/ui_fileopener.c:111
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Close dialog on Open"
 msgstr "Κλείσιμο παραθύρου διαλόγου κατά το άνοιγμα"
 
-#: src/libaudgui/ui_fileopener.c:111
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Close dialog on Add"
 msgstr "Κλείσιμο του διαλόγου κατά την προσθήκη"
 
-#: src/libaudgui/ui_jumptotrack.c:103 src/libaudgui/ui_jumptotrack.c:111
-#: src/libaudgui/ui_jumptotrack.c:322
+#: src/libaudgui/ui_jumptotrack.c:105 src/libaudgui/ui_jumptotrack.c:113
+#: src/libaudgui/ui_jumptotrack.c:332
 msgid "_Queue"
 msgstr "Στην _ουρά"
 
-#: src/libaudgui/ui_jumptotrack.c:109
+#: src/libaudgui/ui_jumptotrack.c:111
 msgid "Un_queue"
 msgstr ""
 
-#: src/libaudgui/ui_jumptotrack.c:239
-msgid "Jump to Track"
-msgstr "Μεταπήδηση στο κομμάτι"
+#: src/libaudgui/ui_jumptotrack.c:262
+msgid "Jump to Song"
+msgstr ""
 
-#: src/libaudgui/ui_jumptotrack.c:277
+#: src/libaudgui/ui_jumptotrack.c:287
 msgid "Filter: "
 msgstr "Φίλτρο:"
 
-#: src/libaudgui/ui_jumptotrack.c:278
+#: src/libaudgui/ui_jumptotrack.c:288
 msgid "_Filter:"
 msgstr ""
 
-#: src/libaudgui/ui_jumptotrack.c:288
+#: src/libaudgui/ui_jumptotrack.c:298
 msgid "Remember"
 msgstr ""
 
-#: src/libaudgui/ui_jumptotrack.c:295
+#: src/libaudgui/ui_jumptotrack.c:305
 msgid "Clea_r"
 msgstr ""
 
-#: src/libaudgui/ui_jumptotrack.c:315
+#: src/libaudgui/ui_jumptotrack.c:325
 msgid "Close on Jump"
 msgstr ""
 
-#: src/libaudgui/ui_playlist_manager.c:250
+#: src/libaudgui/ui_playlist_manager.c:261
 msgid "Playlist Manager"
 msgstr ""
 
-#: src/libaudgui/ui_playlist_manager.c:277
+#: src/libaudgui/ui_playlist_manager.c:288
 msgid "Entries"
 msgstr ""
 
-#: src/libaudgui/ui_playlist_manager.c:298
+#: src/libaudgui/ui_playlist_manager.c:308
 msgid "_Rename"
 msgstr ""
 
-#: src/libaudgui/ui_playlist_manager.c:322
+#: src/libaudgui/ui_playlist_manager.c:328
 msgid "_Close dialog on activating playlist"
 msgstr ""
 
-#: src/libaudgui/ui_urlopener.c:51
+#: src/libaudgui/url-opener.c:56
 msgid "Open URL"
 msgstr ""
 
-#: src/libaudgui/ui_urlopener.c:51
+#: src/libaudgui/url-opener.c:56
 msgid "Add URL"
 msgstr ""
 
-#: src/libaudgui/util.c:95
+#: src/libaudgui/url-opener.c:65
+msgid "Enter URL:"
+msgstr "Πληκτρολόγησε URL:"
+
+#: src/libaudgui/util.c:143
 msgid ""
 "\n"
 "(Further messages have been hidden.)"
 msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:165
-msgid "File is not a valid .desktop file"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:188
-#, c-format
-msgid "Unrecognized desktop file Version '%s'"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:967
-#, c-format
-msgid "Starting %s"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1108
-msgid "Application does not accept documents on command line"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1176
-#, c-format
-msgid "Unrecognized launch option: %d"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1375
-msgid "Can't pass document URIs to a 'Type=Link' desktop entry"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1396
-msgid "Not a launchable item"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:226
-msgid "Disable connection to session manager"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:229
-msgid "Specify file containing saved configuration"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:229
-msgid "FILE"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:232
-msgid "Specify session management ID"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:232
-msgid "ID"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:253
-msgid "Session management options:"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:254
-msgid "Show session management options"
-msgstr ""
-
-

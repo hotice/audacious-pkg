@@ -2,21 +2,19 @@
  * plugin-view.c
  * Copyright 2010 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <gtk/gtk.h>
@@ -55,14 +53,6 @@ static PluginHandle * get_selected_plugin (GtkTreeView * tree)
         gtk_tree_model_get (model, & iter, PVIEW_COL_NODE, & n, -1);
 
     return n == NULL ? NULL : n->p;
-}
-
-static Plugin * get_selected_header (GtkTreeView * tree)
-{
-    PluginHandle * p = get_selected_plugin (tree);
-    g_return_val_if_fail (p != NULL, NULL);
-    g_return_val_if_fail (plugin_get_enabled (p), NULL);
-    return plugin_get_header (p);
 }
 
 static void do_enable (GtkCellRendererToggle * cell, const char * path_str,
@@ -204,22 +194,16 @@ static void button_update (GtkTreeView * tree, GtkWidget * b)
 
 static void do_config (GtkTreeView * tree)
 {
-    Plugin * header = get_selected_header (tree);
-    g_return_if_fail (header != NULL);
-
-    if (header->configure != NULL)
-        header->configure ();
-    else if (header->settings != NULL)
-        plugin_preferences_show (header->settings);
+    PluginHandle * plugin = get_selected_plugin (tree);
+    g_return_if_fail (plugin != NULL);
+    plugin_do_configure (plugin);
 }
 
 static void do_about (GtkTreeView * tree)
 {
-    Plugin * header = get_selected_header (tree);
-    g_return_if_fail (header != NULL);
-
-    if (header->about != NULL)
-        header->about ();
+    PluginHandle * plugin = get_selected_plugin (tree);
+    g_return_if_fail (plugin != NULL);
+    plugin_do_about (plugin);
 }
 
 static void button_destroy (GtkWidget * b)
@@ -235,7 +219,7 @@ static void button_destroy (GtkWidget * b)
 
 GtkWidget * plugin_view_new (int type)
 {
-    GtkWidget * vbox = gtk_vbox_new (FALSE, 6);
+    GtkWidget * vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
     gtk_container_set_border_width ((GtkContainer *) vbox, 6);
 
     GtkWidget * scrolled = gtk_scrolled_window_new (NULL, NULL);
@@ -252,7 +236,7 @@ GtkWidget * plugin_view_new (int type)
      (type));
     g_signal_connect (tree, "destroy", (GCallback) list_destroy, NULL);
 
-    GtkWidget * hbox = gtk_hbox_new (FALSE, 6);
+    GtkWidget * hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,  6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox, FALSE, FALSE, 0);
 
     GtkWidget * config = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);

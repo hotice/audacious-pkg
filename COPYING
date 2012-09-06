@@ -1,43 +1,27 @@
-Audacious
-Copyright (C) 2005-2010 Audacious team
+LICENSE
 
-Based on BMP:
-Copyright (C) 2003-2004 BMP development team
+Copyright © 2001-2012 Audacious developers and others
 
-Based on XMMS:
-Copyright (C) 1998-2000 Peter Alm, Mikael Alm, Olle Hallnas, Thomas Nilsson, and
- 4Front Technologies
+(A list of the copyright holders is provided in the AUTHORS file.)
 
-Audacious is free software: you can redistribute it and/or modify it
-(with the exceptions listed below this notice) under the terms of the GNU
-General Public License as published by the Free Software Foundation, version 3
-of the License.
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
 
-Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+    1. Redistributions of source code must retain the above copyright notice,
+       this list of conditions, and the following disclaimer.
 
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
+    2. Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions, and the following disclaimer in the
+       documentation provided with the distribution.
 
- ***
+    This software is provided “as is” and without any warranty, express or
+    implied.  In no event shall the authors be liable for any damages arising
+    from the use of this software.
 
-The files src/audacious/images/{album audio connectivity menu_playlist
-menu_plugin menu_queue_toggle playlist plugins}.png are taken from the icon
-theme of Gnome 2.30.3 and are distributed under the following terms:
+EXCEPTIONS
 
-Copyright (C) Ulisse Perusin, Riccardo Buzzotta, Josef Vybíral, Hylke Bons,
- Ricardo González, Lapo Calamandrei, Rodney Dawes, Luca Ferretti, Tuomas
- Kuosmanen, Andreas Nilsson, and Jakub Steiner
+Other than the Audacious logo itself, the images included with Audacious are
+based on the Tango Icon Library and are in the public domain.
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation; version 2 of the License.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program; if not, write to the Free Software Foundation, Inc., 51 Franklin
-Street, Fifth Floor, Boston, MA 02110-1301, USA.
+Please note that many of the plugins distributed with Audacious are under
+different licenses.

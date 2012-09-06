@@ -2,21 +2,19 @@
  * plugin-registry.c
  * Copyright 2009-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 /* While the registry is being built (during early startup) or destroyed (during
@@ -34,6 +32,7 @@
 #include <libaudcore/audstrings.h>
 
 #include "debug.h"
+#include "i18n.h"
 #include "interface.h"
 #include "misc.h"
 #include "plugin.h"
@@ -41,7 +40,7 @@
 #include "util.h"
 
 #define FILENAME "plugin-registry"
-#define FORMAT 6
+#define FORMAT 8
 
 typedef struct {
     GList * schemes;
@@ -61,10 +60,11 @@ struct PluginHandle {
     bool_t confirmed, loaded;
     int timestamp, type;
     Plugin * header;
-    char * name;
+    char * name, * domain;
     int priority;
     bool_t has_about, has_configure, enabled;
     GList * watches;
+    PluginMiscData misc;
 
     union {
         TransportPluginData t;
@@ -109,11 +109,14 @@ static PluginHandle * plugin_new (char * path, bool_t confirmed, bool_t
     plugin->type = type;
     plugin->header = header;
     plugin->name = NULL;
+    plugin->domain = NULL;
     plugin->priority = 0;
     plugin->has_about = FALSE;
     plugin->has_configure = FALSE;
     plugin->enabled = FALSE;
     plugin->watches = NULL;
+
+    memset (& plugin->misc, 0, sizeof (PluginMiscData));
 
     if (type == PLUGIN_TYPE_TRANSPORT)
     {
@@ -167,6 +170,7 @@ static void plugin_free (PluginHandle * plugin)
 
     g_free (plugin->path);
     g_free (plugin->name);
+    g_free (plugin->domain);
     g_free (plugin);
 }
 
@@ -210,6 +214,10 @@ static void plugin_save (PluginHandle * plugin, FILE * handle)
     fprintf (handle, "%s %s\n", plugin_type_names[plugin->type], plugin->path);
     fprintf (handle, "stamp %d\n", plugin->timestamp);
     fprintf (handle, "name %s\n", plugin->name);
+
+    if (plugin->domain)
+        fprintf (handle, "domain %s\n", plugin->domain);
+
     fprintf (handle, "priority %d\n", plugin->priority);
     fprintf (handle, "about %d\n", plugin->has_about);
     fprintf (handle, "config %d\n", plugin->has_configure);
@@ -343,6 +351,8 @@ FOUND:
 
     if ((plugin->name = parse_string ("name")))
         parse_next (handle);
+    if ((plugin->domain = parse_string ("domain")))
+        parse_next (handle);
     if (parse_integer ("priority", & plugin->priority))
         parse_next (handle);
     if (parse_integer ("about", & plugin->has_about))
@@ -406,7 +416,7 @@ int plugin_compare (PluginHandle * a, PluginHandle * b)
         return 1;
 
     int diff;
-    if ((diff = string_compare (a->name, b->name)))
+    if ((diff = string_compare (dgettext (a->domain, a->name), dgettext (b->domain, b->name))))
         return diff;
 
     return string_compare (a->path, b->path);
@@ -507,10 +517,11 @@ void plugin_register_loaded (const char * path, Plugin * header)
     }
 
     g_free (plugin->name);
+    g_free (plugin->domain);
     plugin->name = g_strdup (header->name);
-    plugin->has_about = PLUGIN_HAS_FUNC (header, about);
-    plugin->has_configure = PLUGIN_HAS_FUNC (header, configure) ||
-     PLUGIN_HAS_FUNC (header, settings);
+    plugin->domain = PLUGIN_HAS_FUNC (header, domain) ? g_strdup (header->domain) : NULL;
+    plugin->has_about = PLUGIN_HAS_FUNC (header, about) || PLUGIN_HAS_FUNC (header, about_text);
+    plugin->has_configure = PLUGIN_HAS_FUNC (header, configure) || PLUGIN_HAS_FUNC (header, prefs);
 
     if (header->type == PLUGIN_TYPE_TRANSPORT)
     {
@@ -607,6 +618,11 @@ const void * plugin_get_header (PluginHandle * plugin)
     return plugin->header;
 }
 
+const void * plugin_get_header_no_load (PluginHandle * plugin)
+{
+    return plugin->header;
+}
+
 static int plugin_by_header_cb (PluginHandle * plugin, const void * header)
 {
     return (plugin->header == header) ? 0 : -1;
@@ -632,7 +648,7 @@ void plugin_for_each (int type, PluginForEachFunc func, void * data)
 
 const char * plugin_get_name (PluginHandle * plugin)
 {
-    return plugin->name;
+    return dgettext (plugin->domain, plugin->name);
 }
 
 bool_t plugin_has_about (PluginHandle * plugin)
@@ -717,6 +733,11 @@ void plugin_remove_watch (PluginHandle * plugin, PluginForEachFunc func, void *
 
         node = next;
     }
+}
+
+PluginMiscData * plugin_get_misc_data (PluginHandle * plugin)
+{
+    return & plugin->misc;
 }
 
 typedef struct {

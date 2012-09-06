@@ -1,22 +1,20 @@
 /*
  * playback.c
- * Copyright 2005-2011 Audacious Development Team
+ * Copyright 2009-2012 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <glib.h>
@@ -33,8 +31,18 @@
 #include "output.h"
 #include "playback.h"
 #include "playlist.h"
+#include "plugin.h"
 
 static void playback_start (int playlist, int entry, int seek_time, bool_t pause);
+
+static const struct OutputAPI output_api = {
+ .open_audio = output_open_audio,
+ .set_replaygain_info = output_set_replaygain_info,
+ .write_audio = output_write_audio,
+ .abort_write = output_abort_write,
+ .pause = output_pause,
+ .written_time = output_written_time,
+ .flush = output_set_time};
 
 static InputPlayback playback_api;
 
@@ -167,7 +175,7 @@ int playback_get_time (void)
         time = current_decoder->get_time (& playback_api);
 
     if (time < 0)
-        time = get_output_time ();
+        time = output_get_time ();
 
     return time - time_offset;
 }
@@ -177,23 +185,12 @@ void playback_play (int seek_time, bool_t pause)
     g_return_if_fail (! playing);
 
     int playlist = playlist_get_playing ();
-
-    if (playlist == -1)
-    {
-        playlist = playlist_get_active ();
-        playlist_set_playing (playlist);
-    }
+    if (playlist < 0)
+        return;
 
     int entry = playlist_get_position (playlist);
-
-    if (entry == -1)
-    {
-        playlist_next_song (playlist, TRUE);
-        entry = playlist_get_position (playlist);
-
-        if (entry == -1)
-            return;
-    }
+    if (entry < 0)
+        return;
 
     failed_entries = 0;
     playback_start (playlist, entry, seek_time, pause);
@@ -224,6 +221,7 @@ static void playback_cleanup (void)
     playing = FALSE;
 
     event_queue_cancel ("playback ready", NULL);
+    event_queue_cancel ("playback seek", NULL);
     event_queue_cancel ("info change", NULL);
     event_queue_cancel ("title change", NULL);
 
@@ -331,6 +329,8 @@ static void * playback_thread (void * unused)
      file, seekable ? time_offset + initial_seek : 0,
      seekable ? playback_entry_get_end_time () : -1, paused);
 
+    output_close_audio ();
+
     if (file)
         vfs_fclose (file);
 
@@ -388,7 +388,12 @@ void playback_seek (int time)
     current_decoder->mseek (& playback_api, time_offset + CLAMP (time, 0,
      current_length));
 
-    hook_call ("playback seek", NULL);
+    /* If the plugin is using our output system, don't call "playback seek"
+     * immediately but wait for output_set_time() to be called.  This ensures
+     * that a "playback seek" handler can call playback_get_time() and get the
+     * new time. */
+    if (! output_is_open ())
+        hook_call ("playback seek", NULL);
 }
 
 static void set_data (InputPlayback * p, void * data)
@@ -502,10 +507,6 @@ void playback_get_volume (int * l, int * r)
 
 void playback_set_volume (int l, int r)
 {
-    int h_vol[2] = {l, r};
-
-    hook_call ("volume set", h_vol);
-
     if (playing && playback_get_ready () && current_decoder &&
      current_decoder->set_volume && current_decoder->set_volume (l, r))
         return;

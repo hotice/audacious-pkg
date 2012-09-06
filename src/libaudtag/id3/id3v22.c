@@ -1,24 +1,21 @@
 /*
- * Copyright 2009 Paula Stanciu
- * Copyright 2010 John Lindgren
- * Copyright 2010 Tony Vroon
- * Copyright 2010 William Pitcock
+ * id3v24.c
+ * Copyright 2009-2011 Paula Stanciu, Tony Vroon, John Lindgren,
+ *                     and William Pitcock
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <glib.h>
@@ -69,7 +66,7 @@ ID3v2Header;
 
 typedef struct
 {
-    unsigned char key[3];
+    char key[3];
     unsigned char size[3];
 }
 ID3v2FrameHeader;
@@ -169,7 +166,7 @@ static bool_t read_frame (VFSFile * handle, int max_size, int version,
     TAGDBG (" size = %d\n", (int) hdrsz);
 
     * frame_size = sizeof (ID3v2FrameHeader) + hdrsz;
-    sprintf (key, "%.3s", header.key);
+    g_strlcpy (key, header.key, 4);
 
     * size = hdrsz;
     * data = g_malloc (* size);
@@ -506,9 +503,6 @@ bool_t id3v22_read_tag (Tuple * tuple, VFSFile * handle)
             break;
           case ID3_COMMENT:
             decode_comment (tuple, data, size);
-            break;
-          case ID3_ENCODER:
-            associate_string (tuple, -1, "encoder", data, size);
             break;
           case ID3_TXX:
             decode_txx (tuple, data, size);

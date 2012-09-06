@@ -2,21 +2,19 @@
  * misc-api.h
  * Copyright 2010-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 /* Do not include this file directly; use misc.h instead. */
@@ -59,10 +57,6 @@ AUD_FUNC2 (int, get_int, const char *, section, const char *, name)
 AUD_VFUNC3 (set_double, const char *, section, const char *, name, double, value)
 AUD_FUNC2 (double, get_double, const char *, section, const char *, name)
 
-/* credits.c */
-AUD_VFUNC3 (get_audacious_credits, const char * *, brief,
- const char * const * *, credits, const char * const * *, translators)
-
 /* equalizer.c */
 AUD_VFUNC1 (eq_set_bands, const double *, values)
 AUD_VFUNC1 (eq_get_bands, double *, values)
@@ -97,6 +91,9 @@ AUD_VFUNC1 (interface_uninstall_toolbar, void *, button)
 /* main.c */
 AUD_FUNC1 (const char *, get_path, int, path)
 
+/* output.c */
+AUD_VFUNC1 (output_reset, int, type)
+
 /* probe.c */
 AUD_FUNC2 (PluginHandle *, file_find_decoder, const char *, filename, bool_t,
  fast)
@@ -119,7 +116,7 @@ AUD_VFUNC2 (plugin_menu_remove, int, id, MenuFunc, func)
 
 /* ui_preferences.c */
 AUD_VFUNC4 (create_widgets_with_domain, /* GtkWidget * */ void *, box,
- PreferencesWidget *, widgets, int, count, const char *, domain)
+ const PreferencesWidget *, widgets, int, n_widgets, const char *, domain)
 AUD_VFUNC0 (show_prefs_window)
 
 /* util.c */

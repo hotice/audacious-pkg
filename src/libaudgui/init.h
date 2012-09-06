@@ -23,11 +23,17 @@
 void audgui_init (AudAPITable * table);
 void audgui_cleanup (void);
 
+/* jump-to-time.c */
+void audgui_jump_to_time_cleanup (void);
+
 /* queue-manager.c */
 void audgui_queue_manager_cleanup (void);
 
 /* ui_playlist_manager.c */
 void audgui_playlist_manager_cleanup (void);
+
+/* url-opener.c */
+void audgui_url_opener_cleanup (void);
 
 /* util.c */
 void audgui_pixbuf_uncache (void);

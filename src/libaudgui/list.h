@@ -1,6 +1,6 @@
 /*
  * list.h
- * Copyright 2011 John Lindgren
+ * Copyright 2011-2012 John Lindgren and Michał Lipski
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -23,6 +23,11 @@
 #include <gtk/gtk.h>
 #include <libaudcore/core.h>
 
+/* New callbacks should be added to the end of this struct.  The
+ * audgui_list_new() macro tells us the size of the callback struct as it was
+ * defined when the caller code was compiled, allowing us to expand the struct
+ * without breaking backward compatibility. */
+
 typedef struct {
     void (* get_value) (void * user, int row, int column, GValue * value);
 
@@ -40,10 +45,17 @@ typedef struct {
     void (* get_data) (void * user, void * * data, int * length); /* data will
      be freed */
     void (* receive_data) (void * user, int row, const void * data, int length);
+
+    void (* mouse_motion) (void * user, GdkEventMotion * event, int row); /* optional */
+    void (* mouse_leave) (void * user, GdkEventMotion * event, int row); /* optional */
 } AudguiListCallbacks;
 
-GtkWidget * audgui_list_new (const AudguiListCallbacks * cbs, void * user,
- int rows);
+GtkWidget * audgui_list_new_real (const AudguiListCallbacks * cbs, int cbs_size,
+ void * user, int rows);
+
+#define audgui_list_new(c, u, r) \
+ audgui_list_new_real (c, sizeof (AudguiListCallbacks), u, r)
+
 void * audgui_list_get_user (GtkWidget * list);
 void audgui_list_add_column (GtkWidget * list, const char * title,
  int column, GType type, int width);
@@ -60,5 +72,6 @@ int audgui_list_get_focus (GtkWidget * list);
 void audgui_list_set_focus (GtkWidget * list, int row);
 
 int audgui_list_row_at_point (GtkWidget * list, int x, int y);
+int audgui_list_row_at_point_rounded (GtkWidget * list, int x, int y);
 
 #endif

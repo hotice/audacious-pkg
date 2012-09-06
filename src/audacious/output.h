@@ -1,41 +1,44 @@
-/*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2009  Audacious development team
+/*
+ * output.h
+ * Copyright 2010-2011 John Lindgren
  *
- *  Based on BMP:
- *  Copyright (C) 2003-2004  BMP development team
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  Based on XMMS:
- *  Copyright (C) 1998-2003  XMMS development team
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
- *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #ifndef AUDACIOUS_OUTPUT_H
 #define AUDACIOUS_OUTPUT_H
 
-#include "plugin.h"
+#include <libaudcore/core.h>
+#include "types.h"
 
-extern const struct OutputAPI output_api;
+bool_t output_open_audio (int format, int rate, int channels);
+void output_set_replaygain_info (const ReplayGainInfo * info);
+void output_write_audio (void * data, int length);
+void output_abort_write (void);
+void output_pause (bool_t pause);
+int output_written_time (void);
+void output_set_time (int time);
 
-void output_get_volume(int * l, int * r);
-void output_set_volume(int l, int r);
-
-int get_output_time (void);
-int get_raw_output_time (void);
+bool_t output_is_open (void);
+int output_get_time (void);
+int output_get_raw_time (void);
+void output_close_audio (void);
 void output_drain (void);
+
+void output_get_volume (int * left, int * right);
+void output_set_volume (int left, int right);
 
 PluginHandle * output_plugin_probe (void);
 PluginHandle * output_plugin_get_current (void);

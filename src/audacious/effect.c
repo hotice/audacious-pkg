@@ -2,21 +2,19 @@
  * effect.c
  * Copyright 2010 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <glib.h>
@@ -24,6 +22,7 @@
 
 #include "debug.h"
 #include "effect.h"
+#include "misc.h"
 #include "playback.h"
 #include "plugin.h"
 #include "plugins.h"
@@ -92,6 +91,8 @@ static void effect_process_cb (RunningEffect * effect, EffectProcessState *
 {
     if (effect->remove_flag)
     {
+        /* call finish twice to completely drain buffers */
+        effect->header->finish (state->data, state->samples);
         effect->header->finish (state->data, state->samples);
 
         running_effects = g_list_remove (running_effects, effect);
@@ -116,7 +117,10 @@ void effect_flush (void)
     pthread_mutex_lock (& mutex);
 
     for (GList * node = running_effects; node != NULL; node = node->next)
-        ((RunningEffect *) node->data)->header->flush ();
+    {
+        if (PLUGIN_HAS_FUNC (((RunningEffect *) node->data)->header, flush))
+            ((RunningEffect *) node->data)->header->flush ();
+    }
 
     pthread_mutex_unlock (& mutex);
 }
@@ -131,32 +135,18 @@ void effect_finish (float * * data, int * samples)
     pthread_mutex_unlock (& mutex);
 }
 
-int effect_decoder_to_output_time (int time)
-{
-    pthread_mutex_lock (& mutex);
-
-    for (GList * node = running_effects; node != NULL; node = node->next)
-    {
-        if (PLUGIN_HAS_FUNC (((RunningEffect *) node->data)->header, decoder_to_output_time))
-            time = ((RunningEffect *) node->data)->header->decoder_to_output_time (time);
-    }
-
-    pthread_mutex_unlock (& mutex);
-    return time;
-}
-
-int effect_output_to_decoder_time (int time)
+int effect_adjust_delay (int delay)
 {
     pthread_mutex_lock (& mutex);
 
     for (GList * node = g_list_last (running_effects); node != NULL; node = node->prev)
     {
-        if (PLUGIN_HAS_FUNC (((RunningEffect *) node->data)->header, output_to_decoder_time))
-            time = ((RunningEffect *) node->data)->header->output_to_decoder_time (time);
+        if (PLUGIN_HAS_FUNC (((RunningEffect *) node->data)->header, adjust_delay))
+            delay = ((RunningEffect *) node->data)->header->adjust_delay (delay);
     }
 
     pthread_mutex_unlock (& mutex);
-    return time;
+    return delay;
 }
 
 static int effect_find_cb (RunningEffect * effect, PluginHandle * plugin)
@@ -236,10 +226,7 @@ static void effect_enable (PluginHandle * plugin, EffectPlugin * ep, bool_t
     else
     {
         AUDDBG ("Reset to add/remove %s.\n", plugin_get_name (plugin));
-        int time = playback_get_time ();
-        bool_t paused = playback_get_paused ();
-        playback_stop ();
-        playback_play (time, paused);
+        output_reset (OUTPUT_RESET_EFFECTS_ONLY);
     }
 }
 

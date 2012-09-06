@@ -1,26 +1,20 @@
-/*  Audacious - Cross-platform multimedia player
- *  Copyright (C) 2005-2011  Audacious development team.
+/*
+ * main.c
+ * Copyright 2007-2011 William Pitcock and John Lindgren
  *
- *  Based on BMP:
- *  Copyright (C) 2003-2004  BMP development team.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  Based on XMMS:
- *  Copyright (C) 1998-2003  XMMS development team.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
- *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <errno.h>
@@ -41,11 +35,6 @@
 #ifdef USE_DBUS
 #include "../libaudclient/audctrl.h"
 #include "dbus.h"
-#endif
-
-#ifdef USE_EGGSM
-#include "eggdesktopfile.h"
-#include "eggsmclient.h"
 #endif
 
 #include "debug.h"
@@ -268,9 +257,6 @@ static void parse_options (int * argc, char *** argv)
     context = g_option_context_new(_("- play multimedia files"));
     g_option_context_add_main_entries(context, cmd_entries, PACKAGE);
     g_option_context_add_group(context, gtk_get_option_group(FALSE));
-#ifdef USE_EGGSM
-    g_option_context_add_group(context, egg_sm_client_get_option_group());
-#endif
 
     if (!g_option_context_parse(context, argc, argv, &error))
     {
@@ -412,7 +398,7 @@ static void do_remote (void)
 
 static void do_commands (void)
 {
-    bool_t resume = get_bool (NULL, "resume_playback_on_startup");
+    bool_t resume = TRUE;
 
     Index * filenames = convert_filenames ();
     if (filenames)
@@ -453,16 +439,12 @@ static void init_one (void)
     init_paths ();
     make_dirs ();
 
+    setlocale (LC_ALL, "");
     bindtextdomain (PACKAGE, aud_paths[AUD_PATH_LOCALE_DIR]);
     bind_textdomain_codeset (PACKAGE, "UTF-8");
     bindtextdomain (PACKAGE "-plugins", aud_paths[AUD_PATH_LOCALE_DIR]);
     bind_textdomain_codeset (PACKAGE "-plugins", "UTF-8");
     textdomain (PACKAGE);
-
-#ifdef USE_EGGSM
-    egg_sm_client_set_mode (EGG_SM_CLIENT_MODE_NORMAL);
-    egg_set_desktop_file (aud_paths[AUD_PATH_DESKTOP_FILE]);
-#endif
 }
 
 static void init_two (int * p_argc, char * * * p_argv)
@@ -470,7 +452,6 @@ static void init_two (int * p_argc, char * * * p_argv)
     if (! headless)
     {
         g_thread_init (NULL);
-        gtk_rc_add_default_file (aud_paths[AUD_PATH_GTKRC_FILE]);
         gtk_init (p_argc, p_argv);
     }
 
@@ -484,9 +465,6 @@ static void init_two (int * p_argc, char * * * p_argv)
 
 #ifdef HAVE_SIGWAIT
     signals_init ();
-#endif
-#ifdef USE_EGGSM
-    smclient_init ();
 #endif
 
     AUDDBG ("Loading lowlevel plugins.\n");

@@ -2,25 +2,24 @@
  * vis_runner.c
  * Copyright 2009-2011 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <glib.h>
 #include <pthread.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "output.h"
@@ -51,6 +50,9 @@ static void vis_node_free (VisNode * node)
 
 static bool_t send_audio (void * unused)
 {
+    /* call before locking mutex to avoid deadlock */
+    int outputted = output_get_raw_time ();
+
     pthread_mutex_lock (& mutex);
 
     if (! send_source)
@@ -58,8 +60,6 @@ static bool_t send_audio (void * unused)
         pthread_mutex_unlock (& mutex);
         return FALSE;
     }
-
-    int outputted = get_raw_output_time ();
 
     VisNode * vis_node = NULL;
     VisNode * next;
@@ -101,26 +101,7 @@ static bool_t send_clear (void * unused)
     return FALSE;
 }
 
-static bool_t locked = FALSE;
-
-void vis_runner_lock (void)
-{
-    pthread_mutex_lock (& mutex);
-    locked = TRUE;
-}
-
-void vis_runner_unlock (void)
-{
-    locked = FALSE;
-    pthread_mutex_unlock (& mutex);
-}
-
-bool_t vis_runner_locked (void)
-{
-    return locked;
-}
-
-void vis_runner_flush (void)
+static void flush (void)
 {
     if (current_node)
     {
@@ -135,7 +116,14 @@ void vis_runner_flush (void)
         clear_source = g_timeout_add (0, send_clear, NULL);
 }
 
-void vis_runner_start_stop (bool_t new_playing, bool_t new_paused)
+void vis_runner_flush (void)
+{
+    pthread_mutex_lock (& mutex);
+    flush ();
+    pthread_mutex_unlock (& mutex);
+}
+
+static void start_stop (bool_t new_playing, bool_t new_paused)
 {
     playing = new_playing;
     paused = new_paused;
@@ -154,16 +142,25 @@ void vis_runner_start_stop (bool_t new_playing, bool_t new_paused)
     }
 
     if (! active)
-        vis_runner_flush ();
+        flush ();
     else if (! paused)
         send_source = g_timeout_add (INTERVAL, send_audio, NULL);
+}
+
+void vis_runner_start_stop (bool_t new_playing, bool_t new_paused)
+{
+    pthread_mutex_lock (& mutex);
+    start_stop (new_playing, new_paused);
+    pthread_mutex_unlock (& mutex);
 }
 
 void vis_runner_pass_audio (int time, float * data, int samples, int
  channels, int rate)
 {
+    pthread_mutex_lock (& mutex);
+
     if (! active)
-        return;
+        goto UNLOCK;
 
     /* We can build a single node from multiple calls; we can also build
      * multiple nodes from the same call.  If current_node is present, it was
@@ -223,25 +220,15 @@ void vis_runner_pass_audio (int time, float * data, int samples, int
         g_queue_push_tail (& vis_list, current_node);
         current_node = NULL;
     }
-}
 
-static void time_offset_cb (VisNode * vis_node, void * offset)
-{
-    vis_node->time += GPOINTER_TO_INT (offset);
-}
-
-void vis_runner_time_offset (int offset)
-{
-    if (current_node)
-        current_node->time += offset;
-
-    g_queue_foreach (& vis_list, (GFunc) time_offset_cb, GINT_TO_POINTER (offset));
+UNLOCK:
+    pthread_mutex_unlock (& mutex);
 }
 
 void vis_runner_enable (bool_t enable)
 {
     pthread_mutex_lock (& mutex);
     enabled = enable;
-    vis_runner_start_stop (playing, paused);
+    start_stop (playing, paused);
     pthread_mutex_unlock (& mutex);
 }

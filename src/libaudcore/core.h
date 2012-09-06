@@ -22,6 +22,13 @@
 
 /* #define STRPOOL_DEBUG */
 
+#undef NULL
+#ifdef __cplusplus /* *sigh* */
+#define NULL 0
+#else
+#define NULL ((void *) 0)
+#endif
+
 /* "bool_t" means "int" for compatibility with GLib */
 #undef bool_t
 #define bool_t int
@@ -30,6 +37,17 @@
 #define FALSE ((bool_t) 0)
 #undef TRUE
 #define TRUE ((bool_t) 1)
+
+#undef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#undef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#undef CLAMP
+#define CLAMP(a,min,max) ((a) < (min) ? (min) : (a) > (max) ? (max) : (a))
+
+#define SPRINTF(s,...) \
+ char s[snprintf (NULL, 0, __VA_ARGS__) + 1]; \
+ snprintf (s, sizeof s, __VA_ARGS__);
 
 /* Simple sanity check to catch (1) strings that are still in use after their
  * reference count has dropped to zero and (2) strings that should have been

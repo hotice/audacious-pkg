@@ -1,30 +1,26 @@
 /*
  * ui_jumptotrack.c
- * Copyright 1998-2003 XMMS development team
- * Copyright 2003-2004 BMP development team
  * Copyright 2007-2011 Yoshiki Yazawa and John Lindgren
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * The Audacious team does not consider modular code linking to
- * Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 
 #include <audacious/drct.h>
-#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
 #include <audacious/playlist.h>
@@ -92,8 +88,8 @@ static void do_jump (void)
         return;
 
     int playlist = aud_playlist_get_active ();
-    aud_playlist_set_playing (playlist);
     aud_playlist_set_position (playlist, entry);
+    aud_playlist_set_playing (playlist);
     aud_drct_play ();
 
     if (aud_get_bool ("audgui", "close_jtf_dialog"))
@@ -143,7 +139,7 @@ static void selection_changed (void)
 
 static bool_t keypress_cb (GtkWidget * widget, GdkEventKey * event)
 {
-    if (event->keyval == GDK_Escape)
+    if (event->keyval == GDK_KEY_Escape)
     {
         audgui_jump_to_track_hide();
         return TRUE;
@@ -271,10 +267,12 @@ static void create_window (void)
     gtk_container_set_border_width(GTK_CONTAINER(jump_to_track_win), 10);
     gtk_window_set_default_size(GTK_WINDOW(jump_to_track_win), 600, 500);
 
-    GtkWidget * vbox = gtk_vbox_new (FALSE, 5);
+    GtkWidget * vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(jump_to_track_win), vbox);
 
     treeview = audgui_list_new (& callbacks, NULL, 0);
+    gtk_tree_view_set_headers_visible ((GtkTreeView *) treeview, FALSE);
+
     audgui_list_add_column (treeview, NULL, 0, G_TYPE_INT, 7);
     audgui_list_add_column (treeview, NULL, 1, G_TYPE_STRING, -1);
 
@@ -282,7 +280,7 @@ static void create_window (void)
      "changed", (GCallback) selection_changed, NULL);
     g_signal_connect (treeview, "row-activated", (GCallback) do_jump, NULL);
 
-    GtkWidget * hbox = gtk_hbox_new (FALSE, 3);
+    GtkWidget * hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,  3);
     gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 3);
 
     /* filter box */
@@ -313,12 +311,12 @@ static void create_window (void)
     GtkWidget * scrollwin = gtk_scrolled_window_new (NULL, NULL);
     gtk_container_add(GTK_CONTAINER(scrollwin), treeview);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwin),
-                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrollwin),
                                         GTK_SHADOW_IN);
     gtk_box_pack_start(GTK_BOX(vbox), scrollwin, TRUE, TRUE, 0);
 
-    GtkWidget * bbox = gtk_hbutton_box_new ();
+    GtkWidget * bbox = gtk_button_box_new (GTK_ORIENTATION_HORIZONTAL);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_END);
     gtk_box_set_spacing(GTK_BOX(bbox), 4);
     gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
