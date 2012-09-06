@@ -1,1238 +1,990 @@
+# Belarusian translation for Audacious
+# Copyright (C) Audacious translators
 # This file is distributed under the same license as the Audacious package.
 #
-# Copyright (C) 2009 Darafei Praliaskouski <komzpa@gmail.com>
+# Translators:
+#   <dreadnote87@gmail.com>, 2012.
+# Mikalai Udodau <crom-a@tut.by>, 2012.
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: http://jira.atheme.org/\n"
-"POT-Creation-Date: 2011-07-05 22:45+0200\n"
-"PO-Revision-Date: 2009-12-24 21:10+0200\n"
-"Last-Translator: Darafei Praliaskouski <komzpa@gmail.com>\n"
-"Language-Team: Belarusian <i18n@mova.org>\n"
+"Project-Id-Version: Audacious\n"
+"Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
+"POT-Creation-Date: 2012-08-11 13:36-0400\n"
+"PO-Revision-Date: 2012-08-05 18:25+0000\n"
+"Last-Translator: Mikalai Udodau <crom-a@tut.by>\n"
+"Language-Team: Belarusian\n"
 "Language: be\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 1.0\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
-#: src/audacious/adder.c:71
+#: src/audacious/adder.c:75
 msgid "Searching ..."
-msgstr ""
+msgstr "Шукаецца ..."
 
-#: src/audacious/adder.c:99
+#: src/audacious/adder.c:103
 #, c-format
 msgid "%d file found"
 msgid_plural "%d files found"
-msgstr[0] "%d файл знойдзены"
-msgstr[1] "%d файлы знойдзена"
-msgstr[2] "%d файлаў знойдзена"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
-#: src/audacious/chardet.c:37
+#: src/audacious/chardet.c:39
 msgid "  (invalid UTF-8)"
-msgstr ""
+msgstr " (недапушчальны UTF-8)"
 
-#: src/audacious/credits.c:35
-msgid "Core developers:"
-msgstr "Асноўныя распрацоўшчыкі:"
-
-#: src/audacious/credits.c:49
-msgid "Graphics:"
-msgstr "Графіка:"
-
-#: src/audacious/credits.c:54
-msgid "Default skin:"
-msgstr ""
-
-#: src/audacious/credits.c:60
-msgid "Plugin development:"
-msgstr "Распрацоўка утулак:"
-
-#: src/audacious/credits.c:83
-msgid "Patch authors:"
-msgstr ""
-
-#: src/audacious/credits.c:126
-msgid "1.x developers:"
-msgstr ""
-
-#: src/audacious/credits.c:148
-msgid "BMP Developers:"
-msgstr "Распрацоўшчыкі BMP:"
-
-#: src/audacious/credits.c:180
-msgid "Belarusian:"
-msgstr "Беларуская:"
-
-#: src/audacious/credits.c:183
-msgid "Basque:"
-msgstr "Басцкая:"
-
-#: src/audacious/credits.c:186
-msgid "Brazilian Portuguese:"
-msgstr "Партугальская бразільская:"
-
-#: src/audacious/credits.c:190
-msgid "Breton:"
-msgstr "Брэтонская:"
-
-#: src/audacious/credits.c:193
-msgid "Bulgarian:"
-msgstr "Балгарская:"
-
-#: src/audacious/credits.c:196
-msgid "Catalan:"
-msgstr "Каталонская:"
-
-#: src/audacious/credits.c:199
-#, fuzzy
-msgid "Chinese:"
-msgstr "Кітайская (спрошчаная)"
-
-#: src/audacious/credits.c:202
-msgid "Croatian:"
-msgstr "Харвацкая:"
-
-#: src/audacious/credits.c:205
-msgid "Czech:"
-msgstr "Чэшская:"
-
-#: src/audacious/credits.c:208
-msgid "Dutch:"
-msgstr "Галандская:"
-
-#: src/audacious/credits.c:212
-msgid "Estonian:"
-msgstr "Эстонская:"
-
-#: src/audacious/credits.c:215
-msgid "Finnish:"
-msgstr "Фінская:"
-
-#: src/audacious/credits.c:220
-msgid "French:"
-msgstr "Французская:"
-
-#: src/audacious/credits.c:226
-msgid "German:"
-msgstr "Нямецкая:"
-
-#: src/audacious/credits.c:233
-msgid "Georgian:"
-msgstr "Грузінская:"
-
-#: src/audacious/credits.c:236
-msgid "Greek:"
-msgstr "Грэцкая:"
-
-#: src/audacious/credits.c:241
-msgid "Hindi:"
-msgstr "Хіндзі:"
-
-#: src/audacious/credits.c:244
-msgid "Hungarian:"
-msgstr "Венгерская:"
-
-#: src/audacious/credits.c:248
-msgid "Italian:"
-msgstr "Італьянская:"
-
-#: src/audacious/credits.c:252
-msgid "Japanese:"
-msgstr "Японская:"
-
-#: src/audacious/credits.c:255
-msgid "Korean:"
-msgstr "Карэйская:"
-
-#: src/audacious/credits.c:258
-#, fuzzy
-msgid "Latvian:"
-msgstr "Харвацкая:"
-
-#: src/audacious/credits.c:261
-msgid "Lithuanian:"
-msgstr "Літоўская:"
-
-#: src/audacious/credits.c:265
-msgid "Macedonian:"
-msgstr "Македонская:"
-
-#: src/audacious/credits.c:268
-msgid "Polish:"
-msgstr "Польская:"
-
-#: src/audacious/credits.c:274
-#, fuzzy
-msgid "Portuguese:"
-msgstr "Партугальская:"
-
-#: src/audacious/credits.c:277
-msgid "Romanian:"
-msgstr "Румынская:"
-
-#: src/audacious/credits.c:281
-msgid "Russian:"
-msgstr "Расійская:"
-
-#: src/audacious/credits.c:285
-msgid "Serbian (Latin):"
-msgstr "Сербская (лацінка):"
-
-#: src/audacious/credits.c:288
-msgid "Serbian (Cyrillic):"
-msgstr "Сербская (кірыліца):"
-
-#: src/audacious/credits.c:291
-msgid "Simplified Chinese:"
-msgstr "Кітайская спрошчаная:"
-
-#: src/audacious/credits.c:294
-msgid "Slovak:"
-msgstr "Славацкая:"
-
-#: src/audacious/credits.c:297
-msgid "Spanish:"
-msgstr "Іспанская:"
-
-#: src/audacious/credits.c:304
-msgid "Swedish:"
-msgstr "Шведская:"
-
-#: src/audacious/credits.c:307
-msgid "Traditional Chinese:"
-msgstr "Кітайская традыцыйная:"
-
-#: src/audacious/credits.c:312
-msgid "Turkish:"
-msgstr "Турэцкая:"
-
-#: src/audacious/credits.c:316
-msgid "Ukrainian:"
-msgstr "Украінская:"
-
-#: src/audacious/credits.c:319
-msgid "Welsh:"
-msgstr "Валійская:"
-
-#: src/audacious/drct.c:256
-msgid "Temporary Playlist"
-msgstr ""
-
-#: src/audacious/equalizer_preset.c:186
+#: src/audacious/equalizer_preset.c:180
 #, c-format
 msgid "Error importing Winamp EQF file '%s'"
+msgstr "Памылка падчас імпарту файла Winamp EQF file '%s'"
+
+#: src/audacious/main.c:232
+msgid "Skip backwards in playlist"
+msgstr "Прапусціць назад у плэйлісце"
+
+#: src/audacious/main.c:233
+msgid "Start playing current playlist"
+msgstr "Пачаць праграваць бягучы спіс"
+
+#: src/audacious/main.c:234
+msgid "Pause current song"
+msgstr "Прыпыніць бягучую песню"
+
+#: src/audacious/main.c:235
+msgid "Stop current song"
+msgstr "Спыніць бягучую песню"
+
+#: src/audacious/main.c:236
+msgid "Pause if playing, play otherwise"
+msgstr "Прыпыніць калі праграваецца, іначай граць"
+
+#: src/audacious/main.c:237
+msgid "Skip forward in playlist"
+msgstr "Прапусціць наперад у плэйлісце"
+
+#: src/audacious/main.c:238
+msgid "Display Jump to File dialog"
+msgstr "Паказаць дыялог пераходу да файла"
+
+#: src/audacious/main.c:239
+msgid "Add files to the playlist"
+msgstr "Дадаць файлы ў плэйліст"
+
+#: src/audacious/main.c:240
+msgid "Add new files to a temporary playlist"
+msgstr "Дадаць новыя файлы ў часовы плэйліст"
+
+#: src/audacious/main.c:241
+msgid "Display the main window"
+msgstr "Паказаць галоўнае вакно"
+
+#: src/audacious/main.c:242
+msgid "Show version"
+msgstr "Паказаць версію"
+
+#: src/audacious/main.c:243
+msgid "Print debugging messages"
+msgstr "Выводзіць паведамленні адладкі"
+
+#: src/audacious/main.c:244
+msgid "Headless mode (beta)"
 msgstr ""
 
-#: src/audacious/main.c:256
-msgid "Skip backwards in playlist"
-msgstr ""
+#: src/audacious/main.c:245
+msgid "FILE..."
+msgstr "ФАЙЛ..."
 
 #: src/audacious/main.c:257
-msgid "Start playing current playlist"
-msgstr ""
-
-#: src/audacious/main.c:258
-msgid "Pause current song"
-msgstr ""
-
-#: src/audacious/main.c:259
-msgid "Stop current song"
-msgstr ""
-
-#: src/audacious/main.c:260
-msgid "Pause if playing, play otherwise"
-msgstr ""
-
-#: src/audacious/main.c:261
-msgid "Skip forward in playlist"
-msgstr ""
-
-#: src/audacious/main.c:262
-msgid "Display Jump to File dialog"
-msgstr ""
-
-#: src/audacious/main.c:263
-msgid "Add files to the playlist"
-msgstr ""
+msgid "- play multimedia files"
+msgstr "- гранне мультымедыйных файлаў"
 
 #: src/audacious/main.c:264
-msgid "Add new files to a temporary playlist"
-msgstr ""
-
-#: src/audacious/main.c:265
-msgid "Display the main window"
-msgstr ""
-
-#: src/audacious/main.c:266
-msgid "Show version"
-msgstr ""
-
-#: src/audacious/main.c:267
-msgid "Print debugging messages"
-msgstr ""
-
-#: src/audacious/main.c:268
-msgid "FILE..."
-msgstr ""
-
-#: src/audacious/main.c:280
-msgid "- play multimedia files"
-msgstr ""
-
-#: src/audacious/main.c:290
 #, c-format
 msgid ""
 "%s: %s\n"
 "Try `%s --help' for more information.\n"
 msgstr ""
+"%s: %s\n"
+"Паспрабуйце `%s --help' для больш падрабязных звестак.\n"
 
-#: src/audacious/main.c:407
-msgid ""
-"Audacious seems to be already running but is not responding.  You can start "
-"another instance of the program, but please be warned that this can cause "
-"data loss.  If Audacious is not running, you can safely ignore this "
-"message.  Press OK to start Audacious or Cancel to quit."
-msgstr ""
-
-#: src/audacious/main.c:572
+#: src/audacious/main.c:546
 msgid "Audacious"
-msgstr ""
+msgstr "Audacious"
 
-#: src/audacious/playback.c:381
+#: src/audacious/playback.c:305
 #, c-format
 msgid "No decoder found for %s."
-msgstr ""
+msgstr "Не знайшлося дэкодэра для %s."
 
-#: src/audacious/playback.c:531
-msgid "Buffering ..."
-msgstr ""
+#: src/audacious/playlist-files.c:51
+#, c-format
+msgid "Cannot %s %s: unsupported file extension."
+msgstr "Немагчыма %s %s: тып файла не падтрымліваецца."
 
-#: src/audacious/playlist-new.c:303
-msgid "Untitled Playlist"
-msgstr ""
+#: src/audacious/playlist-files.c:52
+msgid "save"
+msgstr "запісаць"
 
-#: src/audacious/ui_preferences.c:87
+#: src/audacious/playlist-files.c:52
+msgid "load"
+msgstr "чытаць"
+
+#: src/audacious/playlist-new.c:121
+msgid "New Playlist"
+msgstr "Новы плэйліст"
+
+#: src/audacious/playlist-new.c:122
+msgid "Now Playing"
+msgstr "Цяпер іграе"
+
+#: src/audacious/playlist-new.c:1650
+msgid ""
+"The playlist cannot be sorted because metadata scanning is still in progress "
+"(or has been disabled)."
+msgstr ""
+"Плэйліст немагчыма ўпарадкаваць, таму што ўсё яшчэ ідзе чытанне метазвестак "
+"(ці яно было адключана)."
+
+#: src/audacious/plugin-preferences.c:50
+#, c-format
+msgid "About %s"
+msgstr "Пра %s"
+
+#: src/audacious/plugin-preferences.c:88
+#, c-format
+msgid "%s Settings"
+msgstr "%s Настаўленні"
+
+#: src/audacious/ui_preferences.c:69
 msgid "Audio"
-msgstr ""
+msgstr "Аўдыа"
 
-#: src/audacious/ui_preferences.c:88
+#: src/audacious/ui_preferences.c:70
 msgid "Network"
-msgstr ""
+msgstr "Праца ў сетцы"
 
-#: src/audacious/ui_preferences.c:89 src/audacious/ui_preferences.c:1556
+#: src/audacious/ui_preferences.c:71 src/audacious/ui_preferences.c:1237
 msgid "Playlist"
-msgstr ""
+msgstr "Плэйліст"
 
-#: src/audacious/ui_preferences.c:90
+#: src/audacious/ui_preferences.c:72
+msgid "Song Info"
+msgstr "Звесткі пра песню"
+
+#: src/audacious/ui_preferences.c:73
 msgid "Plugins"
-msgstr ""
+msgstr "Плагіны"
 
-#: src/audacious/ui_preferences.c:96 src/libaudgui/infopopup.c:204
+#: src/audacious/ui_preferences.c:79 src/libaudgui/infopopup.c:194
 msgid "Artist"
 msgstr "Выканаўца"
 
-#: src/audacious/ui_preferences.c:97 src/libaudgui/infopopup.c:206
+#: src/audacious/ui_preferences.c:80 src/libaudgui/infopopup.c:196
 msgid "Album"
 msgstr "Альбом"
 
-#: src/audacious/ui_preferences.c:98 src/libaudgui/infopopup.c:202
-#: src/libaudgui/ui_playlist_manager.c:263
+#: src/audacious/ui_preferences.c:81 src/libaudgui/infopopup.c:192
+#: src/libaudgui/ui_playlist_manager.c:287
 msgid "Title"
-msgstr "Назва"
+msgstr "Загаловак"
 
-#: src/audacious/ui_preferences.c:99
+#: src/audacious/ui_preferences.c:82
 msgid "Tracknumber"
-msgstr ""
+msgstr "Нумар трэку"
 
-#: src/audacious/ui_preferences.c:100 src/libaudgui/infopopup.c:208
+#: src/audacious/ui_preferences.c:83 src/libaudgui/infopopup.c:198
 msgid "Genre"
 msgstr "Жанр"
 
-#: src/audacious/ui_preferences.c:101
+#: src/audacious/ui_preferences.c:84
 msgid "Filename"
-msgstr "Імя файла"
+msgstr "Назва файла"
 
-#: src/audacious/ui_preferences.c:102
+#: src/audacious/ui_preferences.c:85
 msgid "Filepath"
-msgstr ""
+msgstr "Шлях да файла"
 
-#: src/audacious/ui_preferences.c:103
+#: src/audacious/ui_preferences.c:86
 msgid "Date"
 msgstr "Дата"
 
-#: src/audacious/ui_preferences.c:104 src/libaudgui/infopopup.c:210
+#: src/audacious/ui_preferences.c:87 src/libaudgui/infopopup.c:200
 msgid "Year"
 msgstr "Год"
 
-#: src/audacious/ui_preferences.c:105
+#: src/audacious/ui_preferences.c:88
 msgid "Comment"
-msgstr ""
+msgstr "Каментар"
 
-#: src/audacious/ui_preferences.c:106
+#: src/audacious/ui_preferences.c:89
 msgid "Codec"
 msgstr "Кодэк"
 
-#: src/audacious/ui_preferences.c:107
+#: src/audacious/ui_preferences.c:90
 msgid "Quality"
 msgstr "Якасць"
 
-#: src/audacious/ui_preferences.c:112
+#: src/audacious/ui_preferences.c:96
 msgid "None"
-msgstr ""
+msgstr "Ніхто"
 
-#: src/audacious/ui_preferences.c:113
-msgid "Japanese"
-msgstr "Японская"
-
-#: src/audacious/ui_preferences.c:114
-msgid "Taiwanese"
-msgstr "Кітайская (традыцыйная)"
-
-#: src/audacious/ui_preferences.c:115
-msgid "Chinese"
-msgstr "Кітайская (спрошчаная)"
-
-#: src/audacious/ui_preferences.c:116
-msgid "Korean"
-msgstr "Карэйская"
-
-#: src/audacious/ui_preferences.c:117
-msgid "Russian"
-msgstr "Руская"
-
-#: src/audacious/ui_preferences.c:118
-msgid "Greek"
-msgstr "Грэцкая"
-
-#: src/audacious/ui_preferences.c:119
-msgid "Hebrew"
-msgstr "Іўрыт"
-
-#: src/audacious/ui_preferences.c:120
-msgid "Turkish"
-msgstr "Турэцкая"
-
-#: src/audacious/ui_preferences.c:121
+#: src/audacious/ui_preferences.c:97
 msgid "Arabic"
 msgstr "Арабская"
 
-#: src/audacious/ui_preferences.c:122
-#, fuzzy
-msgid "Polish"
-msgstr "Польская:"
-
-#: src/audacious/ui_preferences.c:123
+#: src/audacious/ui_preferences.c:98
 msgid "Baltic"
+msgstr "Балтыйскі"
+
+#: src/audacious/ui_preferences.c:99
+msgid "Chinese"
+msgstr "Кітайская (спрошчаная)"
+
+#: src/audacious/ui_preferences.c:100
+msgid "Greek"
+msgstr "Грэцкая"
+
+#: src/audacious/ui_preferences.c:101
+msgid "Hebrew"
+msgstr "Іўрыт"
+
+#: src/audacious/ui_preferences.c:102
+msgid "Japanese"
+msgstr "Японская"
+
+#: src/audacious/ui_preferences.c:103
+msgid "Korean"
+msgstr "Карэйская"
+
+#: src/audacious/ui_preferences.c:104
+msgid "Polish"
+msgstr "Польская"
+
+#: src/audacious/ui_preferences.c:105
+msgid "Russian"
+msgstr "Руская"
+
+#: src/audacious/ui_preferences.c:106
+msgid "Taiwanese"
+msgstr "Кітайская (традыцыйная)"
+
+#: src/audacious/ui_preferences.c:107
+msgid "Turkish"
+msgstr "Турэцкая"
+
+#: src/audacious/ui_preferences.c:114
+msgid "Floating point"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:124
-msgid "Universal"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:146
-msgid "Single track mode"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:147
-#, fuzzy
+#: src/audacious/ui_preferences.c:130
 msgid "Album mode"
-msgstr "Альбом"
+msgstr "Рэжым альбома"
 
-#: src/audacious/ui_preferences.c:150
+#: src/audacious/ui_preferences.c:133
 msgid "<b>Output Settings</b>"
-msgstr ""
+msgstr "<b>Настаўленні вываду</b>"
 
-#: src/audacious/ui_preferences.c:152
+#: src/audacious/ui_preferences.c:135
 msgid "Bit depth:"
-msgstr ""
+msgstr "Бітавая глыбіня:"
 
-#: src/audacious/ui_preferences.c:155
+#: src/audacious/ui_preferences.c:138
 msgid "Buffer size:"
-msgstr ""
+msgstr "Памер буферу:"
 
-#: src/audacious/ui_preferences.c:157
+#: src/audacious/ui_preferences.c:140
 msgid "ms"
+msgstr "мс"
+
+#: src/audacious/ui_preferences.c:141
+msgid "Soft clipping"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:158
+#: src/audacious/ui_preferences.c:143
 msgid "Use software volume control (not recommended)"
-msgstr ""
+msgstr "Карыстацца праграмным рэгулятарам гучнасці (не рэкамендуецца)"
 
-#: src/audacious/ui_preferences.c:160
+#: src/audacious/ui_preferences.c:145
 msgid "<b>Replay Gain</b>"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:161
+#: src/audacious/ui_preferences.c:146
 msgid "Enable Replay Gain"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:164
+#: src/audacious/ui_preferences.c:149
 msgid "Prevent clipping (recommended)"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:166
+#: src/audacious/ui_preferences.c:151
 msgid "<b>Adjust Levels</b>"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:167
+#: src/audacious/ui_preferences.c:152
 msgid "Amplify all files:"
-msgstr ""
+msgstr "Узмацняць усе файлы:"
 
-#: src/audacious/ui_preferences.c:169 src/audacious/ui_preferences.c:172
+#: src/audacious/ui_preferences.c:154 src/audacious/ui_preferences.c:157
 msgid "dB"
 msgstr "дБ"
 
-#: src/audacious/ui_preferences.c:170
+#: src/audacious/ui_preferences.c:155
 msgid "Amplify untagged files:"
-msgstr ""
+msgstr "Узмацняць файлы без тэгаў:"
 
-#: src/audacious/ui_preferences.c:175
+#: src/audacious/ui_preferences.c:160
 msgid "Proxy hostname:"
-msgstr ""
+msgstr "Імя хоста проксі:"
 
-#: src/audacious/ui_preferences.c:176
+#: src/audacious/ui_preferences.c:161
 msgid "Proxy port:"
-msgstr ""
+msgstr "Порт проксі:"
 
-#: src/audacious/ui_preferences.c:179
+#: src/audacious/ui_preferences.c:164
 msgid "Proxy username:"
-msgstr ""
+msgstr "Карыстальнік проксі:"
 
-#: src/audacious/ui_preferences.c:180
+#: src/audacious/ui_preferences.c:165
 msgid "Proxy password:"
-msgstr ""
+msgstr "Пароль:"
 
-#: src/audacious/ui_preferences.c:184
+#: src/audacious/ui_preferences.c:169
 msgid "<b>Proxy Configuration</b>"
-msgstr ""
+msgstr "<b>Канфігурацыя проксі</b>"
+
+#: src/audacious/ui_preferences.c:170
+msgid "Enable proxy usage"
+msgstr "Уключыць выкарыстанне проксі"
+
+#: src/audacious/ui_preferences.c:173
+msgid "Use authentication with proxy"
+msgstr "Ужываць аўтэнтыфікацыю на проксі"
+
+#: src/audacious/ui_preferences.c:181
+msgid "Auto character encoding detector for:"
+msgstr "Аўтавызначэнне знаказбору для:"
 
 #: src/audacious/ui_preferences.c:185
-msgid "Enable proxy usage"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:187
-msgid "Use authentication with proxy"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:189
-msgid ""
-"<span size=\"small\">Changing these settings will require a restart of "
-"Audacious.</span>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:193
-msgid "Auto character encoding detector for:"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:201
 msgid "Fallback character encodings:"
 msgstr ""
 
-#: src/audacious/ui_preferences.c:201
-msgid ""
-"List of character encodings used for fall back conversion of metadata. If "
-"automatic character encoding detector failed or has been disabled, encodings "
-"in this list would be treated as candidates of the encoding of metadata, and "
-"fall back conversion from these encodings to UTF-8 would be attempted."
-msgstr ""
-
-#: src/audacious/ui_preferences.c:205
+#: src/audacious/ui_preferences.c:189
 msgid "<b>Behavior</b>"
-msgstr ""
+msgstr "<b>Паводзіны</b>"
 
-#: src/audacious/ui_preferences.c:206
+#: src/audacious/ui_preferences.c:190
 msgid "Continue playback on startup"
-msgstr ""
+msgstr "Працягваць праграванне пры запуску"
+
+#: src/audacious/ui_preferences.c:192
+msgid "Advance when the current song is deleted"
+msgstr "Перайсці да наступнай па сціранні песні"
+
+#: src/audacious/ui_preferences.c:194
+msgid "Clear the playlist when opening files"
+msgstr "Ачышчаць плэйліст па адкрыцці файла"
+
+#: src/audacious/ui_preferences.c:196
+msgid "Open files in a temporary playlist"
+msgstr "Адкрываць файлы ў часовым плэйлісце"
+
+#: src/audacious/ui_preferences.c:198
+msgid "<b>Metadata</b>"
+msgstr "<b>Метаданні</b>"
+
+#: src/audacious/ui_preferences.c:199
+msgid "Do not load metadata for songs until played"
+msgstr "Не чытаць метазвесткі, пакуль песня не прайгравалася"
+
+#: src/audacious/ui_preferences.c:207
+msgid "<b>Album Art</b>"
+msgstr "<b>Афармленне альбома</b>"
 
 #: src/audacious/ui_preferences.c:208
-msgid "Advance when the current song is deleted"
+msgid "Search for images matching these words (comma-separated):"
 msgstr ""
 
 #: src/audacious/ui_preferences.c:210
-msgid "Clear the playlist when opening files"
+msgid "Exclude images matching these words (comma-separated):"
 msgstr ""
 
 #: src/audacious/ui_preferences.c:212
-msgid "Open files in a temporary playlist"
+msgid "Search for images matching song file name"
 msgstr ""
 
 #: src/audacious/ui_preferences.c:214
-msgid "<b>Metadata</b>"
-msgstr ""
+msgid "Search recursively"
+msgstr "Рэкурсіўны пошук"
 
-#: src/audacious/ui_preferences.c:454
-msgid "Category"
-msgstr ""
+#: src/audacious/ui_preferences.c:216
+msgid "Search depth:"
+msgstr "Глыбіня пошуку:"
 
-#: src/audacious/ui_preferences.c:682
-msgid "Popup Information Settings"
-msgstr ""
+#: src/audacious/ui_preferences.c:219
+msgid "<b>Popup Information</b>"
+msgstr "<b>Усплыўныя звесткі</b>"
 
-#: src/audacious/ui_preferences.c:691
-msgid "<b>Cover image retrieve</b>"
-msgstr ""
+#: src/audacious/ui_preferences.c:220
+msgid "Show popup information"
+msgstr "Паказваць усплыўныя паведамленні"
 
-#: src/audacious/ui_preferences.c:696
-msgid ""
-"While searching for the album's cover, Audacious looks for certain words in "
-"the filename. You can specify those words in the lists below, separated "
-"using commas."
-msgstr ""
+#: src/audacious/ui_preferences.c:222
+msgid "Popup delay (tenths of a second):"
+msgstr "Затрымка паведамлення (дзясятыя секунды):"
 
-#: src/audacious/ui_preferences.c:713
-msgid "Exclude:"
-msgstr "Выключаючы:"
+#: src/audacious/ui_preferences.c:225
+msgid "Show time scale for current song"
+msgstr "Паказваць часовую шкалу для бягучай песні"
 
-#: src/audacious/ui_preferences.c:720
-msgid "Include:"
-msgstr "Улучаючы:"
-
-#: src/audacious/ui_preferences.c:737
-msgid "Recursively search for cover"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:747
-msgid "Search depth: "
-msgstr "Глыбіня пошуку: "
-
-#: src/audacious/ui_preferences.c:761
-msgid "Use per-file cover"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:764
-msgid "<b>Miscellaneous</b>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:773
-msgid "Show Progress bar for the current track"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:783
-msgid "Delay until filepopup comes up: "
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1283
-msgid "<b>Song Display</b>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1292
-msgid "Show song numbers"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1303
-msgid "Show leading zeroes (02:00 instead of 2:00)"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1325
-msgid "Show information about titlestring format"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1339
+#: src/audacious/ui_preferences.c:239
 msgid "TITLE"
 msgstr "НАЗВА"
 
-#: src/audacious/ui_preferences.c:1340
+#: src/audacious/ui_preferences.c:240
 msgid "ARTIST - TITLE"
 msgstr "ВЫКАНАЎЦА - НАЗВА"
 
-#: src/audacious/ui_preferences.c:1341
+#: src/audacious/ui_preferences.c:241
 msgid "ARTIST - ALBUM - TITLE"
 msgstr "ВЫКАНАЎЦА - АЛЬБОМ - НАЗВА"
 
-#: src/audacious/ui_preferences.c:1342
+#: src/audacious/ui_preferences.c:242
 msgid "ARTIST - ALBUM - TRACK. TITLE"
 msgstr "ВЫКАНАЎЦА - АЛЬБОМ - НУМАР. НАЗВА"
 
-#: src/audacious/ui_preferences.c:1343
+#: src/audacious/ui_preferences.c:243
 msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
 msgstr "ВЫКАНАЎЦА [ АЛЬБОМ ] - НУМАР. НАЗВА"
 
-#: src/audacious/ui_preferences.c:1344
+#: src/audacious/ui_preferences.c:244
 msgid "ALBUM - TITLE"
 msgstr "АЛЬБОМ - НАЗВА"
 
-#: src/audacious/ui_preferences.c:1345
+#: src/audacious/ui_preferences.c:457
+msgid "Category"
+msgstr "Катэгорыя"
+
+#: src/audacious/ui_preferences.c:995
 msgid "Custom"
-msgstr ""
+msgstr "Адмысловыя"
 
-#: src/audacious/ui_preferences.c:1354
+#: src/audacious/ui_preferences.c:1032
+msgid "<b>Song Display</b>"
+msgstr "<b>Паказ песні</b>"
+
+#: src/audacious/ui_preferences.c:1041
+msgid "Show song numbers"
+msgstr "Паказваць нумары песень"
+
+#: src/audacious/ui_preferences.c:1052
+msgid "Show leading zeroes (02:00 instead of 2:00)"
+msgstr "Паказваць вядучыя нулі (02:00 замест 2:00)"
+
+#: src/audacious/ui_preferences.c:1072
+msgid "Show information about titlestring format"
+msgstr "Паказваць інфармацыю па фармату радка загалоўка"
+
+#: src/audacious/ui_preferences.c:1086
 msgid "Custom string:"
-msgstr ""
+msgstr "Адмысловы радок:"
 
-#: src/audacious/ui_preferences.c:1361
+#: src/audacious/ui_preferences.c:1091
 msgid "Title format:"
-msgstr ""
+msgstr "Фармат загалоўка:"
 
-#: src/audacious/ui_preferences.c:1372
-msgid "<b>Popup Information</b>"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1387
-msgid "Show popup information for playlist entries"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1388
-msgid ""
-"Toggles popup information window for the pointed entry in the playlist. The "
-"window shows title of song, name of album, genre, year of publish, track "
-"number, track length, and artwork."
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1397
-msgid "Edit settings for popup information"
-msgstr ""
-
-#: src/audacious/ui_preferences.c:1497
+#: src/audacious/ui_preferences.c:1178
 msgid "Output plugin:"
-msgstr ""
+msgstr "Плагін вываду:"
 
-#: src/audacious/ui_preferences.c:1556
-#, fuzzy
+#: src/audacious/ui_preferences.c:1237
 msgid "Transport"
-msgstr "Перакладчыкі"
+msgstr "Транспарт"
 
-#: src/audacious/ui_preferences.c:1556
+#: src/audacious/ui_preferences.c:1237
 msgid "Input"
-msgstr ""
+msgstr "Увод"
 
-#: src/audacious/ui_preferences.c:1557
+#: src/audacious/ui_preferences.c:1238
 msgid "Effect"
-msgstr ""
+msgstr "Эфекты"
 
-#: src/audacious/ui_preferences.c:1557
+#: src/audacious/ui_preferences.c:1238
 msgid "Visualization"
-msgstr ""
+msgstr "Візуалізацыя"
 
-#: src/audacious/ui_preferences.c:1557
+#: src/audacious/ui_preferences.c:1238
 msgid "General"
-msgstr ""
+msgstr "Агульныя"
 
-#: src/audacious/ui_preferences.c:1597
+#: src/audacious/ui_preferences.c:1276
 msgid "Audacious Preferences"
-msgstr ""
+msgstr "Пераважанні Audacious"
 
-#: src/audacious/util.c:155
+#: src/audacious/util.c:115
 #, c-format
 msgid "Could not create directory (%s): %s\n"
-msgstr ""
+msgstr "Немагчыма стварыць каталог (%s): %s\n"
 
-#: src/audtool/handlers_playlist.c:264
+#: src/audtool/handlers_playlist.c:262
 msgid "Position not found."
-msgstr ""
+msgstr "Пазіцыя не знойдзена."
 
-#: src/audtool/handlers_vitals.c:64
+#: src/audtool/handlers_vitals.c:51
 msgid "No song playing."
-msgstr ""
+msgstr "Не грае песня."
 
-#: src/libaudcore/tuple.c:685
+#: src/libaudcore/audstrings.c:199
+#, c-format
+msgid "Audio CD, track %s"
+msgstr "Audio CD, трэк %s"
+
+#: src/libaudcore/tuple.c:541
 msgid "Mono"
-msgstr ""
+msgstr "Мона"
 
-#: src/libaudcore/tuple.c:687
+#: src/libaudcore/tuple.c:543
 msgid "Stereo"
-msgstr ""
+msgstr "Стэрэа"
 
-#: src/libaudcore/tuple.c:689
+#: src/libaudcore/tuple.c:545
 #, c-format
 msgid "%d channel"
 msgid_plural "%d channels"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
-#: src/libaudgui/confirm.c:73
+#: src/libaudgui/about.c:38
+msgid "Credits"
+msgstr "Аўтары"
+
+#: src/libaudgui/about.c:38
+msgid "License"
+msgstr "Ліцэнзія"
+
+#: src/libaudgui/about.c:74
+msgid "About Audacious"
+msgstr "Пра Audacious"
+
+#: src/libaudgui/confirm.c:61
+msgid "Close Playlist"
+msgstr "Закрыць плэйліст"
+
+#: src/libaudgui/confirm.c:76
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
 "playlist was exported will be lost."
 msgstr ""
+"Вы ўпэўнены, што хочаце закрыць %s?  Калі вы гэта зробіце, усе змяненні, "
+"зробленыя пасля экспарту плэйліста, будуць згублены."
 
-#: src/libaudgui/confirm.c:86
+#: src/libaudgui/confirm.c:89
 msgid "_Don't show this message again"
-msgstr ""
+msgstr "Больш не паказ_ваць гэта паведамленне"
 
-#: src/libaudgui/confirm.c:124
+#: src/libaudgui/confirm.c:126
 msgid "Rename Playlist"
-msgstr ""
+msgstr "Перайменаваць плэйліст"
 
-#: src/libaudgui/effects-menu.c:76
+#: src/libaudgui/effects-menu.c:72
 msgid "settings ..."
-msgstr ""
+msgstr "настаўленні ..."
 
-#: src/libaudgui/equalizer.c:68
+#: src/libaudgui/equalizer.c:51
 msgid "_Enable"
-msgstr ""
+msgstr "_Уключыць"
 
-#: src/libaudgui/equalizer.c:140
+#: src/libaudgui/equalizer.c:124
 msgid "31 Hz"
-msgstr ""
+msgstr "31 Гц"
 
-#: src/libaudgui/equalizer.c:140
+#: src/libaudgui/equalizer.c:124
 msgid "63 Hz"
-msgstr ""
+msgstr "63 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:125
 msgid "125 Hz"
-msgstr ""
+msgstr "125 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:125
 msgid "250 Hz"
-msgstr ""
+msgstr "250 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:125
 msgid "500 Hz"
-msgstr ""
+msgstr "500 Гц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:125
 msgid "1 kHz"
-msgstr ""
+msgstr "2 кГц"
 
-#: src/libaudgui/equalizer.c:141
+#: src/libaudgui/equalizer.c:125
 msgid "2 kHz"
-msgstr ""
+msgstr "2 кГц"
 
-#: src/libaudgui/equalizer.c:142
+#: src/libaudgui/equalizer.c:126
 msgid "4 kHz"
-msgstr ""
+msgstr "4 кГц"
 
-#: src/libaudgui/equalizer.c:142
+#: src/libaudgui/equalizer.c:126
 msgid "8 kHz"
-msgstr ""
+msgstr "8 кГц"
 
-#: src/libaudgui/equalizer.c:142
+#: src/libaudgui/equalizer.c:126
 msgid "16 kHz"
-msgstr ""
+msgstr "16 кГц"
+
+#: src/libaudgui/equalizer.c:131
+msgid "Equalizer"
+msgstr "Эквалайзер"
 
 #: src/libaudgui/equalizer.c:147
-msgid "Equalizer"
-msgstr ""
-
-#: src/libaudgui/equalizer.c:163
 msgid "Preamp"
-msgstr ""
+msgstr "Перадузмацненне"
 
-#: src/libaudgui/infopopup.c:212
-msgid "Track Number"
-msgstr "Нумар запісу"
+#: src/libaudgui/infopopup.c:202
+msgid "Track"
+msgstr "Трэк"
 
-#: src/libaudgui/infopopup.c:214
-msgid "Track Length"
-msgstr "Працягласць"
+#: src/libaudgui/infopopup.c:204
+msgid "Length"
+msgstr "Даўжыня"
+
+#: src/libaudgui/infowin.c:74
+msgid "Acid Jazz"
+msgstr "Эйсід джаз"
+
+#: src/libaudgui/infowin.c:75
+msgid "Acid Rock"
+msgstr "Эйсід рок"
+
+#: src/libaudgui/infowin.c:76
+msgid "Ambient"
+msgstr "Эмбіент"
 
 #: src/libaudgui/infowin.c:77
-msgid "Acid Jazz"
-msgstr ""
+msgid "Bebop"
+msgstr "Біпоп"
 
 #: src/libaudgui/infowin.c:78
-#, fuzzy
-msgid "Acid Rock"
-msgstr "Рок"
+msgid "Bluegrass"
+msgstr "Блюграс"
 
 #: src/libaudgui/infowin.c:79
-msgid "Ambient"
-msgstr ""
-
-#: src/libaudgui/infowin.c:80
-msgid "Bebop"
-msgstr ""
-
-#: src/libaudgui/infowin.c:81
-msgid "Bluegrass"
-msgstr ""
-
-#: src/libaudgui/infowin.c:82
 msgid "Blues"
 msgstr "Блюз"
 
-#: src/libaudgui/infowin.c:83
+#: src/libaudgui/infowin.c:80
 msgid "Chamber Music"
-msgstr ""
+msgstr "Камерная музыка"
 
-#: src/libaudgui/infowin.c:84
+#: src/libaudgui/infowin.c:81
 msgid "Classical"
-msgstr ""
+msgstr "Класічная музыка"
 
-#: src/libaudgui/infowin.c:85
+#: src/libaudgui/infowin.c:82
 msgid "Country"
 msgstr "Кантры"
 
-#: src/libaudgui/infowin.c:86
+#: src/libaudgui/infowin.c:83
 msgid "Death Metal"
-msgstr ""
+msgstr "Дэз-метал"
 
-#: src/libaudgui/infowin.c:87
+#: src/libaudgui/infowin.c:84
 msgid "Disco"
 msgstr "Дыска"
 
-#: src/libaudgui/infowin.c:88
+#: src/libaudgui/infowin.c:85
 msgid "Easy Listening"
 msgstr ""
 
-#: src/libaudgui/infowin.c:89
+#: src/libaudgui/infowin.c:86
 msgid "Folk"
-msgstr ""
+msgstr "Фолк"
+
+#: src/libaudgui/infowin.c:87
+msgid "Funk"
+msgstr "Фанк"
+
+#: src/libaudgui/infowin.c:88
+msgid "Gangsta Rap"
+msgstr "Ганста рэп"
+
+#: src/libaudgui/infowin.c:89
+msgid "Gospel"
+msgstr "Госпел"
 
 #: src/libaudgui/infowin.c:90
-msgid "Funk"
-msgstr ""
+msgid "Grunge"
+msgstr "Гранж"
 
 #: src/libaudgui/infowin.c:91
-msgid "Gangsta Rap"
-msgstr ""
+msgid "Hard Rock"
+msgstr "Хард-рок"
 
 #: src/libaudgui/infowin.c:92
-msgid "Gospel"
-msgstr ""
+msgid "Heavy Metal"
+msgstr "Хэві-метал"
 
 #: src/libaudgui/infowin.c:93
-msgid "Grunge"
-msgstr ""
+msgid "Hip-hop"
+msgstr "Хіп-хоп"
 
 #: src/libaudgui/infowin.c:94
-msgid "Hard Rock"
-msgstr ""
+msgid "House"
+msgstr "Хаўз"
 
 #: src/libaudgui/infowin.c:95
-msgid "Heavy Metal"
-msgstr ""
-
-#: src/libaudgui/infowin.c:96
-msgid "Hip-hop"
-msgstr ""
-
-#: src/libaudgui/infowin.c:97
-msgid "House"
-msgstr ""
-
-#: src/libaudgui/infowin.c:98
 msgid "Jazz"
 msgstr "Джаз"
 
-#: src/libaudgui/infowin.c:99
+#: src/libaudgui/infowin.c:96
 msgid "Jungle"
-msgstr ""
+msgstr "Джангл"
+
+#: src/libaudgui/infowin.c:97
+msgid "Metal"
+msgstr "Метал"
+
+#: src/libaudgui/infowin.c:98
+msgid "New Age"
+msgstr "Нью эйдж"
+
+#: src/libaudgui/infowin.c:99
+msgid "New Wave"
+msgstr "Нью вэйв"
 
 #: src/libaudgui/infowin.c:100
-msgid "Metal"
-msgstr ""
+msgid "Noise"
+msgstr "Нойз"
 
 #: src/libaudgui/infowin.c:101
-msgid "New Age"
-msgstr ""
-
-#: src/libaudgui/infowin.c:102
-msgid "New Wave"
-msgstr ""
-
-#: src/libaudgui/infowin.c:103
-msgid "Noise"
-msgstr ""
-
-#: src/libaudgui/infowin.c:104
 msgid "Pop"
 msgstr "Поп"
 
-#: src/libaudgui/infowin.c:105
+#: src/libaudgui/infowin.c:102
 msgid "Punk Rock"
-msgstr ""
+msgstr "Панк-рок"
 
-#: src/libaudgui/infowin.c:106
+#: src/libaudgui/infowin.c:103
 msgid "Rap"
 msgstr "Рэп"
 
-#: src/libaudgui/infowin.c:107
+#: src/libaudgui/infowin.c:104
 msgid "Reggae"
 msgstr "Рэгі"
 
-#: src/libaudgui/infowin.c:108
+#: src/libaudgui/infowin.c:105
 msgid "Rock"
 msgstr "Рок"
 
-#: src/libaudgui/infowin.c:109
-#, fuzzy
+#: src/libaudgui/infowin.c:106
 msgid "Rock and Roll"
-msgstr "Рок-н-рол"
+msgstr "Рок-эн-ролл"
+
+#: src/libaudgui/infowin.c:107
+msgid "Rhythm and Blues"
+msgstr "Рытм-эн-блюз"
+
+#: src/libaudgui/infowin.c:108
+msgid "Ska"
+msgstr "Ска"
+
+#: src/libaudgui/infowin.c:109
+msgid "Soul"
+msgstr "Соўл"
 
 #: src/libaudgui/infowin.c:110
-msgid "Rhythm and Blues"
-msgstr ""
+msgid "Swing"
+msgstr "Свінг"
 
 #: src/libaudgui/infowin.c:111
-msgid "Ska"
-msgstr ""
-
-#: src/libaudgui/infowin.c:112
-msgid "Soul"
-msgstr ""
-
-#: src/libaudgui/infowin.c:113
-msgid "Swing"
-msgstr ""
-
-#: src/libaudgui/infowin.c:114
 msgid "Techno"
 msgstr "Тэхна"
 
-#: src/libaudgui/infowin.c:115
+#: src/libaudgui/infowin.c:112
 msgid "Trip-hop"
-msgstr ""
+msgstr "Трып-хоп"
 
-#: src/libaudgui/infowin.c:175 src/libaudgui/infowin.c:361
-#: src/libaudgui/infowin.c:364 src/libaudgui/infowin.c:367
+#: src/libaudgui/infowin.c:176 src/libaudgui/infowin.c:365
+#: src/libaudgui/infowin.c:368 src/libaudgui/infowin.c:371
 msgid "<span size=\"small\">n/a</span>"
-msgstr ""
+msgstr "<span size=\"small\">n/a</span>"
 
-#: src/libaudgui/infowin.c:265
+#: src/libaudgui/infowin.c:266
 msgid "Metadata updated successfully"
-msgstr ""
+msgstr "Метазвесткі паспяхова абноўлены"
 
-#: src/libaudgui/infowin.c:270
+#: src/libaudgui/infowin.c:271
 msgid "Metadata updating failed"
-msgstr ""
+msgstr "Абнаўленне метазвестак схібіла"
 
-#: src/libaudgui/infowin.c:318
+#: src/libaudgui/infowin.c:319
 msgid "Track Information"
-msgstr ""
+msgstr "Інфармацыя па трэку"
 
-#: src/libaudgui/infowin.c:350
+#: src/libaudgui/infowin.c:354
 msgid "<span size=\"small\">Format:</span>"
 msgstr "<span size=\"small\">Фармат:</span>"
 
-#: src/libaudgui/infowin.c:354
+#: src/libaudgui/infowin.c:358
 msgid "<span size=\"small\">Quality:</span>"
 msgstr "<span size=\"small\">Якасць:</span>"
 
-#: src/libaudgui/infowin.c:357
+#: src/libaudgui/infowin.c:361
 msgid "<span size=\"small\">Bitrate:</span>"
-msgstr ""
+msgstr "<span size=\"small\">Бітрэйт:</span>"
 
-#: src/libaudgui/infowin.c:387
+#: src/libaudgui/infowin.c:385
 msgid "<span size=\"small\">Title</span>"
-msgstr "<span size=\"small\">Назва</span>"
+msgstr "<span size=\"small\">Загаловак</span>"
 
-#: src/libaudgui/infowin.c:399
+#: src/libaudgui/infowin.c:397
 msgid "<span size=\"small\">Artist</span>"
-msgstr "<span size=\"small\">Выканаўца</span>"
+msgstr "<span size=\"small\">Спявак</span>"
 
-#: src/libaudgui/infowin.c:411
+#: src/libaudgui/infowin.c:409
 msgid "<span size=\"small\">Album</span>"
 msgstr "<span size=\"small\">Альбом</span>"
 
-#: src/libaudgui/infowin.c:423
+#: src/libaudgui/infowin.c:421
 msgid "<span size=\"small\">Comment</span>"
-msgstr ""
+msgstr "<span size=\"small\">Каментар</span>"
 
-#: src/libaudgui/infowin.c:435
+#: src/libaudgui/infowin.c:433
 msgid "<span size=\"small\">Genre</span>"
 msgstr "<span size=\"small\">Жанр</span>"
 
-#: src/libaudgui/infowin.c:456
+#: src/libaudgui/infowin.c:455
 msgid "<span size=\"small\">Year</span>"
 msgstr "<span size=\"small\">Год</span>"
 
-#: src/libaudgui/infowin.c:467
+#: src/libaudgui/infowin.c:464
 msgid "<span size=\"small\">Track Number</span>"
-msgstr ""
+msgstr "<span size=\"small\">Нумар трэка</span>"
 
-#: src/libaudgui/infowin.c:549
+#: src/libaudgui/infowin.c:541
 #, c-format
 msgid "%d kb/s"
 msgstr "%d Кб/с"
 
-#: src/libaudgui/infowin.c:579
+#: src/libaudgui/infowin.c:568
 #, c-format
 msgid "No info available for %s.\n"
-msgstr ""
+msgstr "Няма даступных звестак па %s.\n"
 
-#: src/libaudgui/jump-to-time.c:75
+#: src/libaudgui/jump-to-time.c:52
 msgid "Jump to Time"
-msgstr ""
+msgstr "Перайсці да часу"
 
-#: src/libaudgui/jump-to-time.c:90
-msgid "mm:ss"
-msgstr ""
+#: src/libaudgui/jump-to-time.c:61
+msgid "Enter time (minutes:seconds):"
+msgstr "Увядзіце час (мінут:секунд):"
 
-#: src/libaudgui/playlists.c:39
+#: src/libaudgui/playlists.c:33
 msgid "Export Playlist"
-msgstr ""
+msgstr "Экспартаваць плэйліст"
 
-#: src/libaudgui/playlists.c:39
+#: src/libaudgui/playlists.c:33
 msgid "Import Playlist"
-msgstr ""
+msgstr "Імпартаваць плэйліст"
 
-#: src/libaudgui/playlists.c:71
+#: src/libaudgui/playlists.c:66
 #, c-format
 msgid "Overwrite %s?"
-msgstr ""
+msgstr "Перапісаць %s?"
 
-#: src/libaudgui/ui_about.c:71
-msgid "About Audacious"
-msgstr "Пра Audacious"
+#: src/libaudgui/queue-manager.c:196
+msgid "Queue Manager"
+msgstr "Кіраўнік чаргі"
 
-#: src/libaudgui/ui_about.c:93 src/libaudgui/ui_credits.c:122
-msgid "Credits"
-msgstr "Падзякі"
-
-#: src/libaudgui/ui_credits.c:126
-msgid "Translators"
-msgstr "Перакладчыкі"
-
-#: src/libaudgui/ui_fileopener.c:108
+#: src/libaudgui/ui_fileopener.c:107
 msgid "Open Files"
 msgstr "Адкрыць файлы"
 
-#: src/libaudgui/ui_fileopener.c:108
+#: src/libaudgui/ui_fileopener.c:107
 msgid "Add Files"
 msgstr "Дадаць файлы"
 
-#: src/libaudgui/ui_fileopener.c:110
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Close dialog on Open"
-msgstr ""
+msgstr "Закрыць дыялог па адкрыцці"
 
-#: src/libaudgui/ui_fileopener.c:110
+#: src/libaudgui/ui_fileopener.c:109
 msgid "Close dialog on Add"
-msgstr ""
+msgstr "Закрыць дыялог па даданні"
 
-#: src/libaudgui/ui_jumptotrack.c:133
-msgid "Un_queue"
-msgstr ""
-
-#: src/libaudgui/ui_jumptotrack.c:135 src/libaudgui/ui_jumptotrack.c:512
+#: src/libaudgui/ui_jumptotrack.c:105 src/libaudgui/ui_jumptotrack.c:113
+#: src/libaudgui/ui_jumptotrack.c:332
 msgid "_Queue"
-msgstr ""
+msgstr "У чаргу"
 
-#: src/libaudgui/ui_jumptotrack.c:399
-msgid "Jump to Track"
-msgstr ""
+#: src/libaudgui/ui_jumptotrack.c:111
+msgid "Un_queue"
+msgstr "З чаргі"
 
-#: src/libaudgui/ui_jumptotrack.c:442
+#: src/libaudgui/ui_jumptotrack.c:262
+msgid "Jump to Song"
+msgstr "Перайсці да песні"
+
+#: src/libaudgui/ui_jumptotrack.c:287
 msgid "Filter: "
 msgstr "Фільтр: "
 
-#: src/libaudgui/ui_jumptotrack.c:443
+#: src/libaudgui/ui_jumptotrack.c:288
 msgid "_Filter:"
-msgstr "_Фільтр:"
+msgstr "Фільт_ар:"
 
-#: src/libaudgui/ui_jumptotrack.c:461
+#: src/libaudgui/ui_jumptotrack.c:298
 msgid "Remember"
 msgstr "Запомніць"
 
-#: src/libaudgui/ui_jumptotrack.c:470
+#: src/libaudgui/ui_jumptotrack.c:305
 msgid "Clea_r"
-msgstr ""
+msgstr "Ачысціць"
 
-#: src/libaudgui/ui_jumptotrack.c:504
+#: src/libaudgui/ui_jumptotrack.c:325
 msgid "Close on Jump"
-msgstr ""
+msgstr "Закрыць па пераходзе"
 
-#: src/libaudgui/ui_playlist_manager.c:240
+#: src/libaudgui/ui_playlist_manager.c:261
 msgid "Playlist Manager"
-msgstr ""
+msgstr "Кіраўнік плэйлістоў"
 
-#: src/libaudgui/ui_playlist_manager.c:264
+#: src/libaudgui/ui_playlist_manager.c:288
 msgid "Entries"
-msgstr ""
+msgstr "Запісы"
 
-#: src/libaudgui/ui_playlist_manager.c:285
-#, fuzzy
+#: src/libaudgui/ui_playlist_manager.c:308
 msgid "_Rename"
-msgstr "Імя файла"
+msgstr "Перайменаваць"
 
-#: src/libaudgui/ui_playlist_manager.c:309
+#: src/libaudgui/ui_playlist_manager.c:328
 msgid "_Close dialog on activating playlist"
-msgstr ""
+msgstr "Закрыць дыялог па актывацыі плэйлі_ста"
 
-#: src/libaudgui/ui_urlopener.c:58
+#: src/libaudgui/url-opener.c:56
 msgid "Open URL"
-msgstr ""
+msgstr "Адкрыць URL"
 
-#: src/libaudgui/ui_urlopener.c:58
+#: src/libaudgui/url-opener.c:56
 msgid "Add URL"
-msgstr ""
+msgstr "Дадаць URL"
 
-#: src/libaudgui/util.c:95
+#: src/libaudgui/url-opener.c:65
+msgid "Enter URL:"
+msgstr "Увядзіце URL:"
+
+#: src/libaudgui/util.c:143
 msgid ""
 "\n"
 "(Further messages have been hidden.)"
 msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:165
-msgid "File is not a valid .desktop file"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:188
-#, c-format
-msgid "Unrecognized desktop file Version '%s'"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:967
-#, c-format
-msgid "Starting %s"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1108
-msgid "Application does not accept documents on command line"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1176
-#, c-format
-msgid "Unrecognized launch option: %d"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1375
-msgid "Can't pass document URIs to a 'Type=Link' desktop entry"
-msgstr ""
-
-#: src/libeggsmclient/eggdesktopfile.c:1396
-msgid "Not a launchable item"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:226
-msgid "Disable connection to session manager"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:229
-msgid "Specify file containing saved configuration"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:229
-msgid "FILE"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:232
-msgid "Specify session management ID"
-msgstr ""
-
-#: src/libeggsmclient/eggsmclient.c:232
-msgid "ID"
-msgstr "ID"
-
-#: src/libeggsmclient/eggsmclient.c:253
-#, fuzzy
-msgid "Session management options:"
-msgstr "Настаўленні кіравання сесіямі"
-
-#: src/libeggsmclient/eggsmclient.c:254
-#, fuzzy
-msgid "Show session management options"
-msgstr "Настаўленні кіравання сесіямі"
-
-#~ msgid "Classic Rock"
-#~ msgstr "Класычны рок"
-
-#~ msgid "Other"
-#~ msgstr "Іншы"
-
-#~ msgid "Trance"
-#~ msgstr "Транс"
-
-#~ msgid "Key"
-#~ msgstr "Ключ"
-
-#~ msgid "Value"
-#~ msgstr "Значэнне"
-
-#~ msgid "Filename:"
-#~ msgstr "Імя файла"
+"\n"
+"(Далейшыя паведамленні былі прыхаваныя.)"

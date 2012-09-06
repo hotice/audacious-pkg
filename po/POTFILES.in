@@ -1,12 +1,12 @@
 # Please don't update this file manually - use ./update-potfiles.sh instead!
 src/audacious/adder.c
 src/audacious/chardet.c
-src/audacious/credits.c
 src/audacious/equalizer_preset.c
 src/audacious/main.c
 src/audacious/playback.c
 src/audacious/playlist-files.c
 src/audacious/playlist-new.c
+src/audacious/plugin-preferences.c
 src/audacious/ui_preferences.c
 src/audacious/util.c
 src/audtool/handlers_playlist.c
@@ -25,7 +25,5 @@ src/libaudgui/queue-manager.c
 src/libaudgui/ui_fileopener.c
 src/libaudgui/ui_jumptotrack.c
 src/libaudgui/ui_playlist_manager.c
-src/libaudgui/ui_urlopener.c
+src/libaudgui/url-opener.c
 src/libaudgui/util.c
-src/libeggsmclient/eggdesktopfile.c
-src/libeggsmclient/eggsmclient.c

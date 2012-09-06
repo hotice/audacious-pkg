@@ -1,14 +1,26 @@
 /*
- *  Equalizer filter, implementation of a 10 band time domain graphic equalizer
- *  using IIR filters.  The IIR filters are implemented using a Direct Form II
- *  approach, modified (b1 == 0 always) to save computation.
+ * equalizer.c
+ * Copyright 2001 Anders Johansson
+ * Copyright 2010-2011 John Lindgren
  *
- *  This software has been released under the terms of the GNU General Public
- *  license.  See http://www.gnu.org/copyleft/gpl.html for details.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  Copyright 2001 Anders Johansson <ajh@atri.curtin.edu.au>
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  Adapted for Audacious by John Lindgren, 2010-2011
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
+ *
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
+ */
+
+/*
+ * Anders Johansson prefers float *ptr; formatting. Please keep it that way.
+ *    - tallica
  */
 
 #include <glib.h>
@@ -47,7 +59,7 @@ static float gv[MAX_CHANNELS][EQ_BANDS]; /* Gain factor for each channel and ban
 static int K; /* Number of used eq bands */
 
 /* 2nd order band-pass filter design */
-static void bp2 (float * a, float * b, float fc, float q)
+static void bp2 (float *a, float *b, float fc, float q)
 {
     float th = 2 * M_PI * fc;
     float C = (1 - tanf (th * q / 2)) / (1 + tanf (th * q / 2));
@@ -83,7 +95,7 @@ void eq_set_format (int new_channels, int new_rate)
     pthread_mutex_unlock (& mutex);
 }
 
-static void eq_set_bands_real (double preamp, double * values)
+static void eq_set_bands_real (double preamp, double *values)
 {
     float adj[EQ_BANDS];
     for (int i = 0; i < EQ_BANDS; i ++)
@@ -94,7 +106,7 @@ static void eq_set_bands_real (double preamp, double * values)
         gv[c][i] = pow (10, adj[i] / 20) - 1;
 }
 
-void eq_filter (float * data, int samples)
+void eq_filter (float *data, int samples)
 {
     int channel;
 
@@ -108,19 +120,19 @@ void eq_filter (float * data, int samples)
 
     for (channel = 0; channel < channels; channel ++)
     {
-        float * g = gv[channel]; /* Gain factor */
-        float * end = data + samples;
-        float * f;
+        float *g = gv[channel]; /* Gain factor */
+        float *end = data + samples;
+        float *f;
 
         for (f = data + channel; f < end; f += channels)
         {
             int k; /* Frequency band index */
-            float yt = * f; /* Current input sample */
+            float yt = *f; /* Current input sample */
 
             for (k = 0; k < K; k ++)
             {
                 /* Pointer to circular buffer wq */
-                float * wq = wqv[channel][k];
+                float *wq = wqv[channel][k];
                 /* Calculate output from AR part of current filter */
                 float w = yt * b[k][0] + wq[0] * a[k][0] + wq[1] * a[k][1];
 
@@ -133,14 +145,14 @@ void eq_filter (float * data, int samples)
             }
 
             /* Calculate output */
-            * f = yt;
+            *f = yt;
         }
     }
 
     pthread_mutex_unlock (& mutex);
 }
 
-static void eq_update (void * data, void * user)
+static void eq_update (void *data, void *user)
 {
     pthread_mutex_lock (& mutex);
 
@@ -168,18 +180,18 @@ void eq_cleanup (void)
     hook_dissociate ("set equalizer_bands", eq_update);
 }
 
-void eq_set_bands (const double * values)
+void eq_set_bands (const double *values)
 {
-    char * string = double_array_to_string (values, EQ_BANDS);
+    char *string = double_array_to_string (values, EQ_BANDS);
     g_return_if_fail (string);
     set_string (NULL, "equalizer_bands", string);
     g_free (string);
 }
 
-void eq_get_bands (double * values)
+void eq_get_bands (double *values)
 {
     memset (values, 0, sizeof (double) * EQ_BANDS);
-    char * string = get_string (NULL, "equalizer_bands");
+    char *string = get_string (NULL, "equalizer_bands");
     string_to_double_array (string, values, EQ_BANDS);
     g_free (string);
 }

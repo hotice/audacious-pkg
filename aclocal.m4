@@ -1,8 +1,7 @@
-# generated automatically by aclocal 1.12 -*- Autoconf -*-
+# generated automatically by aclocal 1.12.2 -*- Autoconf -*-
 
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation,
-# Inc.
+# Copyright (C) 1996-2012 Free Software Foundation, Inc.
+
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -1967,6 +1966,119 @@ else
 fi[]dnl
 ])# PKG_CHECK_MODULES
 
+# PKG_INSTALLDIR(DIRECTORY)
+# -------------------------
+# Substitutes the variable pkgconfigdir as the location where a module
+# should install pkg-config .pc files. By default the directory is
+# $libdir/pkgconfig, but the default can be changed by passing
+# DIRECTORY. The user can override through the --with-pkgconfigdir
+# parameter.
+AC_DEFUN([PKG_INSTALLDIR],
+[m4_pushdef([pkg_default], [m4_default([$1], ['${libdir}/pkgconfig'])])
+m4_pushdef([pkg_description],
+    [pkg-config installation directory @<:@]pkg_default[@:>@])
+AC_ARG_WITH([pkgconfigdir],
+    [AS_HELP_STRING([--with-pkgconfigdir], pkg_description)],,
+    [with_pkgconfigdir=]pkg_default)
+AC_SUBST([pkgconfigdir], [$with_pkgconfigdir])
+m4_popdef([pkg_default])
+m4_popdef([pkg_description])
+]) dnl PKG_INSTALLDIR
+
+
+# PKG_NOARCH_INSTALLDIR(DIRECTORY)
+# -------------------------
+# Substitutes the variable noarch_pkgconfigdir as the location where a
+# module should install arch-independent pkg-config .pc files. By
+# default the directory is $datadir/pkgconfig, but the default can be
+# changed by passing DIRECTORY. The user can override through the
+# --with-noarch-pkgconfigdir parameter.
+AC_DEFUN([PKG_NOARCH_INSTALLDIR],
+[m4_pushdef([pkg_default], [m4_default([$1], ['${datadir}/pkgconfig'])])
+m4_pushdef([pkg_description],
+    [pkg-config arch-independent installation directory @<:@]pkg_default[@:>@])
+AC_ARG_WITH([noarch-pkgconfigdir],
+    [AS_HELP_STRING([--with-noarch-pkgconfigdir], pkg_description)],,
+    [with_noarch_pkgconfigdir=]pkg_default)
+AC_SUBST([noarch_pkgconfigdir], [$with_noarch_pkgconfigdir])
+m4_popdef([pkg_default])
+m4_popdef([pkg_description])
+]) dnl PKG_NOARCH_INSTALLDIR
+
+# PKG_WITH_MODULES(VARIABLE-PREFIX, MODULES,
+#                  [ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND],
+#                  [DESCRIPTION], [DEFAULT])
+#
+# Prepare a "--with-" configure option using the lowercase [VARIABLE-PREFIX]
+# name, merging the behaviour of AC_ARG_WITH and PKG_CHECK_MODULES in a single
+# macro
+#
+# --------------------------------------------------------------
+AC_DEFUN([PKG_WITH_MODULES],
+[
+m4_pushdef([with_arg], m4_tolower([$1]))
+
+m4_pushdef([description],
+           [m4_default([$5], [build with ]with_arg[ support])])
+
+m4_pushdef([def_arg], [m4_default([$6], [auto])])
+m4_pushdef([def_action_if_found], [AS_TR_SH([with_]with_arg)=yes])
+m4_pushdef([def_action_if_not_found], [AS_TR_SH([with_]with_arg)=no])
+
+m4_case(def_arg,
+            [yes],[m4_pushdef([with_without], [--without-]with_arg)],
+            [m4_pushdef([with_without],[--with-]with_arg)])
+
+AC_ARG_WITH(with_arg,
+     AS_HELP_STRING(with_without, description[ @<:@default=]def_arg[@:>@]),,
+    [AS_TR_SH([with_]with_arg)=def_arg])
+
+AS_CASE([$AS_TR_SH([with_]with_arg)],
+            [yes],[PKG_CHECK_MODULES([$1],[$2],$3,$4)],
+            [auto],[PKG_CHECK_MODULES([$1],[$2],
+                                        [m4_n([def_action_if_found]) $3],
+                                        [m4_n([def_action_if_not_found]) $4])])
+
+m4_popdef([with_arg])
+m4_popdef([description])
+m4_popdef([def_arg])
+
+]) dnl PKG_WITH_MODULES
+
+# PKG_HAVE_WITH_MODULES(VARIABLE-PREFIX, MODULES,
+#                       [DESCRIPTION], [DEFAULT])
+#
+# Convenience macro to trigger AM_CONDITIONAL after
+# PKG_WITH_MODULES check.
+#
+# HAVE_[VARIABLE-PREFIX] is exported as make variable.
+#
+# --------------------------------------------------------------
+AC_DEFUN([PKG_HAVE_WITH_MODULES],
+[
+PKG_WITH_MODULES([$1],[$2],,,[$3],[$4])
+
+AM_CONDITIONAL([HAVE_][$1],
+               [test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"])
+])
+
+# PKG_HAVE_DEFINE_WITH_MODULES(VARIABLE-PREFIX, MODULES,
+#                              [DESCRIPTION], [DEFAULT])
+#
+# Convenience macro to run AM_CONDITIONAL and AC_DEFINE after
+# PKG_WITH_MODULES check.
+#
+# HAVE_[VARIABLE-PREFIX] is exported as make and preprocessor variable.
+#
+# --------------------------------------------------------------
+AC_DEFUN([PKG_HAVE_DEFINE_WITH_MODULES],
+[
+PKG_HAVE_WITH_MODULES([$1],[$2],[$3],[$4])
+
+AS_IF([test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"],
+        [AC_DEFINE([HAVE_][$1], 1, [Enable ]m4_tolower([$1])[ support])])
+])
+
 # po.m4 serial 17 (gettext-0.18)
 dnl Copyright (C) 1995-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
@@ -2573,7 +2685,7 @@ fi])])
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 16
+# serial 17
 
 # There are a few dirty hacks below to avoid letting 'AC_PROG_CC' be
 # written in clear, in which case automake, when reading aclocal.m4,
@@ -2585,7 +2697,7 @@ fi])])
 # _AM_DEPENDENCIES(NAME)
 # ----------------------
 # See how the compiler implements dependency checking.
-# NAME is "CC", "CXX", "GCJ", or "OBJC".
+# NAME is "CC", "CXX", "OBJC", "OBJCXX", "UPC", or "GJC".
 # We try a few techniques and use that to set a single cache variable.
 #
 # We don't AC_REQUIRE the corresponding AC_PROG_CC since the latter was
@@ -2601,6 +2713,7 @@ AC_REQUIRE([AM_DEP_TRACK])dnl
 m4_if([$1], [CC],   [depcc="$CC"   am_compiler_list=],
       [$1], [CXX],  [depcc="$CXX"  am_compiler_list=],
       [$1], [OBJC], [depcc="$OBJC" am_compiler_list='gcc3 gcc'],
+      [$1], [OBJCXX], [depcc="$OBJCXX" am_compiler_list='gcc3 gcc'],
       [$1], [UPC],  [depcc="$UPC"  am_compiler_list=],
       [$1], [GCJ],  [depcc="$GCJ"  am_compiler_list='gcc3 gcc'],
                     [depcc="$$1"   am_compiler_list=])
@@ -2912,7 +3025,7 @@ rm -f confinc confmf
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# serial 2
+# serial 3
 
 # AM_PROG_MKDIR_P
 # ---------------
@@ -2920,6 +3033,11 @@ rm -f confinc confmf
 AC_DEFUN([AM_PROG_MKDIR_P],
 [AC_PREREQ([2.60])dnl
 AC_REQUIRE([AC_PROG_MKDIR_P])dnl
+dnl FIXME to be removed in Automake 1.13.
+AC_DIAGNOSE([obsolete],
+[$0: this macro is deprecated, and will soon be removed.
+You should use the Autoconf-provided 'AC][_PROG_MKDIR_P' macro instead,
+and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your Makefile.am files.])
 dnl Automake 1.8 to 1.9.6 used to define mkdir_p.  We now use MKDIR_P,
 dnl while keeping a definition of mkdir_p for backward compatibility.
 dnl @MKDIR_P@ is magic: AC_OUTPUT adjusts its value for each Makefile.

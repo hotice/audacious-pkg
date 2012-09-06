@@ -1,4 +1,4 @@
-LIB = ${LIB_PREFIX}audgui${LIB_SUFFIX}
+SHARED_LIB = ${LIB_PREFIX}audgui${LIB_SUFFIX}
 LIB_MAJOR = 1
 LIB_MINOR = 0
 
@@ -15,12 +15,12 @@ SRCS = about.c \
        playlists.c \
        queue-manager.c \
        ui_fileopener.c \
-       ui_urlopener.c \
        ui_jumptotrack.c \
        ui_jumptotrack_cache.c \
        icons-stock.c \
        ui_playlist_manager.c \
        urilist.c \
+       url-opener.c \
        util.c
 
 INCLUDES = libaudgui.h \

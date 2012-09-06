@@ -3,20 +3,19 @@
  * Copyright 2006-2011 William Pitcock, Daniel Barkalow, Ralf Ertzinger,
  *                     Yoshiki Yazawa, Matti Hämäläinen, and John Lindgren
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * The Audacious team does not consider modular code linking to
- * Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 /**
  * @file vfs.h
@@ -31,6 +30,13 @@
 #include <stdint.h>
 
 #include <libaudcore/core.h>
+
+/* equivalent to G_FILE_TEST_XXX */
+#define VFS_IS_REGULAR    (1 << 0)
+#define VFS_IS_SYMLINK    (1 << 1)
+#define VFS_IS_DIR        (1 << 2)
+#define VFS_IS_EXECUTABLE (1 << 3)
+#define VFS_EXISTS        (1 << 4)
 
 /** @struct VFSFile */
 typedef struct _VFSFile VFSFile;

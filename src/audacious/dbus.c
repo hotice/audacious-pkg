@@ -1,22 +1,22 @@
 /*
- * Audacious: A cross-platform multimedia player
- * Copyright (c) 2007 Ben Tucker
- * Copyright 2009-2011 Audacious development team
+ * dbus.c
+ * Copyright 2007-2011 Ben Tucker, Yoshiki Yazawa, William Pitcock,
+ *                     Matti Hämäläinen, Andrew Shadoura, John Lindgren, and
+ *                     Tomasz Moń
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * The Audacious team does not consider modular code linking to
- * Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include "config.h"
@@ -56,7 +56,7 @@ G_DEFINE_TYPE (MprisTrackList, mpris_tracklist, G_TYPE_OBJECT)
 
 #define DBUS_TYPE_G_STRING_VALUE_HASHTABLE (dbus_g_type_get_map ("GHashTable", G_TYPE_STRING, G_TYPE_VALUE))
 
-static void mpris_playlist_update_hook(gpointer unused, MprisTrackList *obj);
+static void mpris_playlist_update_hook(void * unused, MprisTrackList *obj);
 
 void audacious_rc_class_init(RemoteObjectClass * klass)
 {
@@ -250,7 +250,7 @@ static void tuple_insert_to_hash(GHashTable * md, const Tuple * tuple,
     tuple_insert_to_hash_full(md, tuple, key, key);
 }
 
-static void remove_metadata_value(gpointer value)
+static void remove_metadata_value(void * value)
 {
     g_value_unset((GValue *) value);
     g_free((GValue *) value);
@@ -259,7 +259,7 @@ static void remove_metadata_value(gpointer value)
 static GHashTable *make_mpris_metadata(const char * filename, const Tuple * tuple)
 {
     GHashTable *md = NULL;
-    gpointer value;
+    void * value;
 
     md = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, remove_metadata_value);
 
@@ -492,7 +492,7 @@ bool_t mpris_emit_tracklist_change(MprisTrackList * obj, int playlist)
     return TRUE;
 }
 
-static void mpris_playlist_update_hook(gpointer unused, MprisTrackList * obj)
+static void mpris_playlist_update_hook(void * unused, MprisTrackList * obj)
 {
     int playlist = playlist_get_active();
 
@@ -709,6 +709,9 @@ bool_t audacious_rc_song_title (RemoteObject * obj, unsigned int pos, char * *
  title, GError * * error)
 {
     char * title2 = playlist_entry_get_title (playlist_get_active (), pos, FALSE);
+    if (! title2)
+        return FALSE;
+
     * title = strdup (title2);
     str_unref (title2);
     return TRUE;
@@ -718,6 +721,9 @@ bool_t audacious_rc_song_filename (RemoteObject * obj, unsigned int pos,
  char * * filename, GError * * error)
 {
     char * filename2 = playlist_entry_get_filename (playlist_get_active (), pos);
+    if (! filename2)
+        return FALSE;
+
     * filename = strdup (filename2);
     str_unref (filename2);
     return TRUE;

@@ -1,22 +1,20 @@
 /*
  * playlist-new.c
- * Copyright 2009-2011 John Lindgren
+ * Copyright 2009-2012 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <pthread.h>
@@ -86,15 +84,6 @@ enum {RESUME_STOP, RESUME_PLAY, RESUME_PAUSE};
         LEAVE_RET(ret); \
 } while (0)
 
-#define SELECTION_HAS_CHANGED(p, a, c) \
- queue_update (PLAYLIST_UPDATE_SELECTION, p, a, c)
-
-#define METADATA_HAS_CHANGED(p, a, c) \
- queue_update (PLAYLIST_UPDATE_METADATA, p, a, c)
-
-#define PLAYLIST_HAS_CHANGED(p, a, c) \
- queue_update (PLAYLIST_UPDATE_STRUCTURE, p, a, c)
-
 typedef struct {
     int level, before, after;
 } Update;
@@ -126,6 +115,7 @@ typedef struct {
     int64_t total_length, selected_length;
     bool_t scanning, scan_ending;
     Update next_update, last_update;
+    int resume_state, resume_time;
 } Playlist;
 
 static const char * const default_title = N_("New Playlist");
@@ -144,7 +134,6 @@ static Playlist * active_playlist = NULL;
 static Playlist * playing_playlist = NULL;
 
 static int update_source = 0, update_level;
-static int resume_state, resume_time;
 
 typedef struct {
     Playlist * playlist;
@@ -212,8 +201,7 @@ static void entry_set_tuple_real (Entry * entry, Tuple * tuple)
             entry->segmented = TRUE;
             entry->start = tuple_get_int (tuple, FIELD_SEGMENT_START, NULL);
 
-            if (tuple_get_value_type (tuple, FIELD_SEGMENT_END, NULL) ==
-             TUPLE_INT)
+            if (tuple_get_value_type (tuple, FIELD_SEGMENT_END, NULL) == TUPLE_INT)
                 entry->end = tuple_get_int (tuple, FIELD_SEGMENT_END, NULL);
             else
                 entry->end = -1;
@@ -273,8 +261,7 @@ static void entry_cancel_scan (Entry * entry)
     }
 }
 
-static Entry * entry_new (char * filename, Tuple * tuple,
- PluginHandle * decoder)
+static Entry * entry_new (char * filename, Tuple * tuple, PluginHandle * decoder)
 {
     Entry * entry = g_slice_new (Entry);
 
@@ -344,6 +331,8 @@ static Playlist * playlist_new (int id)
     playlist->selected_length = 0;
     playlist->scanning = FALSE;
     playlist->scan_ending = FALSE;
+    playlist->resume_state = RESUME_STOP;
+    playlist->resume_time = 0;
 
     memset (& playlist->last_update, 0, sizeof (Update));
     memset (& playlist->next_update, 0, sizeof (Update));
@@ -704,6 +693,26 @@ static Entry * get_playback_entry (bool_t need_decoder, bool_t need_tuple)
     }
 }
 
+static void get_resume_state (int * state, int * time)
+{
+    if (playback_get_playing ())
+    {
+        * state = playback_get_paused () ? RESUME_PAUSE : RESUME_PLAY;
+        * time = playback_get_time ();
+    }
+    else
+    {
+        * state = RESUME_STOP;
+        * time = 0;
+    }
+}
+
+static void resume (int state, int time)
+{
+    if (state == RESUME_PLAY || state == RESUME_PAUSE)
+        playback_play (time, state == RESUME_PAUSE);
+}
+
 void playlist_init (void)
 {
     srand (time (NULL));
@@ -778,7 +787,7 @@ void playlist_insert_with_id (int at, int id)
     index_insert (playlists, at, playlist_new (id));
     number_playlists (at, index_count (playlists) - at);
 
-    PLAYLIST_HAS_CHANGED (-1, 0, 0);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, -1, 0, 0);
     LEAVE;
 }
 
@@ -816,12 +825,13 @@ void playlist_reorder (int from, int to, int count)
 
     index_free (displaced);
 
-    PLAYLIST_HAS_CHANGED (-1, 0, 0);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, -1, 0, 0);
     LEAVE;
 }
 
 void playlist_delete (int playlist_num)
 {
+    /* stop playback before locking playlists */
     if (playback_get_playing () && playlist_num == playlist_get_playing ())
         playback_stop ();
 
@@ -838,12 +848,11 @@ void playlist_delete (int playlist_num)
     number_playlists (playlist_num, index_count (playlists) - playlist_num);
 
     if (playlist == active_playlist)
-        active_playlist = index_get (playlists, MIN (playlist_num, index_count
-         (playlists) - 1));
+        active_playlist = index_get (playlists, MIN (playlist_num, index_count (playlists) - 1));
     if (playlist == playing_playlist)
         playing_playlist = NULL;
 
-    PLAYLIST_HAS_CHANGED (-1, 0, 0);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, -1, 0, 0);
     LEAVE;
 }
 
@@ -878,7 +887,7 @@ void playlist_set_filename (int playlist_num, const char * filename)
     playlist->filename = str_get (filename);
     playlist->modified = TRUE;
 
-    METADATA_HAS_CHANGED (-1, 0, 0);
+    queue_update (PLAYLIST_UPDATE_METADATA, -1, 0, 0);
     LEAVE;
 }
 
@@ -903,7 +912,7 @@ void playlist_set_title (int playlist_num, const char * title)
     playlist->title = str_get (title);
     playlist->modified = TRUE;
 
-    METADATA_HAS_CHANGED (-1, 0, 0);
+    queue_update (PLAYLIST_UPDATE_METADATA, -1, 0, 0);
     LEAVE;
 }
 
@@ -969,10 +978,24 @@ int playlist_get_active (void)
 
 void playlist_set_playing (int playlist_num)
 {
-    if (playback_get_playing ())
+    if (playlist_num == playlist_get_playing ())
+        return;
+
+    /* get playback state and stop playback before locking playlists */
+    int state, time;
+    get_resume_state (& state, & time);
+
+    if (state != RESUME_STOP)
         playback_stop ();
 
     ENTER;
+
+    if (playing_playlist)
+    {
+        playing_playlist->resume_state = state;
+        playing_playlist->resume_time = time;
+    }
+
     DECLARE_PLAYLIST;
 
     if (playlist_num < 0)
@@ -982,9 +1005,23 @@ void playlist_set_playing (int playlist_num)
 
     playing_playlist = playlist;
 
+    if (playlist)
+    {
+        state = playlist->resume_state;
+        time = playlist->resume_time;
+    }
+    else
+    {
+        state = RESUME_STOP;
+        time = 0;
+    }
+
     LEAVE;
 
     hook_call ("playlist set playing", NULL);
+
+    /* resume playback after unlocking playlists */
+    resume (state, time);
 }
 
 int playlist_get_playing (void)
@@ -1033,23 +1070,15 @@ int playlist_get_temporary (void)
     return list;
 }
 
-/* If we are already at the song or it is already at the top of the shuffle
- * list, we let it be.  Otherwise, we move it to the top. */
-static void set_position (Playlist * playlist, Entry * entry)
+static void set_position (Playlist * playlist, Entry * entry, bool_t update_shuffle)
 {
-    if (entry == playlist->position)
-        return;
-
     playlist->position = entry;
+    playlist->resume_state = RESUME_STOP;
+    playlist->resume_time = 0;
 
-    if (! entry)
-        return;
-
-    if (! entry->shuffle_num || entry->shuffle_num != playlist->last_shuffle_num)
-    {
-        playlist->last_shuffle_num ++;
-        entry->shuffle_num = playlist->last_shuffle_num;
-    }
+    /* move entry to top of shuffle list */
+    if (entry && update_shuffle)
+        entry->shuffle_num = ++ playlist->last_shuffle_num;
 }
 
 int playlist_entry_count (int playlist_num)
@@ -1106,12 +1135,13 @@ void playlist_entry_insert_batch_raw (int playlist_num, int at,
         playlist->total_length += entry->length;
     }
 
-    PLAYLIST_HAS_CHANGED (playlist->number, at, number);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, at, number);
     LEAVE;
 }
 
 void playlist_entry_delete (int playlist_num, int at, int number)
 {
+    /* stop playback before locking playlists */
     if (playback_get_playing () && playlist_num == playlist_get_playing () &&
      playlist_get_position (playlist_num) >= at && playlist_get_position
      (playlist_num) < at + number)
@@ -1130,7 +1160,7 @@ void playlist_entry_delete (int playlist_num, int at, int number)
 
     if (playlist->position && playlist->position->number >= at &&
      playlist->position->number < at + number)
-        set_position (playlist, NULL);
+        set_position (playlist, NULL, FALSE);
 
     for (int count = 0; count < number; count ++)
     {
@@ -1152,7 +1182,7 @@ void playlist_entry_delete (int playlist_num, int at, int number)
     index_delete (playlist->entries, at, number);
     number_entries (playlist, at, entries - at - number);
 
-    PLAYLIST_HAS_CHANGED (playlist->number, at, 0);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, at, 0);
     LEAVE;
 }
 
@@ -1206,9 +1236,13 @@ void playlist_entry_describe (int playlist_num, int entry_num,
     ENTER;
 
     Entry * entry = get_entry (playlist_num, entry_num, FALSE, ! fast);
-    * title = (entry && entry->title) ? str_ref (entry->title) : NULL;
-    * artist = (entry && entry->artist) ? str_ref (entry->artist) : NULL;
-    * album = (entry && entry->album) ? str_ref (entry->album) : NULL;
+
+    if (title)
+        * title = (entry && entry->title) ? str_ref (entry->title) : NULL;
+    if (artist)
+        * artist = (entry && entry->artist) ? str_ref (entry->artist) : NULL;
+    if (album)
+        * album = (entry && entry->album) ? str_ref (entry->album) : NULL;
 
     LEAVE;
 }
@@ -1225,6 +1259,7 @@ int playlist_entry_get_length (int playlist_num, int entry_num, bool_t fast)
 
 void playlist_set_position (int playlist_num, int entry_num)
 {
+    /* stop playback before locking playlists */
     if (playback_get_playing () && playlist_num == playlist_get_playing ())
         playback_stop ();
 
@@ -1239,7 +1274,7 @@ void playlist_set_position (int playlist_num, int entry_num)
     else
         LOOKUP_PLAYLIST_ENTRY;
 
-    set_position (playlist, entry);
+    set_position (playlist, entry, TRUE);
     LEAVE;
 
     hook_call ("playlist position", GINT_TO_POINTER (playlist_num));
@@ -1279,7 +1314,7 @@ void playlist_entry_set_selected (int playlist_num, int entry_num,
         playlist->selected_length -= entry->length;
     }
 
-    SELECTION_HAS_CHANGED (playlist->number, entry_num, 1);
+    queue_update (PLAYLIST_UPDATE_SELECTION, playlist->number, entry_num, 1);
     LEAVE;
 }
 
@@ -1338,7 +1373,7 @@ void playlist_select_all (int playlist_num, bool_t selected)
     }
 
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+        queue_update (PLAYLIST_UPDATE_SELECTION, playlist->number, first, last + 1 - first);
 
     LEAVE;
 }
@@ -1416,13 +1451,14 @@ int playlist_shift (int playlist_num, int entry_num, int distance)
     index_copy_set (temp, 0, playlist->entries, top, bottom - top);
 
     number_entries (playlist, top, bottom - top);
-    PLAYLIST_HAS_CHANGED (playlist->number, top, bottom - top);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, top, bottom - top);
 
     LEAVE_RET (shift);
 }
 
 void playlist_delete_selected (int playlist_num)
 {
+    /* stop playback before locking playlists */
     if (playback_get_playing () && playlist_num == playlist_get_playing () &&
      playlist_get_position (playlist_num) >= 0 && playlist_entry_get_selected
      (playlist_num, playlist_get_position (playlist_num)))
@@ -1441,7 +1477,7 @@ void playlist_delete_selected (int playlist_num)
     index_allocate (others, entries - playlist->selected_count);
 
     if (playlist->position && playlist->position->selected)
-        set_position (playlist, NULL);
+        set_position (playlist, NULL, FALSE);
 
     int before = 0, after = 0;
     bool_t found = FALSE;
@@ -1479,8 +1515,8 @@ void playlist_delete_selected (int playlist_num)
     playlist->selected_length = 0;
 
     number_entries (playlist, before, index_count (playlist->entries) - before);
-    PLAYLIST_HAS_CHANGED (playlist->number, before, index_count
-     (playlist->entries) - after - before);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, before,
+     index_count (playlist->entries) - after - before);
     LEAVE;
 }
 
@@ -1502,7 +1538,7 @@ void playlist_reverse (int playlist_num)
     playlist->entries = reversed;
 
     number_entries (playlist, 0, entries);
-    PLAYLIST_HAS_CHANGED (playlist->number, 0, entries);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, 0, entries);
     LEAVE;
 }
 
@@ -1524,16 +1560,36 @@ void playlist_randomize (int playlist_num)
     }
 
     number_entries (playlist, 0, entries);
-    PLAYLIST_HAS_CHANGED (playlist->number, 0, entries);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, 0, entries);
     LEAVE;
 }
 
-static int filename_compare (const void * _a, const void * _b, void * compare)
+enum {
+ COMPARE_TYPE_FILENAME,
+ COMPARE_TYPE_TUPLE,
+ COMPARE_TYPE_TITLE};
+
+typedef int (* CompareFunc) (const void * a, const void * b);
+
+typedef struct {
+    int type;
+    CompareFunc func;
+} CompareData;
+
+static int compare_cb (const void * _a, const void * _b, void * _data)
 {
     const Entry * a = _a, * b = _b;
+    CompareData * data = _data;
 
-    int diff = ((int (*) (const char * a, const char * b)) compare)
-     (a->filename, b->filename);
+    int diff = 0;
+
+    if (data->type == COMPARE_TYPE_FILENAME)
+        diff = data->func (a->filename, b->filename);
+    else if (data->type == COMPARE_TYPE_TUPLE)
+        diff = data->func (a->tuple, b->tuple);
+    else if (data->type == COMPARE_TYPE_TITLE)
+        diff = data->func (a->formatted ? a->formatted : a->filename,
+         b->formatted ? b->formatted : b->filename);
 
     if (diff)
         return diff;
@@ -1542,51 +1598,15 @@ static int filename_compare (const void * _a, const void * _b, void * compare)
     return a->number - b->number;
 }
 
-static int tuple_compare (const void * _a, const void * _b, void * compare)
+static void sort (Playlist * playlist, CompareData * data)
 {
-    const Entry * a = _a, * b = _b;
-
-    if (! a->tuple)
-        return b->tuple ? -1 : 0;
-    if (! b->tuple)
-        return 1;
-
-    int diff = ((int (*) (const Tuple * a, const Tuple * b)) compare)
-     (a->tuple, b->tuple);
-
-    if (diff)
-        return diff;
-
-    /* preserve order of "equal" entries */
-    return a->number - b->number;
-}
-
-static int title_compare (const void * _a, const void * _b, void * compare)
-{
-    const Entry * a = _a, * b = _b;
-
-    int diff = ((int (*) (const char * a, const char * b)) compare)
-     (a->formatted ? a->formatted : a->filename,
-      b->formatted ? b->formatted : b->filename);
-
-    if (diff)
-        return diff;
-
-    /* preserve order of "equal" entries */
-    return a->number - b->number;
-}
-
-static void sort (Playlist * playlist, int (* compare) (const void * a,
- const void * b, void * inner), void * inner)
-{
-    index_sort_with_data (playlist->entries, compare, inner);
+    index_sort_with_data (playlist->entries, compare_cb, data);
     number_entries (playlist, 0, index_count (playlist->entries));
 
-    PLAYLIST_HAS_CHANGED (playlist->number, 0, index_count (playlist->entries));
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, 0, index_count (playlist->entries));
 }
 
-static void sort_selected (Playlist * playlist, int (* compare) (const void *
- a, const void * b, void * inner), void * inner)
+static void sort_selected (Playlist * playlist, CompareData * data)
 {
     int entries = index_count (playlist->entries);
 
@@ -1600,7 +1620,7 @@ static void sort_selected (Playlist * playlist, int (* compare) (const void *
             index_append (selected, entry);
     }
 
-    index_sort_with_data (selected, compare, inner);
+    index_sort_with_data (selected, compare_cb, data);
 
     int count2 = 0;
     for (int count = 0; count < entries; count++)
@@ -1613,7 +1633,7 @@ static void sort_selected (Playlist * playlist, int (* compare) (const void *
     index_free (selected);
 
     number_entries (playlist, 0, entries);
-    PLAYLIST_HAS_CHANGED (playlist->number, 0, entries);
+    queue_update (PLAYLIST_UPDATE_STRUCTURE, playlist->number, 0, entries);
 }
 
 static bool_t entries_are_scanned (Playlist * playlist, bool_t selected)
@@ -1643,7 +1663,8 @@ void playlist_sort_by_filename (int playlist_num, int (* compare)
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    sort (playlist, filename_compare, (void *) compare);
+    CompareData data = {COMPARE_TYPE_FILENAME, (CompareFunc) compare};
+    sort (playlist, & data);
 
     LEAVE;
 }
@@ -1655,8 +1676,9 @@ void playlist_sort_by_tuple (int playlist_num, int (* compare)
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
+    CompareData data = {COMPARE_TYPE_TUPLE, (CompareFunc) compare};
     if (entries_are_scanned (playlist, FALSE))
-        sort (playlist, tuple_compare, (void *) compare);
+        sort (playlist, & data);
 
     LEAVE;
 }
@@ -1668,8 +1690,9 @@ void playlist_sort_by_title (int playlist_num, int (* compare) (const char *
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
+    CompareData data = {COMPARE_TYPE_TITLE, (CompareFunc) compare};
     if (entries_are_scanned (playlist, FALSE))
-        sort (playlist, title_compare, (void *) compare);
+        sort (playlist, & data);
 
     LEAVE;
 }
@@ -1681,7 +1704,8 @@ void playlist_sort_selected_by_filename (int playlist_num, int (* compare)
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
-    sort_selected (playlist, filename_compare, (void *) compare);
+    CompareData data = {COMPARE_TYPE_FILENAME, (CompareFunc) compare};
+    sort_selected (playlist, & data);
 
     LEAVE;
 }
@@ -1693,8 +1717,9 @@ void playlist_sort_selected_by_tuple (int playlist_num, int (* compare)
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
+    CompareData data = {COMPARE_TYPE_TUPLE, (CompareFunc) compare};
     if (entries_are_scanned (playlist, TRUE))
-        sort_selected (playlist, tuple_compare, (void *) compare);
+        sort_selected (playlist, & data);
 
     LEAVE;
 }
@@ -1706,8 +1731,9 @@ void playlist_sort_selected_by_title (int playlist_num, int (* compare)
     DECLARE_PLAYLIST;
     LOOKUP_PLAYLIST;
 
+    CompareData data = {COMPARE_TYPE_TITLE, (CompareFunc) compare};
     if (entries_are_scanned (playlist, TRUE))
-        sort (playlist, title_compare, (void *) compare);
+        sort (playlist, & data);
 
     LEAVE;
 }
@@ -1732,7 +1758,7 @@ void playlist_reformat_titles (void)
             entry->formatted = entry->tuple ? title_from_tuple (entry->tuple) : NULL;
         }
 
-        METADATA_HAS_CHANGED (playlist_num, 0, entries);
+        queue_update (PLAYLIST_UPDATE_METADATA, playlist_num, 0, entries);
     }
 
     LEAVE;
@@ -1771,7 +1797,7 @@ static void playlist_rescan_real (int playlist_num, bool_t selected)
         }
     }
 
-    METADATA_HAS_CHANGED (playlist->number, 0, entries);
+    queue_update (PLAYLIST_UPDATE_METADATA, playlist->number, 0, entries);
     LEAVE;
 }
 
@@ -1805,7 +1831,7 @@ void playlist_rescan_file (const char * filename)
                 entry_set_tuple (playlist, entry, NULL);
                 entry->failed = FALSE;
 
-                METADATA_HAS_CHANGED (playlist_num, entry_num, 1);
+                queue_update (PLAYLIST_UPDATE_METADATA, playlist_num, entry_num, 1);
             }
         }
     }
@@ -1862,7 +1888,7 @@ void playlist_queue_insert (int playlist_num, int at, int entry_num)
 
     entry->queued = TRUE;
 
-    SELECTION_HAS_CHANGED (playlist->number, entry_num, 1);
+    queue_update (PLAYLIST_UPDATE_SELECTION, playlist->number, entry_num, 1);
     LEAVE;
 }
 
@@ -1893,7 +1919,7 @@ void playlist_queue_insert_selected (int playlist_num, int at)
     }
 
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+        queue_update (PLAYLIST_UPDATE_SELECTION, playlist->number, first, last + 1 - first);
 
     LEAVE;
 }
@@ -1939,8 +1965,7 @@ void playlist_queue_delete (int playlist_num, int at, int number)
             first = MIN (first, entry->number);
             last = entry->number;
 
-            playlist->queued = g_list_delete_link (playlist->queued,
-             playlist->queued);
+            playlist->queued = g_list_delete_link (playlist->queued, playlist->queued);
         }
     }
     else
@@ -1956,14 +1981,13 @@ void playlist_queue_delete (int playlist_num, int at, int number)
             first = MIN (first, entry->number);
             last = entry->number;
 
-            playlist->queued = g_list_delete_link (playlist->queued,
-             anchor->next);
+            playlist->queued = g_list_delete_link (playlist->queued, anchor->next);
         }
     }
 
 DONE:
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+        queue_update (PLAYLIST_UPDATE_SELECTION, playlist->number, first, last + 1 - first);
 
     LEAVE;
 }
@@ -1994,7 +2018,7 @@ void playlist_queue_delete_selected (int playlist_num)
     }
 
     if (first < entries)
-        SELECTION_HAS_CHANGED (playlist->number, first, last + 1 - first);
+        queue_update (PLAYLIST_UPDATE_SELECTION, playlist->number, first, last + 1 - first);
 
     LEAVE;
 }
@@ -2017,12 +2041,13 @@ static bool_t shuffle_prev (Playlist * playlist)
     if (! found)
         return FALSE;
 
-    playlist->position = found;
+    set_position (playlist, found, FALSE);
     return TRUE;
 }
 
 bool_t playlist_prev_song (int playlist_num)
 {
+    /* stop playback before locking playlists */
     if (playback_get_playing () && playlist_num == playlist_get_playing ())
         playback_stop ();
 
@@ -2041,7 +2066,7 @@ bool_t playlist_prev_song (int playlist_num)
             LEAVE_RET (FALSE);
 
         set_position (playlist, index_get (playlist->entries,
-         playlist->position->number - 1));
+         playlist->position->number - 1), TRUE);
     }
 
     LEAVE;
@@ -2069,7 +2094,7 @@ static bool_t shuffle_next (Playlist * playlist)
 
     if (found)
     {
-        playlist->position = found;
+        set_position (playlist, found, FALSE);
         return TRUE;
     }
 
@@ -2086,7 +2111,7 @@ static bool_t shuffle_next (Playlist * playlist)
         {
             if (! choice)
             {
-                set_position (playlist, entry);
+                set_position (playlist, entry, TRUE);
                 return TRUE;
             }
 
@@ -2110,6 +2135,7 @@ static void shuffle_reset (Playlist * playlist)
 
 bool_t playlist_next_song (int playlist_num, bool_t repeat)
 {
+    /* stop playback before locking playlists */
     if (playback_get_playing () && playlist_num == playlist_get_playing ())
         playback_stop ();
 
@@ -2124,7 +2150,7 @@ bool_t playlist_next_song (int playlist_num, bool_t repeat)
 
     if (playlist->queued)
     {
-        set_position (playlist, playlist->queued->data);
+        set_position (playlist, playlist->queued->data, TRUE);
         playlist->queued = g_list_remove (playlist->queued, playlist->position);
         playlist->position->queued = FALSE;
     }
@@ -2144,17 +2170,17 @@ bool_t playlist_next_song (int playlist_num, bool_t repeat)
     else
     {
         if (! playlist->position)
-            set_position (playlist, index_get (playlist->entries, 0));
+            set_position (playlist, index_get (playlist->entries, 0), TRUE);
         else if (playlist->position->number == entries - 1)
         {
             if (! repeat)
                 LEAVE_RET (FALSE);
 
-            set_position (playlist, index_get (playlist->entries, 0));
+            set_position (playlist, index_get (playlist->entries, 0), TRUE);
         }
         else
             set_position (playlist, index_get (playlist->entries,
-             playlist->position->number + 1));
+             playlist->position->number + 1), TRUE);
     }
 
     LEAVE;
@@ -2201,8 +2227,7 @@ char * playback_entry_get_title (void)
     ENTER;
 
     Entry * entry = get_playback_entry (FALSE, TRUE);
-    char * title = entry ? str_ref (entry->formatted ? entry->formatted :
-     entry->title) : NULL;
+    char * title = entry ? str_ref (entry->formatted ? entry->formatted : entry->title) : NULL;
 
     LEAVE_RET (title);
 }
@@ -2227,7 +2252,7 @@ void playback_entry_set_tuple (Tuple * tuple)
     entry_cancel_scan (entry);
     entry_set_tuple (playing_playlist, entry, tuple);
 
-    METADATA_HAS_CHANGED (playing_playlist->number, entry->number, 1);
+    queue_update (PLAYLIST_UPDATE_METADATA, playing_playlist->number, entry->number, 1);
     LEAVE;
 }
 
@@ -2253,6 +2278,10 @@ int playback_entry_get_end_time (void)
 
 void playlist_save_state (void)
 {
+    /* get playback state before locking playlists */
+    int state, time;
+    get_resume_state (& state, & time);
+
     ENTER;
 
     char * path = g_strdup_printf ("%s/" STATE_FILE, get_path (AUD_PATH_USER_DIR));
@@ -2260,13 +2289,6 @@ void playlist_save_state (void)
     g_free (path);
     if (! handle)
         LEAVE_RET_VOID;
-
-    resume_state = playback_get_playing () ? (playback_get_paused () ?
-     RESUME_PAUSE : RESUME_PLAY) : RESUME_STOP;
-    resume_time = playback_get_playing () ? playback_get_time () : 0;
-
-    fprintf (handle, "resume-state %d\n", resume_state);
-    fprintf (handle, "resume-time %d\n", resume_time);
 
     fprintf (handle, "active %d\n", active_playlist ? active_playlist->number : -1);
     fprintf (handle, "playing %d\n", playing_playlist ? playing_playlist->number : -1);
@@ -2281,8 +2303,16 @@ void playlist_save_state (void)
         if (playlist->filename)
             fprintf (handle, "filename %s\n", playlist->filename);
 
-        fprintf (handle, "position %d\n", playlist->position ?
-         playlist->position->number : -1);
+        fprintf (handle, "position %d\n", playlist->position ? playlist->position->number : -1);
+
+        if (playlist == playing_playlist)
+        {
+            playlist->resume_state = state;
+            playlist->resume_time = time;
+        }
+
+        fprintf (handle, "resume-state %d\n", playlist->resume_state);
+        fprintf (handle, "resume-time %d\n", playlist->resume_time);
     }
 
     fclose (handle);
@@ -2313,8 +2343,7 @@ static void parse_next (FILE * handle)
 
 static bool_t parse_integer (const char * key, int * value)
 {
-    return (parse_value && ! strcmp (parse_key, key) && sscanf (parse_value,
-     "%d", value) == 1);
+    return (parse_value && ! strcmp (parse_key, key) && sscanf (parse_value, "%d", value) == 1);
 }
 
 static char * parse_string (const char * key)
@@ -2334,11 +2363,6 @@ void playlist_load_state (void)
         LEAVE_RET_VOID;
 
     parse_next (handle);
-
-    if (parse_integer ("resume-state", & resume_state))
-        parse_next (handle);
-    if (parse_integer ("resume-time", & resume_time))
-        parse_next (handle);
 
     if (parse_integer ("active", & playlist_num))
     {
@@ -2373,7 +2397,12 @@ void playlist_load_state (void)
             parse_next (handle);
 
         if (position >= 0 && position < entries)
-            set_position (playlist, index_get (playlist->entries, position));
+            set_position (playlist, index_get (playlist->entries, position), TRUE);
+
+        if (parse_integer ("resume-state", & playlist->resume_state))
+            parse_next (handle);
+        if (parse_integer ("resume-time", & playlist->resume_time))
+            parse_next (handle);
     }
 
     fclose (handle);
@@ -2400,6 +2429,21 @@ void playlist_load_state (void)
 
 void playlist_resume (void)
 {
-    if (resume_state == RESUME_PLAY || resume_state == RESUME_PAUSE)
-        playback_play (resume_time, resume_state == RESUME_PAUSE);
+    int state = RESUME_STOP, time = 0;
+
+    ENTER;
+
+    if (playing_playlist)
+    {
+        state = playing_playlist->resume_state;
+        time = playing_playlist->resume_time;
+    }
+
+    LEAVE;
+
+    /* resume playback after unlocking playlists */
+    if (state == RESUME_PLAY && ! get_bool (NULL, "resume_playback_on_startup"))
+        state = RESUME_PAUSE;
+
+    resume (state, time);
 }

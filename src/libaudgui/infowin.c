@@ -3,27 +3,26 @@
  * Copyright 2006-2011 William Pitcock, Tomasz Moń, Eugene Zagidullin, and
  *                     John Lindgren
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * The Audacious team does not consider modular code linking to
- * Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #include <gtk/gtk.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
 #include <audacious/playlist.h>
@@ -309,8 +308,8 @@ static void create_infowin (void)
     GtkWidget * label_quality_label;
     GtkWidget * label_bitrate_label;
     GtkWidget * codec_hbox;
-    GtkWidget * codec_table;
-    GtkWidget * table1;
+    GtkWidget * codec_grid;
+    GtkWidget * grid1;
     GtkWidget * bbox_close;
     GtkWidget * btn_close;
     GtkWidget * alignment;
@@ -321,17 +320,20 @@ static void create_infowin (void)
     gtk_window_set_type_hint ((GtkWindow *) infowin,
      GDK_WINDOW_TYPE_HINT_DIALOG);
 
-    vbox0 = gtk_vbox_new (FALSE, 0);
+    vbox0 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add ((GtkContainer *) infowin, vbox0);
 
-    hbox = gtk_hbox_new (FALSE, 6);
+    hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,  6);
     gtk_box_pack_start ((GtkBox *) vbox0, hbox, TRUE, TRUE, 0);
 
-    vbox2 = gtk_vbox_new (FALSE, 6);
+    vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
     gtk_box_pack_start ((GtkBox *) hbox, vbox2, TRUE, TRUE, 0);
 
+    GtkWidget * vbox3 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
+    gtk_box_pack_start ((GtkBox *) vbox2, vbox3, TRUE, FALSE, 0);
+
     image_artwork = gtk_image_new ();
-    gtk_box_pack_start ((GtkBox *) vbox2, image_artwork, TRUE, TRUE, 0);
+    gtk_box_pack_start ((GtkBox *) vbox3, image_artwork, FALSE, FALSE, 0);
 
     location_text = gtk_label_new ("");
     gtk_widget_set_size_request (location_text, 200, -1);
@@ -339,15 +341,15 @@ static void create_infowin (void)
     gtk_label_set_line_wrap_mode ((GtkLabel *) location_text,
      PANGO_WRAP_WORD_CHAR);
     gtk_label_set_selectable ((GtkLabel *) location_text, TRUE);
-    gtk_box_pack_start ((GtkBox *) vbox2, location_text, FALSE, FALSE, 0);
+    gtk_box_pack_start ((GtkBox *) vbox3, location_text, FALSE, FALSE, 0);
 
-    codec_hbox = gtk_hbox_new (FALSE, 6);
+    codec_hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,  6);
     gtk_box_pack_start ((GtkBox *) vbox2, codec_hbox, FALSE, FALSE, 0);
 
-    codec_table = gtk_table_new(3, 2, FALSE);
-    gtk_table_set_row_spacings ((GtkTable *) codec_table, 3);
-    gtk_table_set_col_spacings ((GtkTable *) codec_table, 12);
-    gtk_box_pack_start ((GtkBox *) codec_hbox, codec_table, FALSE, FALSE, 0);
+    codec_grid = gtk_grid_new ();
+    gtk_grid_set_row_spacing ((GtkGrid *) codec_grid, 3);
+    gtk_grid_set_column_spacing ((GtkGrid *) codec_grid, 12);
+    gtk_box_pack_start ((GtkBox *) codec_hbox, codec_grid, FALSE, FALSE, 0);
 
     label_format = gtk_label_new (_("<span size=\"small\">Format:</span>"));
     gtk_label_set_use_markup ((GtkLabel *) label_format, TRUE);
@@ -370,20 +372,14 @@ static void create_infowin (void)
     gtk_label_set_use_markup ((GtkLabel *) label_bitrate, TRUE);
     gtk_misc_set_alignment ((GtkMisc *) label_bitrate, 0, 0.5);
 
-    gtk_table_attach ((GtkTable *) codec_table, label_format, 0, 1, 0, 1,
-     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-    gtk_table_attach ((GtkTable *) codec_table, label_format_name, 1, 2, 0, 1,
-     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-    gtk_table_attach ((GtkTable *) codec_table, label_quality_label, 0, 1, 1, 2,
-     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-    gtk_table_attach ((GtkTable *) codec_table, label_quality, 1, 2, 1, 2,
-     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-    gtk_table_attach ((GtkTable *) codec_table, label_bitrate_label, 0, 1, 2, 3,
-     GTK_EXPAND | GTK_FILL, 0, 0, 0);
-    gtk_table_attach ((GtkTable *) codec_table, label_bitrate, 1, 2, 2, 3,
-     GTK_EXPAND | GTK_FILL, 0, 0, 0);
+    gtk_grid_attach ((GtkGrid *) codec_grid, label_format, 0, 0, 1, 1);
+    gtk_grid_attach ((GtkGrid *) codec_grid, label_format_name, 1, 0, 1, 1);
+    gtk_grid_attach ((GtkGrid *) codec_grid, label_quality_label, 0, 1, 1, 1);
+    gtk_grid_attach ((GtkGrid *) codec_grid, label_quality, 1, 1, 1, 1);
+    gtk_grid_attach ((GtkGrid *) codec_grid, label_bitrate_label, 0, 2, 1, 1);
+    gtk_grid_attach ((GtkGrid *) codec_grid, label_bitrate, 1, 2, 1, 1);
 
-    vbox2 = gtk_vbox_new (FALSE, 0);
+    vbox2 = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_pack_start ((GtkBox *) hbox, vbox2, TRUE, TRUE, 0);
 
     label_title = gtk_label_new (_("<span size=\"small\">Title</span>"));
@@ -451,33 +447,30 @@ static void create_infowin (void)
     alignment = gtk_alignment_new (0.5, 0.5, 1, 1);
     gtk_box_pack_start ((GtkBox *) vbox2, alignment, FALSE, FALSE, 0);
     gtk_alignment_set_padding ((GtkAlignment *) alignment, 0, 6, 0, 0);
-    table1 = gtk_table_new (2, 2, FALSE);
-    gtk_container_add ((GtkContainer *) alignment, table1);
-    gtk_table_set_col_spacings ((GtkTable *) table1, 6);
+    grid1 = gtk_grid_new ();
+    gtk_grid_set_column_homogeneous ((GtkGrid *) grid1, TRUE);
+    gtk_container_add ((GtkContainer *) alignment, grid1);
+    gtk_grid_set_column_spacing ((GtkGrid *) grid1, 6);
 
     label_year = gtk_label_new (_("<span size=\"small\">Year</span>"));
-    gtk_table_attach ((GtkTable *) table1, label_year, 0, 1, 0, 1, GTK_FILL, 0,
-     0, 0);
+    gtk_grid_attach ((GtkGrid *) grid1, label_year, 0, 0, 1, 1);
     gtk_label_set_use_markup ((GtkLabel *) label_year, TRUE);
     gtk_misc_set_alignment ((GtkMisc *) label_year, 0, 0.5);
 
     entry_year = gtk_entry_new ();
-    gtk_table_attach ((GtkTable *) table1, entry_year, 0, 1, 1, 2, GTK_EXPAND |
-     GTK_FILL, 0, 0, 0);
+    gtk_grid_attach ((GtkGrid *) grid1, entry_year, 0, 1, 1, 1);
     g_signal_connect (entry_year, "changed", (GCallback) entry_changed, NULL);
 
     label_track = gtk_label_new (_("<span size=\"small\">Track Number</span>"));
-    gtk_table_attach ((GtkTable *) table1, label_track, 1, 2, 0, 1, GTK_FILL, 0,
-     0, 0);
+    gtk_grid_attach ((GtkGrid *) grid1, label_track, 1, 0, 1, 1);
     gtk_label_set_use_markup ((GtkLabel *) label_track, TRUE);
     gtk_misc_set_alignment ((GtkMisc *) label_track, 0, 0.5);
 
     entry_track = gtk_entry_new ();
-    gtk_table_attach ((GtkTable *) table1, entry_track, 1, 2, 1, 2, GTK_EXPAND |
-     GTK_FILL, 0, 0, 0);
+    gtk_grid_attach ((GtkGrid *) grid1, entry_track, 1, 1, 1, 1);
     g_signal_connect (entry_track, "changed", (GCallback) entry_changed, NULL);
 
-    hbox_status_and_bbox = gtk_hbox_new (FALSE, 0);
+    hbox_status_and_bbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,  0);
     gtk_box_pack_start ((GtkBox *) vbox0, hbox_status_and_bbox, FALSE, FALSE, 0);
 
     label_mini_status = gtk_label_new ("<span size=\"small\"></span>");
@@ -486,7 +479,7 @@ static void create_infowin (void)
     gtk_box_pack_start ((GtkBox *) hbox_status_and_bbox, label_mini_status,
      TRUE, TRUE, 0);
 
-    bbox_close = gtk_hbutton_box_new ();
+    bbox_close = gtk_button_box_new (GTK_ORIENTATION_HORIZONTAL);
     gtk_box_set_spacing ((GtkBox *) bbox_close, 6);
     gtk_box_pack_start ((GtkBox *) hbox_status_and_bbox, bbox_close, FALSE,
      FALSE, 0);

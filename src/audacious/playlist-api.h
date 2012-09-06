@@ -1,22 +1,20 @@
 /*
  * playlist-api.h
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2012 John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 /* Do not include this file directly; use playlist.h instead. */
@@ -42,9 +40,8 @@ AUD_VFUNC3 (playlist_reorder, int, from, int, to, int, count)
 /* Closes a playlist.  CAUTION: The playlist is not saved, and no confirmation
  * is presented to the user.  If <playlist> is the only playlist, a new playlist
  * is added.  If <playlist> is the active playlist, another playlist is marked
- * active.  If <playlist> is the one from which the last song played was taken,
- * playback is stopped.  In this case, calls to playlist_get_playing() will
- * return -1, and the behavior of drct_play() is unspecified. */
+ * active.  If <playlist> is the currently playing playlist, playback is
+ * stopped.  In this case, calls to playlist_get_playing() will return -1. */
 AUD_VFUNC1 (playlist_delete, int, playlist)
 
 /* Returns a unique non-negative integer which can be used to identify a given
@@ -70,22 +67,20 @@ AUD_VFUNC2 (playlist_set_title, int, playlist, const char *, title)
 /* Returns the title associated with a playlist. */
 AUD_FUNC1 (char *, playlist_get_title, int, playlist)
 
-/* Marks a playlist as active.  This is the playlist which the user will see and
- * on which most DRCT functions will take effect. */
+/* Sets the active playlist.  This is the playlist that user interfaces will
+ * show to the user. */
 AUD_VFUNC1 (playlist_set_active, int, playlist)
 
-/* Returns the number of the playlist marked active. */
+/* Returns the number of the active playlist. */
 AUD_FUNC0 (int, playlist_get_active)
 
-/* Sets the playlist in which playback will begin when drct_play() is called.
- * This does not mark the playlist as active.  If a song is already playing, it
- * will be stopped.  If <playlist> is negative, calls to playlist_get_playing()
- * will return -1, and the behavior of drct_play() is unspecified. */
+/* Sets the currently playing playlist.  Any information needed to resume
+ * playback from the previously playing playlist is saved, and playback is
+ * resumed in the newly set playlist if possible.  (See playlist_set_position()
+ * for a way to prevent this resuming.) */
 AUD_VFUNC1 (playlist_set_playing, int, playlist)
 
-/* Returns the number of the playlist from which the last song played was taken,
- * or -1 if that cannot be determined.  Note that this playlist may not be
- * marked active. */
+/* Returns the number of the currently playing playlist, or -1 if there is none. */
 AUD_FUNC0 (int, playlist_get_playing)
 
 /* Returns the number of a "blank" playlist.  The active playlist is returned if
@@ -167,7 +162,9 @@ AUD_FUNC3 (char *, playlist_entry_get_title, int, playlist, int, entry,
 /* Returns three strings (title, artist, and album) describing an entry.  The
  * strings are pooled, and the usual cautions apply.  If <fast> is nonzero,
  * returns a "best guess" based on the entry's filename if metadata for the
- * entry has not yet been read.  May return NULL for any and all values. */
+ * entry has not yet been read.  The caller may pass NULL for any values that
+ * are not needed; NULL may also be returned for any values that are not
+ * available. */
 AUD_VFUNC6 (playlist_entry_describe, int, playlist, int, entry,
  char * *, title, char * *, artist, char * *, album, bool_t, fast)
 
@@ -178,13 +175,13 @@ AUD_FUNC3 (int, playlist_entry_get_length, int, playlist, int, entry,
 
 /* Sets the entry which will be played (if this playlist is selected with
  * playlist_set_playing()) when drct_play() is called.  If a song from this
- * playlist is already playing, it will be stopped.  If <position> is negative,
- * calls to playlist_get_position() will return -1, and the behavior of
- * drct_play() is unspecified. */
+ * playlist is already playing, it will be stopped.  If the playlist has resume
+ * information set, it will be cleared.  It is possible to set a position of -1,
+ * meaning that no entry is set to be played. */
 AUD_VFUNC2 (playlist_set_position, int, playlist, int, position)
 
-/* Returns the number of the entry which was last played from this playlist, or
- * -1 if that cannot be determined. */
+/* Returns the number of the entry set to be played (which may or may not be
+ * currently playing), or -1 if there is none. */
 AUD_FUNC1 (int, playlist_get_position, int, playlist)
 
 /* Sets whether an entry is selected. */
@@ -206,10 +203,8 @@ AUD_VFUNC2 (playlist_select_all, int, playlist, bool_t, selected)
  * requested offset. */
 AUD_FUNC3 (int, playlist_shift, int, playlist, int, position, int, distance)
 
-/* Removes the selected entries from a playlist.  If the last song played is one
- * of these entries, playback is stopped.  In this case, calls to
- * playlist_get_position() will return -1, and the behavior of drct_play() is
- * unspecified. */
+/* Removes the selected entries from a playlist.  If the currently playing entry
+ * is among these, playback is stopped. */
 AUD_VFUNC1 (playlist_delete_selected, int, playlist)
 
 /* Sorts the entries in a playlist based on filename.  The callback function

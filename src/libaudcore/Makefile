@@ -1,4 +1,4 @@
-LIB = ${LIB_PREFIX}audcore${LIB_SUFFIX}
+SHARED_LIB = ${LIB_PREFIX}audcore${LIB_SUFFIX}
 LIB_MAJOR = 1
 LIB_MINOR = 0
 
@@ -32,8 +32,7 @@ includesubdir = libaudcore
 CPPFLAGS := -I.. -I../.. \
             ${CPPFLAGS} \
             ${GLIB_CFLAGS} \
-            ${PTHREAD_CFLAGS}
 
 CFLAGS += ${LIB_CFLAGS}
 
-LIBS += ${PTHREAD_LIBS} ${GLIB_LIBS} -lm
+LIBS += ${GLIB_LIBS} -lm

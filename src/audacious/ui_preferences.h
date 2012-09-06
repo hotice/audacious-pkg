@@ -1,20 +1,20 @@
-/*  BMP - Cross-platform multimedia player
- *  Copyright (C) 2003-2004  BMP development team.
+/*
+ * ui_preferences.h
+ * Copyright 2006-2010 William Pitcock, Tomasz Moń, and John Lindgren
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; under version 3 of the License.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses>.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- *  The Audacious team does not consider modular code linking to
- *  Audacious or using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #ifndef AUDACIOUS_UI_PREFERENCES_H
@@ -36,8 +36,10 @@ int prefswin_page_new (void * container, const char * name, const char *
  imgurl);
 void prefswin_page_destroy(GtkWidget *container);
 
-void plugin_preferences_show (PluginPreferences * p);
-void plugin_preferences_cleanup (PluginPreferences * p);
+/* plugin-preferences.c */
+void plugin_make_about_window (PluginHandle * plugin);
+void plugin_make_config_window (PluginHandle * plugin);
+void plugin_misc_cleanup (PluginHandle * plugin);
 
 /* plugin-view.c */
 GtkWidget * plugin_view_new (int type);

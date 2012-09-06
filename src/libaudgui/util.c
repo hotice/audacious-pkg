@@ -1,6 +1,6 @@
 /*
  * util.c
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2012 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,12 +17,13 @@
  * the use of this software.
  */
 
+#include <string.h>
+
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
 
 #include <audacious/debug.h>
-#include <audacious/gtk-compat.h>
 #include <audacious/i18n.h>
 #include <audacious/playlist.h>
 #include <audacious/misc.h>
@@ -36,18 +37,56 @@
 
 static GdkPixbuf * current_pixbuf;
 
+EXPORT int audgui_get_digit_width (GtkWidget * widget)
+{
+    int width;
+    PangoLayout * layout = gtk_widget_create_pango_layout (widget, "0123456789");
+    PangoFontDescription * desc = pango_font_description_new ();
+    pango_font_description_set_weight (desc, PANGO_WEIGHT_BOLD);
+    pango_layout_set_font_description (layout, desc);
+    pango_layout_get_pixel_size (layout, & width, NULL);
+    pango_font_description_free (desc);
+    return (width + 9) / 10;
+}
+
+EXPORT void audgui_get_mouse_coords (GtkWidget * widget, int * x, int * y)
+{
+    if (widget)
+    {
+        int xwin, ywin;
+        GdkRectangle alloc;
+
+        GdkWindow * window = gtk_widget_get_window (widget);
+        GdkDisplay * display = gdk_window_get_display (window);
+        GdkDeviceManager * manager = gdk_display_get_device_manager (display);
+        GdkDevice * device = gdk_device_manager_get_client_pointer (manager);
+
+        gdk_window_get_device_position (window, device, & xwin, & ywin, NULL);
+        gtk_widget_get_allocation (widget, & alloc);
+
+        * x = xwin - alloc.x;
+        * y = ywin - alloc.y;
+    }
+    else
+    {
+        GdkDisplay * display = gdk_display_get_default ();
+        GdkDeviceManager * manager = gdk_display_get_device_manager (display);
+        GdkDevice * device = gdk_device_manager_get_client_pointer (manager);
+        gdk_device_get_position (device, NULL, x, y);
+    }
+}
+
 EXPORT void audgui_hide_on_delete (GtkWidget * widget)
 {
     g_signal_connect (widget, "delete-event", (GCallback)
      gtk_widget_hide_on_delete, NULL);
 }
 
-static bool_t escape_cb (GtkWidget * widget, GdkEventKey * event, void
- (* action) (GtkWidget * widget))
+static bool_t escape_hide_cb (GtkWidget * widget, GdkEventKey * event)
 {
-    if (event->keyval == GDK_Escape)
+    if (event->keyval == GDK_KEY_Escape)
     {
-        action (widget);
+        gtk_widget_hide (widget);
         return TRUE;
     }
 
@@ -56,14 +95,23 @@ static bool_t escape_cb (GtkWidget * widget, GdkEventKey * event, void
 
 EXPORT void audgui_hide_on_escape (GtkWidget * widget)
 {
-    g_signal_connect (widget, "key-press-event", (GCallback) escape_cb,
-     (void *) gtk_widget_hide);
+    g_signal_connect (widget, "key-press-event", (GCallback) escape_hide_cb, NULL);
+}
+
+static bool_t escape_destroy_cb (GtkWidget * widget, GdkEventKey * event)
+{
+    if (event->keyval == GDK_KEY_Escape)
+    {
+        gtk_widget_destroy (widget);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 EXPORT void audgui_destroy_on_escape (GtkWidget * widget)
 {
-    g_signal_connect (widget, "key-press-event", (GCallback) escape_cb,
-     (void *) gtk_widget_destroy);
+    g_signal_connect (widget, "key-press-event", (GCallback) escape_destroy_cb, NULL);
 }
 
 static void toggle_cb (GtkToggleButton * toggle, bool_t * setting)
@@ -205,7 +253,9 @@ EXPORT void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, int size)
 {
     int width = gdk_pixbuf_get_width (* pixbuf);
     int height = gdk_pixbuf_get_height (* pixbuf);
-    GdkPixbuf * pixbuf2;
+
+    if (width <= size && height <= size)
+        return;
 
     if (width > height)
     {
@@ -223,7 +273,7 @@ EXPORT void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, int size)
     if (height < 1)
         height = 1;
 
-    pixbuf2 = gdk_pixbuf_scale_simple (* pixbuf, width, height,
+    GdkPixbuf * pixbuf2 = gdk_pixbuf_scale_simple (* pixbuf, width, height,
      GDK_INTERP_BILINEAR);
     g_object_unref (* pixbuf);
     * pixbuf = pixbuf2;

@@ -9,11 +9,8 @@
 #
 LOCALES = ast.po \
 	  be.po \
-	  bg.po \
-	  br.po \
 	  ca.po \
 	  cs.po \
-	  cy.po \
 	  de.po \
 	  el.po \
 	  es.po \
@@ -21,18 +18,18 @@ LOCALES = ast.po \
 	  es_MX.po \
 	  et.po \
 	  eu.po \
+	  fa_IR.po \
 	  fi.po \
 	  fr.po \
-	  hi.po \
-	  hr.po \
+	  gl.po \
+	  he.po \
 	  hu.po \
+	  id_ID.po \
 	  it.po \
 	  ja.po \
-	  ka.po \
 	  ko.po \
 	  lt.po \
 	  lv.po \
-	  mk.po \
 	  nl.po \
 	  pl.po \
 	  pt_BR.po \
@@ -40,10 +37,8 @@ LOCALES = ast.po \
 	  ro.po \
 	  ru.po \
 	  sk.po \
-	  sl.po \
-	  sr@Latn.po \
+	  sr@latin.po \
 	  sr.po \
-	  sv.po \
 	  tr.po \
 	  uk.po \
 	  vi.po \
@@ -64,4 +59,4 @@ update-pot:
 
 update-po: update-pot
 	@echo Updating .po -files ...
-	@for lang in $(LOCALES); do echo -n "$$lang : "; msgmerge --backup=simple --update "$$lang" $(POTTEMPLATE); done
+	@for lang in $(LOCALES); do echo -n "$$lang : "; msgmerge --update "$$lang" $(POTTEMPLATE); done

@@ -1,22 +1,21 @@
 /*
  * plugin.h
- * Copyright 2005-2010 Audacious Development Team
+ * Copyright 2005-2012 William Pitcock, Yoshiki Yazawa, Eugene Zagidullin, and
+ *                     John Lindgren
  *
- * This file is part of Audacious.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * Audacious is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, version 2 or version 3 of the License.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions, and the following disclaimer.
  *
- * Audacious is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions, and the following disclaimer in the documentation
+ *    provided with the distribution.
  *
- * You should have received a copy of the GNU General Public License along with
- * Audacious. If not, see <http://www.gnu.org/licenses/>.
- *
- * The Audacious team does not consider modular code linking to Audacious or
- * using our public API to be a derived work.
+ * This software is provided "as is" and without any warranty, express or
+ * implied. In no event shall the authors be liable for any damages arising from
+ * the use of this software.
  */
 
 #ifndef AUDACIOUS_PLUGIN_H
@@ -45,8 +44,8 @@
  * the API tables), increment _AUD_PLUGIN_VERSION *and* set
  * _AUD_PLUGIN_VERSION_MIN to the same value. */
 
-#define _AUD_PLUGIN_VERSION_MIN 38 /* 3.2-alpha2 */
-#define _AUD_PLUGIN_VERSION     38
+#define _AUD_PLUGIN_VERSION_MIN 40 /* 3.3-devel to 3.3-beta1 */
+#define _AUD_PLUGIN_VERSION     41 /* post 3.3-beta1 */
 
 /* A NOTE ON THREADS
  *
@@ -100,12 +99,18 @@
     int type; /* PLUGIN_TYPE_XXX */ \
     int size; /* size in bytes of the struct */ \
     const char * name; \
+    const char * domain; /* for gettext */ \
+    const char * about_text; \
+    const PluginPreferences * prefs; \
     bool_t (* init) (void); \
     void (* cleanup) (void); \
     int (* take_message) (const char * code, const void * data, int size); \
-    void (* about) (void); \
-    void (* configure) (void); \
-    PluginPreferences * settings;
+    void (* about) (void); /* use about_text instead if possible */ \
+    void (* configure) (void); /* use prefs instead if possible */ \
+    void * reserved1; \
+    void * reserved2; \
+    void * reserved3; \
+    void * reserved4;
 
 struct _Plugin
 {
@@ -122,14 +127,14 @@ struct _TransportPlugin
 struct _PlaylistPlugin
 {
     PLUGIN_COMMON_FIELDS
-	const char * const * extensions; /* array ending with NULL */
-	bool_t (* load) (const char * path, VFSFile * file,
-     char * * title, /* pooled */
-     Index * filenames, /* of (char *), pooled */
-     Index * tuples); /* of (Tuple *) */
-	bool_t (* save) (const char * path, VFSFile * file, const char * title,
-     Index * filenames, /* of (char *) */
-     Index * tuples); /* of (Tuple *) */
+    const char * const * extensions; /* array ending with NULL */
+    bool_t (* load) (const char * path, VFSFile * file,
+    char * * title, /* pooled */
+    Index * filenames, /* of (char *), pooled */
+    Index * tuples); /* of (Tuple *) */
+    bool_t (* save) (const char * path, VFSFile * file, const char * title,
+    Index * filenames, /* of (char *) */
+    Index * tuples); /* of (Tuple *) */
 };
 
 struct _OutputPlugin
@@ -169,9 +174,6 @@ struct _OutputPlugin
     /* Waits until all buffered data has been heard by the user. */
     void (* drain) (void);
 
-    /* Returns time count (in milliseconds) of how much data has been written. */
-    int (* written_time) (void);
-
     /* Returns time count (in milliseconds) of how much data has been heard by
      * the user. */
     int (* output_time) (void);
@@ -184,11 +186,10 @@ struct _OutputPlugin
      * milliseconds) of data written. */
     void (* flush) (int time);
 
-    /* Sets the time counter (in milliseconds) of data written without
-     * discarding any buffered audio data.  If <time> is less than the amount of
-     * buffered data, following calls to output_time() will return negative
-     * values. */
-    void (* set_written_time) (int time);
+    /* Whether close_audio() and open_audio() must always be called between
+     * songs, even if the audio format is the same.  Note that this defeats
+     * gapless playback. */
+    bool_t force_reopen;
 };
 
 struct _EffectPlugin
@@ -207,7 +208,7 @@ struct _EffectPlugin
      * passed, even a zero length. */
     void (* process) (float * * data, int * samples);
 
-    /* A seek is taking place; any buffers should be discarded. */
+    /* Optional.  A seek is taking place; any buffers should be discarded. */
     void (* flush) (void);
 
     /* Exactly like process() except that any buffers should be drained (i.e.
@@ -215,10 +216,13 @@ struct _EffectPlugin
      * at the end of the last song in the playlist. */
     void (* finish) (float * * data, int * samples);
 
-    /* Optional.  For effects that change the length of the song, these
-     * functions allow the correct time to be displayed. */
-    int (* decoder_to_output_time) (int time);
-    int (* output_to_decoder_time) (int time);
+    /* Required only for plugins that change the time domain (e.g. a time
+     * stretch) or use read-ahead buffering.  translate_delay() must do two
+     * things: first, translate <delay> (which is in milliseconds) from the
+     * output time domain back to the input time domain; second, increase
+     * <delay> by the size of the read-ahead buffer.  It should return the
+     * adjusted delay. */
+    int (* adjust_delay) (int delay);
 
     /* Effects with lowest order (0 to 9) are applied first. */
     int order;
@@ -230,69 +234,41 @@ struct _EffectPlugin
 
 struct OutputAPI
 {
-    /* In a multi-thread plugin, only one of these functions may be called at
-     * once (but see pause and abort_write for exceptions to this rule). */
-
-    /* Prepare the output system for playback in the specified format.  Returns
-     * nonzero on success.  If the call fails, no other output functions may be
+    /* Prepares the output system for playback in the specified format.  Returns
+     * TRUE on success.  If the call fails, no other output functions may be
      * called. */
-    int (* open_audio) (int format, int rate, int channels);
+    bool_t (* open_audio) (int format, int rate, int channels);
 
     /* Informs the output system of replay gain values for the current song so
      * that volume levels can be adjusted accordingly, if the user so desires.
      * This may be called at any time during playback should the values change. */
-    void (* set_replaygain_info) (ReplayGainInfo * info);
+    void (* set_replaygain_info) (const ReplayGainInfo * info);
 
-    /* Pass audio data to the output system for playback.  The data must be in
+    /* Passes audio data to the output system for playback.  The data must be in
      * the format passed to open_audio, and the length (in bytes) must be an
      * integral number of frames.  This function blocks until all the data has
-     * been written (though it may not yet be heard by the user); if the output
-     * system is paused; this may be indefinitely.  See abort_write for a way to
-     * interrupt a blocked call. */
+     * been written (though it may not yet be heard by the user). */
     void (* write_audio) (void * data, int length);
 
-    /* End playback.  Any audio data currently buffered by the output system
-     * will be discarded.  After the call, no other output functions, except
-     * open_audio, may be called. */
-    void (* close_audio) (void);
+    /* Interrupts a call to write_audio() so that it returns immediately.
+     * Buffered audio data is discarded.  Until set_written_time() or
+     * open_audio() is called, further calls to write_audio() will have no
+     * effect and will return immediately. */
+    void (* abort_write) (void);
 
-    /* Pause or unpause playback.  This function may be called during a call to
-     * write_audio, in which write_audio will block until playback is unpaused
-     * (but see abort_write to prevent the call from blocking). */
+    /* Pauses or unpauses playback.  If playback is paused during a call to
+     * write_audio(), the call will block until playback is unpaused again or
+     * abort_write() is called. */
     void (* pause) (bool_t pause);
-
-    /* Discard any audio data currently buffered by the output system, and set
-     * the time counter to a new value.  This function is intended to be used
-     * for seeking. */
-    void (* flush) (int time);
 
     /* Returns the time counter.  Note that this represents the amount of audio
      * data passed to the output system, not the amount actually heard by the
-     * user.  This function is useful for handling a changed audio format:
-     * First, save the time counter using this function.  Second, call
-     * close_audio and then open_audio with the new format (note that the call
-     * may fail).  Finally, restore the time counter using flush. */
+     * user. */
     int (* written_time) (void);
 
-    /* Returns TRUE if there is data remaining in the output buffer; FALSE if
-     * all data written to the output system has been heard by the user.  This
-     * function should be polled (1/50 second is a reasonable delay between
-     * calls) at the end of a song before calling close_audio.  Once it returns
-     * FALSE, close_audio can be called without cutting off any of the end of
-     * the song. */
-    bool_t (* buffer_playing) (void);
-
-    /* Interrupt a call to write_audio so that it returns immediately.  This
-     * works even when the call is blocked by pause.  Buffered audio data is
-     * discarded as in flush.  Until flush is called or the output system is
-     * reset, further calls to write_audio will have no effect and return
-     * immediately.  This function is intended to be used in seeking or
-     * stopping in a multi-thread plugin.  To seek, the handler function (called
-     * in the main thread) should first set a flag for the decoding thread and
-     * then call abort_write.  When the decoding thread notices the flag, it
-     * should do the actual seek, call flush, and finally clear the flag.  Once
-     * the flag is cleared, the handler function may return. */
-    void (* abort_write) (void);
+    /* Sets the time counter to a new value.  Does not perform a flush; the name
+     * is kept only for compatibility. */
+    void (* flush) (int time);
 };
 
 typedef const struct _InputPlayback InputPlayback;
@@ -477,6 +453,7 @@ struct _IfacePlugin
      * is_shown() and is_focused() will return nonzero. */
     void (* show) (bool_t show);
     bool_t (* is_shown) (void);
+    bool_t (* is_focused) (void);
 
     void (* show_error) (const char * markup);
     void (* show_filebrowser) (bool_t play_button);
@@ -487,9 +464,6 @@ struct _IfacePlugin
 
     void (* install_toolbar) (void /* GtkWidget */ * button);
     void (* uninstall_toolbar) (void /* GtkWidget */ * button);
-
-    /* added after 3.0-alpha1 */
-    bool_t (* is_focused) (void);
 };
 
 #undef PLUGIN_COMMON_FIELDS
