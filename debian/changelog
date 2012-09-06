@@ -1,3 +1,14 @@
+audacious (3.3.1-1) experimental; urgency=low
+
+  * Team upload.
+  * New upstream release.
+  * Refresh debian/libaudcore1.symbols.
+  * Remove debian/patches/*, all patches do not apply anymore.
+  * Remove README from debian/audacious.docs, upstream doesn't
+    provide it anymore.
+
+ -- Alessio Treglia <alessio@debian.org>  Thu, 06 Sep 2012 17:35:38 +0200
+
 audacious (3.2.3-1) unstable; urgency=low
 
   * Team upload.
