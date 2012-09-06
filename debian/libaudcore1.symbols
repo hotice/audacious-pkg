@@ -1,6 +1,7 @@
 libaudcore.so.1 libaudcore1 #MINVER#
  audio_amplify@Base 2.3
  audio_from_int@Base 2.3
+ audio_soft_clip@Base 3.3.1
  audio_to_int@Base 2.3
  double_array_to_string@Base 3.2
  double_to_string@Base 3.2
@@ -122,6 +123,8 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_create_vis_menu@Base 3.2
  audgui_destroy_on_escape@Base 2.4~alpha1
  audgui_export_playlist@Base 3.2
+ audgui_get_digit_width@Base 3.3.1-1
+ audgui_get_mouse_coords@Base 3.3.1-1
  audgui_hide_equalizer_window@Base 2.4~alpha2
  audgui_hide_filebrowser@Base 2.3
  audgui_hide_on_delete@Base 2.4~alpha1
@@ -142,8 +145,10 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_list_get_highlight@Base 3.2
  audgui_list_get_user@Base 3.2
  audgui_list_insert_rows@Base 3.2
- audgui_list_new@Base 3.2
+(optional)audgui_list_new@Base 3.2
+ audgui_list_new_real@Base 3.3.1
  audgui_list_row_at_point@Base 3.2
+ audgui_list_row_at_point_rounded@Base 3.3.1
  audgui_list_row_count@Base 3.2
  audgui_list_set_focus@Base 3.2
  audgui_list_set_highlight@Base 3.2
