@@ -2,36 +2,42 @@ Source: audacious
 Section: sound
 Priority: optional
 Maintainer: Debian Multimedia Maintainers <pkg-multimedia-maintainers@lists.alioth.debian.org>
-Uploaders: Chris Taylor <ctaylor@debian.org>,
-           Bilal Akhtar <bilalakhtar@ubuntu.com>,
-           Cyril Lavier <cyril.lavier@davromaniak.eu>
+Uploaders:
+ Chris Taylor <ctaylor@debian.org>,
+ Bilal Akhtar <bilalakhtar@ubuntu.com>,
+ Cyril Lavier <cyril.lavier@davromaniak.eu>
 Homepage: http://www.audacious-media-player.org/
-Build-Depends: autotools-dev (>= 20100122.1~),
-               debhelper (>= 9),
-               imagemagick,
-               libdbus-1-dev (>= 0.60),
-               libdbus-glib-1-dev (>= 0.60),
-               libgtk-3-dev,
-               libguess-dev,
-               libmcs-dev (>= 0.7),
-               librsvg2-bin,
-               libuchardet-dev
+Build-Depends:
+ autotools-dev (>= 20100122.1~),
+ debhelper (>= 9),
+ imagemagick,
+ libdbus-1-dev (>= 0.60),
+ libdbus-glib-1-dev (>= 0.60),
+ libgtk-3-dev,
+ libguess-dev,
+ libmcs-dev (>= 0.7),
+ librsvg2-bin,
+ libuchardet-dev
 Standards-Version: 3.9.3
 VCS-Browser: http://git.debian.org/?p=pkg-multimedia/audacious.git;a=summary
 VCS-Git: git://git.debian.org/pkg-multimedia/audacious.git
 
 Package: audacious
 Architecture: any
-Depends: audacious-plugins (>= 3.2),
-         dbus,
-         dbus-x11,
-         gtk2-engines-pixbuf,
-         libaudclient2 (= ${binary:Version}),
-         libaudcore1 (= ${binary:Version}),
-         ${misc:Depends},
-         ${shlibs:Depends}
-Replaces: libaudutil1, libsad2
-Recommends: unzip
+Depends:
+ audacious-plugins (>= 3.2),
+ dbus,
+ dbus-x11,
+ gtk2-engines-pixbuf,
+ libaudclient2 (= ${binary:Version}),
+ libaudcore1 (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends}
+Replaces:
+ libaudutil1,
+ libsad2
+Recommends:
+ unzip
 Description: small and fast audio player which supports lots of formats
  Audacious is a fork of beep-media-player which supports winamp skins
  and many codecs.
@@ -56,9 +62,14 @@ Package: audacious-dbg
 Section: debug
 Architecture: any
 Multi-Arch: same
-Depends: audacious (= ${binary:Version}), ${misc:Depends}
-Provides: libaudclient2-dbg, libaudcore1-dbg
-Recommends: audacious-plugins-dbg
+Depends:
+ audacious (= ${binary:Version}),
+ ${misc:Depends}
+Provides:
+ libaudclient2-dbg,
+ libaudcore1-dbg
+Recommends:
+ audacious-plugins-dbg
 Priority: extra
 Description: audacious media player (debugging symbols)
  Audacious is a fork of beep-media-player which supports winamp skins
@@ -85,14 +96,18 @@ Package: audacious-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libaudclient2 (= ${binary:Version}),
-         libaudcore1 (= ${binary:Version}),
-         libdbus-1-dev (>= 0.60),
-         libdbus-glib-1-dev (>= 0.60),
-         libgtk-3-dev,
-         libmcs-dev (>= 0.7),
-         ${misc:Depends}
-Provides: libaudclient-dev, libaudcore-dev, libaudid3tag-dev
+Depends:
+ libaudclient2 (= ${binary:Version}),
+ libaudcore1 (= ${binary:Version}),
+ libdbus-1-dev (>= 0.60),
+ libdbus-glib-1-dev (>= 0.60),
+ libgtk-3-dev,
+ libmcs-dev (>= 0.7),
+ ${misc:Depends}
+Provides:
+ libaudclient-dev,
+ libaudcore-dev,
+ libaudid3tag-dev
 Description: audacious development files
  Audacious is a fork of beep-media-player which supports winamp skins
  and many codecs.
@@ -122,7 +137,9 @@ Package: libaudclient2
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends}
 Description: audacious dbus remote control library
  Audacious is a fork of beep-media-player which supports winamp skins
  and many codecs.
@@ -147,7 +164,9 @@ Package: libaudcore1
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends}
 Description: audacious core engine library
  Audacious is a fork of beep-media-player which supports winamp skins
  and many codecs.
