@@ -6,21 +6,23 @@
 # Alessio D'Ascanio <g3ntaro@gmail.com>, 2004.
 # Diego 'Flameeyes' Pettenò <flameeyes@gentoo.org>, 2006.
 # Diego 'Flameeyes' Pettenò <flameeyes@gmail.com>, 2007.
+# Gaetano Ingrasciotta <gaetanoingrasciotta@gmail.com>, 2012.
+#   <gaetanoingrasciotta@gmail.com>, 2012.
 # Giuseppe D. B. <giuped@gmail.com>, 2012.
 # Jacopo Lorenzetti <jacopo.jl@gmail.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2012-09-15 12:17+0200\n"
-"PO-Revision-Date: 2012-07-26 23:36+0000\n"
-"Last-Translator: Giuseppe D. B. <giuped@gmail.com>\n"
+"POT-Creation-Date: 2012-12-09 22:42+0100\n"
+"PO-Revision-Date: 2012-10-26 22:14+0000\n"
+"Last-Translator: Gaetano Ingrasciotta <gaetanoingrasciotta@gmail.com>\n"
 "Language-Team: Italian\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/audacious/adder.c:75
 msgid "Searching ..."
@@ -42,67 +44,67 @@ msgstr "  (UTF-8 non valido)"
 msgid "Error importing Winamp EQF file '%s'"
 msgstr "Errore durante l'importazione del file EQF di Winamp '%s'"
 
-#: src/audacious/main.c:232
+#: src/audacious/main.c:233
 msgid "Skip backwards in playlist"
 msgstr "Salta indietro nella playlist"
 
-#: src/audacious/main.c:233
+#: src/audacious/main.c:234
 msgid "Start playing current playlist"
 msgstr "Avvia la riproduzione della playlist corrente"
 
-#: src/audacious/main.c:234
+#: src/audacious/main.c:235
 msgid "Pause current song"
 msgstr "Interrompi il brano corrente"
 
-#: src/audacious/main.c:235
+#: src/audacious/main.c:236
 msgid "Stop current song"
 msgstr "Ferma il brano corrente"
 
-#: src/audacious/main.c:236
+#: src/audacious/main.c:237
 msgid "Pause if playing, play otherwise"
 msgstr "Interrompi se in riproduzione, altrimenti riproduci"
 
-#: src/audacious/main.c:237
+#: src/audacious/main.c:238
 msgid "Skip forward in playlist"
 msgstr "Salta avanti nella playlist"
 
-#: src/audacious/main.c:238
+#: src/audacious/main.c:239
 msgid "Display Jump to File dialog"
 msgstr "Visualizza la finestra di dialogo Salta al file"
 
-#: src/audacious/main.c:239
+#: src/audacious/main.c:240
 msgid "Add files to the playlist"
 msgstr "Aggiunge file alla playlist"
 
-#: src/audacious/main.c:240
+#: src/audacious/main.c:241
 msgid "Add new files to a temporary playlist"
 msgstr "Aggiunge nuovi file a una playlist temporanea"
 
-#: src/audacious/main.c:241
+#: src/audacious/main.c:242
 msgid "Display the main window"
 msgstr "Visualizza la finestra principale"
 
-#: src/audacious/main.c:242
+#: src/audacious/main.c:243
 msgid "Show version"
 msgstr "Mostra versione"
 
-#: src/audacious/main.c:243
+#: src/audacious/main.c:244
 msgid "Print debugging messages"
 msgstr "Visualizza messaggi di debug"
 
-#: src/audacious/main.c:244
+#: src/audacious/main.c:245
 msgid "Headless mode (beta)"
 msgstr "Modalità headless (beta)"
 
-#: src/audacious/main.c:245
+#: src/audacious/main.c:246
 msgid "FILE..."
 msgstr "FILE…"
 
-#: src/audacious/main.c:257
+#: src/audacious/main.c:258
 msgid "- play multimedia files"
 msgstr "- riproduci file multimediali"
 
-#: src/audacious/main.c:264
+#: src/audacious/main.c:265
 #, c-format
 msgid ""
 "%s: %s\n"
@@ -111,7 +113,7 @@ msgstr ""
 "%s: %s\n"
 "Per maggiori informazioni prova `%s --help'.\n"
 
-#: src/audacious/main.c:546
+#: src/audacious/main.c:549
 msgid "Audacious"
 msgstr "Audacious"
 
@@ -127,11 +129,11 @@ msgstr "Impossibile %s %s: estensione file non supportata."
 
 #: src/audacious/playlist-files.c:52
 msgid "save"
-msgstr "salvare"
+msgstr "salva"
 
 #: src/audacious/playlist-files.c:52
 msgid "load"
-msgstr "caricare"
+msgstr "carica"
 
 #: src/audacious/playlist-new.c:121
 msgid "New Playlist"
@@ -152,12 +154,12 @@ msgstr ""
 #: src/audacious/plugin-preferences.c:50
 #, c-format
 msgid "About %s"
-msgstr ""
+msgstr "Riguardo %s"
 
 #: src/audacious/plugin-preferences.c:88
 #, c-format
 msgid "%s Settings"
-msgstr ""
+msgstr "%s Impostazioni"
 
 #: src/audacious/ui_preferences.c:69
 msgid "Audio"
@@ -194,7 +196,7 @@ msgstr "Titolo"
 
 #: src/audacious/ui_preferences.c:82
 msgid "Tracknumber"
-msgstr "Numero di traccia"
+msgstr "Numero traccia"
 
 #: src/audacious/ui_preferences.c:83 src/libaudgui/infopopup.c:198
 msgid "Genre"
@@ -278,7 +280,7 @@ msgstr "Turca"
 
 #: src/audacious/ui_preferences.c:114
 msgid "Floating point"
-msgstr ""
+msgstr "Virgola mobile"
 
 #: src/audacious/ui_preferences.c:130
 msgid "Album mode"
@@ -302,7 +304,7 @@ msgstr "ms"
 
 #: src/audacious/ui_preferences.c:141
 msgid "Soft clipping"
-msgstr ""
+msgstr "Clipping leggero"
 
 #: src/audacious/ui_preferences.c:143
 msgid "Use software volume control (not recommended)"
@@ -398,35 +400,36 @@ msgstr "Non caricare i metadati dei brani finché non vengono riprodotti"
 
 #: src/audacious/ui_preferences.c:201
 msgid "<b>Compatibility</b>"
-msgstr ""
+msgstr "<b>Compatibilità</b>"
 
 #: src/audacious/ui_preferences.c:202
 msgid "Interpret \\ (backward slash) as a folder delimiter"
-msgstr ""
+msgstr "Interpreta\\ (backslash) come un delimitatore di cartella"
 
 #: src/audacious/ui_preferences.c:209
 msgid "<b>Album Art</b>"
-msgstr ""
+msgstr "Cover Album"
 
 #: src/audacious/ui_preferences.c:210
 msgid "Search for images matching these words (comma-separated):"
-msgstr ""
+msgstr "Ricerca elementi contenenti le parole :"
 
 #: src/audacious/ui_preferences.c:212
 msgid "Exclude images matching these words (comma-separated):"
 msgstr ""
+"Escludi elementi corrispondenti alle seguenti parole (separati da virgola):"
 
 #: src/audacious/ui_preferences.c:214
 msgid "Search for images matching song file name"
-msgstr ""
+msgstr "Ricerca elementi corrispondenti al nome del brano"
 
 #: src/audacious/ui_preferences.c:216
 msgid "Search recursively"
-msgstr ""
+msgstr "Cerca ricorsivamente"
 
 #: src/audacious/ui_preferences.c:218
 msgid "Search depth:"
-msgstr ""
+msgstr "Ricerca avanzata:"
 
 #: src/audacious/ui_preferences.c:221
 msgid "<b>Popup Information</b>"
@@ -438,11 +441,11 @@ msgstr "Mostra Finestra informazioni"
 
 #: src/audacious/ui_preferences.c:224
 msgid "Popup delay (tenths of a second):"
-msgstr ""
+msgstr "Ritardo popup (decimi di secondo):"
 
 #: src/audacious/ui_preferences.c:227
 msgid "Show time scale for current song"
-msgstr ""
+msgstr "Mostra scala di tempo per il brano corrente"
 
 #: src/audacious/ui_preferences.c:241
 msgid "TITLE"
@@ -573,11 +576,7 @@ msgstr "Licenza"
 msgid "About Audacious"
 msgstr "Informazioni su Audacious"
 
-#: src/libaudgui/confirm.c:61
-msgid "Close Playlist"
-msgstr "Chiudi playlist"
-
-#: src/libaudgui/confirm.c:76
+#: src/libaudgui/confirm.c:67
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
@@ -586,11 +585,15 @@ msgstr ""
 "Sei sicuro di voler chiudere %s?  Se lo fai, qualunque modifica apportata "
 "dopo l'esportazione della playlist andrà persa."
 
-#: src/libaudgui/confirm.c:89
+#: src/libaudgui/confirm.c:74
+msgid "Close Playlist"
+msgstr "Chiudi playlist"
+
+#: src/libaudgui/confirm.c:78
 msgid "_Don't show this message again"
 msgstr "_Non mostrare più questo messaggio"
 
-#: src/libaudgui/confirm.c:126
+#: src/libaudgui/confirm.c:101
 msgid "Rename Playlist"
 msgstr "Rinomina playlist"
 
@@ -829,7 +832,7 @@ msgstr "Errore nell'aggiornamento dei metadati"
 
 #: src/libaudgui/infowin.c:319
 msgid "Track Information"
-msgstr "Informazioni sulla traccia"
+msgstr "Informazioni traccia"
 
 #: src/libaudgui/infowin.c:354
 msgid "<span size=\"small\">Format:</span>"
@@ -887,7 +890,7 @@ msgstr "Salta alla posizione"
 
 #: src/libaudgui/jump-to-time.c:61
 msgid "Enter time (minutes:seconds):"
-msgstr ""
+msgstr "Inserisci tempo (minuti:secondi):"
 
 #: src/libaudgui/playlists.c:33
 msgid "Export Playlist"
@@ -933,7 +936,7 @@ msgstr "Rimuovi dalla _coda"
 
 #: src/libaudgui/ui_jumptotrack.c:262
 msgid "Jump to Song"
-msgstr "Salta al brano"
+msgstr "Vai al brano"
 
 #: src/libaudgui/ui_jumptotrack.c:287
 msgid "Filter: "
@@ -949,7 +952,7 @@ msgstr "Ricorda"
 
 #: src/libaudgui/ui_jumptotrack.c:305
 msgid "Clea_r"
-msgstr "Ca_ncella"
+msgstr "Cancella"
 
 #: src/libaudgui/ui_jumptotrack.c:325
 msgid "Close on Jump"
@@ -990,6 +993,3 @@ msgid ""
 msgstr ""
 "\n"
 "(Ulteriori messaggi sono stati nascosti.)"
-
-#~ msgid "<b>Metadata</b>"
-#~ msgstr "<b>Metadati</b>"

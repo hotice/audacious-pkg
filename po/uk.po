@@ -8,13 +8,14 @@
 # NaiLi Rootaerc <theism@mail.ru>, 2012.
 # Rax Garfield <admin@dvizho.ks.ua>, 2012.
 # Rax Garfield (http://biokillaz.com/), 2012.
+# Rax Garfield <rax@rax.pp.ua>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2012-09-15 12:17+0200\n"
-"PO-Revision-Date: 2012-08-13 14:08+0000\n"
-"Last-Translator: Rax Garfield <admin@dvizho.ks.ua>\n"
+"POT-Creation-Date: 2012-12-09 22:42+0100\n"
+"PO-Revision-Date: 2012-10-01 13:10+0000\n"
+"Last-Translator: Rax Garfield <rax@rax.pp.ua>\n"
 "Language-Team: Ukrainian\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -44,67 +45,67 @@ msgstr "(недійсний UTF-8)"
 msgid "Error importing Winamp EQF file '%s'"
 msgstr "Не вдалося імпортувати Winamp EQF-файл «%s»"
 
-#: src/audacious/main.c:232
+#: src/audacious/main.c:233
 msgid "Skip backwards in playlist"
 msgstr "Перейти до попередньої доріжки у списку"
 
-#: src/audacious/main.c:233
+#: src/audacious/main.c:234
 msgid "Start playing current playlist"
 msgstr "Почати програвати поточний список"
 
-#: src/audacious/main.c:234
+#: src/audacious/main.c:235
 msgid "Pause current song"
 msgstr "Призупинити поточну пісню"
 
-#: src/audacious/main.c:235
+#: src/audacious/main.c:236
 msgid "Stop current song"
 msgstr "Зупинити поточну пісню"
 
-#: src/audacious/main.c:236
+#: src/audacious/main.c:237
 msgid "Pause if playing, play otherwise"
 msgstr "Призупинити, якщо що-небуть програється, в іншому випадку програвати"
 
-#: src/audacious/main.c:237
+#: src/audacious/main.c:238
 msgid "Skip forward in playlist"
 msgstr "Перейти до наступної доріжки у списку відтворення"
 
-#: src/audacious/main.c:238
+#: src/audacious/main.c:239
 msgid "Display Jump to File dialog"
 msgstr "Показати діалог переходу до файлу"
 
-#: src/audacious/main.c:239
+#: src/audacious/main.c:240
 msgid "Add files to the playlist"
 msgstr "Додати файли до списку відтворення"
 
-#: src/audacious/main.c:240
+#: src/audacious/main.c:241
 msgid "Add new files to a temporary playlist"
 msgstr "Додати нові файли до тимчасового списку відтворення"
 
-#: src/audacious/main.c:241
+#: src/audacious/main.c:242
 msgid "Display the main window"
 msgstr "Показати головне вікно"
 
-#: src/audacious/main.c:242
+#: src/audacious/main.c:243
 msgid "Show version"
 msgstr "Показати версію"
 
-#: src/audacious/main.c:243
+#: src/audacious/main.c:244
 msgid "Print debugging messages"
 msgstr "Друкувати повідомлення про налагодження"
 
-#: src/audacious/main.c:244
+#: src/audacious/main.c:245
 msgid "Headless mode (beta)"
 msgstr "Headless-режим (як демон і без X11, бета)"
 
-#: src/audacious/main.c:245
+#: src/audacious/main.c:246
 msgid "FILE..."
 msgstr "ФАЙЛ..."
 
-#: src/audacious/main.c:257
+#: src/audacious/main.c:258
 msgid "- play multimedia files"
 msgstr "— відтворити мультимедійні файли"
 
-#: src/audacious/main.c:264
+#: src/audacious/main.c:265
 #, c-format
 msgid ""
 "%s: %s\n"
@@ -113,7 +114,7 @@ msgstr ""
 "%s: %s\n"
 "Спробуйте `%s --help' для отримання докладнішого опису.\n"
 
-#: src/audacious/main.c:546
+#: src/audacious/main.c:549
 msgid "Audacious"
 msgstr "Audacious"
 
@@ -400,11 +401,11 @@ msgstr "Не завантажувати метадані доріжок до в�
 
 #: src/audacious/ui_preferences.c:201
 msgid "<b>Compatibility</b>"
-msgstr ""
+msgstr "<b>Сумісність</b>"
 
 #: src/audacious/ui_preferences.c:202
 msgid "Interpret \\ (backward slash) as a folder delimiter"
-msgstr ""
+msgstr "Вважати \\ (обернену косу риску) розділювачем тек"
 
 #: src/audacious/ui_preferences.c:209
 msgid "<b>Album Art</b>"
@@ -576,11 +577,7 @@ msgstr "Ліцензія"
 msgid "About Audacious"
 msgstr "Про Audacious"
 
-#: src/libaudgui/confirm.c:61
-msgid "Close Playlist"
-msgstr "Закрити список відтворення"
-
-#: src/libaudgui/confirm.c:76
+#: src/libaudgui/confirm.c:67
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
@@ -589,11 +586,15 @@ msgstr ""
 "Точно закрити %s? Якщо так, то всі зміни з моменту експорту списку "
 "відтворення будуть втрачені."
 
-#: src/libaudgui/confirm.c:89
+#: src/libaudgui/confirm.c:74
+msgid "Close Playlist"
+msgstr "Закрити список відтворення"
+
+#: src/libaudgui/confirm.c:78
 msgid "_Don't show this message again"
 msgstr "Не показувати це попередження _знову"
 
-#: src/libaudgui/confirm.c:126
+#: src/libaudgui/confirm.c:101
 msgid "Rename Playlist"
 msgstr "Перейменувати список відтворення"
 
@@ -995,6 +996,3 @@ msgid ""
 msgstr ""
 "\n"
 "(Наступні повідомлення були приховані.)"
-
-#~ msgid "<b>Metadata</b>"
-#~ msgstr "<b>Метадані</b>"
