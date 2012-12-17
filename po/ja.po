@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the Audacious package.
 #
 # Translators:
+#   <dritan86@gmail.com>, 2012.
 #   <m2330880989@shibuya-center.com>, 2012.
 # Shuuji Takahashi <shuuji3@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2012-09-15 12:17+0200\n"
-"PO-Revision-Date: 2012-07-26 08:11+0000\n"
-"Last-Translator: Shuuji Takahashi <shuuji3@gmail.com>\n"
+"POT-Creation-Date: 2012-12-09 22:42+0100\n"
+"PO-Revision-Date: 2012-10-11 10:30+0000\n"
+"Last-Translator: natird <dritan86@gmail.com>\n"
 "Language-Team: Japanese\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -38,67 +39,67 @@ msgstr "  (不正な UTF-8)"
 msgid "Error importing Winamp EQF file '%s'"
 msgstr "Winamp EQF ファイル '%s' のインポートエラー"
 
-#: src/audacious/main.c:232
+#: src/audacious/main.c:233
 msgid "Skip backwards in playlist"
 msgstr "プレイリストの一つ前の曲にジャンプする"
 
-#: src/audacious/main.c:233
+#: src/audacious/main.c:234
 msgid "Start playing current playlist"
 msgstr "現在のプレイリストで演奏を開始する"
 
-#: src/audacious/main.c:234
+#: src/audacious/main.c:235
 msgid "Pause current song"
 msgstr "現在の曲を一時停止する"
 
-#: src/audacious/main.c:235
+#: src/audacious/main.c:236
 msgid "Stop current song"
 msgstr "現在の曲を停止する"
 
-#: src/audacious/main.c:236
+#: src/audacious/main.c:237
 msgid "Pause if playing, play otherwise"
 msgstr "演奏していたら一時停止し, それ以外は演奏する"
 
-#: src/audacious/main.c:237
+#: src/audacious/main.c:238
 msgid "Skip forward in playlist"
 msgstr "プレイリストの一つ次の曲にジャンプする"
 
-#: src/audacious/main.c:238
+#: src/audacious/main.c:239
 msgid "Display Jump to File dialog"
 msgstr "ファイルダイアログへのジャンプを表示"
 
-#: src/audacious/main.c:239
+#: src/audacious/main.c:240
 msgid "Add files to the playlist"
 msgstr "プレイリストにファイルを追加"
 
-#: src/audacious/main.c:240
+#: src/audacious/main.c:241
 msgid "Add new files to a temporary playlist"
 msgstr "新しいファイルを一時プレイリストに追加する"
 
-#: src/audacious/main.c:241
+#: src/audacious/main.c:242
 msgid "Display the main window"
 msgstr "メインウィンドウを表示する"
 
-#: src/audacious/main.c:242
+#: src/audacious/main.c:243
 msgid "Show version"
 msgstr "バージョンを表示する"
 
-#: src/audacious/main.c:243
+#: src/audacious/main.c:244
 msgid "Print debugging messages"
 msgstr "デバッグメッセージを表示する"
 
-#: src/audacious/main.c:244
+#: src/audacious/main.c:245
 msgid "Headless mode (beta)"
 msgstr "ヘッドレスモード (ベータ)"
 
-#: src/audacious/main.c:245
+#: src/audacious/main.c:246
 msgid "FILE..."
 msgstr "ファイル..."
 
-#: src/audacious/main.c:257
+#: src/audacious/main.c:258
 msgid "- play multimedia files"
 msgstr "- マルチメディアファイルを再生する"
 
-#: src/audacious/main.c:264
+#: src/audacious/main.c:265
 #, c-format
 msgid ""
 "%s: %s\n"
@@ -107,7 +108,7 @@ msgstr ""
 "%s: %s\n"
 "詳しくは `%s --help' を実行して下さい.\n"
 
-#: src/audacious/main.c:546
+#: src/audacious/main.c:549
 msgid "Audacious"
 msgstr "Audacious"
 
@@ -394,11 +395,11 @@ msgstr "再生が終わるまで曲のメタデータを読み込まない"
 
 #: src/audacious/ui_preferences.c:201
 msgid "<b>Compatibility</b>"
-msgstr ""
+msgstr "<b>Compatibility</b>"
 
 #: src/audacious/ui_preferences.c:202
 msgid "Interpret \\ (backward slash) as a folder delimiter"
-msgstr ""
+msgstr "Interpret \\ (backward slash) as a folder delimiter"
 
 #: src/audacious/ui_preferences.c:209
 msgid "<b>Album Art</b>"
@@ -568,11 +569,7 @@ msgstr "ライセンス"
 msgid "About Audacious"
 msgstr "Audacious について"
 
-#: src/libaudgui/confirm.c:61
-msgid "Close Playlist"
-msgstr "プレイリストを閉じる"
-
-#: src/libaudgui/confirm.c:76
+#: src/libaudgui/confirm.c:67
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
@@ -580,11 +577,15 @@ msgid ""
 msgstr ""
 "本当に %s を閉じますか？ 変更が加えられていた場合、保存されずに破棄されます。"
 
-#: src/libaudgui/confirm.c:89
+#: src/libaudgui/confirm.c:74
+msgid "Close Playlist"
+msgstr "プレイリストを閉じる"
+
+#: src/libaudgui/confirm.c:78
 msgid "_Don't show this message again"
 msgstr "このメッセージを二度と表示しない(_D)"
 
-#: src/libaudgui/confirm.c:126
+#: src/libaudgui/confirm.c:101
 msgid "Rename Playlist"
 msgstr "プレイリストをリネーム"
 
@@ -984,6 +985,3 @@ msgid ""
 msgstr ""
 "\n"
 "(追加のメッセージが隠れているかもしれません。)"
-
-#~ msgid "<b>Metadata</b>"
-#~ msgstr "<b>メタデータ</b>"

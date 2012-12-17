@@ -1733,7 +1733,7 @@ void playlist_sort_selected_by_title (int playlist_num, int (* compare)
 
     CompareData data = {COMPARE_TYPE_TITLE, (CompareFunc) compare};
     if (entries_are_scanned (playlist, TRUE))
-        sort (playlist, & data);
+        sort_selected (playlist, & data);
 
     LEAVE;
 }
@@ -2237,7 +2237,7 @@ int playback_entry_get_length (void)
     ENTER;
 
     Entry * entry = get_playback_entry (FALSE, TRUE);
-    int length = entry->length;
+    int length = entry ? entry->length : 0;
 
     LEAVE_RET (length);
 }

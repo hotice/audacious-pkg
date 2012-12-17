@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Audacious\n"
 "Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
-"POT-Creation-Date: 2012-09-15 12:17+0200\n"
-"PO-Revision-Date: 2012-07-26 04:46+0000\n"
+"POT-Creation-Date: 2012-12-09 22:42+0100\n"
+"PO-Revision-Date: 2012-09-28 04:52+0000\n"
 "Last-Translator: Algimantas Margevičius <gymka@archlinux.lt>\n"
 "Language-Team: Lithuanian\n"
 "Language: lt\n"
@@ -45,67 +45,67 @@ msgstr "  (netinkamas UTF-8)"
 msgid "Error importing Winamp EQF file '%s'"
 msgstr "Klaida įkeliant Winamp EQF failą „%s“"
 
-#: src/audacious/main.c:232
+#: src/audacious/main.c:233
 msgid "Skip backwards in playlist"
 msgstr "Grojaraštyje eiti atgal"
 
-#: src/audacious/main.c:233
+#: src/audacious/main.c:234
 msgid "Start playing current playlist"
 msgstr "Pradėti groti dabartinį grojaraštį"
 
-#: src/audacious/main.c:234
+#: src/audacious/main.c:235
 msgid "Pause current song"
 msgstr "Pristabdyti grojamą dainą"
 
-#: src/audacious/main.c:235
+#: src/audacious/main.c:236
 msgid "Stop current song"
 msgstr "Sustabdyti grojamą dainą"
 
-#: src/audacious/main.c:236
+#: src/audacious/main.c:237
 msgid "Pause if playing, play otherwise"
 msgstr "Pristabdyti, jei grojama, kitu atveju groti"
 
-#: src/audacious/main.c:237
+#: src/audacious/main.c:238
 msgid "Skip forward in playlist"
 msgstr "Grojaraštyje eiti pirmyn"
 
-#: src/audacious/main.c:238
+#: src/audacious/main.c:239
 msgid "Display Jump to File dialog"
 msgstr "Rodyti šokti į bylą langą"
 
-#: src/audacious/main.c:239
+#: src/audacious/main.c:240
 msgid "Add files to the playlist"
 msgstr "Pridėti failus į grojaraštį"
 
-#: src/audacious/main.c:240
+#: src/audacious/main.c:241
 msgid "Add new files to a temporary playlist"
 msgstr "Pridėti naujus failus į laikiną grojaraštį"
 
-#: src/audacious/main.c:241
+#: src/audacious/main.c:242
 msgid "Display the main window"
 msgstr "Parodyti pagrindinį langą"
 
-#: src/audacious/main.c:242
+#: src/audacious/main.c:243
 msgid "Show version"
 msgstr "Rodyti versiją"
 
-#: src/audacious/main.c:243
+#: src/audacious/main.c:244
 msgid "Print debugging messages"
 msgstr "Rodyti derinimo pranešimus"
 
-#: src/audacious/main.c:244
+#: src/audacious/main.c:245
 msgid "Headless mode (beta)"
 msgstr "Begalvis režimas (beta)"
 
-#: src/audacious/main.c:245
+#: src/audacious/main.c:246
 msgid "FILE..."
 msgstr "FAILAS..."
 
-#: src/audacious/main.c:257
+#: src/audacious/main.c:258
 msgid "- play multimedia files"
 msgstr "- groti daugialypės terpės failus"
 
-#: src/audacious/main.c:264
+#: src/audacious/main.c:265
 #, c-format
 msgid ""
 "%s: %s\n"
@@ -114,7 +114,7 @@ msgstr ""
 "%s: %s\n"
 "Bandykite „%s --help“ išsamesniai informacijai.\n"
 
-#: src/audacious/main.c:546
+#: src/audacious/main.c:549
 msgid "Audacious"
 msgstr "Audacious"
 
@@ -401,11 +401,11 @@ msgstr "Kol negrojama, dainom neįkrauti meta duomenų"
 
 #: src/audacious/ui_preferences.c:201
 msgid "<b>Compatibility</b>"
-msgstr ""
+msgstr "<b>Suderinamumas</b>"
 
 #: src/audacious/ui_preferences.c:202
 msgid "Interpret \\ (backward slash) as a folder delimiter"
-msgstr ""
+msgstr "Laikyti \\ (įžambinį kairįjį brūkšnį) aplanko skirtuku"
 
 #: src/audacious/ui_preferences.c:209
 msgid "<b>Album Art</b>"
@@ -578,11 +578,7 @@ msgstr "Licencija"
 msgid "About Audacious"
 msgstr "Apie Audacious"
 
-#: src/libaudgui/confirm.c:61
-msgid "Close Playlist"
-msgstr "Užverti grojaraštį"
-
-#: src/libaudgui/confirm.c:76
+#: src/libaudgui/confirm.c:67
 #, c-format
 msgid ""
 "Are you sure you want to close %s?  If you do, any changes made since the "
@@ -591,11 +587,15 @@ msgstr ""
 "Ar tu tikrai nori uždaryti %s?  Jei taip, visi pakeitimai padaryti po "
 "grojaraščio eksportavimo bus prarasti."
 
-#: src/libaudgui/confirm.c:89
+#: src/libaudgui/confirm.c:74
+msgid "Close Playlist"
+msgstr "Užverti grojaraštį"
+
+#: src/libaudgui/confirm.c:78
 msgid "_Don't show this message again"
 msgstr "_Daugiau neberodyti šio pranešimo"
 
-#: src/libaudgui/confirm.c:126
+#: src/libaudgui/confirm.c:101
 msgid "Rename Playlist"
 msgstr "Pervadinti grojaraštį"
 
@@ -995,6 +995,3 @@ msgid ""
 msgstr ""
 "\n"
 "(Sekantys pranešimai paslėpti.)"
-
-#~ msgid "<b>Metadata</b>"
-#~ msgstr "<b>Meta duomenys</b>"
