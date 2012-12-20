@@ -1,3 +1,9 @@
+audacious (3.3.3-2) experimental; urgency=low
+
+  * Move <libaudcore/audio.h> into the Multi-Arch domain. (Closes: #674492)
+
+ -- Alessio Treglia <alessio@debian.org>  Thu, 20 Dec 2012 20:53:12 +0000
+
 audacious (3.3.3-1) experimental; urgency=low
 
   * New upstream release.
