@@ -22,7 +22,7 @@ override_dh_auto_install:
 	# Move the arch-specific headers into the multiarch domain
 	cd debian/tmp/usr/include && \
 	mkdir -p $(DEB_HOST_MULTIARCH)/libaudcore && \
-	mv audacious/audio.h $(DEB_HOST_MULTIARCH)/libaudcore/
+	mv libaudcore/audio.h $(DEB_HOST_MULTIARCH)/libaudcore/
 
 override_dh_strip:
 	dh_strip --dbg-package=audacious-dbg
