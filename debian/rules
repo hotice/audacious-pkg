@@ -1,5 +1,6 @@
 #!/usr/bin/make -f
 
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 DEB_BUILD_ARCH ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 
 ifeq ($(DEB_BUILD_ARCH),i386)
@@ -15,6 +16,13 @@ LDFLAGS += -Wl,-z,defs -Wl,--as-needed
 override_dh_auto_configure:
 	dh_auto_configure -- --disable-rpath --enable-chardet $(additional_confflags) \
 		--with-buildstamp="$(shell dpkg-vendor --query vendor) package"
+
+override_dh_auto_install:
+	dh_auto_install
+	# Move the arch-specific headers into the multiarch domain
+	cd debian/tmp/usr/include && \
+	mkdir -p $(DEB_HOST_MULTIARCH)/libaudcore && \
+	mv audacious/audio.h $(DEB_HOST_MULTIARCH)/libaudcore/
 
 override_dh_strip:
 	dh_strip --dbg-package=audacious-dbg
