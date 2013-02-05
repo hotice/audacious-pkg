@@ -1,10 +1,10 @@
-audacious (3.3.4-1) UNRELEASED; urgency=low
+audacious (3.3.4-1) experimental; urgency=low
 
   * New upstream release.
   * Fix Vcs-* tags.
   * Bump Standards.
 
- -- Alessio Treglia <alessio@debian.org>  Tue, 05 Feb 2013 08:29:08 +0000
+ -- Alessio Treglia <alessio@debian.org>  Tue, 05 Feb 2013 08:29:49 +0000
 
 audacious (3.3.3-2) experimental; urgency=low
 
