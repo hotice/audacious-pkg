@@ -20,8 +20,8 @@ Build-Depends:
  librsvg2-bin,
  libuchardet-dev
 Standards-Version: 3.9.3
-VCS-Browser: http://git.debian.org/?p=pkg-multimedia/audacious.git;a=summary
-VCS-Git: git://git.debian.org/pkg-multimedia/audacious.git
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/audacious.git
+Vcs-Git: git://anonscm.debian.org/pkg-multimedia/audacious.git
 
 Package: audacious
 Architecture: any
