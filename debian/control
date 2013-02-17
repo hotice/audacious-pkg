@@ -40,7 +40,7 @@ Replaces:
 Recommends:
  unzip
 Description: small and fast audio player which supports lots of formats
- Audacious is a fork of beep-media-player which supports winamp skins
+ Audacious is a fork of beep-media-player which supports Winamp skins
  and many codecs.
  .
  In the default install, the following codecs are supported:
@@ -73,7 +73,7 @@ Recommends:
  audacious-plugins-dbg
 Priority: extra
 Description: audacious media player (debugging symbols)
- Audacious is a fork of beep-media-player which supports winamp skins
+ Audacious is a fork of beep-media-player which supports Winamp skins
  and many codecs.
  .
  In the default install, the following codecs are supported:
@@ -110,7 +110,7 @@ Provides:
  libaudcore-dev,
  libaudid3tag-dev
 Description: audacious development files
- Audacious is a fork of beep-media-player which supports winamp skins
+ Audacious is a fork of beep-media-player which supports Winamp skins
  and many codecs.
  .
  In the default install, the following codecs are supported:
@@ -142,8 +142,8 @@ Pre-Depends:
 Depends:
  ${misc:Depends},
  ${shlibs:Depends}
-Description: audacious dbus remote control library
- Audacious is a fork of beep-media-player which supports winamp skins
+Description: audacious D-Bus remote control library
+ Audacious is a fork of beep-media-player which supports Winamp skins
  and many codecs.
  .
  In the default install, the following codecs are supported:
@@ -171,7 +171,7 @@ Depends:
  ${misc:Depends},
  ${shlibs:Depends}
 Description: audacious core engine library
- Audacious is a fork of beep-media-player which supports winamp skins
+ Audacious is a fork of beep-media-player which supports Winamp skins
  and many codecs.
  .
  In the default install, the following codecs are supported:
