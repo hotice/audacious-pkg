@@ -16,7 +16,6 @@ Build-Depends:
  libdbus-glib-1-dev (>= 0.60),
  libgtk-3-dev,
  libguess-dev,
- libmcs-dev (>= 0.7),
  librsvg2-bin,
  libuchardet-dev
 Standards-Version: 3.9.4
