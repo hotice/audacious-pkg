@@ -25,7 +25,7 @@ Vcs-Git: git://anonscm.debian.org/pkg-multimedia/audacious.git
 Package: audacious
 Architecture: any
 Depends:
- audacious-plugins (>= 3.2),
+ audacious-plugins (>= ${source:Upstream-Version}),
  dbus,
  dbus-x11,
  gtk2-engines-pixbuf,
