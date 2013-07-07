@@ -1,3 +1,14 @@
+audacious (3.4-1) unstable; urgency=low
+
+  * New upstream release:
+    - Fix regression on reading m3u files containing empty
+      lines. (Closes: #705899)
+  * Tighten runtime dependency on audacious-plugins. (Closes: #708693)
+  * Update debian/copyright.
+  * Remove libmcs-dev from audacious-dev's Dependency field.
+
+ -- Alessio Treglia <alessio@debian.org>  Sun, 07 Jul 2013 16:46:38 +0100
+
 audacious (3.3.4-2) unstable; urgency=low
 
   * Upload to unstable.
