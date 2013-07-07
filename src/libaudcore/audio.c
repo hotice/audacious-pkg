@@ -22,7 +22,53 @@
 #include <math.h>
 
 #include "audio.h"
-#include "config.h"
+
+#define INTERLACE_LOOP(TYPE) \
+for (int c = 0; c < channels; c ++) \
+{ \
+    const TYPE * get = in[c]; \
+    const TYPE * end = get + frames; \
+    TYPE * set = (TYPE *) out + c; \
+    while (get < end) \
+    { \
+        * set = * get ++; \
+        set += channels; \
+    } \
+}
+
+EXPORT void audio_interlace (const void * const * in, int format, int channels,
+ void * out, int frames)
+{
+    switch (format)
+    {
+    case FMT_FLOAT:
+        INTERLACE_LOOP (float);
+        break;
+
+    case FMT_S8:
+    case FMT_U8:
+        INTERLACE_LOOP (int8_t);
+        break;
+
+    case FMT_S16_LE:
+    case FMT_S16_BE:
+    case FMT_U16_LE:
+    case FMT_U16_BE:
+        INTERLACE_LOOP (int16_t);
+        break;
+
+    case FMT_S24_LE:
+    case FMT_S24_BE:
+    case FMT_U24_LE:
+    case FMT_U24_BE:
+    case FMT_S32_LE:
+    case FMT_S32_BE:
+    case FMT_U32_LE:
+    case FMT_U32_BE:
+        INTERLACE_LOOP (int32_t);
+        break;
+    }
+}
 
 #define FROM_INT_LOOP(NAME, TYPE, SWAP, OFFSET, RANGE) \
 static void NAME (const TYPE * in, float * out, int samples) \
@@ -43,27 +89,23 @@ static void NAME (const float * in, TYPE * out, int samples) \
     } \
 }
 
-static inline int8_t NOOP8 (int8_t i) {return i;}
-static inline int16_t NOOP16 (int16_t i) {return i;}
-static inline int32_t NOOP32 (int32_t i) {return i;}
+FROM_INT_LOOP (from_s8, int8_t, , 0x00, 0x7f)
+FROM_INT_LOOP (from_u8, int8_t, , 0x80, 0x7f)
+FROM_INT_LOOP (from_s16, int16_t, , 0x0000, 0x7fff)
+FROM_INT_LOOP (from_u16, int16_t, , 0x8000, 0x7fff)
+FROM_INT_LOOP (from_s24, int32_t, , 0x000000, 0x7fffff)
+FROM_INT_LOOP (from_u24, int32_t, , 0x800000, 0x7fffff)
+FROM_INT_LOOP (from_s32, int32_t, , 0x00000000, 0x7fffffff)
+FROM_INT_LOOP (from_u32, int32_t, , 0x80000000, 0x7fffffff)
 
-FROM_INT_LOOP (from_s8, int8_t, NOOP8, 0x00, 0x7f)
-FROM_INT_LOOP (from_u8, int8_t, NOOP8, 0x80, 0x7f)
-FROM_INT_LOOP (from_s16, int16_t, NOOP16, 0x0000, 0x7fff)
-FROM_INT_LOOP (from_u16, int16_t, NOOP16, 0x8000, 0x7fff)
-FROM_INT_LOOP (from_s24, int32_t, NOOP32, 0x000000, 0x7fffff)
-FROM_INT_LOOP (from_u24, int32_t, NOOP32, 0x800000, 0x7fffff)
-FROM_INT_LOOP (from_s32, int32_t, NOOP32, 0x00000000, 0x7fffffff)
-FROM_INT_LOOP (from_u32, int32_t, NOOP32, 0x80000000, 0x7fffffff)
-
-TO_INT_LOOP (to_s8, int8_t, NOOP8, 0x00, 0x7f)
-TO_INT_LOOP (to_u8, int8_t, NOOP8, 0x80, 0x7f)
-TO_INT_LOOP (to_s16, int16_t, NOOP16, 0x0000, 0x7fff)
-TO_INT_LOOP (to_u16, int16_t, NOOP16, 0x8000, 0x7fff)
-TO_INT_LOOP (to_s24, int32_t, NOOP32, 0x000000, 0x7fffff)
-TO_INT_LOOP (to_u24, int32_t, NOOP32, 0x800000, 0x7fffff)
-TO_INT_LOOP (to_s32, int32_t, NOOP32, 0x00000000, 0x7fffffff)
-TO_INT_LOOP (to_u32, int32_t, NOOP32, 0x80000000, 0x7fffffff)
+TO_INT_LOOP (to_s8, int8_t, , 0x00, 0x7f)
+TO_INT_LOOP (to_u8, int8_t, , 0x80, 0x7f)
+TO_INT_LOOP (to_s16, int16_t, , 0x0000, 0x7fff)
+TO_INT_LOOP (to_u16, int16_t, , 0x8000, 0x7fff)
+TO_INT_LOOP (to_s24, int32_t, , 0x000000, 0x7fffff)
+TO_INT_LOOP (to_u24, int32_t, , 0x800000, 0x7fffff)
+TO_INT_LOOP (to_s32, int32_t, , 0x00000000, 0x7fffffff)
+TO_INT_LOOP (to_u32, int32_t, , 0x80000000, 0x7fffffff)
 
 static inline int16_t SWAP16 (int16_t i) {return GUINT16_SWAP_LE_BE (i);}
 static inline int32_t SWAP32 (int32_t i) {return GUINT32_SWAP_LE_BE (i);}

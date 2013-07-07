@@ -19,8 +19,6 @@
  * the use of this software.
  */
 
-#include "config.h"
-
 #include <glib.h>
 #include <string.h>
 
@@ -185,7 +183,6 @@ void init_dbus()
         return;
     }
 
-    g_type_init();
     g_object_new(audacious_rc_get_type(), NULL);
     g_object_new(mpris_root_get_type(), NULL);
     mpris = g_object_new(mpris_player_get_type(), NULL);
@@ -362,7 +359,7 @@ bool_t mpris_player_play (MprisPlayer * obj, GError * * error)
 
 bool_t mpris_player_repeat(MprisPlayer * obj, bool_t rpt, GError ** error)
 {
-    fprintf (stderr, "implement me\n");
+    set_bool (NULL, "repeat", rpt);
     return TRUE;
 }
 
@@ -897,11 +894,7 @@ bool_t audacious_rc_show_filebrowser(RemoteObject * obj, bool_t show, GError ** 
 
 bool_t audacious_rc_play_pause (RemoteObject * obj, GError * * error)
 {
-    if (drct_get_playing ())
-        drct_pause ();
-    else
-        drct_play ();
-
+    drct_play_pause ();
     return TRUE;
 }
 

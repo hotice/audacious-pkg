@@ -27,7 +27,6 @@
 #define AUD_STOCK_PLAYLIST    "aud-playlist"
 #define AUD_STOCK_PLUGIN      "aud-plugin"
 #define AUD_STOCK_QUEUETOGGLE "aud-queuetoggle"
-#define AUD_STOCK_RANDOMIZEPL "aud-randomizepl"
 
 void audgui_register_stock_icons(void);
 
@@ -58,6 +57,7 @@ void audgui_infopopup_hide (void);
 /* infowin.c */
 void audgui_infowin_show (int playlist, int entry);
 void audgui_infowin_show_current (void);
+void audgui_infowin_hide (void);
 
 /* jump-to-time.c */
 void audgui_jump_to_time (void);

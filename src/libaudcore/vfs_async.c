@@ -20,7 +20,6 @@
 #include <glib.h>
 #include <pthread.h>
 
-#include "config.h"
 #include "vfs_async.h"
 
 typedef struct {

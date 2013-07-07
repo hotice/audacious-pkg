@@ -55,6 +55,7 @@ enum {
  PLAYLIST_SORT_DATE,
  PLAYLIST_SORT_TRACK,
  PLAYLIST_SORT_FORMATTED_TITLE,
+ PLAYLIST_SORT_LENGTH,
  PLAYLIST_SORT_SCHEMES};
 
 typedef bool_t (* PlaylistFilterFunc) (const char * filename, void * user);
@@ -98,15 +99,13 @@ bool_t playlist_prev_song (int playlist);
 bool_t playlist_next_song (int playlist, bool_t repeat);
 
 int playback_entry_get_position (void);
+char * playback_entry_get_filename (void);
 PluginHandle * playback_entry_get_decoder (void);
 Tuple * playback_entry_get_tuple (void);
 char * playback_entry_get_title (void);
 int playback_entry_get_length (void);
 
 void playback_entry_set_tuple (Tuple * tuple);
-
-int playback_entry_get_start_time (void);
-int playback_entry_get_end_time (void);
 
 /* playlist-utils.c */
 void load_playlists (void);

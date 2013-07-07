@@ -18,7 +18,6 @@
  */
 
 #include <dirent.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef _WIN32
@@ -38,7 +37,6 @@
 
 #include <libaudcore/audstrings.h>
 
-#include "config.h"
 #include "debug.h"
 #include "i18n.h"
 #include "misc.h"
@@ -105,17 +103,6 @@ char * construct_uri (const char * string, const char * playlist_name)
         str_encode_percent (string, -1, buf + pathlen);
 
     return strdup (buf);
-}
-
-/* local files -- not URI's */
-int file_get_mtime (const char * filename)
-{
-    struct stat info;
-
-    if (stat (filename, & info))
-        return -1;
-
-    return info.st_mtime;
 }
 
 void

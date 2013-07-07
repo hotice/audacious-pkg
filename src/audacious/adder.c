@@ -27,9 +27,8 @@
 #include <libaudcore/audstrings.h>
 #include <libaudcore/hook.h>
 
-#include "config.h"
+#include "drct.h"
 #include "i18n.h"
-#include "playback.h"
 #include "playlist.h"
 #include "plugins.h"
 #include "main.h"
@@ -408,13 +407,10 @@ static bool_t add_finish (void * unused)
 
         if (result->play && playlist_entry_count (playlist) > count)
         {
-            if (get_bool (NULL, "shuffle"))
-                playlist_next_song (playlist, FALSE);
-            else
+            if (! get_bool (NULL, "shuffle"))
                 playlist_set_position (playlist, result->at);
 
-            playlist_set_playing (playlist);
-            playback_play (0, FALSE);
+            drct_play_playlist (playlist);
         }
 
     FREE:
@@ -551,23 +547,30 @@ void playlist_entry_insert_filtered (int playlist, int at,
 
 bool_t playlist_add_in_progress (int playlist)
 {
-    int playlist_id = playlist_get_unique_id (playlist);
-    g_return_val_if_fail (playlist_id >= 0, FALSE);
-
     pthread_mutex_lock (& mutex);
 
-    for (GList * node = add_tasks; node; node = node->next)
+    if (playlist >= 0)
     {
-        if (((AddTask *) node->data)->playlist_id == playlist_id)
+        int playlist_id = playlist_get_unique_id (playlist);
+
+        for (GList * node = add_tasks; node; node = node->next)
+        {
+            if (((AddTask *) node->data)->playlist_id == playlist_id)
+                goto YES;
+        }
+
+        if (current_playlist_id == playlist_id)
             goto YES;
+
+        for (GList * node = add_results; node; node = node->next)
+        {
+            if (((AddResult *) node->data)->playlist_id == playlist_id)
+                goto YES;
+        }
     }
-
-    if (current_playlist_id == playlist_id)
-        goto YES;
-
-    for (GList * node = add_results; node; node = node->next)
+    else
     {
-        if (((AddResult *) node->data)->playlist_id == playlist_id)
+        if (add_tasks || current_playlist_id >= 0 || add_results)
             goto YES;
     }
 

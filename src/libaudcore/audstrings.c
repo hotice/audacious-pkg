@@ -25,11 +25,11 @@
 #include <glib.h>
 #include <string.h>
 #include <ctype.h>
+#include <locale.h>
 
 #include <audacious/i18n.h>
 
 #include "audstrings.h"
-#include "config.h"
 
 #define FROM_HEX(c) ((c) < 'A' ? (c) - '0' : (c) < 'a' ? 10 + (c) - 'A' : 10 + (c) - 'a')
 #define TO_HEX(i) ((i) < 10 ? '0' + (i) : 'A' + (i) - 10)
@@ -145,7 +145,8 @@ EXPORT char * filename_to_uri (const char * name)
     char * utf8 = g_locale_to_utf8 (name, -1, NULL, NULL, NULL);
     if (! utf8)
     {
-        fprintf (stderr, "Cannot convert filename from system locale: %s\n", name);
+        const char * locale = setlocale (LC_ALL, NULL);
+        fprintf (stderr, "Cannot convert filename from system locale (%s): %s\n", locale, name);
         return NULL;
     }
 
@@ -185,7 +186,10 @@ EXPORT char * uri_to_filename (const char * uri)
 
     char * name = g_locale_from_utf8 (buf, -1, NULL, NULL, NULL);
     if (! name)
-        fprintf (stderr, "Cannot convert filename to system locale: %s\n", buf);
+    {
+        const char * locale = setlocale (LC_ALL, NULL);
+        fprintf (stderr, "Cannot convert filename to system locale (%s): %s\n", locale, buf);
+    }
 
     return name;
 }
@@ -534,6 +538,46 @@ EXPORT char * double_to_string (double val)
     * c = 0;
 
     return s;
+}
+
+EXPORT bool_t string_to_int_array (const char * string, int * array, int count)
+{
+    char * * split = g_strsplit (string, ",", -1);
+    if (g_strv_length (split) != count)
+        goto ERR;
+
+    for (int i = 0; i < count; i ++)
+    {
+        if (! string_to_int (split[i], & array[i]))
+            goto ERR;
+    }
+
+    g_strfreev (split);
+    return TRUE;
+
+ERR:
+    g_strfreev (split);
+    return FALSE;
+}
+
+EXPORT char * int_array_to_string (const int * array, int count)
+{
+    char * * split = g_malloc0 (sizeof (char *) * (count + 1));
+
+    for (int i = 0; i < count; i ++)
+    {
+        split[i] = int_to_string (array[i]);
+        if (! split[i])
+            goto ERR;
+    }
+
+    char * string = g_strjoinv (",", split);
+    g_strfreev (split);
+    return string;
+
+ERR:
+    g_strfreev (split);
+    return NULL;
 }
 
 EXPORT bool_t string_to_double_array (const char * string, double * array, int count)

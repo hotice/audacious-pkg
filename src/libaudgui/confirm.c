@@ -23,7 +23,6 @@
 #include <audacious/misc.h>
 #include <audacious/playlist.h>
 
-#include "config.h"
 #include "libaudgui-gtk.h"
 
 static void no_confirm_cb (GtkToggleButton * toggle)

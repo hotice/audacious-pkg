@@ -20,7 +20,6 @@
 #include <glib.h>
 #include <pthread.h>
 
-#include "config.h"
 #include "core.h"
 #include "hook.h"
 

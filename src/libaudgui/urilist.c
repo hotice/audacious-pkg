@@ -25,7 +25,6 @@
 #include <libaudcore/audstrings.h>
 #include <libaudcore/vfs.h>
 
-#include "config.h"
 #include "libaudgui.h"
 
 typedef void (* ForEachFunc) (char *, void *);

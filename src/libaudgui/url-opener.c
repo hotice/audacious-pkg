@@ -23,7 +23,6 @@
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
 
-#include "config.h"
 #include "init.h"
 #include "libaudgui.h"
 

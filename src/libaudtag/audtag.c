@@ -22,7 +22,6 @@
 #include <libaudcore/tuple.h>
 
 #include "audtag.h"
-#include "config.h"
 #include "tag_module.h"
 #include "util.h"
 

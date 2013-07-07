@@ -22,7 +22,6 @@
 
 #include <glib.h>
 
-#include "config.h"
 #include "index.h"
 
 struct _Index {

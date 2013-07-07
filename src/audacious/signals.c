@@ -22,7 +22,6 @@
 
 #include <libaudcore/hook.h>
 
-#include "config.h"
 #include "main.h"
 
 #ifdef HAVE_SIGWAIT

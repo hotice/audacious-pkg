@@ -41,11 +41,6 @@ enum {
  INPUT_KEY_MIME,
  INPUT_KEYS};
 
-typedef struct {
-    void * about_window;
-    void * config_window;
-} PluginMiscData;
-
 /* plugin-init.c */
 void start_plugins_one (void);
 void start_plugins_two (void);
@@ -57,12 +52,10 @@ void plugin_registry_load (void);
 void plugin_registry_prune (void);
 void plugin_registry_save (void);
 
-void plugin_register (const char * path);
-void plugin_register_loaded (const char * path, Plugin * header);
+void plugin_register (const char * path, int timestamp);
 
-const void * plugin_get_header_no_load (PluginHandle * plugin);
 void plugin_set_enabled (PluginHandle * plugin, bool_t enabled);
-PluginMiscData * plugin_get_misc_data (PluginHandle * plugin);
+void * plugin_get_misc_data (PluginHandle * plugin, int size);
 
 PluginHandle * transport_plugin_for_scheme (const char * scheme);
 PluginHandle * playlist_plugin_for_extension (const char * extension);
@@ -76,7 +69,7 @@ bool_t input_plugin_has_infowin (PluginHandle * plugin);
 /* pluginenum.c */
 void plugin_system_init (void);
 void plugin_system_cleanup (void);
-void plugin_load (const char * path);
+Plugin * plugin_load (const char * path);
 
 #else
 

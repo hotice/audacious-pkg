@@ -37,7 +37,6 @@
 #include "misc.h"
 #include "plugin.h"
 #include "plugins.h"
-#include "util.h"
 
 #define FILENAME "plugin-registry"
 #define FORMAT 8
@@ -64,7 +63,7 @@ struct PluginHandle {
     int priority;
     bool_t has_about, has_configure, enabled;
     GList * watches;
-    PluginMiscData misc;
+    void * misc;
 
     union {
         TransportPluginData t;
@@ -115,8 +114,7 @@ static PluginHandle * plugin_new (char * path, bool_t confirmed, bool_t
     plugin->has_configure = FALSE;
     plugin->enabled = FALSE;
     plugin->watches = NULL;
-
-    memset (& plugin->misc, 0, sizeof (PluginMiscData));
+    plugin->misc = NULL;
 
     if (type == PLUGIN_TYPE_TRANSPORT)
     {
@@ -146,31 +144,22 @@ static void plugin_free (PluginHandle * plugin)
 {
     plugin_list = g_list_remove (plugin_list, plugin);
 
-    g_list_foreach (plugin->watches, (GFunc) g_free, NULL);
-    g_list_free (plugin->watches);
+    g_list_free_full (plugin->watches, g_free);
 
     if (plugin->type == PLUGIN_TYPE_TRANSPORT)
-    {
-        g_list_foreach (plugin->u.t.schemes, (GFunc) g_free, NULL);
-        g_list_free (plugin->u.t.schemes);
-    }
+        g_list_free_full (plugin->u.t.schemes, g_free);
     else if (plugin->type == PLUGIN_TYPE_PLAYLIST)
-    {
-        g_list_foreach (plugin->u.p.exts, (GFunc) g_free, NULL);
-        g_list_free (plugin->u.p.exts);
-    }
+        g_list_free_full (plugin->u.p.exts, g_free);
     else if (plugin->type == PLUGIN_TYPE_INPUT)
     {
         for (int key = 0; key < INPUT_KEYS; key ++)
-        {
-            g_list_foreach (plugin->u.i.keys[key], (GFunc) g_free, NULL);
-            g_list_free (plugin->u.i.keys[key]);
-        }
+            g_list_free_full (plugin->u.i.keys[key], g_free);
     }
 
     g_free (plugin->path);
     g_free (plugin->name);
     g_free (plugin->domain);
+    g_free (plugin->misc);
     g_free (plugin);
 }
 
@@ -464,57 +453,9 @@ PluginHandle * plugin_lookup_basename (const char * basename)
     return node ? node->data : NULL;
 }
 
-void plugin_register (const char * path)
+static void plugin_get_info (PluginHandle * plugin, bool_t new)
 {
-    PluginHandle * plugin = plugin_lookup (path);
-    if (! plugin)
-    {
-        AUDDBG ("New plugin: %s\n", path);
-        plugin_load (path);
-        return;
-    }
-
-    int timestamp = file_get_mtime (path);
-    g_return_if_fail (timestamp >= 0);
-
-    AUDDBG ("Register plugin: %s\n", path);
-    plugin->confirmed = TRUE;
-
-    if (plugin->timestamp == timestamp)
-        return;
-
-    AUDDBG ("Rescan plugin: %s\n", path);
-    plugin->timestamp = timestamp;
-    plugin_load (path);
-}
-
-void plugin_register_loaded (const char * path, Plugin * header)
-{
-    AUDDBG ("Loaded plugin: %s\n", path);
-    PluginHandle * plugin = plugin_lookup (path);
-    bool_t new = FALSE;
-
-    if (plugin)
-    {
-        g_return_if_fail (plugin->type == header->type);
-
-        plugin->loaded = TRUE;
-        plugin->header = header;
-
-        if (registry_locked)
-            return;
-    }
-    else
-    {
-        g_return_if_fail (! registry_locked);
-
-        int timestamp = file_get_mtime (path);
-        g_return_if_fail (timestamp >= 0);
-
-        plugin = plugin_new (g_strdup (path), TRUE, TRUE, timestamp,
-         header->type, header);
-        new = TRUE;
-    }
+    Plugin * header = plugin->header;
 
     g_free (plugin->name);
     g_free (plugin->domain);
@@ -526,6 +467,10 @@ void plugin_register_loaded (const char * path, Plugin * header)
     if (header->type == PLUGIN_TYPE_TRANSPORT)
     {
         TransportPlugin * tp = (TransportPlugin *) header;
+
+        g_list_free_full (plugin->u.t.schemes, g_free);
+        plugin->u.t.schemes = NULL;
+
         for (int i = 0; tp->schemes[i]; i ++)
             plugin->u.t.schemes = g_list_prepend (plugin->u.t.schemes, g_strdup
              (tp->schemes[i]));
@@ -533,6 +478,10 @@ void plugin_register_loaded (const char * path, Plugin * header)
     else if (header->type == PLUGIN_TYPE_PLAYLIST)
     {
         PlaylistPlugin * pp = (PlaylistPlugin *) header;
+
+        g_list_free_full (plugin->u.p.exts, g_free);
+        plugin->u.p.exts = NULL;
+
         for (int i = 0; pp->extensions[i]; i ++)
             plugin->u.p.exts = g_list_prepend (plugin->u.p.exts, g_strdup
              (pp->extensions[i]));
@@ -544,8 +493,7 @@ void plugin_register_loaded (const char * path, Plugin * header)
 
         for (int key = 0; key < INPUT_KEYS; key ++)
         {
-            g_list_foreach (plugin->u.i.keys[key], (GFunc) g_free, NULL);
-            g_list_free (plugin->u.i.keys[key]);
+            g_list_free_full (plugin->u.i.keys[key], g_free);
             plugin->u.i.keys[key] = NULL;
         }
 
@@ -594,6 +542,43 @@ void plugin_register_loaded (const char * path, Plugin * header)
     }
 }
 
+void plugin_register (const char * path, int timestamp)
+{
+    PluginHandle * plugin = plugin_lookup (path);
+
+    if (plugin)
+    {
+        AUDDBG ("Register plugin: %s\n", path);
+        plugin->confirmed = TRUE;
+
+        if (plugin->timestamp != timestamp)
+        {
+            AUDDBG ("Rescan plugin: %s\n", path);
+            Plugin * header = plugin_load (path);
+            if (! header || header->type != plugin->type)
+                return;
+
+            plugin->loaded = TRUE;
+            plugin->header = header;
+            plugin->timestamp = timestamp;
+
+            plugin_get_info (plugin, FALSE);
+        }
+    }
+    else
+    {
+        AUDDBG ("New plugin: %s\n", path);
+        Plugin * header = plugin_load (path);
+        if (! header)
+            return;
+
+        plugin = plugin_new (g_strdup (path), TRUE, TRUE, timestamp,
+         header->type, header);
+
+        plugin_get_info (plugin, TRUE);
+    }
+}
+
 int plugin_get_type (PluginHandle * plugin)
 {
     return plugin->type;
@@ -610,16 +595,16 @@ const void * plugin_get_header (PluginHandle * plugin)
 
     if (! plugin->loaded)
     {
-        plugin_load (plugin->path);
+        Plugin * header = plugin_load (plugin->path);
+        if (! header || header->type != plugin->type)
+            goto DONE;
+
         plugin->loaded = TRUE;
+        plugin->header = header;
     }
 
+DONE:
     pthread_mutex_unlock (& mutex);
-    return plugin->header;
-}
-
-const void * plugin_get_header_no_load (PluginHandle * plugin)
-{
     return plugin->header;
 }
 
@@ -735,9 +720,12 @@ void plugin_remove_watch (PluginHandle * plugin, PluginForEachFunc func, void *
     }
 }
 
-PluginMiscData * plugin_get_misc_data (PluginHandle * plugin)
+void * plugin_get_misc_data (PluginHandle * plugin, int size)
 {
-    return & plugin->misc;
+    if (! plugin->misc)
+        plugin->misc = g_malloc0 (size);
+
+    return plugin->misc;
 }
 
 typedef struct {

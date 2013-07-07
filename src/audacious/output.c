@@ -21,7 +21,8 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#include <glib.h> /* for g_usleep */
 
 #include <libaudcore/hook.h>
 
@@ -30,7 +31,6 @@
 #include "equalizer.h"
 #include "misc.h"
 #include "output.h"
-#include "playback.h"
 #include "plugin.h"
 #include "plugins.h"
 #include "vis_runner.h"
@@ -101,7 +101,7 @@ static void cleanup_output (void)
     vis_runner_start_stop (FALSE, FALSE);
 }
 
-/* assumes LOCK_ALL, s_input, s_output */
+/* assumes LOCK_ALL, s_output */
 static void apply_pause (void)
 {
     if (PLUGIN_HAS_FUNC (cop, pause))
@@ -140,7 +140,7 @@ static void setup_output (void)
     apply_pause ();
 }
 
-/* assumes LOCK_MINOR, s_input, s_output */
+/* assumes LOCK_MINOR, s_output */
 static void flush_output (void)
 {
     if (PLUGIN_HAS_FUNC (cop, flush))
@@ -265,7 +265,7 @@ static void write_output_raw (void * data, int samples)
             if (PLUGIN_HAS_FUNC (cop, period_wait))
                 cop->period_wait ();
             else
-                usleep (20000);
+                g_usleep (20000);
         }
 
         LOCK_MINOR;
@@ -309,7 +309,18 @@ static void finish_effects (void)
 
 bool_t output_open_audio (int format, int rate, int channels)
 {
+    /* prevent division by zero */
+    if (rate < 1 || channels < 1)
+        return FALSE;
+
     LOCK_ALL;
+
+    if (s_output && s_paused)
+    {
+        flush_output ();
+        s_paused = FALSE;
+        apply_pause ();
+    }
 
     s_input = TRUE;
     s_gain = s_paused = s_aborted = FALSE;
@@ -354,7 +365,7 @@ void output_write_audio (void * data, int size)
         while ((! s_output || s_resetting) && ! s_aborted)
         {
             UNLOCK_ALL;
-            usleep (20000);
+            g_usleep (20000);
             LOCK_ALL;
         }
 

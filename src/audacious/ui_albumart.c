@@ -22,7 +22,6 @@
 
 #include <libaudcore/audstrings.h>
 
-#include "config.h"
 #include "i18n.h"
 #include "misc.h"
 
@@ -198,10 +197,13 @@ char * get_associated_image_file (const char * filename)
 
     char * path = g_path_get_dirname (unesc);
     char * base = g_path_get_basename (unesc);
-    char * image_file = fileinfo_recursive_get_image (path, base, 0);
+    char * image_unesc = fileinfo_recursive_get_image (path, base, 0);
+    char * image_file = image_unesc ? filename_to_uri (image_unesc) : NULL;
 
     g_free (unesc);
     g_free (path);
     g_free (base);
+    g_free (image_unesc);
+
     return image_file;
 }
