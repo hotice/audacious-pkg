@@ -20,7 +20,6 @@
 #include <stddef.h>
 #include <gtk/gtk.h>
 
-#include "config.h"
 #include "libaudgui-gtk.h"
 #include "list.h"
 
@@ -213,6 +212,13 @@ static void select_cb (GtkTreeSelection * sel, ListModel * model)
         return;
     model->cbs->select_all (model->user, FALSE);
     gtk_tree_selection_selected_foreach (sel, select_row_cb, NULL);
+}
+
+static void focus_cb (GtkTreeView * tree, ListModel * model)
+{
+    if (! model->blocked)
+        model->cbs->focus_change (model->user,
+         audgui_list_get_focus ((GtkWidget *) tree));
 }
 
 static void activate_cb (GtkTreeView * tree, GtkTreePath * path,
@@ -521,8 +527,12 @@ static void drag_data_received (GtkWidget * widget, GdkDragContext * context, in
 
 /* ==== PUBLIC FUNCS ==== */
 
-static void destroy_cb (ListModel * model)
+static void destroy_cb (GtkWidget * list, ListModel * model)
 {
+    /* workaround for Gnome bug #679291 */
+    g_signal_handlers_disconnect_matched (list, G_SIGNAL_MATCH_DATA, 0, 0, NULL,
+     NULL, model);
+
     stop_autoscroll (model);
     g_object_unref (model);
 }
@@ -568,7 +578,7 @@ EXPORT GtkWidget * audgui_list_new_real (const AudguiListCallbacks * cbs, int cb
 
     GtkWidget * list = gtk_tree_view_new_with_model ((GtkTreeModel *) model);
     gtk_tree_view_set_fixed_height_mode ((GtkTreeView *) list, TRUE);
-    g_signal_connect_swapped (list, "destroy", (GCallback) destroy_cb, model);
+    g_signal_connect (list, "destroy", (GCallback) destroy_cb, model);
 
     model->charwidth = audgui_get_digit_width (list);
 
@@ -583,6 +593,9 @@ EXPORT GtkWidget * audgui_list_new_real (const AudguiListCallbacks * cbs, int cb
 
         update_selection (list, model, 0, rows);
     }
+
+    if (MODEL_HAS_CB (model, focus_change))
+        g_signal_connect (list, "cursor-changed", (GCallback) focus_cb, model);
 
     if (MODEL_HAS_CB (model, activate_row))
         g_signal_connect (list, "row-activated", (GCallback) activate_cb, model);
@@ -653,6 +666,7 @@ EXPORT void audgui_list_add_column (GtkWidget * list, const char * title,
      (title, renderer, "text", RESERVED_COLUMNS + column, "weight",
      HIGHLIGHT_COLUMN, NULL);
     gtk_tree_view_column_set_sizing (tree_column, GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_resizable (tree_column, TRUE);
 
     int pad1, pad2, pad3;
     gtk_widget_style_get (list, "horizontal-separator", & pad1, "focus-line-width", & pad2, NULL);
@@ -661,7 +675,7 @@ EXPORT void audgui_list_add_column (GtkWidget * list, const char * title,
 
     if (width < 1)
     {
-        gtk_tree_view_column_set_fixed_width (tree_column,
+        gtk_tree_view_column_set_min_width (tree_column,
          6 * model->charwidth + model->charwidth / 2 + padding);
         gtk_tree_view_column_set_expand (tree_column, TRUE);
         g_object_set ((GObject *) renderer, "ellipsize-set", TRUE, "ellipsize",
@@ -669,7 +683,7 @@ EXPORT void audgui_list_add_column (GtkWidget * list, const char * title,
     }
     else
     {
-        gtk_tree_view_column_set_fixed_width (tree_column,
+        gtk_tree_view_column_set_min_width (tree_column,
          width * model->charwidth + model->charwidth / 2 + padding);
         g_object_set ((GObject *) renderer, "xalign", (float) 1, NULL);
     }
@@ -729,35 +743,23 @@ EXPORT void audgui_list_delete_rows (GtkWidget * list, int at, int rows)
      ((GtkTreeView *) list);
     g_return_if_fail (at >= 0 && rows >= 0 && at + rows <= model->rows);
 
-    /* If we delete the last selected row, GtkTreeView tries to be helpful by
-     * selecting another one near it.  As a workaround, detect this case and
-     * clear the selection when it occurs. */
-    GtkTreeSelection * sel = gtk_tree_view_get_selection ((GtkTreeView *) list);
-    int selected = gtk_tree_selection_count_selected_rows (sel);
-
-    for (int i = at; i < at + rows; i ++)
-    {
-        GtkTreeIter iter = {.user_data = GINT_TO_POINTER (i)};
-        if (gtk_tree_selection_iter_is_selected (sel, & iter))
-            selected --;
-    }
-
     model->rows -= rows;
     if (model->highlight >= at + rows)
         model->highlight -= rows;
     else if (model->highlight >= at)
         model->highlight = -1;
 
+    model->frozen = TRUE;
     model->blocked = TRUE;
+
     GtkTreePath * path = gtk_tree_path_new_from_indices (at, -1);
 
     while (rows --)
         gtk_tree_model_row_deleted ((GtkTreeModel *) model, path);
 
-    if (! selected)
-        gtk_tree_selection_unselect_all (sel);
-
     gtk_tree_path_free (path);
+
+    model->frozen = FALSE;
     model->blocked = FALSE;
 }
 
@@ -814,19 +816,19 @@ EXPORT void audgui_list_set_focus (GtkWidget * list, int row)
      ((GtkTreeView *) list);
     g_return_if_fail (row >= -1 && row < model->rows);
 
-    if (row < 0)
-    {
-        if (model->rows < 1)
-            return;
-        row = 0;
-    }
+    if (row < 0 || row == audgui_list_get_focus (list))
+        return;
 
     model->frozen = TRUE;
+    model->blocked = TRUE;
+
     GtkTreePath * path = gtk_tree_path_new_from_indices (row, -1);
     gtk_tree_view_set_cursor ((GtkTreeView *) list, path, NULL, FALSE);
     gtk_tree_view_scroll_to_cell ((GtkTreeView *) list, path, NULL, FALSE, 0, 0);
     gtk_tree_path_free (path);
+
     model->frozen = FALSE;
+    model->blocked = FALSE;
 }
 
 EXPORT int audgui_list_row_at_point (GtkWidget * list, int x, int y)

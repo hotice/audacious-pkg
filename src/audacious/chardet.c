@@ -21,7 +21,6 @@
 #include <string.h>
 #include <libaudcore/audstrings.h>
 
-#include "config.h"
 #include "debug.h"
 #include "i18n.h"
 #include "main.h"

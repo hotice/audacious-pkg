@@ -24,7 +24,6 @@
 #include <audacious/playlist.h>
 #include <libaudcore/vfs.h>
 
-#include "config.h"
 #include "libaudgui.h"
 
 static char * select_file (bool_t save, const char * default_filename)

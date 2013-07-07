@@ -27,6 +27,7 @@ SRCS = adder.c \
        plugin-view.c \
        probe.c \
        probe-buffer.c \
+       scanner.c \
        signals.c								\
        ui_plugin_menu.c \
        ui_preferences.c							\
@@ -99,9 +100,6 @@ CPPFLAGS := -I.. -I../.. \
 		-D_AUDACIOUS_CORE		\
 		${LIBGUESS_CFLAGS}
 
-# Essential for efficient FFTs. --jlindgren
-CFLAGS += -ffast-math
-
 LIBS := -L../libaudcore -laudcore \
         -L../libaudgui -laudgui \
         -L../libaudtag -laudtag \
@@ -121,7 +119,7 @@ DBUS_BINDINGS_SOURCES = objects.xml			\
 			mpris_player.xml
 
 desktop_DATA = audacious.desktop
-desktopdir = ${datadir}/applications
+desktopdir = ${datarootdir}/applications
 
 dbus-server-bindings.h: ${DBUS_BINDINGS_SOURCES}
 	${DBUS_BINDING_TOOL} --mode=glib-server --prefix=audacious_rc objects.xml > $@

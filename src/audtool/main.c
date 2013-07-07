@@ -145,6 +145,7 @@ audtool_connect(void)
 	if (connection == NULL)
 	{
 		fprintf (stderr, "D-Bus Error: %s\n", error->message);
+		g_error_free (error);
 		exit (EXIT_FAILURE);
 	}
 
@@ -166,7 +167,10 @@ main(gint argc, gchar **argv)
 	gint i, j = 0, k = 0;
 
 	setlocale(LC_CTYPE, "");
+
+#if ! GLIB_CHECK_VERSION (2, 36, 0)
 	g_type_init();
+#endif
 
 	audtool_connect();
 

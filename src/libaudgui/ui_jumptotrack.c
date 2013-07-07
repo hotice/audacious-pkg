@@ -26,7 +26,6 @@
 #include <audacious/playlist.h>
 #include <libaudcore/hook.h>
 
-#include "config.h"
 #include "libaudgui.h"
 #include "list.h"
 #include "ui_jumptotrack_cache.h"

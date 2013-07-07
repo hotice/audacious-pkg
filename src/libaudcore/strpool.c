@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
 #include "core.h"
 
 /* Each string in the pool is allocated with five leading bytes: a 32-bit

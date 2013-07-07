@@ -23,7 +23,6 @@
 #include <audacious/drct.h>
 #include <audacious/misc.h>
 
-#include "config.h"
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
 

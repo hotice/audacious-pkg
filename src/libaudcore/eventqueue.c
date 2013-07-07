@@ -21,7 +21,6 @@
 #include <pthread.h>
 #include <string.h>
 
-#include "config.h"
 #include "core.h"
 #include "hook.h"
 

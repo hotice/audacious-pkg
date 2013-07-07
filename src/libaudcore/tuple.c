@@ -33,7 +33,6 @@
 #include <audacious/i18n.h>
 
 #include "audstrings.h"
-#include "config.h"
 #include "tuple.h"
 #include "tuple_formatter.h"
 
@@ -284,6 +283,9 @@ EXPORT Tuple * tuple_ref (Tuple * tuple)
 
 EXPORT void tuple_unref (Tuple * tuple)
 {
+    if (! tuple)
+        return;
+
     pthread_mutex_lock (& mutex);
 
     if (! -- tuple->refcount)

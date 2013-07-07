@@ -5,7 +5,7 @@ dnl ***
 dnl Initialize
 dnl ==========
 AC_PREREQ([2.59])
-AC_INIT([audacious], [3.3.4])
+AC_INIT([audacious], [3.4])
 AC_COPYRIGHT([(C) 2005-2013 Audacious Team])
 
 AC_SUBST([PACKAGE], [AC_PACKAGE_TARNAME])
@@ -16,12 +16,15 @@ AC_DEFINE_UNQUOTED([VERSION], "$VERSION", [Version number of package])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 AUD_COMMON_PROGS
 
 BUILDSYS_INIT
 BUILDSYS_SHARED_LIB
 AC_DEFINE_UNQUOTED(PLUGIN_SUFFIX, "$PLUGIN_SUFFIX", [Suffix for plugins])
+
+m4_ifdef([PKG_INSTALLDIR], [PKG_INSTALLDIR], AC_SUBST([pkgconfigdir], ${libdir}/pkgconfig))
 
 dnl Byte order
 dnl ==========
@@ -107,7 +110,7 @@ AC_ARG_ENABLE([text-console],
 )
 
 if test "x$HAVE_MSWINDOWS" = "xyes" && test "x$use_text_console" = "xno" ; then
-	LDFLAGS="$LDFLAGS -Wl,-subsystem,windows"
+    LDFLAGS="$LDFLAGS -Wl,-subsystem,windows"
 fi
 
 ### ---------------------------------------------------------------------------
@@ -127,6 +130,13 @@ AUD_ARG_ENABLE([rpath], [yes], [disable rpath])
 if test "x$enable_rpath" = "xyes"; then
     LDFLAGS="$LDFLAGS $LDFLAGS_RPATH"
 fi
+
+### ---------------------------------------------------------------------------
+dnl Thunar support
+dnl ==============
+
+AUD_ARG_ENABLE([thunar], [no], [thunar (Xfce) support files])
+AUD_CONDITIONAL([USE_THUNAR], [enable_thunar])
 
 ### ---------------------------------------------------------------------------
 dnl Chardet support
@@ -245,7 +255,7 @@ if test -z "$datadir"; then
     datadir="${prefix}/share"
 fi
 
-localedir="$datadir/locale"
+localedir="$datarootdir/locale"
 AC_SUBST([localedir])
 
 AUDACIOUS_DEFINES="-DPLUGINSUBS=$pluginsubs"
@@ -253,9 +263,14 @@ AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_BINDIR=\\\"$bindir\\\""
 AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_DATADIR=\\\"$datadir/audacious\\\""
 AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_PLUGINDIR=\\\"$plugindir\\\""
 AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_LOCALEDIR=\\\"$localedir\\\""
-AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_DESKTOPFILE=\\\"${datadir}/applications/audacious.desktop\\\""
-AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_ICONFILE=\\\"${datadir}/pixmaps/audacious.png\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_DESKTOPFILE=\\\"${datarootdir}/applications/audacious.desktop\\\""
+AUDACIOUS_DEFINES="$AUDACIOUS_DEFINES -DHARDCODE_ICONFILE=\\\"${datarootdir}/pixmaps/audacious.png\\\""
 AC_SUBST([AUDACIOUS_DEFINES])
+
+
+dnl Reliably #include "config.h" (for large file support)
+dnl =====================================================
+CPPFLAGS="$CPPFLAGS -include config.h"
 
 
 ### ---------------------------------------------------------------------------
@@ -290,6 +305,7 @@ echo "  Allow user plugin dir:                  $enable_user_plugin_dir"
 echo ""
 echo "  Automatic character code detection:     $enable_chardet"
 echo "  D-Bus support:                          $enable_dbus"
+echo "  Thunar support:                         $enable_thunar"
 echo ""
 
 if test "x$AUDACIOUS_PATH" != "xno" && test "x$prefix/bin/audacious" != "x$AUDACIOUS_PATH"; then

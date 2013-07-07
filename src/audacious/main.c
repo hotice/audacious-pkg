@@ -31,8 +31,6 @@
 #include <libaudcore/hook.h>
 #include <libaudtag/audtag.h>
 
-#include "config.h"
-
 #ifdef USE_DBUS
 #include "../libaudclient/audctrl.h"
 #include "dbus.h"
@@ -45,9 +43,9 @@
 #include "interface.h"
 #include "main.h"
 #include "misc.h"
-#include "playback.h"
 #include "playlist.h"
 #include "plugins.h"
+#include "scanner.h"
 #include "util.h"
 
 #define AUTOSAVE_INTERVAL 300 /* seconds */
@@ -60,6 +58,7 @@ static struct {
     bool_t play, stop, pause, fwd, rew, play_pause, show_jump_box;
     bool_t enqueue, mainwin, remote;
     bool_t enqueue_to_temp;
+    bool_t quit_after_play;
     bool_t version;
     bool_t verbose;
     char *previous_session_id;
@@ -240,9 +239,10 @@ static GOptionEntry cmd_entries[] = {
     {"enqueue", 'e', 0, G_OPTION_ARG_NONE, &options.enqueue, N_("Add files to the playlist"), NULL},
     {"enqueue-to-temp", 'E', 0, G_OPTION_ARG_NONE, &options.enqueue_to_temp, N_("Add new files to a temporary playlist"), NULL},
     {"show-main-window", 'm', 0, G_OPTION_ARG_NONE, &options.mainwin, N_("Display the main window"), NULL},
+    {"headless", 'h', 0, G_OPTION_ARG_NONE, & headless, N_("Headless mode"), NULL},
+    {"quit-after-play", 'q', 0, G_OPTION_ARG_NONE, &options.quit_after_play, N_("Quit on playback stop"), NULL},
     {"version", 'v', 0, G_OPTION_ARG_NONE, &options.version, N_("Show version"), NULL},
     {"verbose", 'V', 0, G_OPTION_ARG_NONE, &options.verbose, N_("Print debugging messages"), NULL},
-    {"headless", 'h', 0, G_OPTION_ARG_NONE, & headless, N_("Headless mode (beta)"), NULL},
     {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &options.filenames, N_("FILE..."), NULL},
     {NULL},
 };
@@ -264,6 +264,7 @@ static void parse_options (int * argc, char *** argv)
         fprintf (stderr,
          _("%s: %s\nTry `%s --help' for more information.\n"), (* argv)[0],
          error->message, (* argv)[0]);
+        g_error_free (error);
         exit (EXIT_FAILURE);
     }
 
@@ -399,7 +400,7 @@ static void do_remote (void)
 
 static void do_commands (void)
 {
-    bool_t resume = TRUE;
+    bool_t resume = get_bool (NULL, "resume_playback_on_startup");
 
     Index * filenames = convert_filenames ();
     if (filenames)
@@ -423,10 +424,10 @@ static void do_commands (void)
 
     if (options.play || options.play_pause)
     {
-        if (! playback_get_playing ())
-            playback_play (0, FALSE);
-        else if (playback_get_paused ())
-            playback_pause ();
+        if (! drct_get_playing ())
+            drct_play ();
+        else if (drct_get_paused ())
+            drct_pause ();
     }
 
     if (options.show_jump_box)
@@ -458,34 +459,40 @@ static void init_two (int * p_argc, char * * * p_argv)
         gtk_init (p_argc, p_argv);
     }
 
+    AUDDBG ("Loading configuration.\n");
     config_load ();
+
+    AUDDBG ("Initializing.\n");
+    art_init ();
     chardet_init ();
-
-    tag_set_verbose (verbose);
-    vfs_set_verbose (verbose);
-
     eq_init ();
+    playlist_init ();
 
 #ifdef HAVE_SIGWAIT
     signals_init ();
 #endif
 
+    tag_set_verbose (verbose);
+    vfs_set_verbose (verbose);
+
     AUDDBG ("Loading lowlevel plugins.\n");
     start_plugins_one ();
 
-    playlist_init ();
+    AUDDBG ("Starting worker threads.\n");
     adder_init ();
-    art_init ();
-    load_playlists ();
+    scanner_init ();
 
-#ifdef USE_DBUS
-    init_dbus ();
-#endif
+    AUDDBG ("Restoring state.\n");
+    load_playlists ();
 
     do_commands ();
 
     AUDDBG ("Loading highlevel plugins.\n");
     start_plugins_two ();
+
+#ifdef USE_DBUS
+    init_dbus ();
+#endif
 
     mpris_signals_init ();
 }
@@ -494,29 +501,23 @@ static void shut_down (void)
 {
     mpris_signals_cleanup ();
 
-    AUDDBG ("Capturing state.\n");
-    hook_call ("config save", NULL);
+    AUDDBG ("Saving playlist state.\n");
     save_playlists (TRUE);
 
     AUDDBG ("Unloading highlevel plugins.\n");
     stop_plugins_two ();
 
-    AUDDBG ("Stopping playback.\n");
-    if (playback_get_playing ())
-    {
-        bool_t stop_after_song = get_bool (NULL, "stop_after_current_song");
-        playback_stop ();
-        set_bool (NULL, "stop_after_current_song", stop_after_song);
-    }
-
 #ifdef USE_DBUS
     cleanup_dbus ();
 #endif
 
+    AUDDBG ("Stopping playback.\n");
+    if (drct_get_playing ())
+        drct_stop ();
+
+    AUDDBG ("Stopping worker threads.\n");
     adder_cleanup ();
-    art_cleanup ();
-    history_cleanup ();
-    playlist_end ();
+    scanner_cleanup ();
 
     AUDDBG ("Unloading lowlevel plugins.\n");
     stop_plugins_one ();
@@ -525,7 +526,11 @@ static void shut_down (void)
     config_save ();
     config_cleanup ();
 
+    AUDDBG ("Cleaning up.\n");
+    art_cleanup ();
     eq_cleanup ();
+    history_cleanup ();
+    playlist_end ();
 
     strpool_shutdown ();
 }
@@ -537,6 +542,17 @@ bool_t do_autosave (void)
     save_playlists (FALSE);
     config_save ();
     return TRUE;
+}
+
+static bool_t check_should_quit (void)
+{
+    return options.quit_after_play && ! drct_get_playing () && ! playlist_add_in_progress (-1);
+}
+
+static void maybe_quit (void)
+{
+    if (check_should_quit ())
+        gtk_main_quit ();
 }
 
 int main(int argc, char ** argv)
@@ -559,10 +575,20 @@ int main(int argc, char ** argv)
     AUDDBG ("Startup complete.\n");
     g_timeout_add_seconds (AUTOSAVE_INTERVAL, (GSourceFunc) do_autosave, NULL);
 
+    if (check_should_quit ())
+        goto QUIT;
+
+    hook_associate ("playback stop", (HookFunction) maybe_quit, NULL);
+    hook_associate ("playlist add complete", (HookFunction) maybe_quit, NULL);
     hook_associate ("quit", (HookFunction) gtk_main_quit, NULL);
+
     gtk_main ();
+
+    hook_dissociate ("playback stop", (HookFunction) maybe_quit);
+    hook_dissociate ("playlist add complete", (HookFunction) maybe_quit);
     hook_dissociate ("quit", (HookFunction) gtk_main_quit);
 
+QUIT:
     shut_down ();
     release_lock ();
     return EXIT_SUCCESS;
