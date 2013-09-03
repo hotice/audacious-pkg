@@ -1,6 +1,7 @@
 libaudcore.so.1 libaudcore1 #MINVER#
  audio_amplify@Base 2.3
  audio_from_int@Base 2.3
+ audio_interlace@Base 3.4.1
  audio_soft_clip@Base 3.3.1
  audio_to_int@Base 2.3
  double_array_to_string@Base 3.2
@@ -28,6 +29,7 @@ libaudcore.so.1 libaudcore1 #MINVER#
  index_set@Base 2.3
  index_sort@Base 2.3
  index_sort_with_data@Base 2.4~alpha1
+ int_array_to_string@Base 3.4.1
  int_to_string@Base 3.2
  str_decode_percent@Base 3.2
  str_encode_percent@Base 3.2
@@ -48,6 +50,7 @@ libaudcore.so.1 libaudcore1 #MINVER#
  string_to_double@Base 3.2
  string_to_double_array@Base 3.2
  string_to_int@Base 3.2
+ string_to_int_array@Base 3.4.1
  strpool_abort@Base 3.2
  strpool_shutdown@Base 3.2
  tuple_copy@Base 2.3
@@ -70,6 +73,7 @@ libaudcore.so.1 libaudcore1 #MINVER#
  tuple_set_subtunes@Base 3.2
  tuple_unref@Base 3.2
  tuple_unset@Base 3.2
+ uri_get_extension@Base 3.4.1
  uri_parse@Base 3.2
  uri_to_display@Base 3.2
  uri_to_filename@Base 2.4.3
@@ -133,6 +137,7 @@ libaudgui.so.1 libaudcore1 #MINVER#
  audgui_infopopup_hide@Base 2.4~alpha1
  audgui_infopopup_show@Base 2.4~alpha1
  audgui_infopopup_show_current@Base 2.4~alpha1
+ audgui_infowin_hide@Base 3.4.1
  audgui_infowin_show@Base 2.4~alpha1
  audgui_infowin_show_current@Base 2.4~alpha1
  audgui_init@Base 2.4~alpha1
