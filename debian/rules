@@ -34,5 +34,5 @@ override_dh_installdirs:
 	convert pixmaps/audacious.png -resize 32x32 debian/tmp/usr/share/pixmaps/audacious-32.xpm
 
 override_dh_auto_clean:
-	dh_auto_clean
+	dh_auto_clean || true
 	rm -f src/libaudcore/audio.h
