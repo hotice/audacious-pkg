@@ -3,9 +3,10 @@ audacious (3.4.1-1) unstable; urgency=low
   * Team upload.
   * New upstream release.
   * Avoid FTBFS on distclean failure.
+  * Refresh symbols.
   * Remove myself from uploaders.
 
- -- Alessio Treglia <alessio@debian.org>  Tue, 03 Sep 2013 09:26:56 +0100
+ -- Alessio Treglia <alessio@debian.org>  Tue, 03 Sep 2013 09:40:44 +0100
 
 audacious (3.4-1) unstable; urgency=low
 
