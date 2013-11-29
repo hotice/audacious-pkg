@@ -33,6 +33,8 @@
 #include "playlist.h"
 #include "plugin.h"
 
+static void playback_restart (int seek_time, bool_t pause);
+
 static const struct OutputAPI output_api = {
  .open_audio = output_open_audio,
  .set_replaygain_info = output_set_replaygain_info,
@@ -302,6 +304,21 @@ void playback_stop (void)
     hook_call ("playback stop", NULL);
 }
 
+static void do_stop (int playlist)
+{
+    playlist_set_playing (-1);
+    playlist_set_position (playlist, playlist_get_position (playlist));
+}
+
+static void do_next (int playlist)
+{
+    if (! playlist_next_song (playlist, get_bool (NULL, "repeat")))
+    {
+        playlist_set_position (playlist, -1);
+        hook_call ("playlist end reached", NULL);
+    }
+}
+
 static bool_t end_cb (void * unused)
 {
     g_return_val_if_fail (playing, FALSE);
@@ -319,40 +336,34 @@ static bool_t end_cb (void * unused)
     int playlist = playlist_get_playing ();
 
     if (get_bool (NULL, "stop_after_current_song"))
-        goto STOP;
-
-    if (repeat_a >= 0 || repeat_b >= 0)
     {
-        if (failed_entries)
-            goto STOP;
+        do_stop (playlist);
 
-        playback_play (MAX (repeat_a, 0), FALSE);
+        if (! get_bool (NULL, "no_playlist_advance"))
+            do_next (playlist);
+    }
+    else if (repeat_a >= 0 || repeat_b >= 0)
+    {
+        if (! failed_entries)
+            playback_restart (MAX (repeat_a, 0), FALSE);
+        else
+            do_stop (playlist);
     }
     else if (get_bool (NULL, "no_playlist_advance"))
     {
-        if (failed_entries || ! get_bool (NULL, "repeat"))
-            goto STOP;
-
-        playback_play (0, FALSE);
+        if (get_bool (NULL, "repeat") && ! failed_entries)
+            playback_restart (0, FALSE);
+        else
+            do_stop (playlist);
     }
     else
     {
-        if (failed_entries >= 10)
-            goto STOP;
-
-        if (! playlist_next_song (playlist, get_bool (NULL, "repeat")))
-        {
-            playlist_set_position (playlist, -1);
-            hook_call ("playlist end reached", NULL);
-        }
+        if (failed_entries < 10)
+            do_next (playlist);
+        else
+            do_stop (playlist);
     }
 
-    return FALSE;
-
-STOP:
-    /* stop playback and set position to beginning of song */
-    playlist_set_playing (-1);
-    playlist_set_position (playlist, playlist_get_position (playlist));
     return FALSE;
 }
 
@@ -421,28 +432,8 @@ DONE:
     return NULL;
 }
 
-void playback_play (int seek_time, bool_t pause)
+static void playback_start (int seek_time, bool_t pause)
 {
-    char * new_filename = playback_entry_get_filename ();
-    g_return_if_fail (new_filename);
-
-    /* pointer comparison works for pooled strings */
-    if (new_filename == current_filename)
-    {
-        if (playing)
-            playback_finish ();
-
-        str_unref (new_filename);
-        restart_flag = TRUE;
-    }
-    else
-    {
-        if (current_filename)
-            playback_cleanup ();
-
-        current_filename = new_filename;
-    }
-
     playing = TRUE;
     initial_seek = seek_time;
     paused = pause;
@@ -450,12 +441,32 @@ void playback_play (int seek_time, bool_t pause)
 
     hook_associate ("playlist update", update_cb, NULL);
     pthread_create (& playback_thread_handle, NULL, playback_thread, NULL);
+}
+
+static void playback_restart (int seek_time, bool_t pause)
+{
+    if (playing)
+        playback_finish ();
+
+    restart_flag = TRUE;
+
+    playback_start (seek_time, pause);
 
     /* on restart, send "playback seek" instead of "playback begin" */
-    if (restart_flag)
-        hook_call ("playback seek", NULL);
-    else
-        hook_call ("playback begin", NULL);
+    hook_call ("playback seek", NULL);
+}
+
+void playback_play (int seek_time, bool_t pause)
+{
+    if (current_filename)
+        playback_cleanup ();
+
+    current_filename = playback_entry_get_filename ();
+    g_return_if_fail (current_filename);
+
+    playback_start (seek_time, pause);
+
+    hook_call ("playback begin", NULL);
 }
 
 bool_t drct_get_playing (void)
@@ -638,8 +649,7 @@ void drct_set_ab_repeat (int a, int b)
         if (repeat_b >= 0 && seek_time >= repeat_b)
             seek_time = MAX (repeat_a, 0);
 
-        playback_finish ();
-        playback_play (seek_time, was_paused);
+        playback_restart (seek_time, was_paused);
     }
 }
 

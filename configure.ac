@@ -5,7 +5,7 @@ dnl ***
 dnl Initialize
 dnl ==========
 AC_PREREQ([2.59])
-AC_INIT([audacious], [3.4.1])
+AC_INIT([audacious], [3.4.2])
 AC_COPYRIGHT([(C) 2005-2013 Audacious Team])
 
 AC_SUBST([PACKAGE], [AC_PACKAGE_TARNAME])
@@ -25,6 +25,10 @@ BUILDSYS_SHARED_LIB
 AC_DEFINE_UNQUOTED(PLUGIN_SUFFIX, "$PLUGIN_SUFFIX", [Suffix for plugins])
 
 m4_ifdef([PKG_INSTALLDIR], [PKG_INSTALLDIR], AC_SUBST([pkgconfigdir], ${libdir}/pkgconfig))
+
+dnl Disable deprecation warnings for stable branch
+dnl ==============================================
+CFLAGS="$CFLAGS -Wno-deprecated-declarations"
 
 dnl Byte order
 dnl ==========
