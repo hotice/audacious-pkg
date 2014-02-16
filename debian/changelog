@@ -1,6 +1,7 @@
 audacious (3.4.3-1) UNRELEASED; urgency=low
 
   * New upstream release. Closes: #728502
+  * Update symbols
 
  -- Jackson Doak <noskcaj@ubuntu.com>  Sat, 30 Nov 2013 08:12:12 +1100
 
