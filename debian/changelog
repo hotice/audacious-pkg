@@ -1,6 +1,6 @@
-audacious (3.4.2-1) UNRELEASED; urgency=low
+audacious (3.4.3-1) UNRELEASED; urgency=low
 
-  * New upstream release.
+  * New upstream release. Closes: #728502
 
  -- Jackson Doak <noskcaj@ubuntu.com>  Sat, 30 Nov 2013 08:12:12 +1100
 
