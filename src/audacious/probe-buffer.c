@@ -1,6 +1,6 @@
 /*
  * probe-buffer.c
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,8 +17,9 @@
  * the use of this software.
  */
 
-#include <stdlib.h>
 #include <string.h>
+
+#include <glib.h>
 
 #include "debug.h"
 #include "probe-buffer.h"
@@ -38,7 +39,7 @@ static int probe_buffer_fclose (VFSFile * file)
     ProbeBuffer * p = vfs_get_handle (file);
 
     int ret = vfs_fclose (p->file);
-    free (p);
+    g_free (p);
     return ret;
 }
 
@@ -73,12 +74,6 @@ static int64_t probe_buffer_fwrite (const void * data, int64_t size, int64_t cou
     return 0; /* not allowed */
 }
 
-static int probe_buffer_getc (VFSFile * file)
-{
-    unsigned char c;
-    return (probe_buffer_fread (& c, 1, 1, file) == 1) ? c : EOF;
-}
-
 static int probe_buffer_fseek (VFSFile * file, int64_t offset, int whence)
 {
     ProbeBuffer * p = vfs_get_handle (file);
@@ -99,16 +94,6 @@ static int probe_buffer_fseek (VFSFile * file, int64_t offset, int whence)
 
     p->at = offset;
     return 0;
-}
-
-static int probe_buffer_ungetc (int c, VFSFile * file)
-{
-    return (! probe_buffer_fseek (file, -1, SEEK_CUR)) ? c : EOF;
-}
-
-static void probe_buffer_rewind (VFSFile * file)
-{
-    probe_buffer_fseek (file, 0, SEEK_SET);
 }
 
 static int64_t probe_buffer_ftell (VFSFile * file)
@@ -152,10 +137,7 @@ static VFSConstructor probe_buffer_table =
     .vfs_fclose_impl = probe_buffer_fclose,
     .vfs_fread_impl = probe_buffer_fread,
     .vfs_fwrite_impl = probe_buffer_fwrite,
-    .vfs_getc_impl = probe_buffer_getc,
-    .vfs_ungetc_impl = probe_buffer_ungetc,
     .vfs_fseek_impl = probe_buffer_fseek,
-    .vfs_rewind_impl = probe_buffer_rewind,
     .vfs_ftell_impl = probe_buffer_ftell,
     .vfs_feof_impl = probe_buffer_feof,
     .vfs_ftruncate_impl = probe_buffer_ftruncate,
@@ -170,7 +152,7 @@ VFSFile * probe_buffer_new (const char * filename)
     if (! file)
         return NULL;
 
-    ProbeBuffer * p = malloc (sizeof (ProbeBuffer));
+    ProbeBuffer * p = g_new (ProbeBuffer, 1);
     p->file = file;
     p->filled = 0;
     p->at = 0;

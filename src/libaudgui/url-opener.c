@@ -1,6 +1,6 @@
 /*
  * url-opener.c
- * Copyright 2012 John Lindgren
+ * Copyright 2012-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -25,49 +25,39 @@
 
 #include "init.h"
 #include "libaudgui.h"
+#include "libaudgui-gtk.h"
 
-static GtkWidget * window;
-
-static void response_cb (GtkWidget * dialog, int response)
+static void open_cb (void * entry)
 {
-    if (response == GTK_RESPONSE_ACCEPT)
-    {
-        GtkWidget * entry = g_object_get_data ((GObject *) dialog, "entry");
-        const char * text = gtk_entry_get_text ((GtkEntry *) entry);
-        bool_t open = GPOINTER_TO_INT (g_object_get_data ((GObject *) dialog, "open"));
+    const char * text = gtk_entry_get_text ((GtkEntry *) entry);
+    bool_t open = GPOINTER_TO_INT (g_object_get_data ((GObject *) entry, "open"));
 
-        if (open)
-            aud_drct_pl_open (text);
-        else
-            aud_drct_pl_add (text, -1);
+    if (open)
+        aud_drct_pl_open (text);
+    else
+        aud_drct_pl_add (text, -1);
 
-        aud_history_add (text);
-    }
-
-    gtk_widget_destroy (dialog);
+    aud_history_add (text);
 }
 
-EXPORT void audgui_show_add_url_window (bool_t open)
+static GtkWidget * create_url_opener (bool_t open)
 {
-    if (window)
-        gtk_widget_destroy (window);
+    const char * title, * verb, * icon;
 
-    window = gtk_dialog_new_with_buttons (open ? _("Open URL") : _("Add URL"),
-     NULL, 0, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, open ? GTK_STOCK_OPEN :
-     GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
-    gtk_widget_set_size_request (window, 300, -1);
-    gtk_window_set_resizable ((GtkWindow *) window, FALSE);
-    gtk_dialog_set_default_response ((GtkDialog *) window, GTK_RESPONSE_ACCEPT);
-
-    GtkWidget * box = gtk_dialog_get_content_area ((GtkDialog *) window);
-
-    GtkWidget * label = gtk_label_new (_("Enter URL:"));
-    gtk_misc_set_alignment ((GtkMisc *) label, 0, 0);
-    gtk_box_pack_start ((GtkBox *) box, label, FALSE, FALSE, 0);
+    if (open)
+    {
+        title = _("Open URL");
+        verb = _("_Open");
+        icon = "document-open";
+    }
+    else
+    {
+        title = _("Add URL");
+        verb = _("_Add");
+        icon = "list-add";
+    }
 
     GtkWidget * combo = gtk_combo_box_text_new_with_entry ();
-    gtk_box_pack_start ((GtkBox *) box, combo, FALSE, FALSE, 0);
-
     GtkWidget * entry = gtk_bin_get_child ((GtkBin *) combo);
     gtk_entry_set_activates_default ((GtkEntry *) entry, TRUE);
 
@@ -75,17 +65,20 @@ EXPORT void audgui_show_add_url_window (bool_t open)
     for (int i = 0; (item = aud_history_get (i)); i++)
         gtk_combo_box_text_append_text ((GtkComboBoxText *) combo, item);
 
-    g_object_set_data ((GObject *) window, "entry", entry);
-    g_object_set_data ((GObject *) window, "open", GINT_TO_POINTER (open));
+    g_object_set_data ((GObject *) entry, "open", GINT_TO_POINTER (open));
 
-    g_signal_connect (window, "response", (GCallback) response_cb, NULL);
-    g_signal_connect (window, "destroy", (GCallback) gtk_widget_destroyed, & window);
+    GtkWidget * button1 = audgui_button_new (verb, icon, open_cb, entry);
+    GtkWidget * button2 = audgui_button_new (_("_Cancel"), "process-stop", NULL, NULL);
 
-    gtk_widget_show_all (window);
+    GtkWidget * dialog = audgui_dialog_new (GTK_MESSAGE_OTHER, title,
+     _("Enter URL:"), button1, button2);
+    gtk_widget_set_size_request (dialog, 400, -1);
+    audgui_dialog_add_widget (dialog, combo);
+
+    return dialog;
 }
 
-void audgui_url_opener_cleanup (void)
+EXPORT void audgui_show_add_url_window (bool_t open)
 {
-    if (window)
-        gtk_widget_destroy (window);
+    audgui_show_unique_window (AUDGUI_URL_OPENER_WINDOW, create_url_opener (open));
 }

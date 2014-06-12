@@ -1,0 +1,1035 @@
+# Hebrew translation for Audacious
+# Copyright (C) Audacious translators
+# This file is distributed under the same license as the Audacious package.
+#
+# Translators:
+# GenghisKhan <genghiskhan@gmx.ca>, 2012
+# GenghisKhan <genghiskhan@gmx.ca>, 2012
+# GenghisKhan <genghiskhan@gmx.ca>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: Audacious\n"
+"Report-Msgid-Bugs-To: http://redmine.audacious-media-player.org/\n"
+"POT-Creation-Date: 2014-04-21 22:48+0200\n"
+"PO-Revision-Date: 2014-04-11 17:07+0000\n"
+"Last-Translator: GenghisKhan <genghiskhan@gmx.ca>\n"
+"Language-Team: Hebrew (http://www.transifex.com/projects/p/audacious/"
+"language/he/)\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/audacious/adder.c:76
+msgid "Searching ..."
+msgstr "כעת מחפש ..."
+
+#: src/audacious/adder.c:104
+#, c-format
+msgid "%d file found"
+msgid_plural "%d files found"
+msgstr[0] "נמצא קובץ %d"
+msgstr[1] "נמצאו %d קבצים"
+
+#: src/audacious/adder.c:386 src/audacious/playlist-new.c:97
+msgid "New Playlist"
+msgstr "רשימת נגינה חדשה"
+
+#: src/audacious/interface.c:93
+msgid "Error"
+msgstr "שגיאה"
+
+#: src/audacious/main.c:70
+msgid "Show command-line help"
+msgstr ""
+
+#: src/audacious/main.c:71
+msgid "Show version"
+msgstr "הצג גירסה"
+
+#: src/audacious/main.c:72
+msgid "Start playback"
+msgstr ""
+
+#: src/audacious/main.c:73
+msgid "Pause playback"
+msgstr ""
+
+#: src/audacious/main.c:74
+msgid "Pause if playing, play otherwise"
+msgstr ""
+
+#: src/audacious/main.c:75
+msgid "Stop playback"
+msgstr ""
+
+#: src/audacious/main.c:76
+msgid "Skip to previous song"
+msgstr ""
+
+#: src/audacious/main.c:77
+msgid "Skip to next song"
+msgstr ""
+
+#: src/audacious/main.c:78
+msgid "Add files to the playlist"
+msgstr "הוסף קבצים אל רשימת הנגינה"
+
+#: src/audacious/main.c:79
+msgid "Add files to a temporary playlist"
+msgstr ""
+
+#: src/audacious/main.c:80
+msgid "Display the main window"
+msgstr "הצג את החלון הראשי"
+
+#: src/audacious/main.c:81
+msgid "Display the jump-to-song window"
+msgstr ""
+
+#: src/audacious/main.c:82
+msgid "Start without a graphical interface"
+msgstr ""
+
+#: src/audacious/main.c:83
+msgid "Quit on playback stop"
+msgstr ""
+
+#: src/audacious/main.c:84
+msgid "Print debugging messages"
+msgstr ""
+
+#: src/audacious/main.c:269
+#, c-format
+msgid "Unknown option: %s\n"
+msgstr ""
+
+#: src/audacious/main.c:291
+#, c-format
+msgid "Unknown option: -%c\n"
+msgstr ""
+
+#: src/audacious/main.c:314
+#, c-format
+msgid ""
+"Usage: audacious [OPTION] ... [FILE] ...\n"
+"\n"
+msgstr ""
+
+#: src/audacious/main.c:601
+msgid "Audacious"
+msgstr "Audacious"
+
+#: src/audacious/playback.c:354
+#, c-format
+msgid "No decoder found for %s."
+msgstr ""
+
+#: src/audacious/playback.c:387
+#, c-format
+msgid "%s could not be opened."
+msgstr ""
+
+#: src/audacious/playlist-files.c:95
+#, c-format
+msgid "Cannot load %s: unsupported file extension."
+msgstr ""
+
+#: src/audacious/playlist-files.c:185
+#, c-format
+msgid "Cannot save %s: unsupported file extension."
+msgstr ""
+
+#: src/audacious/playlist-new.c:98
+msgid "Now Playing"
+msgstr ""
+
+#: src/audacious/playlist-new.c:1656
+msgid ""
+"The playlist cannot be sorted because metadata scanning is still in progress "
+"(or has been disabled)."
+msgstr ""
+
+#: src/audacious/plugin-preferences.c:55
+msgid "About"
+msgstr "אודות"
+
+#: src/audacious/plugin-preferences.c:94
+msgid "Settings"
+msgstr "הגדרות"
+
+#: src/audacious/plugin-preferences.c:99
+msgid "_Set"
+msgstr "_קבע"
+
+#: src/audacious/plugin-preferences.c:100 src/libaudgui/confirm.c:57
+#: src/libaudgui/confirm.c:90 src/libaudgui/jump-to-time.c:49
+#: src/libaudgui/playlists.c:89 src/libaudgui/playlists.c:142
+#: src/libaudgui/url-opener.c:71
+msgid "_Cancel"
+msgstr "_ביטול"
+
+#: src/audacious/plugin-preferences.c:106 src/audacious/ui_preferences.c:763
+#: src/libaudgui/infowin.c:370 src/libaudgui/queue-manager.c:189
+#: src/libaudgui/ui_fileopener.c:127 src/libaudgui/ui_jumptotrack.c:312
+#: src/libaudgui/util.c:161
+msgid "_Close"
+msgstr "_סגור"
+
+#: src/audacious/plugin-view.c:242 src/audacious/ui_preferences.c:641
+msgid "_Settings"
+msgstr "_הגדרות"
+
+#: src/audacious/plugin-view.c:250 src/audacious/ui_preferences.c:652
+msgid "_About"
+msgstr "_אודות"
+
+#: src/audacious/ui_plugin_menu.c:37
+msgid "_Plugins ..."
+msgstr "_תוספות ..."
+
+#: src/audacious/ui_preferences.c:82
+msgid "Appearance"
+msgstr "מראה"
+
+#: src/audacious/ui_preferences.c:83
+msgid "Audio"
+msgstr "שמע"
+
+#: src/audacious/ui_preferences.c:84
+msgid "Network"
+msgstr "רשת עבודה"
+
+#: src/audacious/ui_preferences.c:85 src/audacious/ui_preferences.c:95
+msgid "Playlist"
+msgstr "רשימת נגינה"
+
+#: src/audacious/ui_preferences.c:86 src/libaudgui/infowin.c:299
+msgid "Song Info"
+msgstr "מידע שיר"
+
+#: src/audacious/ui_preferences.c:87
+msgid "Plugins"
+msgstr "תוספים"
+
+#: src/audacious/ui_preferences.c:91
+msgid "General"
+msgstr "כללי"
+
+#: src/audacious/ui_preferences.c:92
+msgid "Effect"
+msgstr "אפקט"
+
+#: src/audacious/ui_preferences.c:93
+msgid "Visualization"
+msgstr "ויזואליזציה"
+
+#: src/audacious/ui_preferences.c:94
+msgid "Input"
+msgstr "קלט"
+
+#: src/audacious/ui_preferences.c:96
+msgid "Transport"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:100 src/libaudgui/infopopup.c:151
+#: src/libaudgui/infowin.c:343
+msgid "Artist"
+msgstr "אמן"
+
+#: src/audacious/ui_preferences.c:101 src/libaudgui/infopopup.c:152
+#: src/libaudgui/infowin.c:346
+msgid "Album"
+msgstr "אלבום"
+
+#: src/audacious/ui_preferences.c:102 src/libaudgui/infopopup.c:150
+#: src/libaudgui/infowin.c:340 src/libaudgui/ui_playlist_manager.c:235
+msgid "Title"
+msgstr "כותרת"
+
+#: src/audacious/ui_preferences.c:103
+msgid "Tracknumber"
+msgstr "מספר רצועה"
+
+#: src/audacious/ui_preferences.c:104 src/libaudgui/infopopup.c:153
+#: src/libaudgui/infowin.c:352
+msgid "Genre"
+msgstr "סגנון"
+
+#: src/audacious/ui_preferences.c:105
+msgid "Filename"
+msgstr "שם קובץ"
+
+#: src/audacious/ui_preferences.c:106
+msgid "Filepath"
+msgstr "נתיב קובץ"
+
+#: src/audacious/ui_preferences.c:107
+msgid "Date"
+msgstr "תאריך"
+
+#: src/audacious/ui_preferences.c:108 src/libaudgui/infopopup.c:154
+#: src/libaudgui/infowin.c:356
+msgid "Year"
+msgstr "שנה"
+
+#: src/audacious/ui_preferences.c:109 src/libaudgui/infowin.c:349
+msgid "Comment"
+msgstr "הערה"
+
+#: src/audacious/ui_preferences.c:110
+msgid "Codec"
+msgstr "קודק"
+
+#: src/audacious/ui_preferences.c:111
+msgid "Quality"
+msgstr "איכות"
+
+#: src/audacious/ui_preferences.c:116
+msgid "None"
+msgstr "ללא"
+
+#: src/audacious/ui_preferences.c:117
+msgid "Arabic"
+msgstr "ערבית"
+
+#: src/audacious/ui_preferences.c:118
+msgid "Baltic"
+msgstr "בלטית"
+
+#: src/audacious/ui_preferences.c:119
+msgid "Chinese"
+msgstr "סינית"
+
+#: src/audacious/ui_preferences.c:120
+msgid "Greek"
+msgstr "יוונית"
+
+#: src/audacious/ui_preferences.c:121
+msgid "Hebrew"
+msgstr "עברית"
+
+#: src/audacious/ui_preferences.c:122
+msgid "Japanese"
+msgstr "יפנית"
+
+#: src/audacious/ui_preferences.c:123
+msgid "Korean"
+msgstr "קוריאנית"
+
+#: src/audacious/ui_preferences.c:124
+msgid "Polish"
+msgstr "פולנית"
+
+#: src/audacious/ui_preferences.c:125
+msgid "Russian"
+msgstr "רוסית"
+
+#: src/audacious/ui_preferences.c:126
+msgid "Taiwanese"
+msgstr "טאיואנית"
+
+#: src/audacious/ui_preferences.c:127
+msgid "Turkish"
+msgstr "טורקית"
+
+#: src/audacious/ui_preferences.c:135
+msgid "Floating point"
+msgstr "נקודה צפה"
+
+#: src/audacious/ui_preferences.c:147
+msgid "<b>Interface Settings</b>"
+msgstr "<b>הגדרות ממשק</b>"
+
+#: src/audacious/ui_preferences.c:148
+msgid "Interface plugin:"
+msgstr "תוספת ממשק:"
+
+#: src/audacious/ui_preferences.c:165
+msgid "Output plugin:"
+msgstr "תוספת פלט:"
+
+#: src/audacious/ui_preferences.c:172
+msgid "<b>Output Settings</b>"
+msgstr "<b>הגדרות פלט</b>"
+
+#: src/audacious/ui_preferences.c:175
+msgid "Bit depth:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:178
+msgid "Buffer size:"
+msgstr "גודל אגירה:"
+
+#: src/audacious/ui_preferences.c:180
+msgid "ms"
+msgstr "אלפית־השנייה"
+
+#: src/audacious/ui_preferences.c:181
+msgid "Soft clipping"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:183
+msgid "Use software volume control (not recommended)"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:185
+msgid "<b>Replay Gain</b>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:186
+msgid "Enable Replay Gain"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:188
+msgid "Album mode"
+msgstr "מצב אלבום"
+
+#: src/audacious/ui_preferences.c:190
+msgid "Prevent clipping (recommended)"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:192
+msgid "<b>Adjust Levels</b>"
+msgstr "<b>התאם רמות</b>"
+
+#: src/audacious/ui_preferences.c:193
+msgid "Amplify all files:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:195 src/audacious/ui_preferences.c:198
+msgid "dB"
+msgstr "דציבל"
+
+#: src/audacious/ui_preferences.c:196
+msgid "Amplify untagged files:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:201
+msgid "Proxy hostname:"
+msgstr "מארח Proxy:"
+
+#: src/audacious/ui_preferences.c:202
+msgid "Proxy port:"
+msgstr "פורט Proxy:"
+
+#: src/audacious/ui_preferences.c:205
+msgid "Proxy username:"
+msgstr "שם משתמש Proxy:"
+
+#: src/audacious/ui_preferences.c:206
+msgid "Proxy password:"
+msgstr "סיסמת Proxy:"
+
+#: src/audacious/ui_preferences.c:210
+msgid "<b>Proxy Configuration</b>"
+msgstr "<b>תצורת מתווך</b>"
+
+#: src/audacious/ui_preferences.c:211
+msgid "Enable proxy usage"
+msgstr "אפשר ניצול Proxy"
+
+#: src/audacious/ui_preferences.c:214
+msgid "Use authentication with proxy"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:221
+msgid "Auto character encoding detector for:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:225
+msgid "Fallback character encodings:"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:229
+msgid "<b>Behavior</b>"
+msgstr "<b>התנהגות</b>"
+
+#: src/audacious/ui_preferences.c:230
+msgid "Continue playback on startup"
+msgstr "המשך ניגון בעת הפעלה"
+
+#: src/audacious/ui_preferences.c:232
+msgid "Advance when the current song is deleted"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:234
+msgid "Clear the playlist when opening files"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:236
+msgid "Open files in a temporary playlist"
+msgstr "פתח קבצים ברשימת נגינה זמנית"
+
+#: src/audacious/ui_preferences.c:238
+msgid "Do not load metadata for songs until played"
+msgstr "אל תטעין metadata עבור שירים עד שינוגנו"
+
+#: src/audacious/ui_preferences.c:241
+msgid "<b>Compatibility</b>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:242
+msgid "Interpret \\ (backward slash) as a folder delimiter"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:247
+msgid "<b>Album Art</b>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:248
+msgid "Search for images matching these words (comma-separated):"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:250
+msgid "Exclude images matching these words (comma-separated):"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:252
+msgid "Search for images matching song file name"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:254
+msgid "Search recursively"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:256
+msgid "Search depth:"
+msgstr "עומק חיפוש:"
+
+#: src/audacious/ui_preferences.c:259
+msgid "<b>Popup Information</b>"
+msgstr "<b>מידע תיבה קופצת</b>"
+
+#: src/audacious/ui_preferences.c:260
+msgid "Show popup information"
+msgstr "הצג מידע תיבה מוקפצת"
+
+#: src/audacious/ui_preferences.c:262
+msgid "Popup delay (tenths of a second):"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:265
+msgid "Show time scale for current song"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:280
+msgid "TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:281
+msgid "ARTIST - TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:282
+msgid "ARTIST - ALBUM - TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:283
+msgid "ARTIST - ALBUM - TRACK. TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:284
+msgid "ARTIST [ ALBUM ] - TRACK. TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:285
+msgid "ALBUM - TITLE"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:375
+msgid "Category"
+msgstr "קטגוריה"
+
+#: src/audacious/ui_preferences.c:457
+msgid "Custom"
+msgstr "מותאם"
+
+#: src/audacious/ui_preferences.c:481
+msgid "<b>Song Display</b>"
+msgstr ""
+
+#: src/audacious/ui_preferences.c:490
+msgid "Show song numbers"
+msgstr "הצג מספרי שירים"
+
+#: src/audacious/ui_preferences.c:501
+msgid "Show leading zeroes (02:00 instead of 2:00)"
+msgstr "הצג אפסים מובילים (02:00 במקום 2:00)"
+
+#: src/audacious/ui_preferences.c:515
+msgid "Title format:"
+msgstr "פורמט כותרת:"
+
+#: src/audacious/ui_preferences.c:520
+msgid "Custom string:"
+msgstr "מחרוזת מותאמת:"
+
+#: src/audacious/ui_preferences.c:714
+msgid "Audacious Settings"
+msgstr "הגדרות Audacious"
+
+#: src/audacious/util.c:112
+#, c-format
+msgid "Could not create directory (%s): %s\n"
+msgstr "לא ניתן ליצור מדור ‏(%s): ‫%s\n"
+
+#: src/libaudcore/audstrings.c:385
+#, c-format
+msgid "Audio CD, track %s"
+msgstr ""
+
+#: src/libaudcore/tuple.c:442
+msgid "Mono"
+msgstr "חד־ערוצי"
+
+#: src/libaudcore/tuple.c:444
+msgid "Stereo"
+msgstr "דו־ערוצי"
+
+#: src/libaudcore/tuple.c:446
+#, c-format
+msgid "%d channel"
+msgid_plural "%d channels"
+msgstr[0] "ערוץ %d"
+msgstr[1] "%d ערוצים"
+
+#: src/libaudgui/about.c:37
+msgid "Credits"
+msgstr "תודות"
+
+#: src/libaudgui/about.c:37
+msgid "License"
+msgstr "רשיון"
+
+#: src/libaudgui/about.c:69
+msgid "About Audacious"
+msgstr "אודות Audacious"
+
+#: src/libaudgui/confirm.c:51
+#, c-format
+msgid "Do you want to permanently remove “%s”?"
+msgstr ""
+
+#: src/libaudgui/confirm.c:55 src/libaudgui/ui_playlist_manager.c:255
+msgid "_Remove"
+msgstr "_הסר"
+
+#: src/libaudgui/confirm.c:60
+msgid "Remove Playlist"
+msgstr "הסר רשימת נגינה"
+
+#: src/libaudgui/confirm.c:62
+msgid "_Don’t ask again"
+msgstr "_אל תשאל שוב"
+
+#: src/libaudgui/confirm.c:89
+msgid "_Rename"
+msgstr "_שנה שם"
+
+#: src/libaudgui/confirm.c:93
+msgid "Rename Playlist"
+msgstr "שנה שם רשימת נגינה"
+
+#: src/libaudgui/confirm.c:93
+msgid "What would you like to call this playlist?"
+msgstr ""
+
+#: src/libaudgui/equalizer.c:44
+msgid "_Enable"
+msgstr "_אפשר"
+
+#: src/libaudgui/equalizer.c:119
+msgid "31 Hz"
+msgstr "31 Hz"
+
+#: src/libaudgui/equalizer.c:119
+msgid "63 Hz"
+msgstr "63 Hz"
+
+#: src/libaudgui/equalizer.c:120
+msgid "125 Hz"
+msgstr "125 Hz"
+
+#: src/libaudgui/equalizer.c:120
+msgid "250 Hz"
+msgstr "250 Hz"
+
+#: src/libaudgui/equalizer.c:120
+msgid "500 Hz"
+msgstr "500 Hz"
+
+#: src/libaudgui/equalizer.c:120
+msgid "1 kHz"
+msgstr "1 kHz"
+
+#: src/libaudgui/equalizer.c:120
+msgid "2 kHz"
+msgstr "2 kHz"
+
+#: src/libaudgui/equalizer.c:121
+msgid "4 kHz"
+msgstr "4 kHz"
+
+#: src/libaudgui/equalizer.c:121
+msgid "8 kHz"
+msgstr "8 kHz"
+
+#: src/libaudgui/equalizer.c:121
+msgid "16 kHz"
+msgstr "16 kHz"
+
+#: src/libaudgui/equalizer.c:124
+msgid "Equalizer"
+msgstr "משווה"
+
+#: src/libaudgui/equalizer.c:138
+msgid "Preamp"
+msgstr "מגבר קדם"
+
+#: src/libaudgui/infopopup.c:155
+msgid "Track"
+msgstr "רצועה"
+
+#: src/libaudgui/infopopup.c:156
+msgid "Length"
+msgstr "אורך"
+
+#: src/libaudgui/infowin.c:46
+msgid "Format:"
+msgstr "פורמט:"
+
+#: src/libaudgui/infowin.c:47
+msgid "Quality:"
+msgstr "איכות:"
+
+#: src/libaudgui/infowin.c:48
+msgid "Bitrate:"
+msgstr "שיעור סביות:"
+
+#: src/libaudgui/infowin.c:76
+msgid "Acid Jazz"
+msgstr ""
+
+#: src/libaudgui/infowin.c:77
+msgid "Acid Rock"
+msgstr ""
+
+#: src/libaudgui/infowin.c:78
+msgid "Ambient"
+msgstr ""
+
+#: src/libaudgui/infowin.c:79
+msgid "Bebop"
+msgstr "ביבופ"
+
+#: src/libaudgui/infowin.c:80
+msgid "Bluegrass"
+msgstr ""
+
+#: src/libaudgui/infowin.c:81
+msgid "Blues"
+msgstr "בלוז"
+
+#: src/libaudgui/infowin.c:82
+msgid "Chamber Music"
+msgstr "מוזיקה קאמרית"
+
+#: src/libaudgui/infowin.c:83
+msgid "Classical"
+msgstr "קלאסי"
+
+#: src/libaudgui/infowin.c:84
+msgid "Country"
+msgstr "קאנטרי"
+
+#: src/libaudgui/infowin.c:85
+msgid "Death Metal"
+msgstr "דת׳ מטאל"
+
+#: src/libaudgui/infowin.c:86
+msgid "Disco"
+msgstr "דיסקו"
+
+#: src/libaudgui/infowin.c:87
+msgid "Easy Listening"
+msgstr ""
+
+#: src/libaudgui/infowin.c:88
+msgid "Folk"
+msgstr ""
+
+#: src/libaudgui/infowin.c:89
+msgid "Funk"
+msgstr "פאנק"
+
+#: src/libaudgui/infowin.c:90
+msgid "Gangsta Rap"
+msgstr "גנגסטר ראפ"
+
+#: src/libaudgui/infowin.c:91
+msgid "Gospel"
+msgstr "גוספל"
+
+#: src/libaudgui/infowin.c:92
+msgid "Grunge"
+msgstr "גראנג׳"
+
+#: src/libaudgui/infowin.c:93
+msgid "Hard Rock"
+msgstr "רוק כבד"
+
+#: src/libaudgui/infowin.c:94
+msgid "Heavy Metal"
+msgstr "הבי מטאל"
+
+#: src/libaudgui/infowin.c:95
+msgid "Hip-hop"
+msgstr "היפ-הופ"
+
+#: src/libaudgui/infowin.c:96
+msgid "House"
+msgstr "האוס"
+
+#: src/libaudgui/infowin.c:97
+msgid "Jazz"
+msgstr "ג׳ז"
+
+#: src/libaudgui/infowin.c:98
+msgid "Jungle"
+msgstr "ג׳ונגל"
+
+#: src/libaudgui/infowin.c:99
+msgid "Metal"
+msgstr "מטאל"
+
+#: src/libaudgui/infowin.c:100
+msgid "New Age"
+msgstr "ניו אייג׳"
+
+#: src/libaudgui/infowin.c:101
+msgid "New Wave"
+msgstr "גל חדש"
+
+#: src/libaudgui/infowin.c:102
+msgid "Noise"
+msgstr "רעש"
+
+#: src/libaudgui/infowin.c:103
+msgid "Pop"
+msgstr "פופ"
+
+#: src/libaudgui/infowin.c:104
+msgid "Punk Rock"
+msgstr "פענק רוק"
+
+#: src/libaudgui/infowin.c:105
+msgid "Rap"
+msgstr "ראפ"
+
+#: src/libaudgui/infowin.c:106
+msgid "Reggae"
+msgstr "רגיי"
+
+#: src/libaudgui/infowin.c:107
+msgid "Rock"
+msgstr "רוק"
+
+#: src/libaudgui/infowin.c:108
+msgid "Rock and Roll"
+msgstr "רוק אנד רול"
+
+#: src/libaudgui/infowin.c:109
+msgid "Rhythm and Blues"
+msgstr ""
+
+#: src/libaudgui/infowin.c:110
+msgid "Ska"
+msgstr "סקה"
+
+#: src/libaudgui/infowin.c:111
+msgid "Soul"
+msgstr "נשמה"
+
+#: src/libaudgui/infowin.c:112
+msgid "Swing"
+msgstr "סווינג"
+
+#: src/libaudgui/infowin.c:113
+msgid "Techno"
+msgstr "טכנו"
+
+#: src/libaudgui/infowin.c:114
+msgid "Trip-hop"
+msgstr ""
+
+#: src/libaudgui/infowin.c:220
+msgid "Save successful"
+msgstr ""
+
+#: src/libaudgui/infowin.c:224
+msgid "Save error"
+msgstr "שמור שגיאה"
+
+#: src/libaudgui/infowin.c:359
+msgid "Track Number"
+msgstr "מספר רצועה"
+
+#: src/libaudgui/infowin.c:367
+msgid "_Save"
+msgstr "_שמור"
+
+#: src/libaudgui/infowin.c:418
+#, c-format
+msgid "%d kb/s"
+msgstr "%d ק״ב/ש"
+
+#: src/libaudgui/infowin.c:423
+msgid "N/A"
+msgstr ""
+
+#: src/libaudgui/infowin.c:453
+#, c-format
+msgid "No info available for %s.\n"
+msgstr "אין מידע זמין עבור %s.\n"
+
+#: src/libaudgui/jump-to-time.c:48 src/libaudgui/ui_jumptotrack.c:305
+msgid "_Jump"
+msgstr "_קפוץ"
+
+#: src/libaudgui/jump-to-time.c:52
+msgid "Jump to Time"
+msgstr "קפוץ אל זמן"
+
+#: src/libaudgui/jump-to-time.c:52
+msgid "Enter time (minutes:seconds):"
+msgstr "הזנת זמן (דקות:שניות):"
+
+#: src/libaudgui/playlists.c:86
+#, c-format
+msgid "Overwrite %s?"
+msgstr "לכתוב על %s?"
+
+#: src/libaudgui/playlists.c:88
+msgid "_Overwrite"
+msgstr "_שכתב"
+
+#: src/libaudgui/playlists.c:92
+msgid "Confirm Overwrite"
+msgstr "ודא כתיבה על גבי קובץ קיים"
+
+#: src/libaudgui/playlists.c:121
+msgid "Export Playlist"
+msgstr "יצא רשימת נגינה"
+
+#: src/libaudgui/playlists.c:122
+msgid "_Export"
+msgstr "י_צא"
+
+#: src/libaudgui/playlists.c:128
+msgid "Import Playlist"
+msgstr "יבא רשימת נגינה"
+
+#: src/libaudgui/playlists.c:129
+msgid "_Import"
+msgstr "י_בא"
+
+#: src/libaudgui/queue-manager.c:172
+msgid "Queue Manager"
+msgstr "ניהול תור"
+
+#: src/libaudgui/queue-manager.c:188
+msgid "_Unqueue"
+msgstr ""
+
+#: src/libaudgui/ui_fileopener.c:79
+msgid "Open Files"
+msgstr "פתח קבצים"
+
+#: src/libaudgui/ui_fileopener.c:80 src/libaudgui/url-opener.c:50
+msgid "_Open"
+msgstr "_פתח"
+
+#: src/libaudgui/ui_fileopener.c:82
+msgid "Close _dialog on open"
+msgstr ""
+
+#: src/libaudgui/ui_fileopener.c:87
+msgid "Add Files"
+msgstr "הוסף קבצים"
+
+#: src/libaudgui/ui_fileopener.c:88 src/libaudgui/url-opener.c:56
+msgid "_Add"
+msgstr "_הוסף"
+
+#: src/libaudgui/ui_fileopener.c:90
+msgid "Close _dialog on add"
+msgstr ""
+
+#: src/libaudgui/ui_jumptotrack.c:101 src/libaudgui/ui_jumptotrack.c:109
+#: src/libaudgui/ui_jumptotrack.c:301
+msgid "_Queue"
+msgstr "_תור"
+
+#: src/libaudgui/ui_jumptotrack.c:107
+msgid "Un_queue"
+msgstr ""
+
+#: src/libaudgui/ui_jumptotrack.c:245
+msgid "Jump to Song"
+msgstr "קפיצה אל שיר"
+
+#: src/libaudgui/ui_jumptotrack.c:270
+msgid "Filter: "
+msgstr "מסנן: "
+
+#: src/libaudgui/ui_jumptotrack.c:271
+msgid "_Filter:"
+msgstr "מ_סנן:"
+
+#: src/libaudgui/ui_jumptotrack.c:294
+msgid "C_lose on jump"
+msgstr ""
+
+#: src/libaudgui/ui_playlist_manager.c:223
+msgid "Playlist Manager"
+msgstr "מנהל רשימת נגינה"
+
+#: src/libaudgui/ui_playlist_manager.c:236
+msgid "Entries"
+msgstr "רשומות"
+
+#: src/libaudgui/ui_playlist_manager.c:254
+msgid "_New"
+msgstr "_חדש"
+
+#: src/libaudgui/ui_playlist_manager.c:256
+msgid "Ren_ame"
+msgstr "שנה _שם"
+
+#: src/libaudgui/ui_playlist_manager.c:257
+msgid "_Play"
+msgstr "_נגן"
+
+#: src/libaudgui/ui_playlist_manager.c:269
+msgid "_Close dialog on activating playlist"
+msgstr ""
+
+#: src/libaudgui/url-opener.c:49
+msgid "Open URL"
+msgstr "פתח URL"
+
+#: src/libaudgui/url-opener.c:55
+msgid "Add URL"
+msgstr "הוסף URL"
+
+#: src/libaudgui/url-opener.c:74
+msgid "Enter URL:"
+msgstr "הזן URL:"
+
+#: src/libaudgui/util.c:148
+msgid ""
+"\n"
+"(Further messages have been hidden.)"
+msgstr ""

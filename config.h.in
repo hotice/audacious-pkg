@@ -6,21 +6,12 @@
 /* Build stamp */
 #undef BUILDSTAMP
 
-/* Define to disable per user plugin directory */
-#undef DISABLE_USER_PLUGIN_DIR
-
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
 
 /* Define to compiler syntax for public symbols */
 #undef EXPORT
-
-/* Define to 1 if you have the `backtrace' function. */
-#undef HAVE_BACKTRACE
-
-/* Define if cexpf is present */
-#undef HAVE_CEXPF
 
 /* Define to 1 if you have the Mac OS X function CFLocaleCopyCurrent in the
    CoreFoundation framework. */
@@ -33,9 +24,6 @@
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
 #undef HAVE_DCGETTEXT
-
-/* Define to 1 if you have the <execinfo.h> header file. */
-#undef HAVE_EXECINFO_H
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
@@ -51,15 +39,6 @@
 
 /* Define if the /proc/self/exe symlink is supported */
 #undef HAVE_PROC_SELF_EXE
-
-/* Define to 1 if you have the <regex.h> header file. */
-#undef HAVE_REGEX_H
-
-/* Define to 1 if you have the <rxposix.h> header file. */
-#undef HAVE_RXPOSIX_H
-
-/* Define to 1 if you have the <rx/rxposix.h> header file. */
-#undef HAVE_RX_RXPOSIX_H
 
 /* Define to 1 if you have the `sigwait' function. */
 #undef HAVE_SIGWAIT
@@ -84,6 +63,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
 
 /* Name of package */
 #undef PACKAGE
@@ -118,14 +100,8 @@
 /* Define if D-Bus support enabled */
 #undef USE_DBUS
 
-/* If this macro is defined, use GNU regex library. */
-#undef USE_REGEX_GNU
-
-/* If this macro is defined, use Oniguruma regex library. */
-#undef USE_REGEX_ONIGURUMA
-
-/* If this macro is defined, use PCRE regex library. */
-#undef USE_REGEX_PCRE
+/* Define to allow Valgrind analysis */
+#undef VALGRIND_FRIENDLY
 
 /* Version number of package */
 #undef VERSION

@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<!--
- * mpris_root.xml
- * Copyright 2007 William Pitcock
+/*
+ * vfs_local.h
+ * Copyright 2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,15 +15,13 @@
  * This software is provided "as is" and without any warranty, express or
  * implied. In no event shall the authors be liable for any damages arising from
  * the use of this software.
- -->
+ */
 
-<node name="/">
-    <interface name="org.freedesktop.MediaPlayer">
-        <method name="Identity">
-            <arg type="s" direction="out" />
-        </method>
-        <method name="Quit">
-            <annotation name="org.freedesktop.DBus.GLib.NoReply" value=""/>
-        </method>
-    </interface>
-</node>
+#ifndef LIBAUDCORE_VFS_LOCAL_H
+#define LIBAUDCORE_VFS_LOCAL_H
+
+#include "vfs.h"
+
+extern VFSConstructor vfs_local_vtable;
+
+#endif /* LIBAUDCORE_VFS_LOCAL_H */

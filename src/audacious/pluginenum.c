@@ -1,6 +1,6 @@
 /*
  * pluginenum.c
- * Copyright 2007-2011 William Pitcock and John Lindgren
+ * Copyright 2007-2013 William Pitcock and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -19,11 +19,13 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <glib.h>
-#include <gmodule.h>
 #include <pthread.h>
 #include <string.h>
 #include <sys/stat.h>
+
+#include <glib.h>
+#include <glib/gstdio.h>
+#include <gmodule.h>
 
 #include <libaudcore/audstrings.h>
 #include <libaudgui/init.h>
@@ -34,17 +36,27 @@
 
 #define AUD_API_DECLARE
 #include "drct.h"
+#include "input.h"
 #include "misc.h"
 #include "playlist.h"
 #include "plugins.h"
 #undef AUD_API_DECLARE
 
-static const char * plugin_dir_list[] = {PLUGINSUBS, NULL};
+static const char * plugin_dir_list[] = {
+    "Transport",
+    "Container",
+    "Input",
+    "Output",
+    "Effect",
+    "General",
+    "Visualization"
+};
 
 char verbose = 0;
 
 AudAPITable api_table = {
  .drct_api = & drct_api,
+ .input_api = & input_api,
  .misc_api = & misc_api,
  .playlist_api = & playlist_api,
  .plugins_api = & plugins_api,
@@ -132,7 +144,9 @@ static void plugin2_unload (LoadedModule * loaded)
     }
 
     pthread_mutex_lock (& mutex);
+#ifndef VALGRIND_FRIENDLY
     g_module_close (loaded->module);
+#endif
     g_slice_free (LoadedModule, loaded);
     pthread_mutex_unlock (& mutex);
 }
@@ -144,8 +158,8 @@ static bool_t scan_plugin_func(const char * path, const char * basename, void * 
     if (!str_has_suffix_nocase(basename, PLUGIN_SUFFIX))
         return FALSE;
 
-    struct stat st;
-    if (stat (path, & st))
+    GStatBuf st;
+    if (g_stat (path, & st) < 0)
     {
         fprintf (stderr, "Unable to stat %s: %s\n", path, strerror (errno));
         return FALSE;
@@ -166,36 +180,17 @@ void plugin_system_init(void)
 {
     assert (g_module_supported ());
 
-    char *dir;
-    int dirsel = 0;
-
-    audgui_init (& api_table);
+    audgui_init (& api_table, _AUD_PLUGIN_VERSION);
 
     plugin_registry_load ();
 
-#ifndef DISABLE_USER_PLUGIN_DIR
-    scan_plugins (get_path (AUD_PATH_USER_PLUGIN_DIR));
-    /*
-     * This is in a separate loop so if the user puts them in the
-     * wrong dir we'll still get them in the right order (home dir
-     * first)                                                - Zinx
-     */
-    while (plugin_dir_list[dirsel])
-    {
-        dir = g_build_filename (get_path (AUD_PATH_USER_PLUGIN_DIR),
-         plugin_dir_list[dirsel ++], NULL);
-        scan_plugins(dir);
-        g_free(dir);
-    }
-    dirsel = 0;
-#endif
+    const char * path = get_path (AUD_PATH_PLUGIN_DIR);
 
-    while (plugin_dir_list[dirsel])
+    for (int i = 0; i < ARRAY_LEN (plugin_dir_list); i ++)
     {
-        dir = g_build_filename (get_path (AUD_PATH_PLUGIN_DIR),
-         plugin_dir_list[dirsel ++], NULL);
-        scan_plugins(dir);
-        g_free(dir);
+        char * dir = filename_build (path, plugin_dir_list[i]);
+        scan_plugins (dir);
+        str_unref (dir);
     }
 
     plugin_registry_prune ();

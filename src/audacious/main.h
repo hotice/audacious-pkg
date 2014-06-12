@@ -1,6 +1,6 @@
 /*
  * main.h
- * Copyright 2011 John Lindgren
+ * Copyright 2011-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -32,8 +32,15 @@ void adder_cleanup (void);
 void art_init (void);
 void art_cleanup (void);
 
+/* dbus-server.c */
+#ifdef USE_DBUS
+void dbus_server_init (void);
+void dbus_server_cleanup (void);
+#endif
+
 /* chardet.c */
 void chardet_init (void);
+void chardet_cleanup (void);
 
 /* config.c */
 void config_load (void);
@@ -44,17 +51,15 @@ void config_cleanup (void);
 void history_cleanup (void);
 
 /* main.c */
-extern bool_t headless;
 bool_t do_autosave (void);
 
-/* mpris-signals.c */
-void mpris_signals_init (void);
-void mpris_signals_cleanup (void);
-
 /* signals.c */
-void signals_init (void);
+#ifdef HAVE_SIGWAIT
+void signals_init_one (void);
+void signals_init_two (void);
+#endif
 
 /* ui_albumart.c */
-char * get_associated_image_file (const char * filename);
+char * get_associated_image_file (const char * filename); /* pooled */
 
 #endif

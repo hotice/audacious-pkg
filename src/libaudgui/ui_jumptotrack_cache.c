@@ -1,6 +1,6 @@
 /*
  * ui_jumptotrack_cache.c
- * Copyright 2008-2011 Jussi Judin and John Lindgren
+ * Copyright 2008-2012 Jussi Judin and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -22,29 +22,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#ifdef HAVE_SYS_TYPES_H
-#  include "sys/types.h"
-#endif
 
 #include <audacious/debug.h>
 #include <audacious/playlist.h>
 #include <libaudcore/audstrings.h>
 
 #include "ui_jumptotrack_cache.h"
-#include "ui_regex.h"
 
 // Struct to keep information about matches from searches.
 typedef struct
 {
     GArray * entries; // int
-    GArray * titles, * artists, * albums, * paths; // char *
+    GArray * titles, * artists, * albums, * paths; // char * (pooled)
 } KeywordMatches;
 
 static void ui_jump_to_track_cache_init (JumpToTrackCache * cache);
 
 static KeywordMatches * keyword_matches_new (void)
 {
-    KeywordMatches * k = g_malloc (sizeof (KeywordMatches));
+    KeywordMatches * k = g_slice_new (KeywordMatches);
     k->entries = g_array_new (FALSE, FALSE, sizeof (int));
     k->titles = g_array_new (FALSE, FALSE, sizeof (char *));
     k->artists = g_array_new (FALSE, FALSE, sizeof (char *));
@@ -60,7 +56,7 @@ static void keyword_matches_free (KeywordMatches * k)
     g_array_free (k->artists, TRUE);
     g_array_free (k->albums, TRUE);
     g_array_free (k->paths, TRUE);
-    g_free (k);
+    g_slice_free (KeywordMatches, k);
 }
 
 /**
@@ -89,40 +85,15 @@ ui_jump_to_track_cache_regex_list_create(const GString* keyword)
         if (words[i][0] == 0) {
             continue;
         }
-        regex_t *regex = g_malloc(sizeof(regex_t));
-    #if defined(USE_REGEX_PCRE)
-        if ( regcomp( regex , words[i] , REG_NOSUB | REG_UTF8 ) == 0 )
-    #else
-        if ( regcomp( regex , words[i] , REG_NOSUB ) == 0 )
-    #endif
-            regex_list = g_slist_append( regex_list , regex );
-        else
-            g_free( regex );
+
+        GRegex * regex = g_regex_new (words[i], G_REGEX_CASELESS, 0, NULL);
+        if (regex)
+            regex_list = g_slist_append (regex_list, regex);
     }
 
     g_strfreev(words);
 
     return regex_list;
-}
-
-/**
- * Frees the regular expression list used in searches.
- */
-static void
-ui_jump_to_track_cache_regex_list_free(GSList* regex_list)
-{
-    if ( regex_list != NULL )
-    {
-        GSList* regex_list_tmp = regex_list;
-        while ( regex_list != NULL )
-        {
-            regex_t *regex = regex_list->data;
-            regfree( regex );
-            g_free( regex );
-            regex_list = g_slist_next(regex_list);
-        }
-        g_slist_free( regex_list_tmp );
-    }
 }
 
 /**
@@ -136,8 +107,8 @@ ui_jump_to_track_match(const char * song, GSList *regex_list)
 
     for ( ; regex_list ; regex_list = g_slist_next(regex_list) )
     {
-        regex_t *regex = regex_list->data;
-        if ( regexec( regex , song , 0 , NULL , 0 ) != 0 )
+        GRegex * regex = regex_list->data;
+        if (! g_regex_match (regex, song, 0, NULL))
             return FALSE;
     }
 
@@ -190,30 +161,9 @@ ui_jump_to_track_cache_match_keyword(JumpToTrackCache* cache,
 
     g_hash_table_insert (cache->keywords, GINT_TO_POINTER (g_string_hash (keyword)), k);
 
-    ui_jump_to_track_cache_regex_list_free(regex_list);
+    g_slist_free_full (regex_list, (GDestroyNotify) g_regex_unref);
+
     return k->entries;
-}
-
-/* calls str_unref() on <string> */
-/* returned string must be freed */
-static char * process_string (char * string, bool_t decode)
-{
-    if (! string)
-        return NULL;
-
-    char * normal;
-
-    if (decode)
-    {
-        char temp[strlen (string) + 1];
-        str_decode_percent (string, -1, temp);
-        normal = g_utf8_casefold (temp, -1);
-    }
-    else
-        normal = g_utf8_casefold (string, -1);
-
-    str_unref (string);
-    return normal;
 }
 
 /**
@@ -224,10 +174,10 @@ ui_jump_to_track_cache_free_keywordmatch_data(KeywordMatches* match_entry)
 {
     for (int i = 0; i < match_entry->entries->len; i ++)
     {
-        g_free (g_array_index (match_entry->titles, char *, i));
-        g_free (g_array_index (match_entry->artists, char *, i));
-        g_free (g_array_index (match_entry->albums, char *, i));
-        g_free (g_array_index (match_entry->paths, char *, i));
+        str_unref (g_array_index (match_entry->titles, char *, i));
+        str_unref (g_array_index (match_entry->artists, char *, i));
+        str_unref (g_array_index (match_entry->albums, char *, i));
+        str_unref (g_array_index (match_entry->paths, char *, i));
     }
 }
 
@@ -239,7 +189,7 @@ ui_jump_to_track_cache_free_keywordmatch_data(KeywordMatches* match_entry)
 JumpToTrackCache*
 ui_jump_to_track_cache_new()
 {
-    JumpToTrackCache* cache = g_new(JumpToTrackCache, 1);
+    JumpToTrackCache * cache = g_slice_new (JumpToTrackCache);
 
     cache->keywords = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) keyword_matches_free);
     ui_jump_to_track_cache_init (cache);
@@ -287,20 +237,18 @@ static void ui_jump_to_track_cache_init (JumpToTrackCache * cache)
 
     for (int entry = 0; entry < entries; entry ++)
     {
-        char * title, * artist, * album, * path;
+        char * title, * artist, * album;
         aud_playlist_entry_describe (playlist, entry, & title, & artist, & album, TRUE);
-        path = aud_playlist_entry_get_filename (playlist, entry);
 
-        title = process_string (title, FALSE);
-        artist = process_string (artist, FALSE);
-        album = process_string (album, FALSE);
-        path = process_string (path, TRUE);
+        char * uri = aud_playlist_entry_get_filename (playlist, entry);
+        char * decoded = uri_to_display (uri);
+        str_unref (uri);
 
         g_array_append_val (k->entries, entry);
         g_array_append_val (k->titles, title);
         g_array_append_val (k->artists, artist);
         g_array_append_val (k->albums, album);
-        g_array_append_val (k->paths, path);
+        g_array_append_val (k->paths, decoded);
     }
 
     // Finally insert all titles into cache into an empty key "" so that
@@ -363,9 +311,8 @@ static void ui_jump_to_track_cache_init (JumpToTrackCache * cache)
 const GArray * ui_jump_to_track_cache_search (JumpToTrackCache * cache, const
  char * keyword)
 {
-    char * normalized_keyword = g_utf8_casefold (keyword, -1);
-    GString* keyword_string = g_string_new(normalized_keyword);
-    GString* match_string = g_string_new(normalized_keyword);
+    GString* keyword_string = g_string_new(keyword);
+    GString* match_string = g_string_new(keyword);
     int match_string_length = keyword_string->len;
 
     while (match_string_length >= 0)
@@ -381,7 +328,6 @@ const GArray * ui_jump_to_track_cache_search (JumpToTrackCache * cache, const
             if (match_string_length == keyword_string->len) {
                 g_string_free(keyword_string, TRUE);
                 g_string_free(match_string, TRUE);
-                g_free(normalized_keyword);
                 return matched_entries->entries;
             }
 
@@ -392,7 +338,6 @@ const GArray * ui_jump_to_track_cache_search (JumpToTrackCache * cache, const
                                                                   keyword_string);
             g_string_free(keyword_string, TRUE);
             g_string_free(match_string, TRUE);
-            g_free(normalized_keyword);
             return result;
         }
         match_string_length--;
@@ -409,5 +354,5 @@ void ui_jump_to_track_cache_free (JumpToTrackCache * cache)
 {
     ui_jump_to_track_cache_clear (cache);
     g_hash_table_unref (cache->keywords);
-    g_free (cache);
+    g_slice_free (JumpToTrackCache, cache);
 }

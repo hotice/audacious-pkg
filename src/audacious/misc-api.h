@@ -1,6 +1,6 @@
 /*
  * misc-api.h
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -19,22 +19,30 @@
 
 /* Do not include this file directly; use misc.h instead. */
 
+/* all (char *) return values must be freed with str_unref() */
+
 /* art.c (thread-safe) */
 
-/* deprecated; use the non-blocking art_request_* functions instead */
-AUD_VFUNC3 (art_get_data, const char *, file, const void * *, data, int64_t *, len)
-AUD_FUNC1 (const char *, art_get_file, const char *, file)
+/* Gets album art for <file> (the URI of a song file) as JPEG or PNG data.  If
+ * the album art is not yet loaded, sets <data> to NULL and begins to load the
+ * album art in the background.  On completion, the "art ready" hook is called,
+ * with <file> as a parameter.  The "current art ready" hook is also called if
+ * <file> is the currently playing song. */
+AUD_VFUNC3 (art_request_data, const char *, file, const void * *, data, int64_t *, len)
+
+/* Similar to art_request_data() but returns the URI of an image file.
+ * (A temporary file will be created if necessary.) */
+AUD_FUNC1 (const char *, art_request_file, const char *, file)
 
 /* Releases album art returned by art_request_data() or art_request_file(). */
 AUD_VFUNC1 (art_unref, const char *, file)
 
-/* config.c */
+/* config.c (thread-safe) */
 
-AUD_VFUNC1 (config_clear_section, const char *, section)
 AUD_VFUNC2 (config_set_defaults, const char *, section, const char * const *, entries)
 
-AUD_VFUNC3 (set_string, const char *, section, const char *, name, const char *, value)
-AUD_FUNC2 (char *, get_string, const char *, section, const char *, name)
+AUD_VFUNC3 (set_str, const char *, section, const char *, name, const char *, value)
+AUD_FUNC2 (char *, get_str, const char *, section, const char *, name)
 AUD_VFUNC3 (set_bool, const char *, section, const char *, name, bool_t, value)
 AUD_FUNC2 (bool_t, get_bool, const char *, section, const char *, name)
 AUD_VFUNC3 (set_int, const char *, section, const char *, name, int, value)
@@ -49,11 +57,17 @@ AUD_VFUNC2 (eq_set_band, int, band, double, value)
 AUD_FUNC1 (double, eq_get_band, int, band)
 
 /* equalizer_preset.c */
+AUD_FUNC1 (EqualizerPreset *, equalizer_preset_new, const char *, name)
+AUD_VFUNC1 (equalizer_preset_free, EqualizerPreset *, preset)
 AUD_FUNC1 (Index *, equalizer_read_presets, const char *, basename)
-AUD_FUNC2 (bool_t, equalizer_write_preset_file, Index *, list, const char *, basename)
+AUD_FUNC2 (bool_t, equalizer_write_presets, Index *, list, const char *, basename)
+
+/* note: legacy code! these are local filenames, not URIs */
 AUD_FUNC1 (EqualizerPreset *, load_preset_file, const char *, filename)
 AUD_FUNC2 (bool_t, save_preset_file, EqualizerPreset *, preset, const char *, filename)
-AUD_FUNC1 (Index *, import_winamp_eqf, VFSFile *, file)
+
+AUD_FUNC1 (Index *, import_winamp_presets, VFSFile *, file)
+AUD_FUNC2 (bool_t, export_winamp_preset, EqualizerPreset *, preset, VFSFile *, file)
 
 /* history.c */
 AUD_FUNC1 (const char *, history_get, int, entry)
@@ -62,19 +76,13 @@ AUD_VFUNC1 (history_add, const char *, path)
 /* interface.c */
 AUD_VFUNC1 (interface_show, bool_t, show)
 AUD_FUNC0 (bool_t, interface_is_shown)
-AUD_FUNC0 (bool_t, interface_is_focused)
 
 /* interface_show_error() is safe to call from any thread */
 AUD_VFUNC1 (interface_show_error, const char *, message)
 
-AUD_VFUNC1 (interface_show_filebrowser, bool_t, play)
-AUD_VFUNC0 (interface_show_jump_to_track)
-
-AUD_VFUNC1 (interface_install_toolbar, void *, button)
-AUD_VFUNC1 (interface_uninstall_toolbar, void *, button)
-
 /* main.c */
 AUD_FUNC1 (const char *, get_path, int, path)
+AUD_FUNC0 (bool_t, headless_mode)
 
 /* output.c */
 AUD_VFUNC1 (output_reset, int, type)
@@ -103,23 +111,18 @@ AUD_VFUNC2 (plugin_menu_remove, int, id, MenuFunc, func)
 AUD_VFUNC4 (create_widgets_with_domain, /* GtkWidget * */ void *, box,
  const PreferencesWidget *, widgets, int, n_widgets, const char *, domain)
 AUD_VFUNC0 (show_prefs_window)
+AUD_VFUNC1 (show_prefs_for_plugin_type, int, type)
 
 /* util.c */
-AUD_FUNC2 (char *, construct_uri, const char *, base, const char *, reference)
+
+/* Constructs a full URI given:
+ *   1. path: one of the following:
+ *     a. a full URI (returned unchanged)
+ *     b. an absolute filename (in the system locale)
+ *     c. a relative path (character set detected according to user settings)
+ *   2. reference: the full URI of the playlist containing <path> */
+AUD_FUNC2 (char *, construct_uri, const char *, path, const char *, reference)
 
 /* visualization.c */
 AUD_VFUNC2 (vis_func_add, int, type, VisFunc, func)
 AUD_VFUNC1 (vis_func_remove, VisFunc, func)
-
-/* added in Audacious 3.4 */
-
-/* Gets album art for <file> (the URI of a song file) as JPEG or PNG data.  If
- * the album art is not yet loaded, sets <data> to NULL and begins to load the
- * album art in the background.  On completion, the "art ready" hook is called,
- * with <file> as a parameter.  The "current art ready" hook is also called if
- * <file> is the currently playing song. */
-AUD_VFUNC3 (art_request_data, const char *, file, const void * *, data, int64_t *, len)
-
-/* Similar to art_request_data() but returns the URI of an image file.
- * (A temporary file will be created if necessary.) */
-AUD_FUNC1 (const char *, art_request_file, const char *, file)

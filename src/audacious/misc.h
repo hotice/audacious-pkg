@@ -1,6 +1,6 @@
 /*
  * misc.h
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2012 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -34,27 +34,17 @@ enum {
  AUD_PATH_DESKTOP_FILE,
  AUD_PATH_ICON_FILE,
  AUD_PATH_USER_DIR,
- AUD_PATH_USER_PLUGIN_DIR,
  AUD_PATH_PLAYLISTS_DIR,
- AUD_PATH_GTKRC_FILE, /* deprecated */
  AUD_PATH_COUNT
 };
-
-typedef struct {
-    char * name;
-    float preamp, bands[10];
-} EqualizerPreset;
 
 enum {OUTPUT_RESET_EFFECTS_ONLY, OUTPUT_RESET_SOFT, OUTPUT_RESET_HARD};
 
 enum {
  AUD_MENU_MAIN,
  AUD_MENU_PLAYLIST,
- AUD_MENU_PLAYLIST_RCLICK,
  AUD_MENU_PLAYLIST_ADD,
  AUD_MENU_PLAYLIST_REMOVE,
- AUD_MENU_PLAYLIST_SELECT,
- AUD_MENU_PLAYLIST_MISC,
  AUD_MENU_COUNT};
 
 typedef void (* MenuFunc) (void);

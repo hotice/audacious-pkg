@@ -1,6 +1,6 @@
 /*
  * audio.c
- * Copyright 2009-2012 John Lindgren, Michał Lipski, and Anders Johansson
+ * Copyright 2009-2013 John Lindgren, Michał Lipski, and Anders Johansson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include "audio.h"
+#include "core.h"
 
 #define INTERLACE_LOOP(TYPE) \
 for (int c = 0; c < channels; c ++) \
@@ -173,7 +174,7 @@ EXPORT void audio_from_int (const void * in, int format, float * out, int sample
 {
     int entry;
 
-    for (entry = 0; entry < G_N_ELEMENTS (convert_table); entry ++)
+    for (entry = 0; entry < ARRAY_LEN (convert_table); entry ++)
     {
         if (convert_table[entry].format == format)
         {
@@ -187,7 +188,7 @@ EXPORT void audio_to_int (const float * in, void * out, int format, int samples)
 {
     int entry;
 
-    for (entry = 0; entry < G_N_ELEMENTS (convert_table); entry ++)
+    for (entry = 0; entry < ARRAY_LEN (convert_table); entry ++)
     {
         if (convert_table[entry].format == format)
         {

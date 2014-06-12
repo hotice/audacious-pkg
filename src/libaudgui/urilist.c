@@ -1,6 +1,6 @@
 /*
  * urilist.c
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,7 +36,7 @@ static char * check_uri (char * name)
     if (strstr (name, "://") || ! (new = filename_to_uri (name)))
         return name;
 
-    g_free (name);
+    str_unref (name);
     return new;
 }
 
@@ -53,15 +53,14 @@ static void urilist_for_each (const char * list, ForEachFunc func, void * user)
         else
             next = end = strchr (list, 0);
 
-        func (check_uri (g_strndup (list, end - list)), user);
+        func (check_uri (str_nget (list, end - list)), user);
         list = next;
     }
 }
 
 static void add_to_index (char * name, Index * index)
 {
-    index_append (index, str_get (name));
-    g_free (name);
+    index_insert (index, -1, name);
 }
 
 EXPORT void audgui_urilist_open (const char * list)

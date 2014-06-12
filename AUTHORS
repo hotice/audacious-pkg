@@ -22,74 +22,29 @@ maintain a list of those who have done so.
 
 DEVELOPERS
 
-Please note that many of Audacious’s features are implemented by plugins, whose
-authors are listed elsewhere.
+Audacious was written by:
 
-Core executable (src/audacious):
- * Copyright © 2001 Anders Johansson
- * Copyright © 2003-2012:
-  Michael Färber
-  Matti Hämäläinen
-  Michael Hanselmann
-  John Lindgren
-  Michał Lipski
-  Tomasz Moń
-  William Pitcock
-  Andrew Shadoura
-  Ben Tucker
-  Yoshiki Yazawa
-  Eugene Zagidullin
-
-Command line tool (src/audtool):
- * Copyright © 2005-2011:
   George Averill
-  Matti Hämäläinen
-  John Lindgren
-  Giacomo Lozito
-  William Pitcock
-  Yoshiki Yazawa
-
-Remote control shared library (src/libaudclient):
- * Copyright © 2007-2011:
-  Matti Hämäläinen
-  John Lindgren
-  William Pitcock
-  Ben Tucker
-  Yoshiki Yazawa
-
-Core shared library (src/libaudcore):
- * Copyright © 2006-2012:
   Daniel Barkalow
   Christian Birchinger
   Ralf Ertzinger
-  Maciej Grela
+  Michael Färber
   Matti Hämäläinen
+  Michael Hanselmann
   Anders Johansson
+  Jussi Judin
+  Thomas Lange
   John Lindgren
   Michał Lipski
   Giacomo Lozito
-  William Pitcock
-  Tony Vroon
-  Yoshiki Yazawa
-  Eugene Zagidullin
-
-User interface shared library (src/libaudgui):
- * Copyright © 2006-2012:
-  Carlo Bramini
-  Michael Färber
-  Jussi Judin
-  John Lindgren
-  Giacomo Lozito
+  Mikael Magnusson
   Tomasz Moń
   William Pitcock
+  Paula Stanciu
+  Ben Tucker
+  Tony Vroon
   Yoshiki Yazawa
   Eugene Zagidullin
 
-Tagging support (src/libaudtag):
- * Copyright © 2009-2011:
-  John Lindgren
-  Michał Lipski
-  Mikael Magnusson
-  William Pitcock
-  Paula Stanciu
-  Tony Vroon
+Please note that many of Audacious’s features are implemented by plugins, whose
+authors are listed elsewhere.

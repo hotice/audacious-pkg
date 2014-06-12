@@ -1,6 +1,6 @@
 /*
- * tuple_formatter.h
- * Copyright (c) 2007 William Pitcock
+ * inifile.h
+ * Copyright 2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,12 +17,17 @@
  * the use of this software.
  */
 
-#ifndef LIBAUDCORE_TUPLE_FORMATTER_H
-#define LIBAUDCORE_TUPLE_FORMATTER_H
+#ifndef LIBAUDCORE_INIFILE_H
+#define LIBAUDCORE_INIFILE_H
 
-#include <libaudcore/tuple.h>
+#include "vfs.h"
 
-/* returned string be released with str_unref() */
-char * tuple_formatter_process_string (const Tuple * tuple, const char * string);
+void inifile_parse (VFSFile * file,
+ void (* handle_heading) (const char * heading, void * data),
+ void (* handle_entry) (const char * key, const char * value, void * data),
+ void * data);
 
-#endif /* LIBAUDCORE_TUPLE_FORMATTER_H */
+bool_t inifile_write_heading (VFSFile * file, const char * heading);
+bool_t inifile_write_entry (VFSFile * file, const char * key, const char * value);
+
+#endif /* LIBAUDCORE_INIFILE_H */

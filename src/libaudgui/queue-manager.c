@@ -1,6 +1,6 @@
 /*
  * queue-manager.c
- * Copyright 2011 John Lindgren
+ * Copyright 2011-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,16 +26,12 @@
 
 #include "init.h"
 #include "libaudgui.h"
+#include "libaudgui-gtk.h"
 #include "list.h"
 
 enum {
  COLUMN_ENTRY,
  COLUMN_TITLE};
-
-#define RESPONSE_REMOVE 1
-
-static GtkWidget * qm_win;
-static GtkWidget * qm_list;
 
 static void get_value (void * user, int row, int column, GValue * value)
 {
@@ -110,7 +106,7 @@ static const AudguiListCallbacks callbacks = {
  .select_all = select_all,
  .shift_rows = shift_rows};
 
-static void remove_selected (void)
+static void remove_selected (void * unused)
 {
     int list = aud_playlist_get_active ();
     int count = aud_playlist_queue_count (list);
@@ -132,6 +128,8 @@ static void remove_selected (void)
 
 static void update_hook (void * data, void * user)
 {
+    GtkWidget * qm_list = user;
+
     int oldrows = audgui_list_row_count (qm_list);
     int newrows = aud_playlist_queue_count (aud_playlist_get_active ());
     int focus = audgui_list_get_focus (qm_list);
@@ -152,9 +150,6 @@ static void destroy_cb (void)
 {
     hook_dissociate ("playlist activate", update_hook);
     hook_dissociate ("playlist update", update_hook);
-
-    qm_win = NULL;
-    qm_list = NULL;
 }
 
 static bool_t keypress_cb (GtkWidget * widget, GdkEventKey * event)
@@ -162,39 +157,19 @@ static bool_t keypress_cb (GtkWidget * widget, GdkEventKey * event)
     if (event->keyval == GDK_KEY_A && (event->state & GDK_CONTROL_MASK))
         select_all (NULL, TRUE);
     else if (event->keyval == GDK_KEY_Delete)
-        remove_selected ();
+        remove_selected (NULL);
     else if (event->keyval == GDK_KEY_Escape)
-        gtk_widget_destroy (qm_win);
+        gtk_widget_destroy (widget);
     else
         return FALSE;
 
     return TRUE;
 }
 
-static void response_cb (GtkDialog * dialog, int response)
+static GtkWidget * create_queue_manager (void)
 {
-    switch (response)
-    {
-    case RESPONSE_REMOVE:;
-        remove_selected ();
-        break;
-    case GTK_RESPONSE_CLOSE:
-        gtk_widget_destroy (qm_win);
-        break;
-    }
-}
-
-EXPORT void audgui_queue_manager_show (void)
-{
-    if (qm_win)
-    {
-        gtk_window_present ((GtkWindow *) qm_win);
-        return;
-    }
-
-    qm_win = gtk_dialog_new_with_buttons (_("Queue Manager"), NULL, 0,
-     GTK_STOCK_REMOVE, RESPONSE_REMOVE, GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-     NULL);
+    GtkWidget * qm_win = gtk_dialog_new ();
+    gtk_window_set_title ((GtkWindow *) qm_win, _("Queue Manager"));
     gtk_window_set_default_size ((GtkWindow *) qm_win, 400, 250);
 
     GtkWidget * vbox = gtk_dialog_get_content_area ((GtkDialog *) qm_win);
@@ -204,24 +179,30 @@ EXPORT void audgui_queue_manager_show (void)
     gtk_box_pack_start ((GtkBox *) vbox, scrolled, TRUE, TRUE, 0);
 
     int count = aud_playlist_queue_count (aud_playlist_get_active ());
-    qm_list = audgui_list_new (& callbacks, NULL, count);
+    GtkWidget * qm_list = audgui_list_new (& callbacks, NULL, count);
     gtk_tree_view_set_headers_visible ((GtkTreeView *) qm_list, FALSE);
     audgui_list_add_column (qm_list, NULL, 0, G_TYPE_INT, 7);
     audgui_list_add_column (qm_list, NULL, 1, G_TYPE_STRING, -1);
     gtk_container_add ((GtkContainer *) scrolled, qm_list);
 
-    hook_associate ("playlist activate", update_hook, NULL);
-    hook_associate ("playlist update", update_hook, NULL);
+    GtkWidget * button1 = audgui_button_new (_("_Unqueue"), "list-remove", remove_selected, NULL);
+    GtkWidget * button2 = audgui_button_new (_("_Close"), "window-close",
+     (AudguiCallback) gtk_widget_destroy, qm_win);
+
+    gtk_dialog_add_action_widget ((GtkDialog *) qm_win, button1, GTK_RESPONSE_NONE);
+    gtk_dialog_add_action_widget ((GtkDialog *) qm_win, button2, GTK_RESPONSE_NONE);
+
+    hook_associate ("playlist activate", update_hook, qm_list);
+    hook_associate ("playlist update", update_hook, qm_list);
 
     g_signal_connect (qm_win, "destroy", (GCallback) destroy_cb, NULL);
     g_signal_connect (qm_win, "key-press-event", (GCallback) keypress_cb, NULL);
-    g_signal_connect (qm_win, "response", (GCallback) response_cb, NULL);
 
-    gtk_widget_show_all (qm_win);
+    return qm_win;
 }
 
-void audgui_queue_manager_cleanup (void)
+EXPORT void audgui_queue_manager_show (void)
 {
-    if (qm_win)
-        gtk_widget_destroy (qm_win);
+    if (! audgui_reshow_unique_window (AUDGUI_QUEUE_MANAGER_WINDOW))
+        audgui_show_unique_window (AUDGUI_QUEUE_MANAGER_WINDOW, create_queue_manager ());
 }

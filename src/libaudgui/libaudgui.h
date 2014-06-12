@@ -1,7 +1,7 @@
 /*
  * libaudgui.h
- * Copyright 2007-2009 Giacomo Lozito and Tomasz Moń
-
+ * Copyright 2007-2013 Giacomo Lozito, Tomasz Moń, and John Lindgren
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
@@ -20,26 +20,20 @@
 #ifndef LIBAUDGUI_H
 #define LIBAUDGUI_H
 
+#include <stdint.h>
 #include <libaudcore/core.h>
-
-/* macro defines for Audacious stock icons */
-#define AUD_STOCK_AUDACIOUS   "aud-audacious"
-#define AUD_STOCK_PLAYLIST    "aud-playlist"
-#define AUD_STOCK_PLUGIN      "aud-plugin"
-#define AUD_STOCK_QUEUETOGGLE "aud-queuetoggle"
-
-void audgui_register_stock_icons(void);
 
 void audgui_show_add_url_window(bool_t open);
 
 void audgui_jump_to_track(void);
 void audgui_jump_to_track_hide(void);
 
-void audgui_run_filebrowser(bool_t clear_pl_on_ok);
+void audgui_run_filebrowser(bool_t open);
 void audgui_hide_filebrowser(void);
 
 /* about.c */
 void audgui_show_about_window (void);
+void audgui_hide_about_window (void);
 
 /* confirm.c */
 void audgui_confirm_playlist_delete (int playlist);
@@ -78,6 +72,6 @@ void audgui_urilist_insert (int playlist, int position, const char * list);
 char * audgui_urilist_create_from_selected (int playlist);
 
 /* util.c */
-void audgui_set_default_icon (void);
+void audgui_format_time (char * buf, int bufsize, int64_t milliseconds);
 
 #endif /* LIBAUDGUI_H */

@@ -1,6 +1,6 @@
 /*
  * probe.c
- * Copyright 2009-2010 John Lindgren
+ * Copyright 2009-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -101,7 +101,7 @@ static bool_t probe_func_fast (PluginHandle * plugin, ProbeState * state)
         PluginHandle * prev = state->plugin;
         state->plugin = NULL;
 
-        if (prev != NULL && ! probe_func (prev, state))
+        if (! probe_func (prev, state))
             return FALSE;
     }
 
@@ -113,15 +113,11 @@ static bool_t probe_func_fast (PluginHandle * plugin, ProbeState * state)
 static void probe_by_scheme (ProbeState * state)
 {
     const char * s = strstr (state->filename, "://");
-
     if (s == NULL)
         return;
 
     AUDDBG ("Probing by scheme.\n");
-    char buf[s - state->filename + 1];
-    memcpy (buf, state->filename, s - state->filename);
-    buf[s - state->filename] = 0;
-
+    SNCOPY (buf, state->filename, s - state->filename);
     input_plugin_for_key (INPUT_KEY_SCHEME, buf, (PluginForEachFunc) probe_func_fast, state);
 }
 
@@ -148,7 +144,7 @@ static void probe_by_mime (ProbeState * state)
     AUDDBG ("Probing by MIME type.\n");
     input_plugin_for_key (INPUT_KEY_MIME, mime, (PluginForEachFunc)
      probe_func_fast, state);
-    g_free (mime);
+    str_unref (mime);
 }
 
 static void probe_by_content (ProbeState * state)
@@ -196,13 +192,27 @@ DONE:
     return state.plugin;
 }
 
+static bool_t open_file (const char * filename, InputPlugin * ip,
+ const char * mode, VFSFile * * handle)
+{
+    /* no need to open a handle for custom URI schemes */
+    if (ip->schemes && ip->schemes[0])
+        return TRUE;
+
+    * handle = vfs_fopen (filename, mode);
+    return (* handle != NULL);
+}
+
 Tuple * file_read_tuple (const char * filename, PluginHandle * decoder)
 {
     InputPlugin * ip = plugin_get_header (decoder);
     g_return_val_if_fail (ip, NULL);
     g_return_val_if_fail (ip->probe_for_tuple, NULL);
 
-    VFSFile * handle = vfs_fopen (filename, "r");
+    VFSFile * handle = NULL;
+    if (! open_file (filename, ip, "r", & handle))
+        return FALSE;
+
     Tuple * tuple = ip->probe_for_tuple (filename, handle);
 
     if (handle)
@@ -214,6 +224,9 @@ Tuple * file_read_tuple (const char * filename, PluginHandle * decoder)
 bool_t file_read_image (const char * filename, PluginHandle * decoder,
  void * * data, int64_t * size)
 {
+    * data = NULL;
+    * size = 0;
+
     if (! input_plugin_has_images (decoder))
         return FALSE;
 
@@ -221,17 +234,14 @@ bool_t file_read_image (const char * filename, PluginHandle * decoder,
     g_return_val_if_fail (ip, FALSE);
     g_return_val_if_fail (ip->get_song_image, FALSE);
 
-    VFSFile * handle = vfs_fopen (filename, "r");
+    VFSFile * handle = NULL;
+    if (! open_file (filename, ip, "r", & handle))
+        return FALSE;
+
     bool_t success = ip->get_song_image (filename, handle, data, size);
 
     if (handle)
         vfs_fclose (handle);
-
-    if (! success)
-    {
-        * data = NULL;
-        * size = 0;
-    }
 
     return success;
 }
@@ -248,12 +258,11 @@ bool_t file_write_tuple (const char * filename, PluginHandle * decoder,
     g_return_val_if_fail (ip, FALSE);
     g_return_val_if_fail (ip->update_song_tuple, FALSE);
 
-    VFSFile * handle = vfs_fopen (filename, "r+");
-
-    if (! handle)
+    VFSFile * handle = NULL;
+    if (! open_file (filename, ip, "r+", & handle))
         return FALSE;
 
-    bool_t success = ip->update_song_tuple (tuple, handle);
+    bool_t success = ip->update_song_tuple (filename, handle, tuple);
 
     if (handle)
         vfs_fclose (handle);

@@ -1,6 +1,6 @@
 /*
  * util.h
- * Copyright 2009-2011 John Lindgren
+ * Copyright 2009-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,11 +30,19 @@ typedef bool_t(*DirForeachFunc) (const char * path,
 bool_t dir_foreach (const char * path, DirForeachFunc func, void * user_data);
 
 void make_directory(const char * path, mode_t mode);
-char * write_temp_file (void * data, int64_t len);
+char * write_temp_file (void * data, int64_t len); /* pooled */
 
-char * get_path_to_self (void);
+char * get_path_to_self (void); /* pooled */
+
+#ifdef _WIN32
+void get_argv_utf8 (int * argc, char * * * argv);
+void free_argv_utf8 (int * argc, char * * * argv);
+#endif
 
 void describe_song (const char * filename, const Tuple * tuple,
  char * * title, char * * artist, char * * album);
+
+char * last_path_element (char * path);
+void cut_path_element (char * path, char * elem);
 
 #endif /* AUDACIOUS_UTIL_H */

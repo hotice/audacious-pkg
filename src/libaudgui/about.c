@@ -1,6 +1,6 @@
 /*
  * about.c
- * Copyright 2011-2012 John Lindgren
+ * Copyright 2011-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -21,7 +21,9 @@
 
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
+#include <libaudcore/audstrings.h>
 
+#include "init.h"
 #include "libaudgui-gtk.h"
 
 static const char about_text[] =
@@ -29,8 +31,6 @@ static const char about_text[] =
  "Copyright © 2001-2014 Audacious developers and others";
 
 static const char website[] = "http://audacious-media-player.org";
-
-static GtkWidget * about_window;
 
 static GtkWidget * create_credits_notebook (const char * credits, const char * license)
 {
@@ -61,27 +61,21 @@ static GtkWidget * create_credits_notebook (const char * credits, const char * l
     return notebook;
 }
 
-EXPORT void audgui_show_about_window (void)
+static GtkWidget * create_about_window (void)
 {
-    if (about_window)
-    {
-        gtk_window_present ((GtkWindow *) about_window);
-        return;
-    }
+    const char * data_dir = aud_get_path (AUD_PATH_DATA_DIR);
 
-    about_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    GtkWidget * about_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title ((GtkWindow *) about_window, _("About Audacious"));
     gtk_window_set_resizable ((GtkWindow *) about_window, FALSE);
     gtk_container_set_border_width ((GtkContainer *) about_window, 3);
 
     audgui_destroy_on_escape (about_window);
-    g_signal_connect (about_window, "destroy", (GCallback) gtk_widget_destroyed,
-     & about_window);
 
     GtkWidget * vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
     gtk_container_add ((GtkContainer *) about_window, vbox);
 
-    SPRINTF (logo_path, "%s/images/about-logo.png", aud_get_path (AUD_PATH_DATA_DIR));
+    SCONCAT2 (logo_path, data_dir, "/images/about-logo.png");
     GtkWidget * image = gtk_image_new_from_file (logo_path);
     gtk_box_pack_start ((GtkBox *) vbox, image, FALSE, FALSE, 0);
 
@@ -96,11 +90,11 @@ EXPORT void audgui_show_about_window (void)
 
     char * credits, * license;
 
-    SPRINTF (credits_path, "%s/AUTHORS", aud_get_path (AUD_PATH_DATA_DIR));
+    SCONCAT2 (credits_path, data_dir, "/AUTHORS");
     if (! g_file_get_contents (credits_path, & credits, NULL, NULL))
         credits = g_strdup_printf ("Unable to load %s; check your installation.", credits_path);
 
-    SPRINTF (license_path, "%s/COPYING", aud_get_path (AUD_PATH_DATA_DIR));
+    SCONCAT2 (license_path, data_dir, "/COPYING");
     if (! g_file_get_contents (license_path, & license, NULL, NULL))
         license = g_strdup_printf ("Unable to load %s; check your installation.", license_path);
 
@@ -114,5 +108,16 @@ EXPORT void audgui_show_about_window (void)
     g_free (credits);
     g_free (license);
 
-    gtk_widget_show_all (about_window);
+    return about_window;
+}
+
+EXPORT void audgui_show_about_window (void)
+{
+    if (! audgui_reshow_unique_window (AUDGUI_ABOUT_WINDOW))
+        audgui_show_unique_window (AUDGUI_ABOUT_WINDOW, create_about_window ());
+}
+
+EXPORT void audgui_hide_about_window (void)
+{
+    audgui_hide_unique_window (AUDGUI_ABOUT_WINDOW);
 }

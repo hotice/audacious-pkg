@@ -45,7 +45,7 @@ static bool_t event_execute (Event * event)
 
     hook_call (event->name, event->data);
 
-    g_free (event->name);
+    str_unref (event->name);
     if (event->destroy)
         event->destroy (event->data);
 
@@ -56,7 +56,7 @@ static bool_t event_execute (Event * event)
 EXPORT void event_queue_full (int time, const char * name, void * data, void (* destroy) (void *))
 {
     Event * event = g_slice_new (Event);
-    event->name = g_strdup (name);
+    event->name = str_get (name);
     event->data = data;
     event->destroy = destroy;
 
@@ -83,12 +83,37 @@ EXPORT void event_queue_cancel (const char * name, void * data)
             g_source_remove (event->source);
             events = g_list_delete_link (events, node);
 
-            g_free (event->name);
+            str_unref (event->name);
             if (event->destroy)
                 event->destroy (event->data);
 
             g_slice_free (Event, event);
         }
+
+        node = next;
+    }
+
+    pthread_mutex_unlock (& mutex);
+}
+
+EXPORT void event_queue_cancel_all (void)
+{
+    pthread_mutex_lock (& mutex);
+
+    GList * node = events;
+    while (node)
+    {
+        Event * event = node->data;
+        GList * next = node->next;
+
+        g_source_remove (event->source);
+        events = g_list_delete_link (events, node);
+
+        str_unref (event->name);
+        if (event->destroy)
+            event->destroy (event->data);
+
+        g_slice_free (Event, event);
 
         node = next;
     }

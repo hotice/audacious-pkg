@@ -1,6 +1,6 @@
 /*
  * util.c
- * Copyright 2009-2012 John Lindgren and Michał Lipski
+ * Copyright 2009-2013 John Lindgren and Michał Lipski
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,10 @@
  * the use of this software.
  */
 
-#include <dirent.h>
+#include <ctype.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #ifdef _WIN32
@@ -29,11 +32,6 @@
 #endif
 
 #include <glib.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
-#include <errno.h>
 
 #include <libaudcore/audstrings.h>
 
@@ -45,64 +43,64 @@
 
 bool_t dir_foreach (const char * path, DirForeachFunc func, void * user)
 {
-    DIR * dir = opendir (path);
+    GDir * dir = g_dir_open (path, 0, NULL);
     if (! dir)
         return FALSE;
 
-    struct dirent * entry;
-    while ((entry = readdir (dir)))
+    const char * name;
+    while ((name = g_dir_read_name (dir)))
     {
-        if (entry->d_name[0] == '.')
-            continue;
-
-        char * full = g_strdup_printf ("%s" G_DIR_SEPARATOR_S "%s", path, entry->d_name);
-        bool_t stop = func (full, entry->d_name, user);
-        g_free (full);
+        char * full = filename_build (path, name);
+        bool_t stop = func (full, name, user);
+        str_unref (full);
 
         if (stop)
             break;
     }
 
-    closedir (dir);
+    g_dir_close (dir);
     return TRUE;
 }
 
-char * construct_uri (const char * string, const char * playlist_name)
+char * construct_uri (const char * path, const char * reference)
 {
     /* URI */
-    if (strstr (string, "://"))
-        return strdup (string);
+    if (strstr (path, "://"))
+        return str_get (path);
 
-    /* absolute filename (assumed UTF-8) */
+    /* absolute filename */
 #ifdef _WIN32
-    if (string[0] && string[1] == ':' && string[2] == '\\')
+    if (path[0] && path[1] == ':' && path[2] == '\\')
 #else
-    if (string[0] == '/')
+    if (path[0] == '/')
 #endif
-        return filename_to_uri (string);
+        return filename_to_uri (path);
 
-    /* relative filename (assumed UTF-8) */
-    const char * slash = strrchr (playlist_name, '/');
+    /* relative path */
+    const char * slash = strrchr (reference, '/');
     if (! slash)
         return NULL;
 
-    int pathlen = slash + 1 - playlist_name;
-    int rellen = strlen (string);
+    char * utf8 = str_to_utf8 (path, -1);
+    if (! utf8)
+        return NULL;
 
-    char buf[pathlen + 3 * rellen + 1];
-    memcpy (buf, playlist_name, pathlen);
+    int pathlen = slash + 1 - reference;
+
+    char buf[pathlen + 3 * strlen (utf8) + 1];
+    memcpy (buf, reference, pathlen);
 
     if (get_bool (NULL, "convert_backslash"))
     {
-        char tmp[rellen + 1];
-        strcpy (tmp, string);
-        string_replace_char (tmp, '\\', '/');
+        SCOPY (tmp, utf8);
+        str_replace_char (tmp, '\\', '/');
         str_encode_percent (tmp, -1, buf + pathlen);
     }
     else
-        str_encode_percent (string, -1, buf + pathlen);
+        str_encode_percent (utf8, -1, buf + pathlen);
 
-    return strdup (buf);
+    str_unref (utf8);
+    return str_get (buf);
 }
 
 void
@@ -117,13 +115,14 @@ make_directory(const char * path, mode_t mode)
 
 char * write_temp_file (void * data, int64_t len)
 {
-    char * name = g_strdup_printf ("%s/audacious-temp-XXXXXX", g_get_tmp_dir ());
+    char * temp = filename_build (g_get_tmp_dir (), "audacious-temp-XXXXXX");
+    SCOPY (name, temp);
+    str_unref (temp);
 
     int handle = g_mkstemp (name);
     if (handle < 0)
     {
         fprintf (stderr, "Error creating temporary file: %s\n", strerror (errno));
-        g_free (name);
         return NULL;
     }
 
@@ -134,7 +133,6 @@ char * write_temp_file (void * data, int64_t len)
         {
             fprintf (stderr, "Error writing %s: %s\n", name, strerror (errno));
             close (handle);
-            g_free (name);
             return NULL;
         }
 
@@ -145,71 +143,102 @@ char * write_temp_file (void * data, int64_t len)
     if (close (handle) < 0)
     {
         fprintf (stderr, "Error closing %s: %s\n", name, strerror (errno));
-        g_free (name);
         return NULL;
     }
 
-    return name;
+    return str_get (name);
 }
 
 char * get_path_to_self (void)
 {
-#if defined _WIN32 || defined HAVE_PROC_SELF_EXE
+#ifdef HAVE_PROC_SELF_EXE
     int size = 256;
-    char * buf = g_malloc (size);
 
     while (1)
     {
+        char buf[size];
         int len;
 
-#ifdef _WIN32
-        if (! (len = GetModuleFileName (NULL, buf, size)))
-        {
-            fprintf (stderr, "GetModuleFileName failed.\n");
-            g_free (buf);
-            return NULL;
-        }
-#else
         if ((len = readlink ("/proc/self/exe", buf, size)) < 0)
         {
             fprintf (stderr, "Cannot access /proc/self/exe: %s.\n", strerror (errno));
-            g_free (buf);
             return NULL;
         }
-#endif
 
         if (len < size)
         {
             buf[len] = 0;
-            return buf;
+            return str_get (buf);
         }
 
         size += size;
-        buf = g_realloc (buf, size);
     }
-#elif defined __APPLE__
-    unsigned int size = 256;
-    char * buf = g_malloc (size);
+#elif defined _WIN32
+    int size = 256;
 
     while (1)
     {
+        wchar_t buf[size];
+        int len;
+
+        if (! (len = GetModuleFileNameW (NULL, buf, size)))
+        {
+            fprintf (stderr, "GetModuleFileName failed.\n");
+            return NULL;
+        }
+
+        if (len < size)
+        {
+            char * temp = g_utf16_to_utf8 (buf, len, NULL, NULL, NULL);
+            char * path = str_get (temp);
+            g_free (temp);
+            return path;
+        }
+
+        size += size;
+    }
+#elif defined __APPLE__
+    unsigned int size = 256;
+
+    while (1)
+    {
+        char buf[size];
         int res;
 
         if (! (res = _NSGetExecutablePath (buf, &size)))
-            return buf;
+            return str_get (buf);
 
-        if (res == -1)
-            buf = g_realloc (buf, size);
-        else
-        {
-            g_free (buf);
+        if (res != -1)
             return NULL;
-        }
     }
 #else
     return NULL;
 #endif
 }
+
+#ifdef _WIN32
+void get_argv_utf8 (int * argc, char * * * argv)
+{
+    wchar_t * combined = GetCommandLineW ();
+    wchar_t * * split = CommandLineToArgvW (combined, argc);
+
+    * argv = g_new (char *, argc + 1);
+
+    for (int i = 0; i < * argc; i ++)
+        (* argv)[i] = g_utf16_to_utf8 (split[i], -1, NULL, NULL, NULL);
+
+    (* argv)[* argc] = 0;
+
+    LocalFree (split);
+}
+
+void free_argv_utf8 (int * argc, char * * * argv)
+{
+    g_strfreev (* argv);
+    * argc = 0;
+    * argv = NULL;
+}
+#endif
 
 /* Strips various common top-level folders from a filename.  The string passed
  * will not be modified, but the string returned will share the same memory.
@@ -327,7 +356,7 @@ static char * stream_name (char * name)
 
 static char * get_nonblank_field (const Tuple * tuple, int field)
 {
-    char * str = tuple ? tuple_get_str (tuple, field, NULL) : NULL;
+    char * str = tuple ? tuple_get_str (tuple, field) : NULL;
 
     if (str && ! str[0])
     {
@@ -375,13 +404,15 @@ DONE:
         if (! filename)
             goto DONE;
 
+        SCOPY (buf, filename);
+
         char * base, * first, * second;
-        split_filename (skip_top_folders (filename), & base, & first, & second);
+        split_filename (skip_top_folders (buf), & base, & first, & second);
 
         if (! title)
             title = str_get (base);
 
-        for (int i = 0; i < G_N_ELEMENTS (skip); i ++)
+        for (int i = 0; i < ARRAY_LEN (skip); i ++)
         {
             if (first && ! g_ascii_strcasecmp (first, skip[i]))
                 first = NULL;
@@ -402,12 +433,11 @@ DONE:
                 album = str_get (first);
         }
 
-        free (filename);
+        str_unref (filename);
     }
     else
     {
-        char buf[strlen (name) + 1];
-        strcpy (buf, name);
+        SCOPY (buf, name);
 
         if (! title)
         {
@@ -423,4 +453,22 @@ DONE:
     }
 
     goto DONE;
+}
+
+char * last_path_element (char * path)
+{
+    char * slash = strrchr (path, G_DIR_SEPARATOR);
+    return (slash && slash[1]) ? slash + 1 : NULL;
+}
+
+void cut_path_element (char * path, char * elem)
+{
+#ifdef _WIN32
+    if (elem > path + 3)
+#else
+    if (elem > path + 1)
+#endif
+        elem[-1] = 0; /* overwrite slash */
+    else
+        elem[0] = 0; /* leave [drive letter and] leading slash */
 }

@@ -1,7 +1,7 @@
 /*
  *  vfs_common.c
- *  Copyright 2006-2010 Tony Vroon, William Pitcock, Maciej Grela,
- *                      Matti Hämäläinen, and John Lindgren
+ *  Copyright 2006-2013 Tony Vroon, William Pitcock, Matti Hämäläinen, and
+ *                      John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -18,12 +18,12 @@
  * the use of this software.
  */
 
-#include <glib.h>
-#include <glib/gprintf.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
+#include <glib.h>
+
+#include "audstrings.h"
 #include "vfs.h"
 
 /**
@@ -94,7 +94,7 @@ EXPORT char *vfs_fgets(char *s, int n, VFSFile *stream)
  */
 EXPORT int vfs_fputs(const char *s, VFSFile *stream)
 {
-    gsize n = strlen(s);
+    int64_t n = strlen(s);
 
     return ((vfs_fwrite(s, 1, n, stream) == n) ? n : EOF);
 }
@@ -109,12 +109,8 @@ EXPORT int vfs_fputs(const char *s, VFSFile *stream)
  */
 EXPORT int vfs_vfprintf(VFSFile *stream, char const *format, va_list args)
 {
-    char *string;
-    int rv = g_vasprintf(&string, format, args);
-    if (rv < 0) return rv;
-    rv = vfs_fputs(string, stream);
-    g_free(string);
-    return rv;
+    VSPRINTF (buf, format, args);
+    return vfs_fputs (buf, stream);
 }
 
 /**
@@ -137,6 +133,47 @@ EXPORT int vfs_fprintf(VFSFile *stream, char const *format, ...)
     return rv;
 }
 
+EXPORT void vfs_file_read_all (VFSFile * file, void * * bufp, int64_t * sizep)
+{
+    char * buf = NULL;
+    int64_t size = vfs_fsize (file);
+
+    if (size >= 0)
+    {
+        size = MIN (size, SIZE_MAX - 1);
+        buf = g_malloc (size + 1);
+        size = vfs_fread (buf, 1, size, file);
+    }
+    else
+    {
+        size = 0;
+
+        size_t bufsize = 4096;
+        buf = g_malloc (bufsize);
+
+        size_t readsize;
+        while ((readsize = vfs_fread (buf + size, 1, bufsize - 1 - size, file)))
+        {
+            size += readsize;
+
+            if (size == bufsize - 1)
+            {
+                if (bufsize > SIZE_MAX - 4096)
+                    break;
+
+                bufsize += 4096;
+                buf = g_realloc (buf, bufsize);
+            }
+        }
+    }
+
+    buf[size] = 0; // nul-terminate
+
+    * bufp = buf;
+    if (sizep)
+        * sizep = size;
+}
+
 /**
  * Gets contents of the file into a buffer. Buffer of filesize bytes
  * is allocated by this function as necessary.
@@ -149,230 +186,13 @@ EXPORT int vfs_fprintf(VFSFile *stream, char const *format, ...)
 EXPORT void vfs_file_get_contents (const char * filename, void * * buf, int64_t * size)
 {
     * buf = NULL;
-    * size = 0;
+    if (size)
+        * size = 0;
 
-    VFSFile *fd;
-    gsize filled_size = 0, buf_size = 4096;
-    unsigned char * ptr;
-
-    if ((fd = vfs_fopen(filename, "rb")) == NULL)
+    VFSFile * file = vfs_fopen (filename, "r");
+    if (! file)
         return;
 
-    if ((* size = vfs_fsize (fd)) >= 0)
-    {
-        * buf = g_malloc (* size);
-        * size = vfs_fread (* buf, 1, * size, fd);
-        goto close_handle;
-    }
-
-    if ((*buf = g_malloc(buf_size)) == NULL)
-        goto close_handle;
-
-    ptr = *buf;
-    while (TRUE) {
-        gsize read_size = vfs_fread(ptr, 1, buf_size - filled_size, fd);
-        if (read_size == 0) break;
-
-        filled_size += read_size;
-        ptr += read_size;
-
-        if (filled_size == buf_size) {
-            buf_size += 4096;
-
-            *buf = g_realloc(*buf, buf_size);
-
-            if (*buf == NULL)
-                goto close_handle;
-
-            ptr = (unsigned char *) (* buf) + filled_size;
-        }
-    }
-
-    *size = filled_size;
-
-close_handle:
-    vfs_fclose(fd);
-}
-
-
-/**
- * Reads an unsigned 16-bit Little Endian value from the stream
- * into native endian format.
- *
- * @param value Pointer to the variable to read the value into.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fget_le16(uint16_t *value, VFSFile *stream)
-{
-    uint16_t tmp;
-    if (vfs_fread(&tmp, sizeof(tmp), 1, stream) != 1)
-        return FALSE;
-    *value = GUINT16_FROM_LE(tmp);
-    return TRUE;
-}
-
-/**
- * Reads an unsigned 32-bit Little Endian value from the stream into native endian format.
- *
- * @param value Pointer to the variable to read the value into.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fget_le32(uint32_t *value, VFSFile *stream)
-{
-    uint32_t tmp;
-    if (vfs_fread(&tmp, sizeof(tmp), 1, stream) != 1)
-        return FALSE;
-    *value = GUINT32_FROM_LE(tmp);
-    return TRUE;
-}
-
-/**
- * Reads an unsigned 64-bit Little Endian value from the stream into native endian format.
- *
- * @param value Pointer to the variable to read the value into.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fget_le64(uint64_t *value, VFSFile *stream)
-{
-    uint64_t tmp;
-    if (vfs_fread(&tmp, sizeof(tmp), 1, stream) != 1)
-        return FALSE;
-    *value = GUINT64_FROM_LE(tmp);
-    return TRUE;
-}
-
-
-/**
- * Reads an unsigned 16-bit Big Endian value from the stream into native endian format.
- *
- * @param value Pointer to the variable to read the value into.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fget_be16(uint16_t *value, VFSFile *stream)
-{
-    uint16_t tmp;
-    if (vfs_fread(&tmp, sizeof(tmp), 1, stream) != 1)
-        return FALSE;
-    *value = GUINT16_FROM_BE(tmp);
-    return TRUE;
-}
-
-/**
- * Reads an unsigned 32-bit Big Endian value from the stream into native endian format.
- *
- * @param value Pointer to the variable to read the value into.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fget_be32(uint32_t *value, VFSFile *stream)
-{
-    uint32_t tmp;
-    if (vfs_fread(&tmp, sizeof(tmp), 1, stream) != 1)
-        return FALSE;
-    *value = GUINT32_FROM_BE(tmp);
-    return TRUE;
-}
-
-/**
- * Reads an unsigned 64-bit Big Endian value from the stream into native endian format.
- *
- * @param value Pointer to the variable to read the value into.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fget_be64(uint64_t *value, VFSFile *stream)
-{
-    uint64_t tmp;
-    if (vfs_fread(&tmp, sizeof(tmp), 1, stream) != 1)
-        return FALSE;
-    *value = GUINT64_FROM_BE(tmp);
-    return TRUE;
-}
-
-/**
- * Writes an unsigned 16-bit native endian value into the stream as a
- * Little Endian value.
- *
- * @param value Value to write into the stream.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fput_le16(uint16_t value, VFSFile *stream)
-{
-    uint16_t tmp = GUINT16_TO_LE(value);
-    return vfs_fwrite(&tmp, sizeof(tmp), 1, stream) == 1;
-}
-
-/**
- * Writes an unsigned 32-bit native endian value into the stream as a
- * Big Endian value.
- *
- * @param value Value to write into the stream.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fput_le32(uint32_t value, VFSFile *stream)
-{
-    uint32_t tmp = GUINT32_TO_LE(value);
-    return vfs_fwrite(&tmp, sizeof(tmp), 1, stream) == 1;
-}
-
-/**
- * Writes an unsigned 64-bit native endian value into the stream as a
- * Big Endian value.
- *
- * @param value Value to write into the stream.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fput_le64(uint64_t value, VFSFile *stream)
-{
-    uint64_t tmp = GUINT64_TO_LE(value);
-    return vfs_fwrite(&tmp, sizeof(tmp), 1, stream) == 1;
-}
-
-/**
- * Writes an unsigned 16-bit native endian value into the stream as a
- * Big Endian value.
- *
- * @param value Value to write into the stream.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fput_be16(uint16_t value, VFSFile *stream)
-{
-    uint16_t tmp = GUINT16_TO_BE(value);
-    return vfs_fwrite(&tmp, sizeof(tmp), 1, stream) == 1;
-}
-
-/**
- * Writes an unsigned 32-bit native endian value into the stream as a
- * Big Endian value.
- *
- * @param value Value to write into the stream.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fput_be32(uint32_t value, VFSFile *stream)
-{
-    uint32_t tmp = GUINT32_TO_BE(value);
-    return vfs_fwrite(&tmp, sizeof(tmp), 1, stream) == 1;
-}
-
-/**
- * Writes an unsigned 64-bit native endian value into the stream as a
- * Big Endian value.
- *
- * @param value Value to write into the stream.
- * @param stream A #VFSFile object representing the stream.
- * @return TRUE if read was succesful, FALSE if there was an error.
- */
-EXPORT bool_t vfs_fput_be64(uint64_t value, VFSFile *stream)
-{
-    uint64_t tmp = GUINT64_TO_BE(value);
-    return vfs_fwrite(&tmp, sizeof(tmp), 1, stream) == 1;
+    vfs_file_read_all (file, buf, size);
+    vfs_fclose (file);
 }

@@ -18,81 +18,84 @@
  */
 
 #include <stdlib.h>
-#include <string.h>
-#include <glib.h>
-#include <locale.h>
-#include "libaudclient/audctrl.h"
+
 #include "audtool.h"
 
-void audtool_report(const gchar *str, ...)
+void audtool_report (const char * str, ...)
 {
-	gchar *buf;
-	va_list va;
+    char * buf;
+    va_list va;
 
-	va_start(va, str);
-	buf = g_strdup_vprintf(str, va);
-	va_end(va);
+    va_start (va, str);
+    buf = g_strdup_vprintf (str, va);
+    va_end (va);
 
-	g_print("%s\n", buf);
-	g_free(buf);
+    g_print ("%s\n", buf);
+    g_free (buf);
 }
 
-void audtool_whine(const gchar *str, ...)
+void audtool_whine (const char * str, ...)
 {
-	gchar *buf;
-	va_list va;
+    char * buf;
+    va_list va;
 
-	va_start(va, str);
-	buf = g_strdup_vprintf(str, va);
-	va_end(va);
+    va_start (va, str);
+    buf = g_strdup_vprintf (str, va);
+    va_end (va);
 
-	g_printerr("audtool: %s", buf);
-	g_free(buf);
+    g_printerr ("audtool: %s", buf);
+    g_free (buf);
 }
 
-void audtool_whine_args(const gchar *name, const gchar *fmt, ...)
+void audtool_whine_args (const char * name, const char * fmt, ...)
 {
-	gchar *buf;
-	va_list va;
+    char * buf;
+    va_list va;
 
-	va_start(va, fmt);
-	buf = g_strdup_vprintf(fmt, va);
-	va_end(va);
+    va_start (va, fmt);
+    buf = g_strdup_vprintf (fmt, va);
+    va_end (va);
 
-	g_printerr("audtool: Invalid parameters for %s\n", name);
-	g_printerr(" syntax: %s %s\n", name, buf);
-	g_free(buf);
+    g_printerr ("audtool: Invalid parameters for %s\n", name);
+    g_printerr (" syntax: %s %s\n", name, buf);
+    g_free (buf);
 }
 
-void audtool_whine_tuple_fields(void)
+void audtool_whine_tuple_fields (void)
 {
-    gint nfields, i;
-    gchar **fields = audacious_remote_get_tuple_fields(dbus_proxy),
-          **tmp = fields;
+    char * * fields = NULL;
+    obj_audacious_call_get_tuple_fields_sync (dbus_proxy, & fields, NULL, NULL);
 
-    audtool_whine("Field names include, but are not limited to:\n");
+    if (! fields)
+        exit (1);
 
-    for (nfields = 0; tmp && *tmp; nfields++, tmp++);
+    audtool_whine ("Field names include, but are not limited to:\n");
 
-    tmp = fields;
-    i = 0;
-    g_printerr("         ");
-    while (tmp && *tmp) {
-        i += g_utf8_strlen(*tmp, -1);
-        if (i > 45) {
-            g_printerr("\n         ");
-            i = 0;
+    char * * tmp = fields;
+    int col = 0;
+
+    g_printerr ("         ");
+
+    while (tmp && * tmp)
+    {
+        col += g_utf8_strlen (* tmp, -1);
+
+        if (col > 45)
+        {
+            g_printerr ("\n         ");
+            col = 0;
         }
-        g_printerr("%s", *tmp);
-        if (--nfields > 0)
-            g_printerr(", ");
 
-        g_free(*tmp);
-        tmp++;
+        g_printerr ("%s", * tmp);
+
+        g_free (* tmp);
+        tmp ++;
+
+        if (* tmp)
+            g_printerr (", ");
     }
 
-    g_printerr("\n");
+    g_printerr ("\n");
 
-    g_free(fields);
+    g_free (fields);
 }
-
