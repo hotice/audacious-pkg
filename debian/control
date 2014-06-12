@@ -17,7 +17,7 @@ Build-Depends:
  libguess-dev,
  librsvg2-bin,
  libuchardet-dev
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-multimedia/audacious.git
 Vcs-Git: git://anonscm.debian.org/pkg-multimedia/audacious.git
 
