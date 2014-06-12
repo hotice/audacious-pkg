@@ -14,7 +14,7 @@ ca.po)
     LANGUAGE="Catalan"
     ;;
 cmn.po)
-    LANGUAGE="Mandarin"
+    LANGUAGE="Chinese (Mandarin)"
     ;;
 cs.po)
     LANGUAGE="Czech"
@@ -61,6 +61,9 @@ fr.po)
 gl.po)
     LANGUAGE="Galician"
     ;;
+he.po)
+    LANGUAGE="Hebrew"
+    ;;
 hu.po)
     LANGUAGE="Hungarian"
     ;;
@@ -86,7 +89,7 @@ lv.po)
     LANGUAGE="Latvian"
     ;;
 ml_IN.po)
-    LANGUAGE="Malayalam"
+    LANGUAGE="Malayalam (India)"
     ;;
 ms.po)
     LANGUAGE="Malay"
@@ -123,6 +126,12 @@ sr@latin.po)
     ;;
 sr.po)
     LANGUAGE="Serbian"
+    ;;
+sr_RS.po)
+    LANGUAGE="Serbian (Serbia)"
+    ;;
+sv.po)
+    LANGUAGE="Swedish"
     ;;
 ta.po)
     LANGUAGE="Tamil"

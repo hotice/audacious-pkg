@@ -1,6 +1,6 @@
 /*
  * output.c
- * Copyright 2009-2012 John Lindgren
+ * Copyright 2009-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -23,8 +23,6 @@
 #include <string.h>
 
 #include <glib.h> /* for g_usleep */
-
-#include <libaudcore/hook.h>
 
 #include "debug.h"
 #include "effect.h"
@@ -68,8 +66,13 @@ static ReplayGainInfo gain_info;
 static bool_t change_op;
 static OutputPlugin * new_op;
 
+static void * buffer1, * buffer2;
+static int buffer1_size, buffer2_size;
+
 static inline int FR2MS (int64_t f, int r)
  { return (f > 0) ? (f * 1000 + r / 2) / r : (f * 1000 - r / 2) / r; }
+static inline int MS2FR (int64_t ms, int r)
+ { return (ms > 0) ? (ms * r + 500) / 1000 : (ms * r - 500) / 1000; }
 
 static inline int get_format (void)
 {
@@ -79,6 +82,16 @@ static inline int get_format (void)
         case 24: return FMT_S24_NE;
         case 32: return FMT_S32_NE;
         default: return FMT_FLOAT;
+    }
+}
+
+static void ensure_buffer (void * * buffer, int * size, int newsize)
+{
+    if (newsize > * size)
+    {
+        g_free (* buffer);
+        * buffer = g_malloc (newsize);
+        * size = newsize;
     }
 }
 
@@ -93,6 +106,13 @@ static void cleanup_output (void)
     }
 
     s_output = FALSE;
+
+    g_free (buffer1);
+    g_free (buffer2);
+    buffer1 = NULL;
+    buffer2 = NULL;
+    buffer1_size = 0;
+    buffer2_size = 0;
 
     if (PLUGIN_HAS_FUNC (cop, close_audio))
         cop->close_audio ();
@@ -217,8 +237,6 @@ static void apply_software_volume (float * data, int channels, int samples)
 /* assumes LOCK_ALL, s_output */
 static void write_output_raw (void * data, int samples)
 {
-    void * buffer = NULL;
-
     vis_runner_pass_audio (FR2MS (out_frames, out_rate), data, samples,
      out_channels, out_rate);
     out_frames += samples / out_channels;
@@ -231,9 +249,9 @@ static void write_output_raw (void * data, int samples)
 
     if (out_format != FMT_FLOAT)
     {
-        buffer = malloc (FMT_SIZEOF (out_format) * samples);
-        audio_to_int (data, buffer, out_format, samples);
-        data = buffer;
+        ensure_buffer (& buffer2, & buffer2_size, FMT_SIZEOF (out_format) * samples);
+        audio_to_int (data, buffer2, out_format, samples);
+        data = buffer2;
     }
 
     while (! (s_aborted || s_resetting))
@@ -270,26 +288,39 @@ static void write_output_raw (void * data, int samples)
 
         LOCK_MINOR;
     }
-
-    free (buffer);
 }
 
 /* assumes LOCK_ALL, s_input, s_output */
-static void write_output (void * data, int size)
+static bool_t write_output (void * data, int size, int stop_time)
 {
-    void * buffer = NULL;
+    bool_t stopped = FALSE;
 
+    int64_t cur_frame = in_frames;
     int samples = size / FMT_SIZEOF (in_format);
+
+    /* always update in_frames, whether we use all the decoded frames or not */
     in_frames += samples / in_channels;
 
+    if (stop_time != -1)
+    {
+        int64_t frames_left = MS2FR (stop_time - seek_time, in_rate) - cur_frame;
+        int64_t samples_left = in_channels * MAX (0, frames_left);
+
+        if (samples >= samples_left)
+        {
+            samples = samples_left;
+            stopped = TRUE;
+        }
+    }
+
     if (s_aborted)
-        return;
+        return ! stopped;
 
     if (in_format != FMT_FLOAT)
     {
-        buffer = malloc (sizeof (float) * samples);
-        audio_from_int (data, in_format, buffer, samples);
-        data = buffer;
+        ensure_buffer (& buffer1, & buffer1_size, sizeof (float) * samples);
+        audio_from_int (data, in_format, buffer1, samples);
+        data = buffer1;
     }
 
     float * fdata = data;
@@ -297,7 +328,7 @@ static void write_output (void * data, int size)
     effect_process (& fdata, & samples);
     write_output_raw (fdata, samples);
 
-    free (buffer);
+    return ! stopped;
 }
 
 /* assumes LOCK_ALL, s_output */
@@ -359,9 +390,11 @@ void output_set_replaygain_info (const ReplayGainInfo * info)
     UNLOCK_ALL;
 }
 
-void output_write_audio (void * data, int size)
+/* returns FALSE if stop_time is reached */
+bool_t output_write_audio (void * data, int size, int stop_time)
 {
     LOCK_ALL;
+    bool_t good = FALSE;
 
     if (s_input)
     {
@@ -372,10 +405,11 @@ void output_write_audio (void * data, int size)
             LOCK_ALL;
         }
 
-        write_output (data, size);
+        good = write_output (data, size, stop_time);
     }
 
     UNLOCK_ALL;
+    return good;
 }
 
 void output_abort_write (void)
@@ -432,9 +466,6 @@ void output_set_time (int time)
     }
 
     UNLOCK_ALL;
-
-    /* See comment in playback_seek(). */
-    event_queue ("playback seek", NULL);
 }
 
 bool_t output_is_open (void)

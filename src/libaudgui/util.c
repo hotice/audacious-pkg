@@ -1,6 +1,6 @@
 /*
  * util.c
- * Copyright 2010-2012 John Lindgren
+ * Copyright 2010-2012 John Lindgren and Michał Lipski
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -20,12 +20,10 @@
 #include <string.h>
 
 #include <gdk/gdkkeysyms.h>
-#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
 
 #include <audacious/debug.h>
 #include <audacious/i18n.h>
-#include <audacious/playlist.h>
 #include <audacious/misc.h>
 #include <libaudcore/audstrings.h>
 #include <libaudcore/hook.h>
@@ -33,8 +31,6 @@
 #include "init.h"
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
-
-static GdkPixbuf * current_pixbuf;
 
 EXPORT int audgui_get_digit_width (GtkWidget * widget)
 {
@@ -45,6 +41,7 @@ EXPORT int audgui_get_digit_width (GtkWidget * widget)
     pango_layout_set_font_description (layout, desc);
     pango_layout_get_pixel_size (layout, & width, NULL);
     pango_font_description_free (desc);
+    g_object_unref (layout);
     return (width + 9) / 10;
 }
 
@@ -75,28 +72,6 @@ EXPORT void audgui_get_mouse_coords (GtkWidget * widget, int * x, int * y)
     }
 }
 
-EXPORT void audgui_hide_on_delete (GtkWidget * widget)
-{
-    g_signal_connect (widget, "delete-event", (GCallback)
-     gtk_widget_hide_on_delete, NULL);
-}
-
-static bool_t escape_hide_cb (GtkWidget * widget, GdkEventKey * event)
-{
-    if (event->keyval == GDK_KEY_Escape)
-    {
-        gtk_widget_hide (widget);
-        return TRUE;
-    }
-
-    return FALSE;
-}
-
-EXPORT void audgui_hide_on_escape (GtkWidget * widget)
-{
-    g_signal_connect (widget, "key-press-event", (GCallback) escape_hide_cb, NULL);
-}
-
 static bool_t escape_destroy_cb (GtkWidget * widget, GdkEventKey * event)
 {
     if (event->keyval == GDK_KEY_Escape)
@@ -113,15 +88,48 @@ EXPORT void audgui_destroy_on_escape (GtkWidget * widget)
     g_signal_connect (widget, "key-press-event", (GCallback) escape_destroy_cb, NULL);
 }
 
-static void toggle_cb (GtkToggleButton * toggle, bool_t * setting)
+EXPORT GtkWidget * audgui_button_new (const char * text, const char * icon,
+ AudguiCallback callback, void * data)
 {
-    * setting = gtk_toggle_button_get_active (toggle);
+    GtkWidget * button = gtk_button_new_with_mnemonic (text);
+
+    if (icon)
+    {
+        GtkWidget * image = gtk_image_new_from_icon_name (icon, GTK_ICON_SIZE_MENU);
+        gtk_button_set_image ((GtkButton *) button, image);
+    }
+
+    if (callback)
+        g_signal_connect_swapped (button, "clicked", (GCallback) callback, data);
+
+    return button;
 }
 
-EXPORT void audgui_connect_check_box (GtkWidget * box, bool_t * setting)
+EXPORT GtkWidget * audgui_dialog_new (GtkMessageType type, const char * title,
+ const char * text, GtkWidget * button1, GtkWidget * button2)
 {
-    gtk_toggle_button_set_active ((GtkToggleButton *) box, * setting);
-    g_signal_connect ((GObject *) box, "toggled", (GCallback) toggle_cb, setting);
+    GtkWidget * dialog = gtk_message_dialog_new (NULL, 0, type, GTK_BUTTONS_NONE, "%s", text);
+    gtk_window_set_title ((GtkWindow *) dialog, title);
+
+    if (button2)
+    {
+        gtk_dialog_add_action_widget ((GtkDialog *) dialog, button2, GTK_RESPONSE_NONE);
+        g_signal_connect_swapped (button2, "clicked", (GCallback) gtk_widget_destroy, dialog);
+    }
+
+    gtk_dialog_add_action_widget ((GtkDialog *) dialog, button1, GTK_RESPONSE_NONE);
+    g_signal_connect_swapped (button1, "clicked", (GCallback) gtk_widget_destroy, dialog);
+
+    gtk_widget_set_can_default (button1, TRUE);
+    gtk_widget_grab_default (button1);
+
+    return dialog;
+}
+
+EXPORT void audgui_dialog_add_widget (GtkWidget * dialog, GtkWidget * widget)
+{
+    GtkWidget * box = gtk_message_dialog_get_message_area ((GtkMessageDialog *) dialog);
+    gtk_box_pack_start ((GtkBox *) box, widget, FALSE, FALSE, 0);
 }
 
 EXPORT void audgui_simple_message (GtkWidget * * widget, GtkMessageType type,
@@ -129,207 +137,48 @@ EXPORT void audgui_simple_message (GtkWidget * * widget, GtkMessageType type,
 {
     AUDDBG ("%s\n", text);
 
-    if (* widget != NULL)
+    if (* widget)
     {
         const char * old = NULL;
         g_object_get ((GObject *) * widget, "text", & old, NULL);
         g_return_if_fail (old);
 
-        int messages = GPOINTER_TO_INT (g_object_get_data ((GObject *)
-         * widget, "messages"));
-
+        int messages = GPOINTER_TO_INT (g_object_get_data ((GObject *) * widget, "messages"));
         if (messages > 10)
             text = _("\n(Further messages have been hidden.)");
 
-        if (strstr (old, text))
-            goto CREATED;
-
-        char both[strlen (old) + strlen (text) + 2];
-        snprintf (both, sizeof both, "%s\n%s", old, text);
-        g_object_set ((GObject *) * widget, "text", both, NULL);
-
-        g_object_set_data ((GObject *) * widget, "messages", GINT_TO_POINTER
-         (messages + 1));
-
-        goto CREATED;
-    }
-
-    * widget = gtk_message_dialog_new (NULL, 0, type, GTK_BUTTONS_OK, "%s", text);
-    gtk_window_set_title ((GtkWindow *) * widget, title);
-
-    g_object_set_data ((GObject *) * widget, "messages", GINT_TO_POINTER (1));
-
-    g_signal_connect (* widget, "response", (GCallback) gtk_widget_destroy, NULL);
-    audgui_destroy_on_escape (* widget);
-    g_signal_connect (* widget, "destroy", (GCallback) gtk_widget_destroyed,
-     widget);
-
-CREATED:
-    gtk_window_present ((GtkWindow *) * widget);
-}
-
-EXPORT GdkPixbuf * audgui_pixbuf_from_data (const void * data, int64_t size)
-{
-    GdkPixbuf * pixbuf = NULL;
-    GdkPixbufLoader * loader = gdk_pixbuf_loader_new ();
-    GError * error = NULL;
-
-    if (gdk_pixbuf_loader_write (loader, data, size, & error) &&
-     gdk_pixbuf_loader_close (loader, & error))
-    {
-        if ((pixbuf = gdk_pixbuf_loader_get_pixbuf (loader)))
-            g_object_ref (pixbuf);
-    }
-    else
-    {
-        AUDDBG ("error while loading pixbuf: %s\n", error->message);
-        g_error_free (error);
-    }
-
-    g_object_unref (loader);
-    return pixbuf;
-}
-
-/* deprecated */
-EXPORT GdkPixbuf * audgui_pixbuf_for_entry (int list, int entry)
-{
-    char * name = aud_playlist_entry_get_filename (list, entry);
-    g_return_val_if_fail (name, NULL);
-
-    const void * data;
-    int64_t size;
-
-    aud_art_get_data (name, & data, & size);
-
-    if (data)
-    {
-        GdkPixbuf * p = audgui_pixbuf_from_data (data, size);
-        aud_art_unref (name);
-
-        if (p)
+        if (! strstr (old, text))
         {
-            str_unref (name);
-            return p;
+            SCONCAT3 (both, old, "\n", text);
+            g_object_set ((GObject *) * widget, "text", both, NULL);
+            g_object_set_data ((GObject *) * widget, "messages", GINT_TO_POINTER (messages + 1));
         }
-    }
 
-    str_unref (name);
-    return audgui_pixbuf_fallback ();
-}
-
-EXPORT GdkPixbuf * audgui_pixbuf_fallback (void)
-{
-    static GdkPixbuf * fallback = NULL;
-
-    if (! fallback)
-    {
-        SPRINTF (path, "%s/images/album.png", aud_get_path (AUD_PATH_DATA_DIR));
-        fallback = gdk_pixbuf_new_from_file (path, NULL);
-    }
-
-    if (fallback)
-        g_object_ref ((GObject *) fallback);
-
-    return fallback;
-}
-
-void audgui_pixbuf_uncache (void)
-{
-    if (current_pixbuf)
-    {
-        g_object_unref ((GObject *) current_pixbuf);
-        current_pixbuf = NULL;
-    }
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-/* deprecated */
-EXPORT GdkPixbuf * audgui_pixbuf_for_current (void)
-{
-    if (! current_pixbuf)
-    {
-        int list = aud_playlist_get_playing ();
-        current_pixbuf = audgui_pixbuf_for_entry (list, aud_playlist_get_position (list));
-    }
-
-    if (current_pixbuf)
-        g_object_ref ((GObject *) current_pixbuf);
-
-    return current_pixbuf;
-}
-
-#pragma GCC diagnostic pop
-
-EXPORT void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, int size)
-{
-    int width = gdk_pixbuf_get_width (* pixbuf);
-    int height = gdk_pixbuf_get_height (* pixbuf);
-
-    if (width <= size && height <= size)
-        return;
-
-    if (width > height)
-    {
-        height = size * height / width;
-        width = size;
+        gtk_window_present ((GtkWindow *) * widget);
     }
     else
     {
-        width = size * width / height;
-        height = size;
+        GtkWidget * button = audgui_button_new (_("_Close"), "window-close", NULL, NULL);
+        * widget = audgui_dialog_new (type, title, text, button, NULL);
+
+        g_object_set_data ((GObject *) * widget, "messages", GINT_TO_POINTER (1));
+        g_signal_connect (* widget, "destroy", (GCallback) gtk_widget_destroyed, widget);
+
+        gtk_widget_show_all (* widget);
     }
-
-    if (width < 1)
-        width = 1;
-    if (height < 1)
-        height = 1;
-
-    GdkPixbuf * pixbuf2 = gdk_pixbuf_scale_simple (* pixbuf, width, height,
-     GDK_INTERP_BILINEAR);
-    g_object_unref (* pixbuf);
-    * pixbuf = pixbuf2;
 }
 
-EXPORT GdkPixbuf * audgui_pixbuf_request (const char * filename)
+EXPORT void audgui_format_time (char * buf, int bufsize, int64_t milliseconds)
 {
-    const void * data;
-    int64_t size;
+    int hours = milliseconds / 3600000;
+    int minutes = (milliseconds / 60000) % 60;
+    int seconds = (milliseconds / 1000) % 60;
 
-    aud_art_request_data (filename, & data, & size);
-    if (! data)
-        return NULL;
-
-    GdkPixbuf * p = audgui_pixbuf_from_data (data, size);
-
-    aud_art_unref (filename);
-    return p;
-}
-
-EXPORT GdkPixbuf * audgui_pixbuf_request_current (void)
-{
-    if (! current_pixbuf)
+    if (hours)
+        snprintf (buf, bufsize, "%d:%02d:%02d", hours, minutes, seconds);
+    else
     {
-        int list = aud_playlist_get_playing ();
-        int entry = aud_playlist_get_position (list);
-        if (entry < 0)
-            return NULL;
-
-        char * filename = aud_playlist_entry_get_filename (list, entry);
-        current_pixbuf = audgui_pixbuf_request (filename);
-        str_unref (filename);
+        bool_t zero = aud_get_bool (NULL, "leading_zero");
+        snprintf (buf, bufsize, zero ? "%02d:%02d" : "%d:%02d", minutes, seconds);
     }
-
-    if (current_pixbuf)
-        g_object_ref ((GObject *) current_pixbuf);
-
-    return current_pixbuf;
-}
-
-EXPORT void audgui_set_default_icon (void)
-{
-#ifndef _WIN32
-    gtk_window_set_default_icon_name ("audacious");
-#endif
 }

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <libaudcore/audstrings.h>
 #include <libaudcore/vfs.h>
 
 #include "ape.h"
@@ -73,8 +74,8 @@ static bool_t ape_read_header (VFSFile * handle, APEHeader * header)
     return TRUE;
 }
 
-static bool_t ape_find_header (VFSFile * handle, APEHeader * header, int *
- start, int * length, int * data_start, int * data_length)
+static bool_t ape_find_header (VFSFile * handle, APEHeader * header,
+ int * start, int * length, int * data_start, int * data_length)
 {
     APEHeader secondary;
 
@@ -83,15 +84,15 @@ static bool_t ape_find_header (VFSFile * handle, APEHeader * header, int *
 
     if (ape_read_header (handle, header))
     {
-        TAGDBG ("Found header at 0, length = %d, version = %d.\n", (int)
-         header->length, (int) header->version);
+        TAGDBG ("Found header at 0, length = %d, version = %d.\n",
+         (int) header->length, (int) header->version);
+
         * start = 0;
         * length = header->length;
         * data_start = sizeof (APEHeader);
         * data_length = header->length - sizeof (APEHeader);
 
-        if (! (header->flags & APE_FLAG_HAS_HEADER) || ! (header->flags &
-         APE_FLAG_IS_HEADER))
+        if (! (header->flags & APE_FLAG_HAS_HEADER) || ! (header->flags & APE_FLAG_IS_HEADER))
         {
             TAGDBG ("Invalid header flags (%u).\n", (unsigned int) header->flags);
             return FALSE;
@@ -117,44 +118,50 @@ static bool_t ape_find_header (VFSFile * handle, APEHeader * header, int *
     if (vfs_fseek (handle, -(int) sizeof (APEHeader), SEEK_END))
         return FALSE;
 
-    if (ape_read_header (handle, header))
+    if (! ape_read_header (handle, header))
     {
-        TAGDBG ("Found footer at %d, length = %d, version = %d.\n", (int)
-         vfs_ftell (handle) - (int) sizeof (APEHeader), (int) header->length,
-         (int) header->version);
-        * start = vfs_ftell (handle) - header->length;
-        * length = header->length;
-        * data_start = vfs_ftell (handle) - header->length;
-        * data_length = header->length - sizeof (APEHeader);
+        /* APE tag may be followed by an ID3v1 tag */
+        if (vfs_fseek (handle, -128 - (int) sizeof (APEHeader), SEEK_END))
+            return FALSE;
 
-        if ((header->flags & APE_FLAG_HAS_NO_FOOTER) || (header->flags &
-         APE_FLAG_IS_HEADER))
+        if (! ape_read_header (handle, header))
         {
-            TAGDBG ("Invalid footer flags (%u).\n", (unsigned int) header->flags);
+            TAGDBG ("No header found.\n");
+            return FALSE;
+        }
+    }
+
+    TAGDBG ("Found footer at %d, length = %d, version = %d.\n",
+     (int) vfs_ftell (handle) - (int) sizeof (APEHeader), (int) header->length,
+     (int) header->version);
+
+    * start = vfs_ftell (handle) - header->length;
+    * length = header->length;
+    * data_start = vfs_ftell (handle) - header->length;
+    * data_length = header->length - sizeof (APEHeader);
+
+    if ((header->flags & APE_FLAG_HAS_NO_FOOTER) || (header->flags & APE_FLAG_IS_HEADER))
+    {
+        TAGDBG ("Invalid footer flags (%u).\n", (unsigned) header->flags);
+        return FALSE;
+    }
+
+    if (header->flags & APE_FLAG_HAS_HEADER)
+    {
+        if (vfs_fseek (handle, -(int) header->length - sizeof (APEHeader), SEEK_CUR))
+            return FALSE;
+
+        if (! ape_read_header (handle, & secondary))
+        {
+            TAGDBG ("Expected header, but found none.\n");
             return FALSE;
         }
 
-        if (header->flags & APE_FLAG_HAS_HEADER)
-        {
-            if (vfs_fseek (handle, -(int) header->length - sizeof (APEHeader),
-             SEEK_CUR))
-                return FALSE;
-
-            if (! ape_read_header (handle, & secondary))
-            {
-                TAGDBG ("Expected header, but found none.\n");
-                return FALSE;
-            }
-
-            * start -= sizeof (APEHeader);
-            * length += sizeof (APEHeader);
-        }
-
-        return TRUE;
+        * start -= sizeof (APEHeader);
+        * length += sizeof (APEHeader);
     }
 
-    TAGDBG ("No header found.\n");
-    return FALSE;
+    return TRUE;
 }
 
 static bool_t ape_is_our_file (VFSFile * handle)
@@ -195,9 +202,9 @@ static ValuePair * ape_read_item (void * * data, int length)
         return NULL;
     }
 
-    pair = g_malloc (sizeof (ValuePair));
-    pair->key = g_strdup ((char *) (* data) + 8);
-    pair->value = g_strndup (value, header[0]);
+    pair = g_slice_new (ValuePair);
+    pair->key = str_get ((char *) (* data) + 8);
+    pair->value = str_nget (value, header[0]);
 
     * data = value + header[0];
 
@@ -245,15 +252,11 @@ static GList * ape_read_items (VFSFile * handle)
     return g_list_reverse (list);
 }
 
-static void free_tag_list (GList * list)
+static void free_value_pair (ValuePair * pair)
 {
-    while (list != NULL)
-    {
-        g_free (((ValuePair *) list->data)->key);
-        g_free (((ValuePair *) list->data)->value);
-        g_free (list->data);
-        list = g_list_delete_link (list, list);
-    }
+    str_unref (pair->key);
+    str_unref (pair->value);
+    g_slice_free (ValuePair, pair);
 }
 
 static void parse_gain_text (const char * text, int * value, int * unit)
@@ -297,12 +300,12 @@ static void set_gain_info (Tuple * tuple, int field, int unit_field,
 
     parse_gain_text (text, & value, & unit);
 
-    if (tuple_get_value_type (tuple, unit_field, NULL) == TUPLE_INT)
-        value = value * (int64_t) tuple_get_int (tuple, unit_field, NULL) / unit;
+    if (tuple_get_value_type (tuple, unit_field) == TUPLE_INT)
+        value = value * (int64_t) tuple_get_int (tuple, unit_field) / unit;
     else
-        tuple_set_int (tuple, unit_field, NULL, unit);
+        tuple_set_int (tuple, unit_field, unit);
 
-    tuple_set_int (tuple, field, NULL, value);
+    tuple_set_int (tuple, field, value);
 }
 
 static bool_t ape_read_tag (Tuple * tuple, VFSFile * handle)
@@ -315,34 +318,30 @@ static bool_t ape_read_tag (Tuple * tuple, VFSFile * handle)
         char * value = ((ValuePair *) node->data)->value;
 
         if (! strcmp (key, "Artist"))
-            tuple_set_str (tuple, FIELD_ARTIST, NULL, value);
+            tuple_set_str (tuple, FIELD_ARTIST, value);
         else if (! strcmp (key, "Title"))
-            tuple_set_str (tuple, FIELD_TITLE, NULL, value);
+            tuple_set_str (tuple, FIELD_TITLE, value);
         else if (! strcmp (key, "Album"))
-            tuple_set_str (tuple, FIELD_ALBUM, NULL, value);
+            tuple_set_str (tuple, FIELD_ALBUM, value);
         else if (! strcmp (key, "Comment"))
-            tuple_set_str (tuple, FIELD_COMMENT, NULL, value);
+            tuple_set_str (tuple, FIELD_COMMENT, value);
         else if (! strcmp (key, "Genre"))
-            tuple_set_str (tuple, FIELD_GENRE, NULL, value);
+            tuple_set_str (tuple, FIELD_GENRE, value);
         else if (! strcmp (key, "Track"))
-            tuple_set_int (tuple, FIELD_TRACK_NUMBER, NULL, atoi (value));
+            tuple_set_int (tuple, FIELD_TRACK_NUMBER, atoi (value));
         else if (! strcmp (key, "Year"))
-            tuple_set_int (tuple, FIELD_YEAR, NULL, atoi (value));
+            tuple_set_int (tuple, FIELD_YEAR, atoi (value));
         else if (! g_ascii_strcasecmp (key, "REPLAYGAIN_TRACK_GAIN"))
-            set_gain_info (tuple, FIELD_GAIN_TRACK_GAIN, FIELD_GAIN_GAIN_UNIT,
-             value);
+            set_gain_info (tuple, FIELD_GAIN_TRACK_GAIN, FIELD_GAIN_GAIN_UNIT, value);
         else if (! g_ascii_strcasecmp (key, "REPLAYGAIN_TRACK_PEAK"))
-            set_gain_info (tuple, FIELD_GAIN_TRACK_PEAK, FIELD_GAIN_PEAK_UNIT,
-             value);
+            set_gain_info (tuple, FIELD_GAIN_TRACK_PEAK, FIELD_GAIN_PEAK_UNIT, value);
         else if (! g_ascii_strcasecmp (key, "REPLAYGAIN_ALBUM_GAIN"))
-            set_gain_info (tuple, FIELD_GAIN_ALBUM_GAIN, FIELD_GAIN_GAIN_UNIT,
-             value);
+            set_gain_info (tuple, FIELD_GAIN_ALBUM_GAIN, FIELD_GAIN_GAIN_UNIT, value);
         else if (! g_ascii_strcasecmp (key, "REPLAYGAIN_ALBUM_PEAK"))
-            set_gain_info (tuple, FIELD_GAIN_ALBUM_PEAK, FIELD_GAIN_PEAK_UNIT,
-             value);
+            set_gain_info (tuple, FIELD_GAIN_ALBUM_PEAK, FIELD_GAIN_PEAK_UNIT, value);
     }
 
-    free_tag_list (list);
+    g_list_free_full (list, (GDestroyNotify) free_value_pair);
     return TRUE;
 }
 
@@ -374,7 +373,7 @@ static bool_t ape_write_item (VFSFile * handle, const char * key,
 static bool_t write_string_item (const Tuple * tuple, int field, VFSFile *
  handle, const char * key, int * written_length, int * written_items)
 {
-    char * value = tuple_get_str (tuple, field, NULL);
+    char * value = tuple_get_str (tuple, field);
 
     if (value == NULL)
         return TRUE;
@@ -391,13 +390,13 @@ static bool_t write_string_item (const Tuple * tuple, int field, VFSFile *
 static bool_t write_integer_item (const Tuple * tuple, int field, VFSFile *
  handle, const char * key, int * written_length, int * written_items)
 {
-    int value = tuple_get_int (tuple, field, NULL);
+    int value = tuple_get_int (tuple, field);
     char scratch[32];
 
-    if (! value)
+    if (value <= 0)
         return TRUE;
 
-    snprintf (scratch, sizeof scratch, "%d", value);
+    str_itoa (value, scratch, sizeof scratch);
 
     if (! ape_write_item (handle, key, scratch, written_length))
         return FALSE;
@@ -488,11 +487,11 @@ static bool_t ape_write_tag (const Tuple * tuple, VFSFile * handle)
      start, SEEK_SET) || ! write_header (length, items, TRUE, handle))
         goto ERR;
 
-    free_tag_list (list);
+    g_list_free_full (list, (GDestroyNotify) free_value_pair);
     return TRUE;
 
 ERR:
-    free_tag_list (list);
+    g_list_free_full (list, (GDestroyNotify) free_value_pair);
     return FALSE;
 }
 

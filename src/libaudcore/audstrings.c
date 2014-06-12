@@ -1,7 +1,6 @@
 /*
  * audstrings.c
- * Copyright 2009-2011 John Lindgren
- * Copyright 2010 William Pitcock
+ * Copyright 2009-2012 John Lindgren and William Pitcock
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -22,19 +21,67 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <glib.h>
 #include <string.h>
-#include <ctype.h>
-#include <locale.h>
+
+#include <glib.h>
 
 #include <audacious/i18n.h>
 
 #include "audstrings.h"
+#include "index.h"
 
-#define FROM_HEX(c) ((c) < 'A' ? (c) - '0' : (c) < 'a' ? 10 + (c) - 'A' : 10 + (c) - 'a')
-#define TO_HEX(i) ((i) < 10 ? '0' + (i) : 'A' + (i) - 10)
-#define IS_LEGAL(c) (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z') \
-                  || ((c) >= '0' && (c) <= '9') || (strchr ("-_.~/", (c))))
+static const char ascii_to_hex[256] = {
+    ['0'] = 0x0, ['1'] = 0x1, ['2'] = 0x2, ['3'] = 0x3, ['4'] = 0x4,
+    ['5'] = 0x5, ['6'] = 0x6, ['7'] = 0x7, ['8'] = 0x8, ['9'] = 0x9,
+    ['a'] = 0xa, ['b'] = 0xb, ['c'] = 0xc, ['d'] = 0xd, ['e'] = 0xe, ['f'] = 0xf,
+    ['A'] = 0xa, ['B'] = 0xb, ['C'] = 0xc, ['D'] = 0xd, ['E'] = 0xe, ['F'] = 0xf
+};
+
+static const char hex_to_ascii[16] = {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+};
+
+static const char uri_legal_table[256] = {
+    ['0'] = 1, ['1'] = 1, ['2'] = 1, ['3'] = 1, ['4'] = 1,
+    ['5'] = 1, ['6'] = 1, ['7'] = 1, ['8'] = 1, ['9'] = 1,
+    ['a'] = 1, ['b'] = 1, ['c'] = 1, ['d'] = 1, ['e'] = 1, ['f'] = 1, ['g'] = 1,
+    ['h'] = 1, ['i'] = 1, ['j'] = 1, ['k'] = 1, ['l'] = 1, ['m'] = 1, ['n'] = 1,
+    ['o'] = 1, ['p'] = 1, ['q'] = 1, ['r'] = 1, ['s'] = 1, ['t'] = 1, ['u'] = 1,
+    ['v'] = 1, ['w'] = 1, ['x'] = 1, ['y'] = 1, ['z'] = 1,
+    ['A'] = 1, ['B'] = 1, ['C'] = 1, ['D'] = 1, ['E'] = 1, ['F'] = 1, ['G'] = 1,
+    ['H'] = 1, ['I'] = 1, ['J'] = 1, ['K'] = 1, ['L'] = 1, ['M'] = 1, ['N'] = 1,
+    ['O'] = 1, ['P'] = 1, ['Q'] = 1, ['R'] = 1, ['S'] = 1, ['T'] = 1, ['U'] = 1,
+    ['V'] = 1, ['W'] = 1, ['X'] = 1, ['Y'] = 1, ['Z'] = 1,
+    ['-'] = 1, ['_'] = 1, ['.'] = 1, ['~'] = 1, ['/'] = 1
+};
+
+static const char swap_case[256] =
+    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+    "\0abcdefghijklmnopqrstuvwxyz\0\0\0\0\0"
+    "\0ABCDEFGHIJKLMNOPQRSTUVWXYZ\0\0\0\0\0";
+
+#define FROM_HEX(c)  (ascii_to_hex[(unsigned char) (c)])
+#define TO_HEX(i)    (hex_to_ascii[(i) & 15])
+#define IS_LEGAL(c)  (uri_legal_table[(unsigned char) (c)])
+#define SWAP_CASE(c) (swap_case[(unsigned char) (c)])
+
+EXPORT char * str_printf (const char * format, ...)
+{
+    va_list args;
+    va_start (args, format);
+
+    char * str = str_vprintf (format, args);
+
+    va_end (args);
+    return str;
+}
+
+EXPORT char * str_vprintf (const char * format, va_list args)
+{
+    VSPRINTF (buf, format, args);
+    return str_get (buf);
+}
 
 EXPORT bool_t str_has_prefix_nocase (const char * str, const char * prefix)
 {
@@ -52,32 +99,115 @@ EXPORT bool_t str_has_suffix_nocase (const char * str, const char * suffix)
     return ! g_ascii_strcasecmp (str + len1 - len2, suffix);
 }
 
-static char * (* str_to_utf8_impl) (const char *) = NULL;
-static char * (* str_to_utf8_full_impl) (const char *, int, int *, int *) = NULL;
-
-EXPORT void str_set_utf8_impl (char * (* stu_impl) (const char *),
- char * (* stuf_impl) (const char *, int, int *, int *))
+EXPORT char * strstr_nocase (const char * haystack, const char * needle)
 {
-    str_to_utf8_impl = stu_impl;
-    str_to_utf8_full_impl = stuf_impl;
+    while (1)
+    {
+        const char * ap = haystack;
+        const char * bp = needle;
+
+        while (1)
+        {
+            char a = * ap ++;
+            char b = * bp ++;
+
+            if (! b) /* all of needle matched */
+                return (char *) haystack;
+            if (! a) /* end of haystack reached */
+                return NULL;
+
+            if (a != b && a != SWAP_CASE (b))
+                break;
+        }
+
+        haystack ++;
+    }
 }
 
-EXPORT char * str_to_utf8 (const char * str)
+EXPORT char * strstr_nocase_utf8 (const char * haystack, const char * needle)
 {
-    g_return_val_if_fail (str_to_utf8_impl, NULL);
-    return str_to_utf8_impl (str);
+    while (1)
+    {
+        const char * ap = haystack;
+        const char * bp = needle;
+
+        while (1)
+        {
+            gunichar a = g_utf8_get_char (ap);
+            gunichar b = g_utf8_get_char (bp);
+
+            if (! b) /* all of needle matched */
+                return (char *) haystack;
+            if (! a) /* end of haystack reached */
+                return NULL;
+
+            if (a != b && (a < 128 ? SWAP_CASE (a) != b :
+             g_unichar_tolower (a) != g_unichar_tolower (b)))
+                break;
+
+            ap = g_utf8_next_char (ap);
+            bp = g_utf8_next_char (bp);
+        }
+
+        haystack = g_utf8_next_char (haystack);
+    }
 }
 
-EXPORT char * str_to_utf8_full (const char * str, int len, int * bytes_read, int * bytes_written)
+EXPORT char * str_tolower_utf8 (const char * str)
 {
-    g_return_val_if_fail (str_to_utf8_full_impl, NULL);
-    return str_to_utf8_full_impl (str, len, bytes_read, bytes_written);
+    char buf[6 * strlen (str) + 1];
+    const char * get = str;
+    char * set = buf;
+    gunichar c;
+
+    while ((c = g_utf8_get_char (get)))
+    {
+        if (c < 128)
+            * set ++ = g_ascii_tolower (c);
+        else
+            set += g_unichar_to_utf8 (g_unichar_tolower (c), set);
+
+        get = g_utf8_next_char (get);
+    }
+
+    * set = 0;
+
+    return str_get (buf);
 }
 
-EXPORT void string_replace_char (char * string, char old_c, char new_c)
+EXPORT void str_replace_char (char * string, char old_c, char new_c)
 {
     while ((string = strchr (string, old_c)))
         * string ++ = new_c;
+}
+
+EXPORT void str_itoa (int x, char * buf, int bufsize)
+{
+    if (! bufsize)
+        return;
+
+    if (x < 0)
+    {
+        if (bufsize > 1)
+        {
+            * buf ++ = '-';
+            bufsize --;
+        }
+
+        x = -x;
+    }
+
+    char * rev = buf + bufsize - 1;
+    * rev = 0;
+
+    while (rev > buf)
+    {
+        * (-- rev) = '0' + x % 10;
+        if (! (x /= 10))
+            break;
+    }
+
+    while ((* buf ++ = * rev ++));
 }
 
 /* Percent-decodes up to <len> bytes of <str> to <out>, which must be large
@@ -86,26 +216,37 @@ EXPORT void string_replace_char (char * string, char old_c, char new_c)
 
 EXPORT void str_decode_percent (const char * str, int len, char * out)
 {
-    if (len < 0)
-        len = INT_MAX;
+    const char * nul;
 
-    while (len --)
+    if (len < 0)
+        len = strlen (str);
+    else if ((nul = memchr (str, 0, len)))
+        len = nul - str;
+
+    while (1)
     {
-        char c = * str ++;
-        if (! c)
+        const char * p = memchr (str, '%', len);
+        if (! p)
             break;
 
-        if (c == '%' && len >= 2 && str[0] && str[1])
-        {
-            c = (FROM_HEX (str[0]) << 4) | FROM_HEX (str[1]);
-            str += 2;
-            len -= 2;
-        }
+        int block = p - str;
+        memmove (out, str, block);
 
-        * out ++ = c;
+        str += block;
+        out += block;
+        len -= block;
+
+        if (len < 3)
+            break;
+
+        * out ++ = (FROM_HEX (str[1]) << 4) | FROM_HEX (str[2]);
+
+        str += 3;
+        len -= 3;
     }
 
-    * out = 0;
+    memmove (out, str, len);
+    out[len] = 0;
 }
 
 /* Percent-encodes up to <len> bytes of <str> to <out>, which must be large
@@ -114,14 +255,16 @@ EXPORT void str_decode_percent (const char * str, int len, char * out)
 
 EXPORT void str_encode_percent (const char * str, int len, char * out)
 {
+    const char * nul;
+
     if (len < 0)
-        len = INT_MAX;
+        len = strlen (str);
+    else if ((nul = memchr (str, 0, len)))
+        len = nul - str;
 
     while (len --)
     {
         char c = * str ++;
-        if (! c)
-            break;
 
         if (IS_LEGAL (c))
             * out ++ = c;
@@ -136,62 +279,101 @@ EXPORT void str_encode_percent (const char * str, int len, char * out)
     * out = 0;
 }
 
-/* Like g_filename_to_uri, but converts the filename from the system locale to
- * UTF-8 before percent-encoding.  On Windows, replaces '\' with '/' and adds a
- * leading '/'. */
-
-EXPORT char * filename_to_uri (const char * name)
+EXPORT void filename_normalize (char * filename)
 {
-    char * utf8 = g_locale_to_utf8 (name, -1, NULL, NULL, NULL);
-    if (! utf8)
+#ifdef _WIN32
+    /* convert slash to backslash on Windows */
+    str_replace_char (filename, '/', '\\');
+#endif
+
+    /* remove trailing slash */
+    int len = strlen (filename);
+#ifdef _WIN32
+    if (len > 3 && filename[len - 1] == '\\') /* leave "C:\" */
+#else
+    if (len > 1 && filename[len - 1] == '/') /* leave leading "/" */
+#endif
+        filename[len - 1] = 0;
+}
+
+EXPORT char * filename_build (const char * path, const char * name)
+{
+    int len = strlen (path);
+
+#ifdef _WIN32
+    if (! len || path[len - 1] == '/' || path[len - 1] == '\\')
     {
-        const char * locale = setlocale (LC_ALL, NULL);
-        fprintf (stderr, "Cannot convert filename from system locale (%s): %s\n", locale, name);
-        return NULL;
+        SCONCAT2 (filename, path, name);
+        return str_get (filename);
     }
 
-#ifdef _WIN32
-    string_replace_char (utf8, '\\', '/');
-#endif
-    char enc[3 * strlen (utf8) + 1];
-    str_encode_percent (utf8, -1, enc);
-
-    g_free (utf8);
-
-#ifdef _WIN32
-    return g_strdup_printf ("file:///%s", enc);
+    SCONCAT3 (filename, path, "\\", name);
+    return str_get (filename);
 #else
-    return g_strdup_printf ("file://%s", enc);
+    if (! len || path[len - 1] == '/')
+    {
+        SCONCAT2 (filename, path, name);
+        return str_get (filename);
+    }
+
+    SCONCAT3 (filename, path, "/", name);
+    return str_get (filename);
 #endif
 }
 
+#ifdef _WIN32
+#define URI_PREFIX "file:///"
+#define URI_PREFIX_LEN 8
+#else
+#define URI_PREFIX "file://"
+#define URI_PREFIX_LEN 7
+#endif
+
+/* Like g_filename_to_uri, but converts the filename from the system locale to
+ * UTF-8 before percent-encoding (except on Windows, where filenames are assumed
+ * to be UTF-8).  On Windows, replaces '\' with '/' and adds a leading '/'. */
+
+EXPORT char * filename_to_uri (const char * name)
+{
+#ifdef _WIN32
+    SCOPY (utf8, name);
+    str_replace_char (utf8, '\\', '/');
+#else
+    char * utf8 = str_from_locale (name, -1);
+    if (! utf8)
+        return NULL;
+#endif
+
+    char enc[URI_PREFIX_LEN + 3 * strlen (utf8) + 1];
+    strcpy (enc, URI_PREFIX);
+    str_encode_percent (utf8, -1, enc + URI_PREFIX_LEN);
+
+#ifndef _WIN32
+    str_unref (utf8);
+#endif
+
+    return str_get (enc);
+}
+
 /* Like g_filename_from_uri, but converts the filename from UTF-8 to the system
- * locale after percent-decoding.  On Windows, strips the leading '/' and
- * replaces '/' with '\'. */
+ * locale after percent-decoding (except on Windows, where filenames are assumed
+ * to be UTF-8).  On Windows, strips the leading '/' and replaces '/' with '\'. */
 
 EXPORT char * uri_to_filename (const char * uri)
 {
+    if (strncmp (uri, URI_PREFIX, URI_PREFIX_LEN))
+        return NULL;
+
+    char buf[strlen (uri + URI_PREFIX_LEN) + 1];
+    str_decode_percent (uri + URI_PREFIX_LEN, -1, buf);
+
+    filename_normalize (buf);
+
 #ifdef _WIN32
-    g_return_val_if_fail (! strncmp (uri, "file:///", 8), NULL);
-    char buf[strlen (uri + 8) + 1];
-    str_decode_percent (uri + 8, -1, buf);
+    return str_get (buf);
 #else
-    g_return_val_if_fail (! strncmp (uri, "file://", 7), NULL);
-    char buf[strlen (uri + 7) + 1];
-    str_decode_percent (uri + 7, -1, buf);
+    return str_to_locale (buf, -1);
 #endif
-#ifdef _WIN32
-    string_replace_char (buf, '/', '\\');
-#endif
-
-    char * name = g_locale_from_utf8 (buf, -1, NULL, NULL, NULL);
-    if (! name)
-    {
-        const char * locale = setlocale (LC_ALL, NULL);
-        fprintf (stderr, "Cannot convert filename to system locale (%s): %s\n", locale, buf);
-    }
-
-    return name;
 }
 
 /* Formats a URI for human-readable display.  Percent-decodes and, for file://
@@ -200,25 +382,25 @@ EXPORT char * uri_to_filename (const char * uri)
 EXPORT char * uri_to_display (const char * uri)
 {
     if (! strncmp (uri, "cdda://?", 8))
-        return g_strdup_printf (_("Audio CD, track %s"), uri + 8);
+        return str_printf (_("Audio CD, track %s"), uri + 8);
 
     char buf[strlen (uri) + 1];
 
-#ifdef _WIN32
-    if (! strncmp (uri, "file:///", 8))
+    if (! strncmp (uri, URI_PREFIX, URI_PREFIX_LEN))
     {
-        str_decode_percent (uri + 8, -1, buf);
-        string_replace_char (buf, '/', '\\');
-    }
-#else
-    if (! strncmp (uri, "file://", 7))
-        str_decode_percent (uri + 7, -1, buf);
+        str_decode_percent (uri + URI_PREFIX_LEN, -1, buf);
+#ifdef _WIN32
+        str_replace_char (buf, '/', '\\');
 #endif
+    }
     else
         str_decode_percent (uri, -1, buf);
 
-    return g_strdup (buf);
+    return str_get (buf);
 }
+
+#undef URI_PREFIX
+#undef URI_PREFIX_LEN
 
 EXPORT void uri_parse (const char * uri, const char * * base_p, const char * * ext_p,
  const char * * sub_p, int * isub_p)
@@ -238,9 +420,7 @@ EXPORT void uri_parse (const char * uri, const char * * base_p, const char * * e
     else
         sub = end;
 
-    char buf[sub - base + 1];
-    memcpy (buf, base, sub - base);
-    buf[sub - base] = 0;
+    SNCOPY (buf, base, sub - base);
 
     if ((c = strrchr (buf, '.')))
         ext = base + (c - buf);
@@ -265,7 +445,8 @@ EXPORT bool_t uri_get_extension (const char * uri, char * buf, int buflen)
     if (ext[0] != '.')
         return FALSE;
 
-    g_strlcpy (buf, ext + 1, buflen);
+    strncpy (buf, ext + 1, buflen - 1);
+    buf[buflen - 1] = 0;
 
     /* remove subtunes and HTTP query strings */
     char * qmark;
@@ -279,7 +460,7 @@ EXPORT bool_t uri_get_extension (const char * uri, char * buf, int buflen)
 /* Non-ASCII characters are treated exactly as is. */
 /* Handles NULL gracefully. */
 
-EXPORT int string_compare (const char * ap, const char * bp)
+EXPORT int str_compare (const char * ap, const char * bp)
 {
     if (ap == NULL)
         return (bp == NULL) ? 0 : -1;
@@ -321,9 +502,9 @@ EXPORT int string_compare (const char * ap, const char * bp)
     return 0;
 }
 
-/* Decodes percent-encoded strings, then compares then with string_compare. */
+/* Decodes percent-encoded strings, then compares then with str_compare. */
 
-EXPORT int string_compare_encoded (const char * ap, const char * bp)
+EXPORT int str_compare_encoded (const char * ap, const char * bp)
 {
     if (ap == NULL)
         return (bp == NULL) ? 0 : -1;
@@ -376,37 +557,72 @@ EXPORT int string_compare_encoded (const char * ap, const char * bp)
     return 0;
 }
 
-EXPORT char *
-str_replace_fragment(char *s, int size, const char *old, const char *new)
+EXPORT Index * str_list_to_index (const char * list, const char * delims)
 {
-    char *ptr = s;
-    int left = strlen(s);
-    int avail = size - (left + 1);
-    int oldlen = strlen(old);
-    int newlen = strlen(new);
-    int diff = newlen - oldlen;
+    char dmap[256] = {0};
 
-    while (left >= oldlen)
+    for (; * delims; delims ++)
+        dmap[(unsigned char) (* delims)] = 1;
+
+    Index * index = index_new ();
+    const char * word = NULL;
+
+    for (; * list; list ++)
     {
-        if (strncmp(ptr, old, oldlen))
+        if (dmap[(unsigned char) (* list)])
         {
-            left--;
-            ptr++;
-            continue;
+            if (word)
+            {
+                index_insert (index, -1, str_nget (word, list - word));
+                word = NULL;
+            }
         }
-
-        if (diff > avail)
-            break;
-
-        if (diff != 0)
-            memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
-
-        memcpy(ptr, new, newlen);
-        ptr += newlen;
-        left -= oldlen;
+        else
+        {
+            if (! word)
+            {
+                word = list;
+            }
+        }
     }
 
-    return s;
+    if (word)
+        index_insert (index, -1, str_get (word));
+
+    return index;
+}
+
+EXPORT char * index_to_str_list (Index * index, const char * sep)
+{
+    int count = index_count (index);
+    int seplen = strlen (sep);
+    int total = count ? seplen * (count - 1) : 0;
+    int lengths[count];
+
+    for (int i = 0; i < count; i ++)
+    {
+        lengths[i] = strlen (index_get (index, i));
+        total += lengths[i];
+    }
+
+    char buf[total + 1];
+    int pos = 0;
+
+    for (int i = 0; i < count; i ++)
+    {
+        if (i)
+        {
+            strcpy (buf + pos, sep);
+            pos += seplen;
+        }
+
+        strcpy (buf + pos, index_get (index, i));
+        pos += lengths[i];
+    }
+
+    buf[pos] = 0;
+
+    return str_get (buf);
 }
 
 /*
@@ -420,11 +636,11 @@ str_replace_fragment(char *s, int size, const char *old, const char *new)
  *    architecture or locale we have to deal with.
  *  - Readability, meaning that the number one is rendered "1", not "1.000".
  *
- * Values are limited between -1,000,000,000 and 1,000,000,000 (inclusive) and
+ * Values between -1,000,000,000 and 1,000,000,000 (inclusive) are guaranteed to
  * have an accuracy of 6 decimal places.
  */
 
-EXPORT bool_t string_to_int (const char * string, int * addr)
+EXPORT int str_to_int (const char * string)
 {
     bool_t neg = (string[0] == '-');
     if (neg)
@@ -433,88 +649,41 @@ EXPORT bool_t string_to_int (const char * string, int * addr)
     int val = 0;
     char c;
 
-    while ((c = * string ++))
-    {
-        if (c < '0' || c > '9' || val > 100000000)
-            goto ERR;
-
+    while ((c = * string ++) && c >= '0' && c <= '9')
         val = val * 10 + (c - '0');
-    }
 
-    if (val > 1000000000)
-        goto ERR;
-
-    * addr = neg ? -val : val;
-    return TRUE;
-
-ERR:
-    return FALSE;
+    return neg ? -val : val;
 }
 
-EXPORT bool_t string_to_double (const char * string, double * addr)
+EXPORT double str_to_double (const char * string)
 {
     bool_t neg = (string[0] == '-');
     if (neg)
         string ++;
 
+    double val = str_to_int (string);
     const char * p = strchr (string, '.');
-    int i, f;
 
     if (p)
     {
-        char buf[11];
-        int len;
-
-        len = p - string;
-        if (len > 10)
-            goto ERR;
-
-        memcpy (buf, string, len);
-        buf[len] = 0;
-
-        if (! string_to_int (buf, & i))
-            goto ERR;
-
-        len = strlen (p + 1);
-        if (len > 6)
-            goto ERR;
-
-        memcpy (buf, p + 1, len);
-        memset (buf + len, '0', 6 - len);
-        buf[6] = 0;
-
-        if (! string_to_int (buf, & f))
-            goto ERR;
-    }
-    else
-    {
-        if (! string_to_int (string, & i))
-            goto ERR;
-
-        f = 0;
+        char buf[7] = "000000";
+        const char * nul = memchr (p + 1, 0, 6);
+        memcpy (buf, p + 1, nul ? nul - (p + 1) : 6);
+        val += (double) str_to_int (buf) / 1000000;
     }
 
-    double val = i + (double) f / 1000000;
-    if (val > 1000000000)
-        goto ERR;
-
-    * addr = neg ? -val : val;
-    return TRUE;
-
-ERR:
-    return FALSE;
+    return neg ? -val : val;
 }
 
-EXPORT char * int_to_string (int val)
+EXPORT char * int_to_str (int val)
 {
-    g_return_val_if_fail (val >= -1000000000 && val <= 1000000000, NULL);
-    return g_strdup_printf ("%d", val);
+    char buf[16];
+    str_itoa (val, buf, sizeof buf);
+    return str_get (buf);
 }
 
-EXPORT char * double_to_string (double val)
+EXPORT char * double_to_str (double val)
 {
-    g_return_val_if_fail (val >= -1000000000 && val <= 1000000000, NULL);
-
     bool_t neg = (val < 0);
     if (neg)
         val = -val;
@@ -528,94 +697,88 @@ EXPORT char * double_to_string (double val)
         f = 0;
     }
 
-    char * s = neg ? g_strdup_printf ("-%d.%06d", i, f) : g_strdup_printf ("%d.%06d", i, f);
+    SPRINTF (buf, "%s%d.%06d", neg ? "-" : "", i, f);
 
-    char * c = s + strlen (s);
+    char * c = buf + strlen (buf);
     while (* (c - 1) == '0')
         c --;
     if (* (c - 1) == '.')
         c --;
     * c = 0;
 
-    return s;
+    return str_get (buf);
 }
 
-EXPORT bool_t string_to_int_array (const char * string, int * array, int count)
+EXPORT bool_t str_to_int_array (const char * string, int * array, int count)
 {
-    char * * split = g_strsplit (string, ",", -1);
-    if (g_strv_length (split) != count)
-        goto ERR;
+    Index * index = str_list_to_index (string, ", ");
+    bool_t okay = (index_count (index) == count);
+
+    if (okay)
+    {
+        for (int i = 0; i < count; i ++)
+            array[i] = str_to_int (index_get (index, i));
+    }
+
+    index_free_full (index, (IndexFreeFunc) str_unref);
+    return okay;
+}
+
+EXPORT char * int_array_to_str (const int * array, int count)
+{
+    Index * index = index_new ();
 
     for (int i = 0; i < count; i ++)
     {
-        if (! string_to_int (split[i], & array[i]))
+        char * value = int_to_str (array[i]);
+        if (! value)
             goto ERR;
+
+        index_insert (index, -1, value);
     }
 
-    g_strfreev (split);
-    return TRUE;
-
-ERR:
-    g_strfreev (split);
-    return FALSE;
-}
-
-EXPORT char * int_array_to_string (const int * array, int count)
-{
-    char * * split = g_malloc0 (sizeof (char *) * (count + 1));
-
-    for (int i = 0; i < count; i ++)
-    {
-        split[i] = int_to_string (array[i]);
-        if (! split[i])
-            goto ERR;
-    }
-
-    char * string = g_strjoinv (",", split);
-    g_strfreev (split);
+    char * string = index_to_str_list (index, ",");
+    index_free_full (index, (IndexFreeFunc) str_unref);
     return string;
 
 ERR:
-    g_strfreev (split);
+    index_free_full (index, (IndexFreeFunc) str_unref);
     return NULL;
 }
 
-EXPORT bool_t string_to_double_array (const char * string, double * array, int count)
+EXPORT bool_t str_to_double_array (const char * string, double * array, int count)
 {
-    char * * split = g_strsplit (string, ",", -1);
-    if (g_strv_length (split) != count)
-        goto ERR;
+    Index * index = str_list_to_index (string, ", ");
+    bool_t okay = (index_count (index) == count);
 
-    for (int i = 0; i < count; i ++)
+    if (okay)
     {
-        if (! string_to_double (split[i], & array[i]))
-            goto ERR;
+        for (int i = 0; i < count; i ++)
+            array[i] = str_to_double (index_get (index, i));
     }
 
-    g_strfreev (split);
-    return TRUE;
-
-ERR:
-    g_strfreev (split);
-    return FALSE;
+    index_free_full (index, (IndexFreeFunc) str_unref);
+    return okay;
 }
 
-EXPORT char * double_array_to_string (const double * array, int count)
+EXPORT char * double_array_to_str (const double * array, int count)
 {
-    char * * split = g_malloc0 (sizeof (char *) * (count + 1));
+    Index * index = index_new ();
 
     for (int i = 0; i < count; i ++)
     {
-        split[i] = double_to_string (array[i]);
-        if (! split[i])
+        char * value = double_to_str (array[i]);
+        if (! value)
             goto ERR;
+
+        index_insert (index, -1, value);
     }
 
-    char * string = g_strjoinv (",", split);
-    g_strfreev (split);
+    char * string = index_to_str_list (index, ",");
+    index_free_full (index, (IndexFreeFunc) str_unref);
     return string;
 
 ERR:
-    g_strfreev (split);
+    index_free_full (index, (IndexFreeFunc) str_unref);
     return NULL;
 }

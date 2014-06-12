@@ -36,7 +36,7 @@ struct _ScanRequest {
     Tuple * tuple;
     void * image_data;
     int64_t image_len;
-    char * image_file;
+    char * image_file; /* pooled */
 };
 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -73,8 +73,8 @@ static void scan_request_free (ScanRequest * request)
         tuple_unref (request->tuple);
 
     str_unref (request->filename);
-    free (request->image_data);
-    free (request->image_file);
+    g_free (request->image_data);
+    str_unref (request->image_file);
     g_slice_free (ScanRequest, request);
 }
 
@@ -144,11 +144,9 @@ void scan_request_get_image_data (ScanRequest * request, void * * data, int64_t 
     request->image_len = 0;
 }
 
-char * scan_request_get_image_file (ScanRequest * request)
+const char * scan_request_get_image_file (ScanRequest * request)
 {
-    char * image_file = request->image_file;
-    request->image_file = NULL;
-    return image_file;
+    return request->image_file;
 }
 
 void scanner_init (void)

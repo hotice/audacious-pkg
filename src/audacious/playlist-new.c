@@ -1,6 +1,6 @@
 /*
  * playlist-new.c
- * Copyright 2009-2012 John Lindgren
+ * Copyright 2009-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -24,6 +24,7 @@
 #include <time.h>
 
 #include <glib.h>
+#include <glib/gstdio.h>
 
 #include <libaudcore/audstrings.h>
 #include <libaudcore/hook.h>
@@ -126,22 +127,13 @@ static void scan_restart (void);
 
 static bool_t next_song_locked (Playlist * playlist, bool_t repeat, int hint);
 
-static char * title_format;
-
-static char * title_from_tuple (Tuple * tuple)
-{
-    if (! title_format)
-        title_format = get_string (NULL, "generic_title_format");
-
-    return tuple_format_title (tuple, title_format);
-}
+static TupleFormatter * title_formatter;
 
 static void entry_set_tuple_real (Entry * entry, Tuple * tuple)
 {
     /* Hack: We cannot refresh segmented entries (since their info is read from
      * the cue sheet when it is first loaded), so leave them alone. -jlindgren */
-    if (entry->tuple && tuple_get_value_type (entry->tuple, FIELD_SEGMENT_START,
-     NULL) == TUPLE_INT)
+    if (entry->tuple && tuple_get_value_type (entry->tuple, FIELD_SEGMENT_START) == TUPLE_INT)
     {
         if (tuple)
             tuple_unref (tuple);
@@ -168,8 +160,8 @@ static void entry_set_tuple_real (Entry * entry, Tuple * tuple)
     }
     else
     {
-        entry->formatted = title_from_tuple (tuple);
-        entry->length = tuple_get_int (tuple, FIELD_LENGTH, NULL);
+        entry->formatted = tuple_format_title (title_formatter, tuple);
+        entry->length = tuple_get_int (tuple, FIELD_LENGTH);
         if (entry->length < 0)
             entry->length = 0;
     }
@@ -286,11 +278,7 @@ static void playlist_free (Playlist * playlist)
 
     str_unref (playlist->filename);
     str_unref (playlist->title);
-
-    for (int count = 0; count < index_count (playlist->entries); count ++)
-        entry_free (index_get (playlist->entries, count));
-
-    index_free (playlist->entries);
+    index_free_full (playlist->entries, (IndexFreeFunc) entry_free);
     g_list_free (playlist->queued);
     g_slice_free (Playlist, playlist);
 }
@@ -655,6 +643,9 @@ void playlist_init (void)
     scan_playlist = scan_row = 0;
 
     LEAVE;
+
+    /* initialize title formatter */
+    playlist_reformat_titles ();
 }
 
 void playlist_end (void)
@@ -670,17 +661,14 @@ void playlist_end (void)
     active_playlist = playing_playlist = NULL;
     resume_playlist = -1;
 
-    for (int i = 0; i < index_count (playlists); i ++)
-        playlist_free (index_get (playlists, i));
-
-    index_free (playlists);
+    index_free_full (playlists, (IndexFreeFunc) playlist_free);
     playlists = NULL;
 
     g_hash_table_destroy (unique_id_table);
     unique_id_table = NULL;
 
-    g_free (title_format);
-    title_format = NULL;
+    tuple_formatter_free (title_formatter);
+    title_formatter = NULL;
 
     LEAVE;
 }
@@ -722,11 +710,11 @@ void playlist_reorder (int from, int to, int count)
     Index * displaced = index_new ();
 
     if (to < from)
-        index_copy_append (playlists, to, displaced, from - to);
+        index_copy_insert (playlists, to, displaced, -1, from - to);
     else
-        index_copy_append (playlists, from + count, displaced, to - from);
+        index_copy_insert (playlists, from + count, displaced, -1, to - from);
 
-    index_move (playlists, from, to, count);
+    index_copy_set (playlists, from, playlists, to, count);
 
     if (to < from)
     {
@@ -751,8 +739,7 @@ void playlist_delete (int playlist_num)
 
     bool_t was_playing = (playlist == playing_playlist);
 
-    index_delete (playlists, playlist_num, 1);
-    playlist_free (playlist);
+    index_delete_full (playlists, playlist_num, 1, (IndexFreeFunc) playlist_free);
 
     if (! index_count (playlists))
         index_insert (playlists, 0, playlist_new (-1));
@@ -1010,7 +997,7 @@ void playlist_entry_insert_batch_raw (int playlist_num, int at,
         char * filename = index_get (filenames, i);
         Tuple * tuple = tuples ? index_get (tuples, i) : NULL;
         PluginHandle * decoder = decoders ? index_get (decoders, i) : NULL;
-        index_append (add, entry_new (filename, tuple, decoder));
+        index_insert (add, -1, entry_new (filename, tuple, decoder));
     }
 
     index_free (filenames);
@@ -1020,7 +1007,7 @@ void playlist_entry_insert_batch_raw (int playlist_num, int at,
         index_free (tuples);
 
     number = index_count (add);
-    index_merge_insert (playlist->entries, at, add);
+    index_copy_insert (add, 0, playlist->entries, at, -1);
     index_free (add);
 
     number_entries (playlist, at, entries + number - at);
@@ -1083,10 +1070,9 @@ void playlist_entry_delete (int playlist_num, int at, int number)
         }
 
         playlist->total_length -= entry->length;
-        entry_free (entry);
     }
 
-    index_delete (playlist->entries, at, number);
+    index_delete_full (playlist->entries, at, number, (IndexFreeFunc) entry_free);
     number_entries (playlist, at, entries - at - number);
 
     if (position_changed && get_bool (NULL, "advance_on_delete"))
@@ -1352,21 +1338,21 @@ int playlist_shift (int playlist_num, int entry_num, int distance)
     {
         entry = index_get (playlist->entries, i);
         if (! entry->selected)
-            index_append (temp, entry);
+            index_insert (temp, -1, entry);
     }
 
     for (int i = top; i < bottom; i ++)
     {
         entry = index_get (playlist->entries, i);
         if (entry->selected)
-            index_append (temp, entry);
+            index_insert (temp, -1, entry);
     }
 
     for (int i = center; i < bottom; i ++)
     {
         entry = index_get (playlist->entries, i);
         if (! entry->selected)
-            index_append (temp, entry);
+            index_insert (temp, -1, entry);
     }
 
     index_copy_set (temp, 0, playlist->entries, top, bottom - top);
@@ -1446,7 +1432,7 @@ void playlist_delete_selected (int playlist_num)
         }
         else
         {
-            index_append (others, entry);
+            index_insert (others, -1, entry);
 
             if (found)
                 after ++;
@@ -1486,7 +1472,7 @@ void playlist_reverse (int playlist_num)
     index_allocate (reversed, entries);
 
     for (int count = entries; count --; )
-        index_append (reversed, index_get (playlist->entries, count));
+        index_insert (reversed, -1, index_get (playlist->entries, count));
 
     index_free (playlist->entries);
     playlist->entries = reversed;
@@ -1509,7 +1495,7 @@ void playlist_reverse_selected (int playlist_num)
     {
         Entry * entry = index_get (playlist->entries, count);
         if (entry->selected)
-            index_append (reversed, index_get (playlist->entries, count));
+            index_insert (reversed, -1, index_get (playlist->entries, count));
     }
 
     int count2 = 0;
@@ -1560,7 +1546,7 @@ void playlist_randomize_selected (int playlist_num)
     {
         Entry * entry = index_get (playlist->entries, count);
         if (entry->selected)
-            index_append (selected, entry);
+            index_insert (selected, -1, entry);
     }
 
     for (int i = 0; i < playlist->selected_count; i ++)
@@ -1637,7 +1623,7 @@ static void sort_selected (Playlist * playlist, CompareData * data)
     {
         Entry * entry = index_get (playlist->entries, count);
         if (entry->selected)
-            index_append (selected, entry);
+            index_insert (selected, -1, entry);
     }
 
     index_sort_with_data (selected, compare_cb, data);
@@ -1750,11 +1736,14 @@ void playlist_reformat_titles (void)
 {
     ENTER;
 
-    g_free (title_format);
-    title_format = NULL;
+    if (title_formatter)
+        tuple_formatter_free (title_formatter);
 
-    for (int playlist_num = 0; playlist_num < index_count (playlists);
-     playlist_num ++)
+    char * format = get_str (NULL, "generic_title_format");
+    title_formatter = tuple_formatter_new (format);
+    str_unref (format);
+
+    for (int playlist_num = 0; playlist_num < index_count (playlists); playlist_num ++)
     {
         Playlist * playlist = index_get (playlists, playlist_num);
         int entries = index_count (playlist->entries);
@@ -1763,7 +1752,11 @@ void playlist_reformat_titles (void)
         {
             Entry * entry = index_get (playlist->entries, count);
             str_unref (entry->formatted);
-            entry->formatted = entry->tuple ? title_from_tuple (entry->tuple) : NULL;
+
+            if (entry->tuple)
+                entry->formatted = tuple_format_title (title_formatter, entry->tuple);
+            else
+                entry->formatted = NULL;
         }
 
         queue_update (PLAYLIST_UPDATE_METADATA, playlist_num, 0, entries);
@@ -2251,9 +2244,10 @@ void playlist_save_state (void)
 
     ENTER;
 
-    char * path = g_strdup_printf ("%s/" STATE_FILE, get_path (AUD_PATH_USER_DIR));
-    FILE * handle = fopen (path, "w");
-    g_free (path);
+    const char * user_dir = get_path (AUD_PATH_USER_DIR);
+    SCONCAT2 (path, user_dir, "/" STATE_FILE);
+
+    FILE * handle = g_fopen (path, "w");
     if (! handle)
         RETURN ();
 
@@ -2323,9 +2317,10 @@ void playlist_load_state (void)
     ENTER;
     int playlist_num;
 
-    char * path = g_strdup_printf ("%s/" STATE_FILE, get_path (AUD_PATH_USER_DIR));
-    FILE * handle = fopen (path, "r");
-    g_free (path);
+    const char * user_dir = get_path (AUD_PATH_USER_DIR);
+    SCONCAT2 (path, user_dir, "/" STATE_FILE);
+
+    FILE * handle = g_fopen (path, "r");
     if (! handle)
         RETURN ();
 

@@ -1,6 +1,6 @@
 /*
  * types.h
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2011 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -50,6 +50,12 @@ typedef const struct _IfacePlugin IfacePlugin;
 
 typedef struct _PluginPreferences PluginPreferences;
 typedef struct _PreferencesWidget PreferencesWidget;
+
+typedef struct {
+    char * name;
+    float preamp;
+    float bands[AUD_EQUALIZER_NBANDS];
+} EqualizerPreset;
 
 typedef struct {
     float track_gain; /* dB */

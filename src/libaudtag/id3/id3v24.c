@@ -1,6 +1,6 @@
 /*
  * id3v24.c
- * Copyright 2009-2011 Paula Stanciu, Tony Vroon, John Lindgren,
+ * Copyright 2009-2014 Paula Stanciu, Tony Vroon, John Lindgren,
  *                     Mikael Magnusson, and Michał Lipski
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <libaudcore/audstrings.h>
 
@@ -95,7 +96,7 @@ ID3v2FrameHeader;
 typedef struct
 {
     char key[5];
-    unsigned char * data;
+    char * data;
     int size;
 }
 GenericFrame;
@@ -197,6 +198,9 @@ static bool_t read_header (VFSFile * handle, int * version, bool_t *
             if (! validate_header (& footer, TRUE))
                 return FALSE;
 
+            if (vfs_fseek (handle, sizeof (ID3v2Header), SEEK_SET))
+                return FALSE;
+
             * footer_size = sizeof (ID3v2Header);
         }
         else
@@ -263,15 +267,15 @@ static bool_t read_header (VFSFile * handle, int * version, bool_t *
     return TRUE;
 }
 
-static int unsyncsafe (unsigned char * data, int size)
+static int unsyncsafe (char * data, int size)
 {
-    unsigned char * get = data, * set = data;
+    char * get = data, * set = data;
 
     while (size --)
     {
-        unsigned char c = * set ++ = * get ++;
+        char c = * set ++ = * get ++;
 
-        if (c == 0xff && size && ! get[0])
+        if (c == (char) 0xff && size && ! get[0])
         {
             size --;
             get ++;
@@ -282,7 +286,7 @@ static int unsyncsafe (unsigned char * data, int size)
 }
 
 static bool_t read_frame (VFSFile * handle, int max_size, int version,
- bool_t syncsafe, int * frame_size, char * key, unsigned char * * data, int * size)
+ bool_t syncsafe, int * frame_size, char * key, char * * data, int * size)
 {
     ID3v2FrameHeader header;
     int skip = 0;
@@ -339,44 +343,15 @@ static bool_t read_frame (VFSFile * handle, int max_size, int version,
     return TRUE;
 }
 
-static char * decode_text_frame (const unsigned char * data, int size)
-{
-    return convert_text ((const char *) data + 1, size - 1, data[0], FALSE,
-     NULL, NULL);
-}
-
-static bool_t decode_comment_frame (const unsigned char * _data, int size, char * *
- lang, char * * type, char * * value)
-{
-    const char * data = (const char *) _data;
-    char * pair, * sep;
-    int converted;
-
-    pair = convert_text (data + 4, size - 4, data[0], FALSE, & converted, NULL);
-
-    if (pair == NULL || (sep = memchr (pair, 0, converted)) == NULL)
-        return FALSE;
-
-    * lang = g_strndup (data + 1, 3);
-    * type = g_strdup (pair);
-    * value = g_strdup (sep + 1);
-
-    g_free (pair);
-    return TRUE;
-}
-
 static void free_frame (GenericFrame * frame)
 {
     g_free (frame->data);
-    g_free (frame);
+    g_slice_free (GenericFrame, frame);
 }
 
 static void free_frame_list (GList * list)
 {
-    for (GList * node = list; node; node = node->next)
-        free_frame (node->data);
-
-    g_list_free (list);
+    g_list_free_full (list, (GDestroyNotify) free_frame);
 }
 
 static void read_all_frames (VFSFile * handle, int version, bool_t syncsafe,
@@ -388,7 +363,7 @@ static void read_all_frames (VFSFile * handle, int version, bool_t syncsafe,
     {
         int frame_size, size;
         char key[5];
-        unsigned char * data;
+        char * data;
         GenericFrame * frame;
 
         if (! read_frame (handle, data_size - pos, version, syncsafe,
@@ -397,7 +372,7 @@ static void read_all_frames (VFSFile * handle, int version, bool_t syncsafe,
 
         pos += frame_size;
 
-        frame = g_malloc (sizeof (GenericFrame));
+        frame = g_slice_new (GenericFrame);
         strcpy (frame->key, key);
         frame->data = data;
         frame->size = size;
@@ -414,23 +389,23 @@ static void read_all_frames (VFSFile * handle, int version, bool_t syncsafe,
     }
 }
 
-static bool_t write_frame (VFSFile * handle, GenericFrame * frame, int *
- frame_size)
+static bool_t write_frame (int fd, GenericFrame * frame, int version, int * frame_size)
 {
     TAGDBG ("Writing frame %s, size %d\n", frame->key, frame->size);
 
     ID3v2FrameHeader header;
 
     memcpy (header.key, frame->key, 4);
-    header.size = syncsafe32 (frame->size);
-    header.size = GUINT32_TO_BE (header.size);
+
+    uint32_t size = (version == 3) ? frame->size : syncsafe32 (frame->size);
+    header.size = GUINT32_TO_BE (size);
+
     header.flags = 0;
 
-    if (vfs_fwrite (& header, 1, sizeof (ID3v2FrameHeader), handle) != sizeof
-     (ID3v2FrameHeader))
+    if (write (fd, & header, sizeof (ID3v2FrameHeader)) != sizeof (ID3v2FrameHeader))
         return FALSE;
 
-    if (vfs_fwrite (frame->data, 1, frame->size, handle) != frame->size)
+    if (write (fd, frame->data, frame->size) != frame->size)
         return FALSE;
 
     * frame_size = sizeof (ID3v2FrameHeader) + frame->size;
@@ -438,7 +413,8 @@ static bool_t write_frame (VFSFile * handle, GenericFrame * frame, int *
 }
 
 typedef struct {
-    VFSFile * file;
+    int fd;
+    int version;
     int written_size;
 } WriteState;
 
@@ -449,33 +425,32 @@ static void write_frame_list (void * key, void * list, void * user)
     for (GList * node = list; node; node = node->next)
     {
         int size;
-        if (write_frame (state->file, node->data, & size))
+        if (write_frame (state->fd, node->data, state->version, & size))
             state->written_size += size;
     }
 }
 
-static int write_all_frames (VFSFile * handle, GHashTable * dict)
+static int write_all_frames (int fd, GHashTable * dict, int version)
 {
-    WriteState state = {handle, 0};
+    WriteState state = {fd, version, 0};
     g_hash_table_foreach (dict, write_frame_list, & state);
 
     TAGDBG ("Total frame bytes written = %d.\n", state.written_size);
     return state.written_size;
 }
 
-static bool_t write_header (VFSFile * handle, int size, bool_t is_footer)
+static bool_t write_header (int fd, int version, int size)
 {
     ID3v2Header header;
 
-    memcpy (header.magic, is_footer ? "3DI" : "ID3", 3);
-    header.version = 4;
+    memcpy (header.magic, "ID3", 3);
+    header.version = version;
     header.revision = 0;
-    header.flags = ID3_HEADER_HAS_FOOTER;
+    header.flags = 0;
     header.size = syncsafe32 (size);
     header.size = GUINT32_TO_BE (header.size);
 
-    return vfs_fwrite (& header, 1, sizeof (ID3v2Header), handle) == sizeof
-     (ID3v2Header);
+    return write (fd, & header, sizeof (ID3v2Header)) == sizeof (ID3v2Header);
 }
 
 static int get_frame_id (const char * key)
@@ -491,46 +466,7 @@ static int get_frame_id (const char * key)
     return -1;
 }
 
-static void associate_string (Tuple * tuple, int field, const char *
- customfield, const unsigned char * data, int size)
-{
-    char * text = decode_text_frame (data, size);
-
-    if (text == NULL || ! text[0])
-    {
-        g_free (text);
-        return;
-    }
-
-    if (customfield != NULL)
-        TAGDBG ("Custom field %s = %s.\n", customfield, text);
-    else
-        TAGDBG ("Field %i = %s.\n", field, text);
-
-    tuple_set_str (tuple, field, customfield, text);
-    g_free (text);
-}
-
-static void associate_int (Tuple * tuple, int field, const char *
- customfield, const unsigned char * data, int size)
-{
-    char * text = decode_text_frame (data, size);
-
-    if (text == NULL || atoi (text) < 1)
-    {
-        g_free (text);
-        return;
-    }
-
-    if (customfield != NULL)
-        TAGDBG ("Custom field %s = %s.\n", customfield, text);
-    else
-        TAGDBG ("Field %i = %s.\n", field, text);
-
-    tuple_set_int (tuple, field, customfield, atoi (text));
-    g_free (text);
-}
-
+#if 0
 static void decode_private_info (Tuple * tuple, const unsigned char * data, int size)
 {
     char * text = g_strndup ((const char *) data, size);
@@ -572,164 +508,12 @@ static void decode_private_info (Tuple * tuple, const unsigned char * data, int 
 DONE:
     g_free (text);
 }
-
-static void decode_comment (Tuple * tuple, const unsigned char * data, int size)
-{
-    char * lang, * type, * value;
-
-    if (! decode_comment_frame (data, size, & lang, & type, & value))
-        return;
-
-    TAGDBG ("Comment: lang = %s, type = %s, value = %s.\n", lang, type, value);
-
-    if (! type[0]) /* blank type == actual comment */
-        tuple_set_str (tuple, FIELD_COMMENT, NULL, value);
-
-    g_free (lang);
-    g_free (type);
-    g_free (value);
-}
-
-static bool_t decode_rva2_block (const unsigned char * * _data, int * _size, int *
- channel, int * adjustment, int * adjustment_unit, int * peak, int *
- peak_unit)
-{
-    const unsigned char * data = * _data;
-    int size = * _size;
-    int peak_bits;
-
-    if (size < 4)
-        return FALSE;
-
-    * channel = data[0];
-    * adjustment = (char) data[1]; /* first byte is signed */
-    * adjustment = (* adjustment << 8) | data[2];
-    * adjustment_unit = 512;
-    peak_bits = data[3];
-
-    data += 4;
-    size -= 4;
-
-    TAGDBG ("RVA2 block: channel = %d, adjustment = %d/%d, peak bits = %d\n",
-     * channel, * adjustment, * adjustment_unit, peak_bits);
-
-    if (peak_bits > 0 && peak_bits < sizeof (int) * 8)
-    {
-        int bytes = (peak_bits + 7) / 8;
-        int count;
-
-        if (bytes > size)
-            return FALSE;
-
-        * peak = 0;
-        * peak_unit = 1 << peak_bits;
-
-        for (count = 0; count < bytes; count ++)
-            * peak = (* peak << 8) | data[count];
-
-        data += bytes;
-        size -= count;
-
-        TAGDBG ("RVA2 block: peak = %d/%d\n", * peak, * peak_unit);
-    }
-    else
-    {
-        * peak = 0;
-        * peak_unit = 0;
-    }
-
-    * _data = data;
-    * _size = size;
-    return TRUE;
-}
-
-static void decode_rva2 (Tuple * tuple, const unsigned char * data, int size)
-{
-    const char * domain;
-    int channel, adjustment, adjustment_unit, peak, peak_unit;
-
-    if (memchr (data, 0, size) == NULL)
-        return;
-
-    domain = (const char *) data;
-
-    TAGDBG ("RVA2 domain: %s\n", domain);
-
-    size -= strlen (domain) + 1;
-    data += strlen (domain) + 1;
-
-    while (size > 0)
-    {
-        if (! decode_rva2_block (& data, & size, & channel, & adjustment,
-         & adjustment_unit, & peak, & peak_unit))
-            break;
-
-        if (channel != 1) /* specific channel? */
-            continue;
-
-        if (tuple_get_value_type (tuple, FIELD_GAIN_GAIN_UNIT, NULL) ==
-         TUPLE_INT)
-            adjustment = adjustment * (int64_t) tuple_get_int (tuple,
-             FIELD_GAIN_GAIN_UNIT, NULL) / adjustment_unit;
-        else
-            tuple_set_int (tuple, FIELD_GAIN_GAIN_UNIT, NULL,
-             adjustment_unit);
-
-        if (peak_unit)
-        {
-            if (tuple_get_value_type (tuple, FIELD_GAIN_PEAK_UNIT, NULL) ==
-             TUPLE_INT)
-                peak = peak * (int64_t) tuple_get_int (tuple,
-                 FIELD_GAIN_PEAK_UNIT, NULL) / peak_unit;
-            else
-                tuple_set_int (tuple, FIELD_GAIN_PEAK_UNIT, NULL,
-                 peak_unit);
-        }
-
-        if (! g_ascii_strcasecmp (domain, "album"))
-        {
-            tuple_set_int (tuple, FIELD_GAIN_ALBUM_GAIN, NULL, adjustment);
-
-            if (peak_unit)
-                tuple_set_int (tuple, FIELD_GAIN_ALBUM_PEAK, NULL, peak);
-        }
-        else if (! g_ascii_strcasecmp (domain, "track"))
-        {
-            tuple_set_int (tuple, FIELD_GAIN_TRACK_GAIN, NULL, adjustment);
-
-            if (peak_unit)
-                tuple_set_int (tuple, FIELD_GAIN_TRACK_PEAK, NULL, peak);
-        }
-    }
-}
-
-static void decode_genre (Tuple * tuple, const unsigned char * data, int size)
-{
-    int numericgenre;
-    char * text = decode_text_frame (data, size);
-
-    if (text == NULL)
-        return;
-
-    if (text[0] == '(')
-        numericgenre = atoi (text + 1);
-    else
-        numericgenre = atoi (text);
-
-    if (numericgenre > 0)
-        tuple_set_str (tuple, FIELD_GENRE, NULL,
-         convert_numericgenre_to_text (numericgenre));
-    else
-        tuple_set_str (tuple, FIELD_GENRE, NULL, text);
-
-    g_free (text);
-    return;
-}
+#endif
 
 static GenericFrame * add_generic_frame (int id, int size,
  GHashTable * dict)
 {
-    GenericFrame * frame = g_malloc (sizeof (GenericFrame));
+    GenericFrame * frame = g_slice_new (GenericFrame);
 
     strcpy (frame->key, id3_frames[id]);
     frame->data = g_malloc (size);
@@ -756,11 +540,18 @@ static void add_text_frame (int id, const char * text, GHashTable * dict)
     }
 
     TAGDBG ("Adding text frame %s = %s.\n", id3_frames[id], text);
-    int length = strlen (text);
 
-    GenericFrame * frame = add_generic_frame (id, length + 1, dict);
-    frame->data[0] = 3; /* UTF-8 encoding */
-    memcpy (frame->data + 1, text, length);
+    long words;
+    uint16_t * utf16 = g_utf8_to_utf16 (text, -1, NULL, & words, NULL);
+    g_return_if_fail (utf16);
+
+    GenericFrame * frame = add_generic_frame (id, 3 + 2 * words, dict);
+
+    frame->data[0] = 1;                            /* UTF-16 encoding */
+    * (uint16_t *) (frame->data + 1) = 0xfeff;     /* byte order mark */
+    memcpy (frame->data + 3, utf16, 2 * words);
+
+    g_free (utf16);
 }
 
 static void add_comment_frame (const char * text, GHashTable * dict)
@@ -772,18 +563,27 @@ static void add_comment_frame (const char * text, GHashTable * dict)
     }
 
     TAGDBG ("Adding comment frame = %s.\n", text);
-    int length = strlen (text);
-    GenericFrame * frame = add_generic_frame (ID3_COMMENT, length + 5, dict);
 
-    frame->data[0] = 3; /* UTF-8 encoding */
-    strcpy ((char *) frame->data + 1, "eng"); /* well, it *might* be English */
-    memcpy (frame->data + 5, text, length);
+    long words;
+    uint16_t * utf16 = g_utf8_to_utf16 (text, -1, NULL, & words, NULL);
+    g_return_if_fail (utf16);
+
+    GenericFrame * frame = add_generic_frame (ID3_COMMENT, 10 + 2 * words, dict);
+
+    frame->data[0] = 1;                             /* UTF-16 encoding */
+    memcpy (frame->data + 1, "eng", 3);             /* language */
+    * (uint16_t *) (frame->data + 4) = 0xfeff;      /* byte order mark */
+    * (uint16_t *) (frame->data + 6) = 0;           /* end of content description */
+    * (uint16_t *) (frame->data + 8) = 0xfeff;      /* byte order mark */
+    memcpy (frame->data + 10, utf16, 2 * words);
+
+    g_free (utf16);
 }
 
 static void add_frameFromTupleStr (const Tuple * tuple, int field, int
  id3_field, GHashTable * dict)
 {
-    char * str = tuple_get_str (tuple, field, NULL);
+    char * str = tuple_get_str (tuple, field);
     add_text_frame (id3_field, str, dict);
     str_unref (str);
 }
@@ -791,14 +591,14 @@ static void add_frameFromTupleStr (const Tuple * tuple, int field, int
 static void add_frameFromTupleInt (const Tuple * tuple, int field, int
  id3_field, GHashTable * dict)
 {
-    if (tuple_get_value_type (tuple, field, NULL) != TUPLE_INT)
+    if (tuple_get_value_type (tuple, field) != TUPLE_INT)
     {
         remove_frame (id3_field, dict);
         return;
     }
 
     char scratch[16];
-    snprintf (scratch, sizeof scratch, "%d", tuple_get_int (tuple, field, NULL));
+    str_itoa (tuple_get_int (tuple, field), scratch, sizeof scratch);
     add_text_frame (id3_field, scratch, dict);
 }
 
@@ -827,7 +627,7 @@ static bool_t id3v24_read_tag (Tuple * tuple, VFSFile * handle)
     {
         int frame_size, size, id;
         char key[5];
-        unsigned char * data;
+        char * data;
 
         if (! read_frame (handle, data_size - pos, version, syncsafe,
          & frame_size, key, & data, & size))
@@ -838,44 +638,46 @@ static bool_t id3v24_read_tag (Tuple * tuple, VFSFile * handle)
         switch (id)
         {
           case ID3_ALBUM:
-            associate_string (tuple, FIELD_ALBUM, NULL, data, size);
+            id3_associate_string (tuple, FIELD_ALBUM, data, size);
             break;
           case ID3_TITLE:
-            associate_string (tuple, FIELD_TITLE, NULL, data, size);
+            id3_associate_string (tuple, FIELD_TITLE, data, size);
             break;
           case ID3_COMPOSER:
-            associate_string (tuple, FIELD_COMPOSER, NULL, data, size);
+            id3_associate_string (tuple, FIELD_COMPOSER, data, size);
             break;
           case ID3_COPYRIGHT:
-            associate_string (tuple, FIELD_COPYRIGHT, NULL, data, size);
+            id3_associate_string (tuple, FIELD_COPYRIGHT, data, size);
             break;
           case ID3_DATE:
-            associate_string (tuple, FIELD_DATE, NULL, data, size);
+            id3_associate_string (tuple, FIELD_DATE, data, size);
             break;
           case ID3_LENGTH:
-            associate_int (tuple, FIELD_LENGTH, NULL, data, size);
+            id3_associate_int (tuple, FIELD_LENGTH, data, size);
             break;
           case ID3_ARTIST:
-            associate_string (tuple, FIELD_ARTIST, NULL, data, size);
+            id3_associate_string (tuple, FIELD_ARTIST, data, size);
             break;
           case ID3_TRACKNR:
-            associate_int (tuple, FIELD_TRACK_NUMBER, NULL, data, size);
+            id3_associate_int (tuple, FIELD_TRACK_NUMBER, data, size);
             break;
           case ID3_YEAR:
           case ID3_RECORDING_TIME:
-            associate_int (tuple, FIELD_YEAR, NULL, data, size);
+            id3_associate_int (tuple, FIELD_YEAR, data, size);
             break;
           case ID3_GENRE:
-            decode_genre (tuple, data, size);
+            id3_decode_genre (tuple, data, size);
             break;
           case ID3_COMMENT:
-            decode_comment (tuple, data, size);
+            id3_decode_comment (tuple, data, size);
             break;
+#if 0
           case ID3_PRIVATE:
             decode_private_info (tuple, data, size);
             break;
+#endif
           case ID3_RVA2:
-            decode_rva2 (tuple, data, size);
+            id3_decode_rva (tuple, data, size);
             break;
           default:
             TAGDBG ("Ignoring unsupported ID3 frame %s.\n", key);
@@ -889,33 +691,10 @@ static bool_t id3v24_read_tag (Tuple * tuple, VFSFile * handle)
     return TRUE;
 }
 
-static bool_t parse_apic (const unsigned char * _data, int size, char * * mime,
- int * type, char * * desc, void * * image_data, int * image_size)
-{
-    const char * data = (const char *) _data;
-    const char * sep, * after;
-
-    if (size < 2 || (sep = memchr (data + 1, 0, size - 2)) == NULL)
-        return FALSE;
-
-    if ((* desc = convert_text (sep + 2, data + size - sep - 2, data[0], TRUE,
-     NULL, & after)) == NULL)
-        return FALSE;
-
-    * mime = g_strdup (data + 1);
-    * type = sep[1];
-    * image_data = g_memdup (after, data + size - after);
-    * image_size = data + size - after;
-
-    TAGDBG ("APIC: mime = %s, type = %d, desc = %s, size = %d.\n", * mime,
-     * type, * desc, * image_size);
-    return TRUE;
-}
-
 static bool_t id3v24_read_image (VFSFile * handle, void * * image_data,
- int64_t * image_size64)
+ int64_t * image_size)
 {
-    int version, header_size, data_size, footer_size, parsed, image_size = 0;
+    int version, header_size, data_size, footer_size, parsed;
     bool_t syncsafe;
     int64_t offset;
     bool_t found = FALSE;
@@ -928,19 +707,15 @@ static bool_t id3v24_read_image (VFSFile * handle, void * * image_data,
     {
         int frame_size, size, type;
         char key[5];
-        unsigned char * data;
-        char * mime, * desc;
+        char * data;
 
         if (! read_frame (handle, data_size - parsed, version, syncsafe,
          & frame_size, key, & data, & size))
             break;
 
-        if (! strcmp (key, "APIC") && parse_apic (data, size, & mime, & type,
-         & desc, image_data, & image_size))
+        if (! strcmp (key, "APIC") && id3_decode_picture (data, size, & type,
+         image_data, image_size))
         {
-            g_free (mime);
-            g_free (desc);
-
             if (type == 3) /* album cover */
                 found = TRUE;
             else if (type == 0) /* iTunes */
@@ -956,26 +731,22 @@ static bool_t id3v24_read_image (VFSFile * handle, void * * image_data,
         parsed += frame_size;
     }
 
-    if (found)
-        * image_size64 = image_size;
-
     return found;
 }
 
 static bool_t id3v24_write_tag (const Tuple * tuple, VFSFile * f)
 {
-    int version, header_size, data_size, footer_size;
+    int version = 3;
+    int header_size, data_size, footer_size;
     bool_t syncsafe;
     int64_t offset;
-
-    if (! read_header (f, & version, & syncsafe, & offset, & header_size,
-     & data_size, & footer_size))
-        return FALSE;
 
     //read all frames into generic frames;
     GHashTable * dict = g_hash_table_new_full (g_str_hash, g_str_equal,
      (GDestroyNotify) str_unref, (GDestroyNotify) free_frame_list);
-    read_all_frames (f, version, syncsafe, data_size, dict);
+
+    if (read_header (f, & version, & syncsafe, & offset, & header_size, & data_size, & footer_size))
+        read_all_frames (f, version, syncsafe, data_size, dict);
 
     //make the new frames from tuple and replace in the dictionary the old frames with the new ones
     add_frameFromTupleStr (tuple, FIELD_TITLE, ID3_TITLE, dict);
@@ -985,46 +756,50 @@ static bool_t id3v24_write_tag (const Tuple * tuple, VFSFile * f)
     add_frameFromTupleInt (tuple, FIELD_TRACK_NUMBER, ID3_TRACKNR, dict);
     add_frameFromTupleStr (tuple, FIELD_GENRE, ID3_GENRE, dict);
 
-    char * comment = tuple_get_str (tuple, FIELD_COMMENT, NULL);
+    char * comment = tuple_get_str (tuple, FIELD_COMMENT);
     add_comment_frame (comment, dict);
     str_unref (comment);
 
-    if (! offset)
-    {
-        if (! cut_beginning_tag (f, header_size + data_size + footer_size))
-            goto ERR;
-    }
-    else
-    {
-        if (offset + header_size + data_size + footer_size != vfs_fsize (f))
-            goto ERR;
-        if (vfs_ftruncate (f, offset))
-            goto ERR;
-    }
+    /* location and size of non-tag data */
+    int64_t mp3_offset = offset ? 0 : header_size + data_size + footer_size;
+    int64_t mp3_size = offset ? offset : -1;
 
-    offset = vfs_fsize (f);
-
-    if (offset < 0 || vfs_fseek (f, offset, SEEK_SET) || ! write_header (f, 0,
-     FALSE))
+    TempFile temp = {0};
+    if (! open_temp_file_for (& temp, f))
         goto ERR;
 
-    data_size = write_all_frames (f, dict);
+    /* write empty header (will be overwritten later) */
+    if (! write_header (temp.fd, version, 0))
+        goto ERR;
 
-    if (! write_header (f, data_size, TRUE) || vfs_fseek (f, offset, SEEK_SET)
-     || ! write_header (f, data_size, FALSE))
+    /* write tag data */
+    data_size = write_all_frames (temp.fd, dict, version);
+
+    /* copy non-tag data */
+    if (! copy_region_to_temp_file (& temp, f, mp3_offset, mp3_size))
+        goto ERR;
+
+    /* go back to beginning and write real header */
+    if (lseek (temp.fd, 0, SEEK_SET) < 0 || ! write_header (temp.fd, version, data_size))
+        goto ERR;
+
+    if (! replace_with_temp_file (& temp, f))
         goto ERR;
 
     g_hash_table_destroy (dict);
+    str_unref (temp.name);
     return TRUE;
 
 ERR:
     g_hash_table_destroy (dict);
+    str_unref (temp.name);
     return FALSE;
 }
 
 tag_module_t id3v24 =
 {
     .name = "ID3v2.3/4",
+    .type = TAG_TYPE_ID3V2,
     .can_handle_file = id3v24_can_handle_file,
     .read_tag = id3v24_read_tag,
     .read_image = id3v24_read_image,

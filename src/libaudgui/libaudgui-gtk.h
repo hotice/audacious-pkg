@@ -1,6 +1,6 @@
 /*
  * libaudgui-gtk.h
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2012 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -24,33 +24,31 @@
 #include <gtk/gtk.h>
 #include <libaudcore/core.h>
 
-/* effects-menu.c */
-GtkWidget * audgui_create_effects_menu (void);
-GtkWidget * audgui_create_vis_menu (void);
+typedef void (* AudguiCallback) (void * data);
 
-/* iface-menu.c */
-GtkWidget * audgui_create_iface_menu (void);
+/* pixbufs.c */
+GdkPixbuf * audgui_pixbuf_from_data (const void * data, int64_t size);
+GdkPixbuf * audgui_pixbuf_fallback (void);
+void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, int size);
+GdkPixbuf * audgui_pixbuf_request (const char * filename);
+GdkPixbuf * audgui_pixbuf_request_current (void);
+
+/* scaled-image.c */
+GtkWidget * audgui_scaled_image_new (GdkPixbuf * pixbuf);
+void audgui_scaled_image_set (GtkWidget * widget, GdkPixbuf * pixbuf);
 
 /* util.c */
 int audgui_get_digit_width (GtkWidget * widget);
 void audgui_get_mouse_coords (GtkWidget * widget, int * x, int * y);
-void audgui_hide_on_delete (GtkWidget * widget);
-void audgui_hide_on_escape (GtkWidget * widget);
 void audgui_destroy_on_escape (GtkWidget * widget);
 void audgui_simple_message (GtkWidget * * widget, GtkMessageType type,
  const char * title, const char * text);
-void audgui_connect_check_box (GtkWidget * box, bool_t * setting);
 
-GdkPixbuf * audgui_pixbuf_from_data (const void * data, int64_t size);
-GdkPixbuf * audgui_pixbuf_fallback (void);
-void audgui_pixbuf_scale_within (GdkPixbuf * * pixbuf, int size);
+GtkWidget * audgui_button_new (const char * text, const char * icon,
+ AudguiCallback callback, void * data);
 
-/* non-blocking (like the aud_art_request_* functions) */
-GdkPixbuf * audgui_pixbuf_request (const char * filename);
-GdkPixbuf * audgui_pixbuf_request_current (void);
-
-/* deprecated */
-GdkPixbuf * audgui_pixbuf_for_current (void) __attribute ((deprecated));
-GdkPixbuf * audgui_pixbuf_for_entry (int playlist, int entry) __attribute ((deprecated));
+GtkWidget * audgui_dialog_new (GtkMessageType type, const char * title,
+ const char * text, GtkWidget * button1, GtkWidget * button2);
+void audgui_dialog_add_widget (GtkWidget * dialog, GtkWidget * widget);
 
 #endif

@@ -1,6 +1,6 @@
 /*
  * plugin.h
- * Copyright 2005-2012 William Pitcock, Yoshiki Yazawa, Eugene Zagidullin, and
+ * Copyright 2005-2013 William Pitcock, Yoshiki Yazawa, Eugene Zagidullin, and
  *                     John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,22 +30,6 @@
 
 /* "Magic" bytes identifying an Audacious plugin header. */
 #define _AUD_PLUGIN_MAGIC 0x8EAC8DE2
-
-/* API version.  Plugins are marked with this number at compile time.
- *
- * _AUD_PLUGIN_VERSION is the current version; _AUD_PLUGIN_VERSION_MIN is
- * the oldest one we are backward compatible with.  Plugins marked older than
- * _AUD_PLUGIN_VERSION_MIN or newer than _AUD_PLUGIN_VERSION are not loaded.
- *
- * Before releases that add new pointers to the end of the API tables, increment
- * _AUD_PLUGIN_VERSION but leave _AUD_PLUGIN_VERSION_MIN the same.
- *
- * Before releases that break backward compatibility (e.g. remove pointers from
- * the API tables), increment _AUD_PLUGIN_VERSION *and* set
- * _AUD_PLUGIN_VERSION_MIN to the same value. */
-
-#define _AUD_PLUGIN_VERSION_MIN 40 /* 3.3-devel */
-#define _AUD_PLUGIN_VERSION     43 /* 3.4-devel */
 
 /* A NOTE ON THREADS
  *
@@ -254,78 +238,6 @@ struct _EffectPlugin
     bool_t preserves_format;
 };
 
-struct OutputAPI
-{
-    /* Prepares the output system for playback in the specified format.  Returns
-     * TRUE on success.  If the call fails, no other output functions may be
-     * called. */
-    bool_t (* open_audio) (int format, int rate, int channels);
-
-    /* Informs the output system of replay gain values for the current song so
-     * that volume levels can be adjusted accordingly, if the user so desires.
-     * This may be called at any time during playback should the values change. */
-    void (* set_replaygain_info) (const ReplayGainInfo * info);
-
-    /* Passes audio data to the output system for playback.  The data must be in
-     * the format passed to open_audio, and the length (in bytes) must be an
-     * integral number of frames.  This function blocks until all the data has
-     * been written (though it may not yet be heard by the user). */
-    void (* write_audio) (void * data, int length);
-
-    /* Interrupts a call to write_audio() so that it returns immediately.
-     * Buffered audio data is discarded.  Until set_written_time() or
-     * open_audio() is called, further calls to write_audio() will have no
-     * effect and will return immediately. */
-    void (* abort_write) (void);
-
-    /* Pauses or unpauses playback.  If playback is paused during a call to
-     * write_audio(), the call will block until playback is unpaused again or
-     * abort_write() is called. */
-    void (* pause) (bool_t pause);
-
-    /* Returns the time counter.  Note that this represents the amount of audio
-     * data passed to the output system, not the amount actually heard by the
-     * user. */
-    int (* written_time) (void);
-
-    /* Sets the time counter to a new value.  Does not perform a flush; the name
-     * is kept only for compatibility. */
-    void (* flush) (int time);
-};
-
-typedef const struct _InputPlayback InputPlayback;
-
-struct _InputPlayback
-{
-    /* Pointer to the output API functions. */
-    const struct OutputAPI * output;
-
-    /* Allows the plugin to associate data with a playback instance. */
-    void (* set_data) (InputPlayback * p, void * data);
-
-    /* Returns the pointer passed to set_data. */
-    void * (* get_data) (InputPlayback * p);
-
-    /* Signifies that the plugin has started playback is ready to accept mseek,
-     * pause, and stop calls. */
-    void (* set_pb_ready) (InputPlayback * p);
-
-    /* Updates attributes of the stream.  "bitrate" is in bits per second.
-     * "samplerate" is in hertz. */
-    void (* set_params) (InputPlayback * p, int bitrate, int samplerate,
-     int channels);
-
-    /* Updates metadata for the stream.  Caller gives up ownership of one
-     * reference to the tuple. */
-    void (* set_tuple) (InputPlayback * playback, Tuple * tuple);
-
-    /* If replay gain settings are stored in the tuple associated with the
-     * current song, this function can be called (after opening audio) to apply
-     * those settings.  If the settings are changed in a call to set_tuple, this
-     * function must be called again to apply the updated settings. */
-    void (* set_gain_from_playlist) (InputPlayback * playback);
-};
-
 struct _InputPlugin
 {
     PLUGIN_COMMON_FIELDS
@@ -355,8 +267,11 @@ struct _InputPlugin
     /* Pointer to an array (terminated with NULL) of MIME types the plugin can
      * handle. */
     const char * const * mimes;
+
     /* Pointer to an array (terminated with NULL) of custom URI schemes the
-     * plugin can handle. */
+     * plugin supports.  Plugins using custom URI schemes are expected to
+     * handle their own I/O.  Hence, any VFSFile pointers passed to play(),
+     * probe_for_tuple(), etc. will be NULL. */
     const char * const * schemes;
 
     /* How quickly the plugin should be tried in searching for a plugin to
@@ -364,73 +279,28 @@ struct _InputPlugin
      * with priority 0 are tried first, 10 last. */
     int priority;
 
-    /* Must return nonzero if the plugin can handle this file.  If the file
-     * could not be opened, "file" will be NULL.  (This is normal in the case of
-     * special URI schemes like cdda:// that do not represent actual files.) */
+    /* Returns TRUE if the plugin can handle the file. */
     bool_t (* is_our_file_from_vfs) (const char * filename, VFSFile * file);
 
-    /* Must return a tuple containing metadata for this file, or NULL if no
-     * metadata could be read.  If the file could not be opened, "file" will be
-     * NULL.  Audacious takes over one reference to the tuple returned. */
+    /* Reads metadata from the file, returning a reference to the tuple produced. */
     Tuple * (* probe_for_tuple) (const char * filename, VFSFile * file);
 
-    /* Optional.  Must write metadata from a tuple to this file.  Must return
-     * nonzero on success or zero on failure.  "file" will never be NULL. */
-    /* Bug: This function does not support special URI schemes like cdda://,
-     * since no file name is passed. */
-    bool_t (* update_song_tuple) (const Tuple * tuple, VFSFile * file);
+    /* Plays the file.  Returns FALSE on error.  Also see input-api.h. */
+    bool_t (* play) (const char * filename, VFSFile * file);
 
-    /* Optional, and not recommended.  Must show a window with information about
-     * this file.  If this function is provided, update_song_tuple should not be. */
-    /* Bug: Implementing this function duplicates user interface code and code
-     * to open the file in each and every plugin. */
-    void (* file_info_box) (const char * filename);
+    /* Optional.  Writes metadata to the file, returning FALSE on error. */
+    bool_t (* update_song_tuple) (const char * filename, VFSFile * file, const Tuple * tuple);
 
-    /* Optional.  Must try to read an "album art" image embedded in this file.
-     * Must return nonzero on success or zero on failure.  If the file could not
-     * be opened, "file" will be NULL.  On success, must fill "data" with a
-     * pointer to a block of data allocated with g_malloc and "size" with the
-     * size in bytes of that block.  The data may be in any format supported by
-     * GTK.  Audacious will free the data when it is no longer needed. */
+    /* Optional.  Reads an album art image (JPEG or PNG data) from the file.
+     * Returns a pointer to the data along with its size in bytes.  The returned
+     * data will be freed when no longer needed.  Returns FALSE on error. */
     bool_t (* get_song_image) (const char * filename, VFSFile * file,
      void * * data, int64_t * size);
 
-    /* Must try to play this file.  "playback" is a structure containing output-
-     * related functions which the plugin may make use of.  It also contains a
-     * "data" pointer which the plugin may use to refer private data associated
-     * with the playback state.  This pointer can then be used from pause,
-     * mseek, and stop. If the file could not be opened, "file" will be NULL.
-     * "start_time" is the position in milliseconds at which to start from, or
-     * -1 to start from the beginning of the file.  "stop_time" is the position
-     * in milliseconds at which to end playback, or -1 to play to the end of the
-     * file.  "paused" specifies whether playback should immediately be paused.
-     * Must return nonzero if some of the file was successfully played or zero
-     * on failure. */
-    bool_t (* play) (InputPlayback * playback, const char * filename,
-     VFSFile * file, int start_time, int stop_time, bool_t pause);
-
-    /* Must pause or unpause a file currently being played.  This function will
-     * be called from a different thread than play, but it will not be called
-     * before the plugin calls set_pb_ready or after stop is called. */
-    void (* pause) (InputPlayback * playback, bool_t paused);
-
-    /* Optional.  Must seek to the given position in milliseconds within a file
-     * currently being played.  This function will be called from a different
-     * thread than play, but it will not be called before the plugin calls
-     * set_pb_ready or after stop is called. */
-    void (* mseek) (InputPlayback * playback, int time);
-
-    /* Must signal a currently playing song to stop and cause play to return.
-     * This function will be called from a different thread than play.  It will
-     * only be called once. It should not join the thread from which play is
-     * called. */
-    void (* stop) (InputPlayback * playback);
-
-    /* Advanced, for plugins that do not use Audacious's output system.  Use at
-     * your own risk. */
-    int (* get_time) (InputPlayback * playback);
-    int (* get_volume) (int * l, int * r);
-    int (* set_volume) (int l, int r);
+    /* Optional.  Displays a window showing info about the file.  In general,
+     * this function should be avoided since Audacious already provides a file
+     * info window. */
+    void (* file_info_box) (const char * filename);
 };
 
 struct _GeneralPlugin
@@ -467,25 +337,10 @@ struct _IfacePlugin
 {
     PLUGIN_COMMON_FIELDS
 
-    /* is_shown() may return nonzero even if the interface is not actually
-     * visible; for example, if it is obscured by other windows or minimized.
-     * is_focused() only returns nonzero if the interface is actually visible;
-     * in X11, this should be determined by whether the interface has the
-     * toplevel focus.  show() should show and raise the interface, so that both
-     * is_shown() and is_focused() will return nonzero. */
     void (* show) (bool_t show);
-    bool_t (* is_shown) (void);
-    bool_t (* is_focused) (void);
-
-    void (* show_error) (const char * markup);
-    void (* show_filebrowser) (bool_t play_button);
-    void (* show_jump_to_track) (void);
 
     void (* run_gtk_plugin) (void /* GtkWidget */ * widget, const char * name);
     void (* stop_gtk_plugin) (void /* GtkWidget */ * widget);
-
-    void (* install_toolbar) (void /* GtkWidget */ * button);
-    void (* uninstall_toolbar) (void /* GtkWidget */ * button);
 };
 
 #undef PLUGIN_COMMON_FIELDS

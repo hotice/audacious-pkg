@@ -1,6 +1,6 @@
 /*
  * core.h
- * Copyright 2011 John Lindgren
+ * Copyright 2011-2012 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -43,14 +43,7 @@
 #undef CLAMP
 #define CLAMP(a,min,max) ((a) < (min) ? (min) : (a) > (max) ? (max) : (a))
 
-#define SPRINTF(s,...) \
- char s[snprintf (NULL, 0, __VA_ARGS__) + 1]; \
- snprintf (s, sizeof s, __VA_ARGS__);
-
-/* Simple sanity check to catch (1) strings that are still in use after their
- * reference count has dropped to zero and (2) strings that should have been
- * pooled but never were.  If the check fails, the program is aborted. */
-#define STR_CHECK(str) do {if ((str) && (str)[-1] != '@') strpool_abort (str);} while (0)
+#define ARRAY_LEN(a) (sizeof (a) / sizeof (a)[0])
 
 /* If the pool contains a copy of <str>, increments its reference count.
  * Otherwise, adds a copy of <str> to the pool with a reference count of one.
@@ -63,7 +56,7 @@ char * str_get (const char * str);
  * string already in the pool.  Faster than calling str_get() a second time.
  * Returns <str> for convenience.  If <str> is NULL, simply returns NULL with no
  * side effects. */
-char * str_ref (char * str);
+char * str_ref (const char * str);
 
 /* Decrements the reference count of <str>, where <str> is the address of a
  * string in the pool.  If the reference count drops to zero, releases the
@@ -71,15 +64,17 @@ char * str_ref (char * str);
  * effects. */
 void str_unref (char * str);
 
+/* Returns the cached hash value of a pooled string (or 0 for NULL). */
+unsigned str_hash (const char * str);
+
+/* Checks whether two pooled strings are equal.  Since the pool never contains
+ * duplicate strings, this is a simple pointer comparison and thus much faster
+ * than strcmp().  NULL is considered equal to NULL but not equal to any string. */
+bool_t str_equal (const char * str1, const char * str2);
+
 /* Calls str_get() on the first <len> characters of <str>.  If <str> has less
  * than or equal to <len> characters, equivalent to str_get(). */
 char * str_nget (const char * str, int len);
-
-/* Calls sprintf() internally, then pools the produced string with str_get(). */
-char * str_printf (const char * format, ...);
-
-/* Used by STR_CHECK; should not be called directly. */
-void strpool_abort (char * str);
 
 /* Releases all memory used by the string pool.  If strings remain in the pool,
  * a warning may be printed to stderr in order to reveal memory leaks. */

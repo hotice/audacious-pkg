@@ -20,27 +20,28 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include <libaudgui/menu.h>
+
+#include "i18n.h"
 #include "misc.h"
 
-struct Item {
-    MenuFunc func;
-    const char * name;
-    const char * icon;
-};
-
-static GList * items[AUD_MENU_COUNT];
+static GList * items[AUD_MENU_COUNT]; /* of AudguiMenuItem */
 static GtkWidget * menus[AUD_MENU_COUNT];
 
-static void add_to_menu (GtkWidget * menu, struct Item * item)
+static void configure_plugins (void)
 {
-    GtkWidget * widget = gtk_image_menu_item_new_with_mnemonic (item->name);
+    show_prefs_for_plugin_type (PLUGIN_TYPE_GENERAL);
+}
+
+static const AudguiMenuItem main_items[] = {
+    {N_("_Plugins ..."), .func = configure_plugins},
+    {.sep = TRUE}
+};
+
+static void add_to_menu (GtkWidget * menu, const AudguiMenuItem * item)
+{
+    GtkWidget * widget = audgui_menu_item_new_with_domain (item, NULL, NULL);
     g_object_set_data ((GObject *) widget, "func", (void *) item->func);
-    g_signal_connect (widget, "activate", item->func, NULL);
-
-    if (item->icon)
-        gtk_image_menu_item_set_image ((GtkImageMenuItem *) widget,
-         gtk_image_new_from_stock (item->icon, GTK_ICON_SIZE_MENU));
-
     gtk_widget_show (widget);
     gtk_menu_shell_append ((GtkMenuShell *) menu, widget);
 }
@@ -54,6 +55,9 @@ void * get_plugin_menu (int id)
         g_signal_connect (menus[id], "destroy", (GCallback)
          gtk_widget_destroyed, & menus[id]);
 
+        if (id == AUD_MENU_MAIN)
+            audgui_menu_init (menus[id], main_items, ARRAY_LEN (main_items), NULL);
+
         for (GList * node = items[id]; node; node = node->next)
             add_to_menu (menus[id], node->data);
     }
@@ -64,7 +68,7 @@ void * get_plugin_menu (int id)
 void plugin_menu_add (int id, MenuFunc func, const char * name,
  const char * icon)
 {
-    struct Item * item = g_slice_new (struct Item);
+    AudguiMenuItem * item = g_slice_new0 (AudguiMenuItem);
     item->name = name;
     item->icon = icon;
     item->func = func;
@@ -92,9 +96,9 @@ void plugin_menu_remove (int id, MenuFunc func)
     {
         next = node->next;
 
-        if (((struct Item *) node->data)->func == func)
+        if (((AudguiMenuItem *) node->data)->func == func)
         {
-            g_slice_free (struct Item, node->data);
+            g_slice_free (AudguiMenuItem, node->data);
             items[id] = g_list_delete_link (items[id], node);
         }
     }

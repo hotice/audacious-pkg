@@ -1,6 +1,6 @@
 /*
  * confirm.c
- * Copyright 2010-2011 John Lindgren
+ * Copyright 2010-2013 John Lindgren and Thomas Lange
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -22,6 +22,7 @@
 #include <audacious/i18n.h>
 #include <audacious/misc.h>
 #include <audacious/playlist.h>
+#include <libaudcore/audstrings.h>
 
 #include "libaudgui-gtk.h"
 
@@ -33,85 +34,68 @@ static void no_confirm_cb (GtkToggleButton * toggle)
 static void confirm_delete_cb (void * data)
 {
     int list = aud_playlist_by_unique_id (GPOINTER_TO_INT (data));
-    if (list < 0)
-        return;
 
-    aud_playlist_delete (list);
-    if (list > 0)
-        aud_playlist_set_active (list - 1);
-}
-
-static void confirm_playlist_delete_response (GtkWidget * dialog, gint response, gpointer data)
-{
-    if (response == GTK_RESPONSE_YES)
-        confirm_delete_cb (data);
-
-    gtk_widget_destroy (dialog);
+    if (list >= 0)
+        aud_playlist_delete (list);
 }
 
 EXPORT void audgui_confirm_playlist_delete (int playlist)
 {
-    GtkWidget * dialog, * vbox, * button;
-    char * message;
-
     if (aud_get_bool ("audgui", "no_confirm_playlist_delete"))
     {
         aud_playlist_delete (playlist);
-        if (playlist > 0)
-            aud_playlist_set_active (playlist - 1);
         return;
     }
 
     char * title = aud_playlist_get_title (playlist);
-    message = g_strdup_printf (_("Are you sure you want to close %s?  If you "
-     "do, any changes made since the playlist was exported will be lost."), title);
+    SPRINTF (message, _("Do you want to permanently remove “%s”?"), title);
     str_unref (title);
 
-    dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
-     GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", message);
-    g_free (message);
-    gtk_window_set_title ((GtkWindow *) dialog, _("Close Playlist"));
-    gtk_dialog_set_default_response ((GtkDialog *) dialog, GTK_RESPONSE_YES);
+    int id = aud_playlist_get_unique_id (playlist);
+    GtkWidget * button1 = audgui_button_new (_("_Remove"), "edit-delete",
+     confirm_delete_cb, GINT_TO_POINTER (id));
+    GtkWidget * button2 = audgui_button_new (_("_Cancel"), "process-stop", NULL, NULL);
 
-    vbox = gtk_message_dialog_get_message_area ((GtkMessageDialog *) dialog);
-    button = gtk_check_button_new_with_mnemonic (_("_Don't show this message again"));
+    GtkWidget * dialog = audgui_dialog_new (GTK_MESSAGE_QUESTION,
+     _("Remove Playlist"), message, button1, button2);
 
-    gtk_container_add ((GtkContainer *) vbox, button);
-
-    g_signal_connect (button, "toggled", (GCallback) no_confirm_cb, NULL);
-    g_signal_connect (dialog, "response", (GCallback) confirm_playlist_delete_response,
-     GINT_TO_POINTER (aud_playlist_get_unique_id (playlist)));
+    GtkWidget * check = gtk_check_button_new_with_mnemonic (_("_Don’t ask again"));
+    g_signal_connect (check, "toggled", (GCallback) no_confirm_cb, NULL);
+    audgui_dialog_add_widget (dialog, check);
 
     gtk_widget_show_all (dialog);
 }
 
-static void rename_cb (GtkDialog * dialog, int resp, void * list)
+static void rename_cb (void * entry)
 {
-    if (resp == GTK_RESPONSE_ACCEPT && GPOINTER_TO_INT (list) <
-     aud_playlist_count ())
-        aud_playlist_set_title (GPOINTER_TO_INT (list), gtk_entry_get_text
-         ((GtkEntry *) g_object_get_data ((GObject *) dialog, "entry")));
+    void * data = g_object_get_data ((GObject *) entry, "playlist-id");
+    int list = aud_playlist_by_unique_id (GPOINTER_TO_INT (data));
 
-    gtk_widget_destroy ((GtkWidget *) dialog);
+    if (list >= 0)
+        aud_playlist_set_title (list, gtk_entry_get_text ((GtkEntry *) entry));
 }
 
 EXPORT void audgui_show_playlist_rename (int playlist)
 {
-    GtkWidget * dialog = gtk_dialog_new_with_buttons (_("Rename Playlist"),
-     NULL, 0, GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, GTK_STOCK_CANCEL,
-     GTK_RESPONSE_REJECT, NULL);
-    gtk_dialog_set_default_response ((GtkDialog *) dialog, GTK_RESPONSE_ACCEPT);
+    char * title = aud_playlist_get_title (playlist);
 
     GtkWidget * entry = gtk_entry_new ();
-    char * title = aud_playlist_get_title (playlist);
     gtk_entry_set_text ((GtkEntry *) entry, title);
-    str_unref (title);
     gtk_entry_set_activates_default ((GtkEntry *) entry, TRUE);
-    gtk_box_pack_start ((GtkBox *) gtk_dialog_get_content_area ((GtkDialog *)
-     dialog), entry, FALSE, FALSE, 0);
-    g_object_set_data ((GObject *) dialog, "entry", entry);
 
-    g_signal_connect (dialog, "response", (GCallback) rename_cb, GINT_TO_POINTER
-     (playlist));
+    int id = aud_playlist_get_unique_id (playlist);
+    g_object_set_data ((GObject *) entry, "playlist-id", GINT_TO_POINTER (id));
+
+    GtkWidget * button1 = audgui_button_new (_("_Rename"), "insert-text", rename_cb, entry);
+    GtkWidget * button2 = audgui_button_new (_("_Cancel"), "process-stop", NULL, NULL);
+
+    GtkWidget * dialog = audgui_dialog_new (GTK_MESSAGE_QUESTION,
+     _("Rename Playlist"), _("What would you like to call this playlist?"),
+     button1, button2);
+
+    audgui_dialog_add_widget (dialog, entry);
+
     gtk_widget_show_all (dialog);
+
+    str_unref (title);
 }

@@ -1,6 +1,6 @@
 /*
  * plugin-view.c
- * Copyright 2010 John Lindgren
+ * Copyright 2010-2012 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -19,6 +19,9 @@
 
 #include <gtk/gtk.h>
 
+#include <libaudgui/libaudgui-gtk.h>
+
+#include "i18n.h"
 #include "plugin.h"
 #include "plugins.h"
 #include "ui_preferences.h"
@@ -27,7 +30,6 @@ enum {
  PVIEW_COL_NODE,
  PVIEW_COL_ENABLED,
  PVIEW_COL_NAME,
- PVIEW_COL_PATH,
  PVIEW_COLS
 };
 
@@ -88,8 +90,8 @@ static bool_t fill_cb (PluginHandle * p, GtkTreeModel * model)
     GtkTreeIter iter;
     gtk_list_store_append ((GtkListStore *) model, & iter);
     gtk_list_store_set ((GtkListStore *) model, & iter, PVIEW_COL_NODE, n,
-     PVIEW_COL_ENABLED, plugin_get_enabled (p), PVIEW_COL_NAME, plugin_get_name
-     (p), PVIEW_COL_PATH, plugin_get_filename (p), -1);
+     PVIEW_COL_ENABLED, plugin_get_enabled (p), PVIEW_COL_NAME,
+     plugin_get_name (p), -1);
 
     n->p = p;
     n->model = model;
@@ -103,7 +105,7 @@ static bool_t fill_cb (PluginHandle * p, GtkTreeModel * model)
 static void list_fill (GtkTreeView * tree, void * type)
 {
     GtkTreeModel * model = (GtkTreeModel *) gtk_list_store_new (PVIEW_COLS,
-     G_TYPE_POINTER, G_TYPE_BOOLEAN, G_TYPE_STRING, G_TYPE_STRING);
+     G_TYPE_POINTER, G_TYPE_BOOLEAN, G_TYPE_STRING);
     gtk_tree_view_set_model (tree, model);
 
     GtkTreeViewColumn * col = gtk_tree_view_column_new ();
@@ -117,17 +119,15 @@ static void list_fill (GtkTreeView * tree, void * type)
     gtk_tree_view_column_set_attributes (col, rend, "active", PVIEW_COL_ENABLED,
      NULL);
 
-    for (int i = PVIEW_COL_NAME; i <= PVIEW_COL_PATH; i ++)
-    {
-        col = gtk_tree_view_column_new ();
-        gtk_tree_view_column_set_sizing (col, GTK_TREE_VIEW_COLUMN_GROW_ONLY);
-        gtk_tree_view_column_set_resizable (col, FALSE);
-        gtk_tree_view_append_column (tree, col);
+    col = gtk_tree_view_column_new ();
+    gtk_tree_view_column_set_sizing (col, GTK_TREE_VIEW_COLUMN_FIXED);
+    gtk_tree_view_column_set_expand (col, TRUE);
+    gtk_tree_view_column_set_resizable (col, FALSE);
+    gtk_tree_view_append_column (tree, col);
 
-        rend = gtk_cell_renderer_text_new ();
-        gtk_tree_view_column_pack_start (col, rend, FALSE);
-        gtk_tree_view_column_set_attributes (col, rend, "text", i, NULL);
-    }
+    rend = gtk_cell_renderer_text_new ();
+    gtk_tree_view_column_pack_start (col, rend, FALSE);
+    gtk_tree_view_column_set_attributes (col, rend, "text", PVIEW_COL_NAME, NULL);
 
     plugin_for_each (GPOINTER_TO_INT (type), (PluginForEachFunc) fill_cb, model);
 }
@@ -192,14 +192,14 @@ static void button_update (GtkTreeView * tree, GtkWidget * b)
         gtk_widget_set_sensitive (b, FALSE);
 }
 
-static void do_config (GtkTreeView * tree)
+static void do_config (void * tree)
 {
     PluginHandle * plugin = get_selected_plugin (tree);
     g_return_if_fail (plugin != NULL);
     plugin_do_configure (plugin);
 }
 
-static void do_about (GtkTreeView * tree)
+static void do_about (void * tree)
 {
     PluginHandle * plugin = get_selected_plugin (tree);
     g_return_if_fail (plugin != NULL);
@@ -239,21 +239,19 @@ GtkWidget * plugin_view_new (int type)
     GtkWidget * hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL,  6);
     gtk_box_pack_start ((GtkBox *) vbox, hbox, FALSE, FALSE, 0);
 
-    GtkWidget * config = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
+    GtkWidget * config = audgui_button_new (_("_Settings"),
+     "preferences-system", do_config, tree);
     gtk_box_pack_start ((GtkBox *) hbox, config, FALSE, FALSE, 0);
     gtk_widget_set_sensitive (config, FALSE);
     g_object_set_data ((GObject *) config, "watcher", (void *) config_watcher);
     g_signal_connect (tree, "cursor-changed", (GCallback) button_update, config);
-    g_signal_connect_swapped (config, "clicked", (GCallback)
-     do_config, tree);
     g_signal_connect (config, "destroy", (GCallback) button_destroy, NULL);
 
-    GtkWidget * about = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
+    GtkWidget * about = audgui_button_new (_("_About"), "help-about", do_about, tree);
     gtk_box_pack_start ((GtkBox *) hbox, about, FALSE, FALSE, 0);
     gtk_widget_set_sensitive (about, FALSE);
     g_object_set_data ((GObject *) about, "watcher", (void *) about_watcher);
     g_signal_connect (tree, "cursor-changed", (GCallback) button_update, about);
-    g_signal_connect_swapped (about, "clicked", (GCallback) do_about, tree);
     g_signal_connect (about, "destroy", (GCallback) button_destroy, NULL);
 
     return vbox;

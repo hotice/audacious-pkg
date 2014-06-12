@@ -14,7 +14,6 @@ SRCS = adder.c \
        history.c \
        interface.c								\
        main.c									\
-       mpris-signals.c \
        output.c									\
        playback.c								\
        playlist-files.c \
@@ -25,6 +24,7 @@ SRCS = adder.c \
        plugin-registry.c \
        plugin-init.c \
        plugin-view.c \
+       preferences.c \
        probe.c \
        probe-buffer.c \
        scanner.c \
@@ -36,10 +36,6 @@ SRCS = adder.c \
        visualization.c							\
        ui_albumart.c
 
-ifeq ($(USE_DBUS),yes)
-SRCS += dbus.c
-endif
-
 ifeq ($(HAVE_MSWINDOWS),yes)
 SRCS += audacious.rc
 endif
@@ -49,12 +45,12 @@ INCLUDES = api.h \
            api-alias-end.h \
            api-define-begin.h \
            api-define-end.h \
-           dbus.h				\
-           dbus-service.h		\
            debug.h \
            drct.h \
            drct-api.h \
            i18n.h				\
+           input.h \
+           input-api.h \
            misc.h \
            misc-api.h \
            playlist.h \
@@ -67,38 +63,42 @@ INCLUDES = api.h \
 
 DATA = images/about-logo.png				\
        images/album.png \
-       images/audacious.png \
+       images/appearance.png \
        images/audio.png						\
        images/connectivity.png				\
        images/info.png \
-       images/menu_playlist.png				\
-       images/menu_plugin.png				\
-       images/menu_queue_toggle.png			\
        images/playlist.png					\
        images/plugins.png
 
-CLEAN = build_stamp.c dbus-client-bindings.h dbus-server-bindings.h
+CLEAN = build_stamp.c
+
+ifeq ($(USE_DBUS),yes)
+SRCS += dbus-server.c
+EXT_DEPS += ../dbus/aud-dbus.a
+endif
 
 include ../../buildsys.mk
 
 ifeq ($(USE_DBUS),yes)
-DBUS_BINDINGS = dbus-server-bindings.h dbus-client-bindings.h
-LIBS := -L../libaudclient -laudclient ${LIBS}
+CPPFLAGS := -I../dbus ${CPPFLAGS} ${GIO_CFLAGS}
+LIBS := ../dbus/aud-dbus.a ${LIBS} ${GIO_LIBS}
 endif
-
-pre-depend: ${DBUS_BINDINGS}
 
 CPPFLAGS := -I.. -I../.. \
             ${CPPFLAGS} \
 		${GLIB_CFLAGS}			\
 		${GMODULE_CFLAGS} \
-		${GTHREAD_CFLAGS} \
 		${GTK_CFLAGS}			\
-		${AUDACIOUS_DEFINES}	\
-		${DBUS_CFLAGS}			\
-		${REGEX_CFLAGS}			\
-		-D_AUDACIOUS_CORE		\
 		${LIBGUESS_CFLAGS}
+
+CPPFLAGS := ${CPPFLAGS} \
+            -D_AUDACIOUS_CORE \
+            -DHARDCODE_BINDIR=\"${bindir}\" \
+            -DHARDCODE_DATADIR=\"${datadir}/audacious\" \
+            -DHARDCODE_PLUGINDIR=\"${plugindir}\" \
+            -DHARDCODE_LOCALEDIR=\"${localedir}\" \
+            -DHARDCODE_DESKTOPFILE=\"${datarootdir}/applications/audacious.desktop\" \
+            -DHARDCODE_ICONFILE=\"${datarootdir}/pixmaps/audacious.png\"
 
 LIBS := -L../libaudcore -laudcore \
         -L../libaudgui -laudgui \
@@ -107,25 +107,7 @@ LIBS := -L../libaudcore -laudcore \
 		${LIBINTL}						\
 		${GLIB_LIBS}					\
 		${GMODULE_LIBS} \
-		${GTHREAD_LIBS} \
-		${GTK_LIBS}						\
-		${DBUS_LIBS}					\
-		${REGEX_LIBS}					\
-		${LIBGUESS_LIBS}
-
-DBUS_BINDINGS_SOURCES = objects.xml			\
-			mpris_root.xml			\
-			mpris_tracklist.xml		\
-			mpris_player.xml
+		${GTK_LIBS}
 
 desktop_DATA = audacious.desktop
 desktopdir = ${datarootdir}/applications
-
-dbus-server-bindings.h: ${DBUS_BINDINGS_SOURCES}
-	${DBUS_BINDING_TOOL} --mode=glib-server --prefix=audacious_rc objects.xml > $@
-	${DBUS_BINDING_TOOL} --mode=glib-server --prefix=mpris_root mpris_root.xml >> $@
-	${DBUS_BINDING_TOOL} --mode=glib-server --prefix=mpris_tracklist mpris_tracklist.xml >> $@
-	${DBUS_BINDING_TOOL} --mode=glib-server --prefix=mpris_player mpris_player.xml >> $@
-
-dbus-client-bindings.h: ${DBUS_BINDINGS_SOURCES}
-	${DBUS_BINDING_TOOL} --mode=glib-client --prefix=audacious_rc objects.xml > $@

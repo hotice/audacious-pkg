@@ -1,6 +1,6 @@
 /*
  * util.c
- * Copyright 2009-2011 Paula Stanciu, Tony Vroon, and John Lindgren
+ * Copyright 2009-2014 Paula Stanciu, Tony Vroon, and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,165 +17,15 @@
  * the use of this software.
  */
 
-#include <glib.h>
 #include <stdio.h>
+#include <unistd.h>
+
+#include <glib.h>
+#include <glib/gstdio.h>
+
+#include <libaudcore/audstrings.h>
 
 #include "util.h"
-#include <inttypes.h>
-
-/* convert windows time to unix time */
-time_t unix_time(uint64_t win_time)
-{
-    uint64_t t = (uint64_t) ((win_time / 10000000LL) - 11644473600LL);
-    return (time_t) t;
-}
-
-uint16_t get_year(uint64_t win_time)
-{
-    GDate *d = g_date_new();
-    g_date_set_time_t(d, unix_time(win_time));
-    uint16_t year = g_date_get_year(d);
-    g_date_free(d);
-    return year;
-}
-
-char * read_char_data (VFSFile * file, int size)
-{
-    char * value = g_malloc (size + 1);
-    if (vfs_fread (value, 1, size, file) < size)
-    {
-        g_free (value);
-        return NULL;
-    }
-    value[size] = 0;
-    return value;
-}
-
-bool_t write_char_data(VFSFile * f, char * data, size_t i)
-{
-    return (vfs_fwrite(data, i, 1, f) == i);
-}
-
-uint8_t read_uint8(VFSFile * fd)
-{
-    uint16_t i;
-    if (vfs_fread(&i, 1, 1, fd) == 1)
-    {
-        return i;
-    }
-    return -1;
-}
-
-uint16_t read_LEuint16(VFSFile * fd)
-{
-    uint16_t a;
-    if (vfs_fget_le16(&a, fd))
-        return a;
-    else
-        return -1;
-}
-
-uint16_t read_BEuint16(VFSFile * fd)
-{
-    uint16_t a;
-    if (vfs_fget_be16(&a, fd))
-        return a;
-    else
-        return -1;
-}
-
-uint32_t read_LEuint32(VFSFile * fd)
-{
-    uint32_t a;
-    if (vfs_fget_le32(&a, fd))
-        return a;
-    else
-        return -1;
-}
-
-uint32_t read_BEuint32(VFSFile * fd)
-{
-    uint32_t a;
-    if (vfs_fget_be32(&a, fd))
-        return a;
-    else
-        return -1;
-}
-
-uint64_t read_LEuint64(VFSFile * fd)
-{
-    uint64_t a;
-    if (vfs_fget_le64(&a, fd))
-        return a;
-    else
-        return -1;
-}
-
-uint64_t read_BEuint64(VFSFile * fd)
-{
-    uint64_t a;
-    if (vfs_fget_be64(&a, fd))
-        return a;
-    else
-        return 1;
-}
-
-bool_t write_uint8(VFSFile * fd, uint8_t val)
-{
-    return (vfs_fwrite(&val, 1, 1, fd) == 1);
-}
-
-bool_t write_LEuint16(VFSFile * fd, uint16_t val)
-{
-    uint16_t le_val = GUINT32_TO_LE(val);
-    return (vfs_fwrite(&le_val, 2, 1, fd) == 2);
-}
-
-bool_t write_BEuint32(VFSFile * fd, uint32_t val)
-{
-    uint32_t be_val = GUINT32_TO_BE(val);
-    return (vfs_fwrite(&be_val, 4, 1, fd) == 4);
-}
-
-bool_t write_LEuint32(VFSFile * fd, uint32_t val)
-{
-    uint32_t le_val = GUINT32_TO_LE(val);
-    return (vfs_fwrite(&le_val, 4, 1, fd) == 4);
-}
-
-bool_t write_LEuint64(VFSFile * fd, uint64_t val)
-{
-    uint64_t le_val = GUINT64_TO_LE(val);
-    return (vfs_fwrite(&le_val, 8, 1, fd) == 8);
-}
-
-bool_t cut_beginning_tag (VFSFile * handle, int64_t tag_size)
-{
-    unsigned char buffer[16384];
-    gsize offset = 0, readed;
-
-    if (! tag_size)
-        return TRUE;
-
-    do
-    {
-        if (vfs_fseek (handle, offset + tag_size, SEEK_SET))
-            return FALSE;
-
-        readed = vfs_fread (buffer, 1, sizeof buffer, handle);
-
-        if (vfs_fseek (handle, offset, SEEK_SET))
-            return FALSE;
-
-        if (vfs_fwrite (buffer, 1, readed, handle) != readed)
-            return FALSE;
-
-        offset += readed;
-    }
-    while (readed);
-
-    return vfs_ftruncate (handle, offset) == 0;
-}
 
 const char *convert_numericgenre_to_text(int numericgenre)
 {
@@ -315,12 +165,10 @@ const char *convert_numericgenre_to_text(int numericgenre)
 
     int count;
 
-    for (count = 0; count < G_N_ELEMENTS(table); count++)
+    for (count = 0; count < ARRAY_LEN (table); count++)
     {
         if (table[count].numericgenre == numericgenre)
-        {
-             return table[count].genre;
-        }
+            return table[count].genre;
     }
 
     return "Unknown";
@@ -338,3 +186,90 @@ uint32_t syncsafe32 (uint32_t x)
      0xfe00000) << 3);
 }
 
+bool_t open_temp_file_for (TempFile * temp, VFSFile * file)
+{
+    char * template = filename_build (g_get_tmp_dir (), "audacious-temp-XXXXXX");
+    SCOPY (tempname, template);
+    str_unref (template);
+
+    temp->fd = g_mkstemp (tempname);
+    if (temp->fd < 0)
+        return FALSE;
+
+    temp->name = str_get (tempname);
+
+    return TRUE;
+}
+
+bool_t copy_region_to_temp_file (TempFile * temp, VFSFile * file, int64_t offset, int64_t size)
+{
+    if (vfs_fseek (file, offset, SEEK_SET) < 0)
+        return FALSE;
+
+    char buf[16384];
+
+    while (size < 0 || size > 0)
+    {
+        int64_t readsize;
+
+        if (size > 0)
+        {
+            readsize = MIN (size, sizeof buf);
+            if (vfs_fread (buf, 1, readsize, file) != readsize)
+                return FALSE;
+
+            size -= readsize;
+        }
+        else
+        {
+            /* negative size means copy to EOF */
+            readsize = vfs_fread (buf, 1, sizeof buf, file);
+            if (! readsize)
+                break;
+        }
+
+        int64_t written = 0;
+        while (written < readsize)
+        {
+            int64_t writesize = write (temp->fd, buf + written, readsize - written);
+            if (writesize <= 0)
+                return FALSE;
+
+            written += writesize;
+        }
+    }
+
+    return TRUE;
+}
+
+bool_t replace_with_temp_file (TempFile * temp, VFSFile * file)
+{
+    if (lseek (temp->fd, 0, SEEK_SET) < 0)
+        return FALSE;
+
+    if (vfs_fseek (file, 0, SEEK_SET) < 0)
+        return FALSE;
+
+    if (vfs_ftruncate (file, 0) < 0)
+        return FALSE;
+
+    char buf[16384];
+
+    while (1)
+    {
+        int64_t readsize = read (temp->fd, buf, sizeof buf);
+        if (readsize < 0)
+            return FALSE;
+
+        if (readsize == 0)
+            break;
+
+        if (vfs_fwrite (buf, 1, readsize, file) != readsize)
+            return FALSE;
+    }
+
+    close (temp->fd);
+    g_unlink (temp->name);
+
+    return TRUE;
+}

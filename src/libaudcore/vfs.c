@@ -1,6 +1,6 @@
 /*
  * vfs.c
- * Copyright 2006-2011 William Pitcock, Daniel Barkalow, Ralf Ertzinger,
+ * Copyright 2006-2013 William Pitcock, Daniel Barkalow, Ralf Ertzinger,
  *                     Yoshiki Yazawa, Matti Hämäläinen, and John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
@@ -18,16 +18,20 @@
  * the use of this software.
  */
 
-#include <glib.h>
-#include <inttypes.h>
-
 #include "vfs.h"
-#include "audstrings.h"
+
+#include <inttypes.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <string.h>
+#include <unistd.h>
+
+#include <glib.h>
+#include <glib/gstdio.h>
+
+#include "audstrings.h"
+#include "vfs_local.h"
 
 #define VFS_SIG ('V' | ('F' << 8) | ('S' << 16))
 
@@ -123,24 +127,31 @@ vfs_fopen(const char * path,
           const char * mode)
 {
     g_return_val_if_fail (path && mode, NULL);
-    g_return_val_if_fail (lookup_func, NULL);
 
-    const char * s = strstr (path, "://");
-    g_return_val_if_fail (s, NULL);
-    char scheme[s - path + 1];
-    strncpy (scheme, path, s - path);
-    scheme[s - path] = 0;
+    VFSConstructor * vtable = NULL;
 
-    VFSConstructor * vtable = lookup_func (scheme);
-    if (! vtable)
-        return NULL;
+    if (! strncmp (path, "file://", 7))
+        vtable = & vfs_local_vtable;
+    else
+    {
+        const char * s = strstr (path, "://");
+
+        if (! s)
+        {
+            fprintf (stderr, "Invalid URI: %s\n", path);
+            return NULL;
+        }
+
+        SNCOPY (scheme, path, s - path);
+
+        if (! (vtable = lookup_func (scheme)))
+            return NULL;
+    }
 
     const gchar * sub;
     uri_parse (path, NULL, NULL, & sub, NULL);
 
-    gchar buf[sub - path + 1];
-    memcpy (buf, path, sub - path);
-    buf[sub - path] = 0;
+    SNCOPY (buf, path, sub - path);
 
     void * handle = vtable->vfs_fopen_impl (buf, mode);
     if (! handle)
@@ -174,8 +185,6 @@ vfs_fclose(VFSFile * file)
         ret = -1;
 
     str_unref (file->uri);
-
-    memset (file, 0, sizeof (VFSFile));
     g_slice_free (VFSFile, file);
 
     return ret;
@@ -234,12 +243,12 @@ EXPORT int64_t vfs_fwrite (const void * ptr, int64_t size, int64_t nmemb, VFSFil
 EXPORT int
 vfs_getc(VFSFile *file)
 {
-    g_return_val_if_fail (file && file->sig == VFS_SIG, EOF);
+    unsigned char c;
 
-    if (verbose)
-        logger ("VFS: <%p> getc\n", file);
+    if (vfs_fread (& c, 1, 1, file) != 1)
+        return EOF;
 
-    return file->base->vfs_getc_impl(file);
+    return c;
 }
 
 /**
@@ -252,12 +261,10 @@ vfs_getc(VFSFile *file)
 EXPORT int
 vfs_ungetc(int c, VFSFile *file)
 {
-    g_return_val_if_fail (file && file->sig == VFS_SIG, EOF);
+    if (vfs_fseek (file, -1, SEEK_CUR) < 0)
+        return EOF;
 
-    if (verbose)
-        logger ("VFS: <%p> ungetc\n", file);
-
-    return file->base->vfs_ungetc_impl(c, file);
+    return c;
 }
 
 /**
@@ -285,23 +292,13 @@ vfs_fseek(VFSFile * file,
          SEEK_CUR ? "current" : whence == SEEK_SET ? "beginning" : whence ==
          SEEK_END ? "end" : "invalid");
 
-    return file->base->vfs_fseek_impl(file, offset, whence);
-}
-
-/**
- * Rewinds a VFS stream.
- *
- * @param file #VFSFile object that represents the VFS stream.
- */
-EXPORT void
-vfs_rewind(VFSFile * file)
-{
-    g_return_if_fail (file && file->sig == VFS_SIG);
+    if (! file->base->vfs_fseek_impl (file, offset, whence))
+        return 0;
 
     if (verbose)
-        logger ("VFS: <%p> rewind\n", file);
+        logger ("VFS: <%p> seek failed!\n", file);
 
-    file->base->vfs_rewind_impl(file);
+    return -1;
 }
 
 /**
@@ -415,8 +412,8 @@ vfs_file_test(const char * path, int test)
 #ifdef S_ISLNK
     if (test & VFS_IS_SYMLINK)
     {
-        struct stat st;
-        if (lstat (path2, & st) < 0)
+        GStatBuf st;
+        if (g_lstat (path2, & st) < 0)
             goto DONE;
 
         if (S_ISLNK (st.st_mode))
@@ -426,8 +423,8 @@ vfs_file_test(const char * path, int test)
 
     if (test & (VFS_IS_REGULAR | VFS_IS_DIR | VFS_IS_EXECUTABLE | VFS_EXISTS))
     {
-        struct stat st;
-        if (stat (path2, & st) < 0)
+        GStatBuf st;
+        if (g_stat (path2, & st) < 0)
             goto DONE;
 
         if (S_ISREG (st.st_mode))
@@ -441,8 +438,7 @@ vfs_file_test(const char * path, int test)
     }
 
 DONE:
-    g_free (path2);
-
+    str_unref (path2);
     return ! test;
 }
 
@@ -455,14 +451,13 @@ DONE:
 EXPORT bool_t
 vfs_is_writeable(const char * path)
 {
-    struct stat info;
+    GStatBuf info;
     char * realfn = uri_to_filename (path);
 
-    if (stat(realfn, &info) == -1)
+    if (! realfn || g_stat (realfn, & info) < 0)
         return FALSE;
 
-    g_free(realfn);
-
+    str_unref (realfn);
     return (info.st_mode & S_IWUSR);
 }
 

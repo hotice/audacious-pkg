@@ -1,6 +1,6 @@
 /*
  * drct.c
- * Copyright 2009-2011 John Lindgren
+ * Copyright 2009-2013 John Lindgren
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,6 @@
  * the use of this software.
  */
 
-#include <glib.h>
 #include <libaudcore/hook.h>
 #include <libaudcore/vfs.h>
 
@@ -25,13 +24,6 @@
 #include "i18n.h"
 #include "misc.h"
 #include "playlist.h"
-
-/* --- PROGRAM CONTROL --- */
-
-void drct_quit (void)
-{
-    hook_call ("quit", NULL);
-}
 
 /* --- PLAYBACK CONTROL --- */
 
@@ -169,7 +161,7 @@ static void add_list (Index * filenames, int at, bool_t to_temp, bool_t play)
 void drct_pl_add (const char * filename, int at)
 {
     Index * filenames = index_new ();
-    index_append (filenames, str_get (filename));
+    index_insert (filenames, -1, str_get (filename));
     add_list (filenames, at, FALSE, FALSE);
 }
 
@@ -181,7 +173,7 @@ void drct_pl_add_list (Index * filenames, int at)
 void drct_pl_open (const char * filename)
 {
     Index * filenames = index_new ();
-    index_append (filenames, str_get (filename));
+    index_insert (filenames, -1, str_get (filename));
     add_list (filenames, -1, get_bool (NULL, "open_to_temporary"), TRUE);
 }
 
@@ -193,16 +185,11 @@ void drct_pl_open_list (Index * filenames)
 void drct_pl_open_temp (const char * filename)
 {
     Index * filenames = index_new ();
-    index_append (filenames, str_get (filename));
+    index_insert (filenames, -1, str_get (filename));
     add_list (filenames, -1, TRUE, TRUE);
 }
 
 void drct_pl_open_temp_list (Index * filenames)
 {
     add_list (filenames, -1, TRUE, TRUE);
-}
-
-void drct_pl_delete_selected (int list)
-{
-    playlist_delete_selected (list);
 }
