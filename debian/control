@@ -28,8 +28,7 @@ Depends:
  dbus,
  dbus-x11,
  gtk2-engines-pixbuf,
- libaudclient2 (= ${binary:Version}),
- libaudcore1 (= ${binary:Version}),
+ libaudcore2 (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends}
 Replaces:
@@ -65,8 +64,7 @@ Depends:
  audacious (= ${binary:Version}),
  ${misc:Depends}
 Provides:
- libaudclient2-dbg,
- libaudcore1-dbg
+ libaudcore2-dbg
 Recommends:
  audacious-plugins-dbg
 Priority: extra
@@ -96,14 +94,12 @@ Section: libdevel
 Architecture: any
 Multi-Arch: same
 Depends:
- libaudclient2 (= ${binary:Version}),
- libaudcore1 (= ${binary:Version}),
+ libaudcore2 (= ${binary:Version}),
  libdbus-1-dev (>= 0.60),
  libdbus-glib-1-dev (>= 0.60),
  libgtk-3-dev,
  ${misc:Depends}
 Provides:
- libaudclient-dev,
  libaudcore-dev,
  libaudid3tag-dev
 Description: audacious development files
@@ -128,38 +124,9 @@ Description: audacious development files
  required for developing components for audacious.
  .
  Please note that this package no longer contains libaudacious, as
- libaudacious was dropped in Audacious 1.4. You should use libaudclient
- instead.
+ libaudacious was dropped in Audacious 1.4.
 
-Package: libaudclient2
-Architecture: any
-Multi-Arch: same
-Pre-Depends:
- ${misc:Pre-Depends}
-Depends:
- ${misc:Depends},
- ${shlibs:Depends}
-Description: audacious D-Bus remote control library
- Audacious is a fork of beep-media-player which supports Winamp skins
- and many codecs.
- .
- In the default install, the following codecs are supported:
- .
-  * MP3
-  * Ogg Vorbis / Theora
-  * AAC and AAC+
-  * FLAC
-  * ALAC
-  * Windows Media (WMA)
-  * WAVE
- .
- Additionally, Audacious is extendable through plugins, and contains
- other useful features like LIRC support. Support for many more codecs
- can also be added through plugins.
- .
- This package contains a library used to remote control audacious.
-
-Package: libaudcore1
+Package: libaudcore2
 Architecture: any
 Multi-Arch: same
 Pre-Depends:

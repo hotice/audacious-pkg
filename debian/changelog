@@ -1,3 +1,14 @@
+audacious (3.5-1) unstable; urgency=medium
+
+  * New upstream release
+  * Removed libaudclient from control / install and libaudclient2.symbols
+    since libaudclient was dropped in Audacious 3.5
+  * Updated symbols
+  * Rename binary package libaudcore1 to libaudcore2 because
+    of bumped major version
+
+ -- Alin Andrei <webupd8@gmail.com>  Mon, 30 Jun 2014 17:06:19 +0200
+
 audacious (3.4.3-1) unstable; urgency=low
 
   * New upstream release. Closes: #728502
